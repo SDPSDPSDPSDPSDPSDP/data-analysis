@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
-from typing import Optional, Dict, Tuple
+from typing import Any, Optional, Dict, Tuple
 from ..config import TextColors, FontSizes
 
 plt.rcParams['legend.fontsize'] = FontSizes.LEGEND
 
 def format_legend(
-    label_map: Optional[Dict[str, str]], 
+    label_map: Optional[Dict[Any, str]], 
     ncol: int = 2, 
     bbox_to_anchor: Tuple[float, float] = (0, 1.08)
 ) -> None:
@@ -33,7 +33,7 @@ def format_optional_legend(
     plot: object, 
     hue: Optional[str], 
     plot_legend: bool, 
-    label_map: Optional[Dict[str, str]], 
+    label_map: Optional[Dict[Any, str]], 
     ncol: int, 
     legend_offset: float
 ) -> None:

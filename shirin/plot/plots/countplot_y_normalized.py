@@ -1,99 +1,115 @@
-from typing import Optional, Dict, Union
+from typing import Any, Dict, Optional, Union
+
 import matplotlib.pyplot as plt
 import pandas as pd
+
 from ..config import FigureSize
-from ..formatting import format_optional_legend, format_ticks, format_xy_labels#, format_datalabels_stacked
+from ..formatting import format_optional_legend, format_ticks, format_xy_labels
 from ..utils import filter_top_n_categories
-from .countplot_y import _dynamic_figsize_height
+from .countplot_y import _calculate_figsize_height, _sort_pivot_table
 
 
-def _calculate_normalized_counts(df: pd.DataFrame, y: str, hue: str) -> pd.DataFrame:
-    """Calculate normalized counts (as percentages) for the bars."""
+def _calculate_normalized_counts(
+    df: pd.DataFrame,
+    y: str,
+    hue: str
+) -> pd.DataFrame:
     counts = df.groupby([y, hue]).size()
     normalized_counts = counts / counts.groupby(level=0).sum()
-    normalized_df = normalized_counts.rename("percentage").reset_index()
-    return normalized_df
+    return normalized_counts.rename("percentage").reset_index()
+
+def _create_normalized_pivot(
+    df: pd.DataFrame,
+    y: str,
+    hue: str
+) -> pd.DataFrame:
+    normalized_df = _calculate_normalized_counts(df, y, hue)
+    normalized_pivot = normalized_df.pivot(
+        index=y, columns=hue, values="percentage"
+    )
+    return normalized_pivot.fillna(0)
+
+def _create_normalized_plot(
+    df_pivot: pd.DataFrame,
+    palette: Dict[Any, str]
+) -> Any:
+    colors = [palette[col] for col in df_pivot.columns]
+    return df_pivot.plot(
+        kind='barh',
+        stacked=True,
+        color=colors,
+        edgecolor='none',
+        alpha=1,
+        width=0.8,
+        ax=plt.gca()
+    )
+
+def _ensure_strings(df: pd.DataFrame, y: str, hue: str) -> pd.DataFrame:
+    df = df.copy()
+    df[y] = df[y].astype(str)
+    df[hue] = df[hue].astype(str)
+    return df
+
+def _validate_palette_keys(
+    df: pd.DataFrame,
+    hue: str,
+    palette: Dict[Any, str]
+) -> None:
+    unique_hue_values = df[hue].unique()
+    missing_keys = [val for val in unique_hue_values if val not in palette]
+    if missing_keys:
+        raise ValueError(
+            f"Palette missing keys for hue values: {missing_keys}"
+        )
+
+def _convert_palette_to_strings(palette: Dict[Any, str]) -> Dict[str, str]:
+    return {str(k): str(v) for k, v in palette.items()}
+
+def _create_string_label_map(
+    label_map: Optional[Dict[Any, str]],
+    hue_values: Any
+) -> Dict[str, str]:
+    if label_map is None:
+        return {str(key): str(key) for key in hue_values}
+    return {str(key): str(value) for key, value in label_map.items()}
 
 
 def countplot_y_normalized(
     df: pd.DataFrame,
     y: str,
     hue: str,
-    palette: Dict[str|int|bool, str],
-    label_map: Optional[Dict[str|int|bool, str]] = None,
+    palette: Dict[Any, str],
+    label_map: Optional[Dict[Any, str]] = None,
+    xlabel: str = 'Percentage',
+    ylabel: str = '',
     plot_legend: bool = True,
     legend_offset: float = 1.13,
     ncol: int = 2,
     top_n: Optional[int] = None,
     figsize_height: Union[str, float] = 'dynamic',
-    ylabel: str = '',
-    xlabel: str = 'Percentage',
-    order_type: str = 'frequency',  # alphabetical
-    # stacked_labels: Union[None, str] = None, # 'reverse' or 'standard',
+    order_type: str = 'frequency',
 ) -> None:
-    # Validate that all values in 'hue' column exist in the palette dictionary
-    unique_hue_values = df[hue].unique()
-    if not all(hue_value in palette for hue_value in unique_hue_values):
-        missing_keys = [hue_value for hue_value in unique_hue_values if hue_value not in palette]
-        raise ValueError(f"The palette dictionary is missing keys for hue values: {missing_keys}")
-
-    # Copy the dataframe and ensure 'y' and 'hue' are strings for consistency
-    df = df.copy()
-    df[y] = df[y].astype(str)
-    df[hue] = df[hue].astype(str)
-    if palette is not None:
-        palette = {str(k): str(v) for k, v in palette.items()}
-
-    # Filter for top-n categories if required
+    _validate_palette_keys(df, hue, palette)
+    
+    df = _ensure_strings(df, y, hue)
+    palette = _convert_palette_to_strings(palette)
+    
     if top_n is not None:
         df = filter_top_n_categories(df, y, top_n)
 
-    # Normalize the counts
+    normalized_pivot = _create_normalized_pivot(df, y, hue)
+    normalized_pivot = _sort_pivot_table(normalized_pivot, order_type)
+    figsize_height = _calculate_figsize_height(df, y, figsize_height)
+
+    plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
+    plot = _create_normalized_plot(normalized_pivot, palette)
+    
     normalized_df = _calculate_normalized_counts(df, y, hue)
-
-    # Transpose normalized dataframe for stacking
-    normalized_pivot = normalized_df.pivot(index=y, columns=hue, values="percentage")
-    normalized_pivot = normalized_pivot.fillna(0)  # Fill missing values with zero
-
-    # Step 3: Sort the rows based on the selected ordering type
-    if order_type == 'frequency':
-        # Sort rows by total count in descending order
-        normalized_pivot['order'] = normalized_pivot.sum(axis=1)  # Compute totals for each row
-        normalized_pivot = normalized_pivot.sort_values(by='order', ascending=True)  # Sort rows
-        del normalized_pivot['order']  # Remove 'order' column after sorting
-    elif order_type == 'alphabetical':
-        normalized_pivot = normalized_pivot.sort_index(ascending=False)  # Sort rows alphabetically by index
-    # print(normalized_pivot)
-
-    # Use dynamic figure height logic
-    figsize_height = _dynamic_figsize_height(df, y, figsize_height)
-
-    # Plot the stacked bar chart
-    plt.figure(figsize=(FigureSize.WIDTH, figsize_height))  # Ensure the figure is properly initialized
-    colors = [palette[col] for col in normalized_pivot.columns]
-    ax = plt.gca()  # Explicitly create axes
-    plot = normalized_pivot.plot(
-        kind='barh',  # Horizontal bars
-        stacked=True,
-        color=colors,
-        edgecolor='none',
-        alpha=1,
-        width=0.8,
-        ax=ax  # Assign existing axes
+    label_map = _create_string_label_map(
+        label_map if not plot_legend else label_map,
+        normalized_df[hue].unique()
     )
 
-
-    # Apply label mapping to legend if specified
-    if label_map is None and plot_legend:
-        label_map = {str(key): str(key) for key in normalized_df[hue].unique()}  # Ensure label mapping keys are strings
-    else:
-        label_map = {str(key): str(value) for key, value in label_map.items()}  # Convert all keys and values to strings
-
-    # Format the plot
-    format_xy_labels(ax, ylabel=ylabel, xlabel=xlabel)
-    format_optional_legend(ax, hue, plot_legend, label_map, ncol, legend_offset)
-    format_ticks(plot=ax, x_grid=True, percentage_x=True)
-    # if stacked_labels is not None:
-    #     reverse = stacked_labels == 'reversed'
-    #     format_datalabels_stacked(plot, normalized_df, reverse)
-    # plt.show()  # Ensure the figure is displayed properly
+    format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
+    format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
+    format_ticks(plot=plot, x_grid=True, percentage_x=True)
