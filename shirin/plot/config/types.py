@@ -1,7 +1,7 @@
 """Type definitions for plot configuration."""
 
 from enum import Enum
-from typing import Union
+from typing import Optional, Union
 
 
 class OrderType(str, Enum):
@@ -50,6 +50,6 @@ class FillMissingValues(str, Enum):
 
 # Type aliases that accept both Enum and string
 OrderTypeInput = Union[OrderType, str]
-StackedLabelTypeInput = Union[StackedLabelType, str, None]
+StackedLabelTypeInput = Optional[Union[StackedLabelType, str]]
 FigureSizeInput = Union[FigureSize, str, float]
-FillMissingValuesInput = Union[FillMissingValues, str, None]
+FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
