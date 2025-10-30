@@ -1,69 +1,121 @@
+"""SQL query execution utilities for IBM DB2 databases."""
+
+import json
+import os
+from pathlib import Path
+from typing import Dict, Optional, Union
 import pandas as pd
 from sqlalchemy import create_engine, text
-import os
-import json
-from pathlib import Path
-from typing import Union, Optional, Dict
 
 
 try:
     os.add_dll_directory("C:\\Program Files\\IBM\\SQLLIB\\BIN")
 except AttributeError:
-    # Ignore errors, such as this method not existing in older Python versions
+    # Ignore errors for older Python versions without add_dll_directory
     pass
 
 
-def _open_sql_query(sql_query: Union[str, Path]) -> str:
-    if isinstance(sql_query, Path) and os.path.exists(sql_query):
-        with open(sql_query, 'r') as f:
-            sql_query = f.read()
-    if not isinstance(sql_query, str):
-        raise ValueError("sql_query must be a string.")
-    return sql_query
+def _load_sql_query(sql_query: Union[str, Path]) -> str:
+    if isinstance(sql_query, Path):
+        if not sql_query.exists():
+            raise ValueError(
+                f"SQL file not found: {sql_query}"
+            )
+        with open(sql_query, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    if isinstance(sql_query, str):
+        return sql_query
+
+    raise ValueError(
+        "sql_query must be a string or Path object."
+    )
 
 
-def _open_db_config(db_config: Union[Dict[str, str], Path]) -> Dict[str, str]:
-    if isinstance(db_config, Path) and os.path.exists(db_config):
-        with open(db_config, 'r') as f:
-            db_config = json.load(f)
-    if not isinstance(db_config, dict):
-        raise ValueError("db_config must be a dictionary.")
-    return db_config
+def _load_db_config(
+    db_config: Union[Dict[str, str], Path]
+) -> Dict[str, str]:
+    if isinstance(db_config, Path):
+        if not db_config.exists():
+            raise ValueError(
+                f"Database config file not found: {db_config}"
+            )
+        with open(db_config, 'r', encoding='utf-8') as f:
+            loaded_config = json.load(f)
+        if not isinstance(loaded_config, dict):
+            raise ValueError(
+                "Database config file must contain a JSON object."
+            )
+        return loaded_config
+
+    if isinstance(db_config, dict):
+        return db_config
+
+    raise ValueError(
+        "db_config must be a dictionary or Path object."
+    )
 
 
-def _run_sql_query(sql_query: str, db_config: dict) -> pd.DataFrame:
-    connection_string = f"ibm_db_sa://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
+def _execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
+    required_keys = ['user', 'password', 'host', 'port', 'db_name', 'schema']
+    missing_keys = [key for key in required_keys if key not in db_config]
+    if missing_keys:
+        raise KeyError(
+            f"Missing required database config keys: {missing_keys}"
+        )
+
+    connection_string = (
+        f"ibm_db_sa://{db_config['user']}:{db_config['password']}"
+        f"@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
+    )
     engine = create_engine(connection_string)
 
     with engine.connect() as connection:
         connection.execute(text(f"SET SCHEMA {db_config['schema']}"))
         df = pd.read_sql(sql_query, con=connection)
-            
+
     return df
 
 
-def run_sql_query(sql_query: Union[str, Path], db_config: Union[dict, Path], output_path: Optional[Path] = None) -> Optional[pd.DataFrame]:
-    """
-    Main function to execute an SQL query.
+def run_sql_query(
+    sql_query: Union[str, Path],
+    db_config: Union[Dict[str, str], Path],
+    output_path: Optional[Path] = None
+) -> Optional[pd.DataFrame]:
+    """Execute SQL query against IBM DB2 database.
 
-    ## Parameters:
-    - sql_query: str  
-        SQL query as a string or the path to a file containing the SQL query.
-    - db_config: dict or path  
-        Database configuration as a dictionary or the path to a JSON file containing the configuration.
-    - output_path: str, optional  
-        The file path where the query result will be saved in Parquet format. 
-        If `None`, the function returns the resulting DataFrame.
+    Args:
+        sql_query: SQL query as string or Path to SQL file.
+        db_config: Database configuration dict or Path to JSON config file.
+                   Required keys: user, password, host, port, db_name, schema.
+        output_path: Optional Path to save results as Parquet file.
+                     If None, returns DataFrame.
 
-    ## Returns:
-    - pd.DataFrame
-        A DataFrame containing the query results if `output_path` is not provided; otherwise nothing is returned, and the dataframe is saved to the specified path as a parquet file.
+    Returns:
+        DataFrame with query results if output_path is None,
+        otherwise None (results saved to file).
+
+    Raises:
+        ValueError: If sql_query or db_config format is invalid.
+        KeyError: If required database config keys are missing.
+
+    Examples:
+        >>> # Execute query and get DataFrame
+        >>> df = run_sql_query("SELECT * FROM table", db_config)
+        >>>
+        >>> # Execute query and save to file
+        >>> run_sql_query(
+        ...     Path("query.sql"),
+        ...     Path("db_config.json"),
+        ...     output_path=Path("results.parquet")
+        ... )
     """
-    sql_query = _open_sql_query(sql_query)
-    db_config = _open_db_config(db_config)
-    df = _run_sql_query(sql_query, db_config)
+    query_string = _load_sql_query(sql_query)
+    config_dict = _load_db_config(db_config)
+    df = _execute_query(query_string, config_dict)
 
     if output_path:
         df.to_parquet(output_path, index=False)
-    else:
-        return df
+        return None
+
+    return df

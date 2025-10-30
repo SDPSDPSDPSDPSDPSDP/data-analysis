@@ -12,7 +12,7 @@ from ..formatting import (
     format_ticks,
     format_xy_labels,
 )
-from ..utils import filter_top_n_categories, handle_palette
+from ..utils import ensure_column_is_string, filter_top_n_categories, handle_palette
 
 def _calculate_figsize_height(
     df: pd.DataFrame,
@@ -138,8 +138,7 @@ def countplot_y(
     stacked_labels: Optional[str] = None,
     order_type: str = 'frequency',
 ) -> None:
-    df = df.copy()
-    df[y] = df[y].astype(str)
+    df = ensure_column_is_string(df, y)
     
     if top_n is not None:
         df = filter_top_n_categories(df, y, top_n)
