@@ -120,3 +120,55 @@ def format_datalabels_stacked(
                         color=text_color,
                         fontsize=FontSizes.DATALABELS
                     )
+
+
+def format_datalabels_stacked_normalized(
+    plot: BarContainer,
+    pivot_data: pd.DataFrame,
+    palette: Dict,
+    orientation: str = 'horizontal'
+) -> None:
+    """Format percentage labels for normalized stacked bar plots with automatic text color selection.
+    
+    Args:
+        plot: The matplotlib plot object
+        pivot_data: The normalized pivot data (values between 0 and 1)
+        palette: Dictionary mapping category names to hex colors
+        orientation: 'horizontal' or 'vertical'
+    """
+    threshold = 0.04  # Show label only if segment is at least 4%
+    ax = plt.gca()
+
+    for index, row_values in enumerate(pivot_data.values):
+        cumulative_sum = 0
+
+        for col_index, value in enumerate(row_values):
+            # Get the category name and its color
+            category = pivot_data.columns[col_index]
+            bg_color = palette.get(category, '#000000')  # Default to black if not found
+            
+            # Determine text color based on background luminance
+            text_color = get_text_color_for_background(bg_color)
+            
+            # Calculate percentage (value is already normalized between 0-1)
+            value_percentage = value * 100
+            cumulative_sum += value
+            
+            # Only show label if bar is visible enough
+            if value >= threshold:
+                if orientation == 'horizontal':
+                    ax.text(
+                        cumulative_sum - value / 2, index,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )
+                else:  # vertical
+                    ax.text(
+                        index, cumulative_sum - value / 2,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )

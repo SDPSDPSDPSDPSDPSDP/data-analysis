@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from ..config import FigureSize
-from ..formatting import format_optional_legend, format_ticks, format_xy_labels
+from ..formatting import format_optional_legend, format_ticks, format_xy_labels, format_datalabels_stacked_normalized
 from ..utils import (
     convert_palette_to_strings,
     create_label_map,
@@ -81,10 +81,12 @@ def countplot_y_normalized(
     top_n: Optional[int] = None,
     figsize_height: Union[str, float] = 'dynamic',
     order_type: str = 'frequency',
+    show_labels: bool = True,
 ) -> None:
     _validate_palette_keys(df, hue, palette)
     
     df = _ensure_strings(df, y, hue)
+    original_palette = palette.copy()
     palette = convert_palette_to_strings(palette)
     
     if top_n is not None:
@@ -106,3 +108,6 @@ def countplot_y_normalized(
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
     format_ticks(plot=plot, x_grid=True, percentage_x=True)
+    
+    if show_labels:
+        format_datalabels_stacked_normalized(plot, normalized_pivot, original_palette, orientation='horizontal')
