@@ -67,9 +67,10 @@ def format_datalabels(
     label_offset = _calculate_label_offset(patches, label_offset, orientation)
     _format_labels(patches, label_offset, formatting, orientation)
 
-def format_datalabels_stacked(plot:BarContainer, pivot_data: pd.DataFrame, reverse: bool = False) -> None:
+def format_datalabels_stacked(plot:BarContainer, pivot_data: pd.DataFrame, reverse: bool = False, orientation: str = 'horizontal') -> None:
     max_count = pivot_data.sum(axis=1).max()
     threshold = 0.04 * max_count
+    ax = plt.gca()
 
     for index, row_values in enumerate(pivot_data.values):
         total = row_values.sum()
@@ -86,11 +87,19 @@ def format_datalabels_stacked(plot:BarContainer, pivot_data: pd.DataFrame, rever
                     color = TextColors.BLACK if cumulative_sum - value / 2 < max_count / 2 else TextColors.WHITE
                 else:
                     color = TextColors.WHITE if cumulative_sum - value / 2 < max_count / 2 else TextColors.BLACK
-                plot.text(cumulative_sum - value / 2, index, 
-                          f"{value_percentage:.0f}%", 
-                          ha='center', va='center', 
-                          color=color, 
-                          fontsize=FontSizes.DATALABELS)
+                
+                if orientation == 'horizontal':
+                    ax.text(cumulative_sum - value / 2, index, 
+                            f"{value_percentage:.0f}%", 
+                            ha='center', va='center', 
+                            color=color, 
+                            fontsize=FontSizes.DATALABELS)
+                else:  # vertical
+                    ax.text(index, cumulative_sum - value / 2, 
+                            f"{value_percentage:.0f}%", 
+                            ha='center', va='center', 
+                            color=color, 
+                            fontsize=FontSizes.DATALABELS)
                 
 # def format_datalabels_stacked(
 #     plot: BarContainer, 

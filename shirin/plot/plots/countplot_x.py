@@ -39,7 +39,7 @@ def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
         edgecolor='none',
         ax=plt.gca(),
         alpha=1,
-        width=0.4
+        width=0.6
     )
 
 def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
@@ -88,8 +88,8 @@ def _create_stacked_plot(
     order_type: str
 ) -> tuple[Any, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, x, order_type)
-    colors = _create_colors_list(df_prepared, palette)
     df_labeled = _apply_label_mapping(df_prepared, label_map)
+    colors = _create_colors_list(df_prepared, palette)
     plot = _plot_stacked_bars(df_labeled, colors)
     return plot, df_labeled
 
@@ -164,6 +164,6 @@ def countplot_x(
     
     if stacked and stacked_labels is not None and df_transposed is not None:
         reverse = stacked_labels == 'reversed'
-        format_datalabels_stacked(plot, df_transposed, reverse)
+        format_datalabels_stacked(plot, df_transposed, reverse, orientation='vertical')
     elif not stacked:
         format_datalabels(plot, label_offset=0.007, orientation='vertical')
