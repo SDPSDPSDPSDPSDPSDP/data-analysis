@@ -147,7 +147,7 @@ def countplot_x(
     order = _get_category_order(df, x, order_type)
     color, palette = handle_palette(palette)
 
-    plt.figure(figsize=(figsize_width, FigureSize.HEIGHT))
+    plt.figure(figsize=(figsize_width, FigureSize.STANDARD_HEIGHT))
     
     if stacked and hue is not None and isinstance(palette, dict):
         plot, df_transposed = _create_stacked_plot(df, hue, x, palette, label_map, order_type)

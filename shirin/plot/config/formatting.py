@@ -14,4 +14,5 @@ class FontSizes:
 class FigureSize:
     HEIGHT = 8 * 1.5
     WIDTH = 12 * 1.5 * 0.7
+    STANDARD_HEIGHT = 4
     PIE = 4 * 1.2

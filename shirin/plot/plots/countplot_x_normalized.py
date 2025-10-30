@@ -94,7 +94,7 @@ def countplot_x_normalized(
     normalized_pivot = _sort_pivot_table(normalized_pivot, order_type)
     figsize_width = _calculate_figsize_width(df, x, figsize_width)
 
-    plt.figure(figsize=(figsize_width, FigureSize.HEIGHT))
+    plt.figure(figsize=(figsize_width, FigureSize.STANDARD_HEIGHT))
     plot = _create_normalized_plot(normalized_pivot, palette)
     
     normalized_df = _calculate_normalized_counts(df, x, hue)
