@@ -1,10 +1,16 @@
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from .plots import countplot_y, countplot_y_normalized, histogram, lineplot, pie_base
+from .plots import (
+    countplot_y,
+    countplot_y_normalized,
+    histogram,
+    lineplot,
+    pie_base,
+)
 
 def _calculate_value_counts(df: pd.DataFrame, col: str) -> pd.DataFrame:
     df_value_counts = df[col].value_counts().to_frame().reset_index()
@@ -67,10 +73,28 @@ class PlotGraphs:
         self,
         df: pd.DataFrame,
         y: str,
-        output_name: str = 'countplot_y',
-        **kwargs
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = 'Count',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_height: Union[str, float] = 'dynamic',
+        stacked: bool = False,
+        stacked_labels: Optional[str] = None,
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_y'
     ) -> None:
-        countplot_y(df, y, **kwargs)
+        countplot_y(
+            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_height=figsize_height, stacked=stacked,
+            stacked_labels=stacked_labels, order_type=order_type
+        )
         self._export_graph(output_name)
 
     def countplot_y_normalized(
@@ -78,20 +102,49 @@ class PlotGraphs:
         df: pd.DataFrame,
         y: str,
         hue: str,
-        output_name: str = 'countplot_y_normalized',
-        **kwargs
+        palette: Dict[Any, str],
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = 'Percentage',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_height: Union[str, float] = 'dynamic',
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_y_normalized'
     ) -> None:
-        countplot_y_normalized(df, y, hue, **kwargs)
+        countplot_y_normalized(
+            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_height=figsize_height, order_type=order_type
+        )
         self._export_graph(output_name)
 
     def histogram(
         self,
         df: pd.DataFrame,
         x: str,
-        output_name: str = 'histogram',
-        **kwargs
+        xlabel: str = '',
+        ylabel: str = 'Count',
+        xlimit: Optional[Union[float, int]] = None,
+        bins: int = 100,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[str, str]] = None,
+        hue: Optional[str] = None,
+        stacked: Optional[bool] = None,
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        output_name: str = 'histogram'
     ) -> None:
-        histogram(df, x, **kwargs)
+        histogram(
+            df=df, x=x, xlabel=xlabel, ylabel=ylabel, xlimit=xlimit,
+            bins=bins, palette=palette, label_map=label_map, hue=hue,
+            stacked=stacked, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol
+        )
         self._export_graph(output_name)
 
     def pie(
@@ -99,8 +152,12 @@ class PlotGraphs:
         df: pd.DataFrame,
         col: str,
         palette: Dict[Any, str],
-        output_name: str = 'pie_value_counts',
-        **kwargs
+        label_map: Optional[Dict[str, str]] = None,
+        white_text_labels: Optional[Union[str, list[str]]] = None,
+        n_after_comma: int = 0,
+        value_datalabel: int = 5,
+        donut: bool = False,
+        output_name: str = 'pie_value_counts'
     ) -> None:
         df_value_counts = _calculate_value_counts(df, col)
         pie_base(
@@ -108,7 +165,11 @@ class PlotGraphs:
             value="count",
             label=col,
             palette=palette,
-            **kwargs
+            label_map=label_map,
+            white_text_labels=white_text_labels,
+            n_after_comma=n_after_comma,
+            value_datalabel=value_datalabel,
+            donut=donut
         )
         self._export_graph(output_name)
 
@@ -118,8 +179,16 @@ class PlotGraphs:
         df: pd.DataFrame,
         x: str,
         y: str,
-        output_name: str = 'lineplot',
-        **kwargs
+        xlabel: str = '',
+        ylabel: str = '',
+        rotation: int = 0,
+        dynamic_x_ticks: Optional[int] = None,
+        fill_missing_values: Optional[str] = None,
+        output_name: str = 'lineplot'
     ) -> None:
-        lineplot(df, x, y, **kwargs)
+        lineplot(
+            df=df, x=x, y=y, xlabel=xlabel, ylabel=ylabel,
+            rotation=rotation, dynamic_x_ticks=dynamic_x_ticks,
+            fill_missing_values=fill_missing_values
+        )
         self._export_graph(output_name)
