@@ -20,7 +20,7 @@ def _calculate_figsize_width(
     figsize_width: Union[str, float]
 ) -> float:
     if figsize_width == 'dynamic':
-        return (len(df[x].value_counts()) / 2) + 1
+        return (len(df[x].value_counts()) * 1) + 1
     if figsize_width == 'standard':
         return FigureSize.WIDTH
     return float(figsize_width)
@@ -39,7 +39,7 @@ def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
         edgecolor='none',
         ax=plt.gca(),
         alpha=1,
-        width=0.8
+        width=0.4
     )
 
 def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
