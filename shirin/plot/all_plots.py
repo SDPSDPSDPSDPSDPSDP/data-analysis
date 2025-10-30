@@ -208,7 +208,6 @@ class PlotGraphs:
         col: str,
         palette: Dict[Any, str],
         label_map: Optional[Dict[Any, str]] = None,
-        white_text_labels: Optional[Union[str, list[str]]] = None,
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
@@ -221,7 +220,6 @@ class PlotGraphs:
             label=col,
             palette=palette,
             label_map=label_map,
-            white_text_labels=white_text_labels,
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
             donut=donut
