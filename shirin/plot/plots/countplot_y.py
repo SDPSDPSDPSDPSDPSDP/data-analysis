@@ -86,12 +86,12 @@ def _create_stacked_plot(
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]],
     order_type: str
-) -> tuple[Any, pd.DataFrame]:
+) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, y, order_type)
     df_labeled = _apply_label_mapping(df_prepared, label_map)
     colors = _create_colors_list(df_prepared, palette)
     plot = _plot_stacked_bars(df_labeled, colors)
-    return plot, df_labeled
+    return plot, df_labeled, df_prepared
 
 def _get_category_order(
     df: pd.DataFrame,
@@ -146,14 +146,16 @@ def countplot_y(
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
     order = _get_category_order(df, y, order_type)
     color, palette = handle_palette(palette)
+    original_palette = palette if isinstance(palette, dict) else None
 
     plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
     
     if stacked and hue is not None and isinstance(palette, dict):
-        plot, df_transposed = _create_stacked_plot(df, hue, y, palette, label_map, order_type)
+        plot, df_transposed, df_unlabeled = _create_stacked_plot(df, hue, y, palette, label_map, order_type)
     else:
         plot = _plot_standard_countplot(df, y, hue, order, color, palette)
         df_transposed = None
+        df_unlabeled = None
 
     if label_map is None and plot_legend and hue is not None:
         label_map = _create_default_label_map(df, hue)
@@ -162,8 +164,7 @@ def countplot_y(
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
     format_ticks(plot, x_grid=True, numeric_x=True)
     
-    if stacked and stacked_labels is not None and df_transposed is not None:
-        reverse = stacked_labels == 'reversed'
-        format_datalabels_stacked(plot, df_transposed, reverse)
+    if stacked and stacked_labels is not None and df_unlabeled is not None and original_palette is not None:
+        format_datalabels_stacked(plot, df_unlabeled, original_palette)
     elif not stacked:
         format_datalabels(plot, label_offset=0.007, orientation='horizontal')
