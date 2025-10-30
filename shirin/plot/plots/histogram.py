@@ -77,7 +77,7 @@ def histogram(
     xlimit: Optional[Union[float, int]] = None,
     bins: int = 100,
     palette: Optional[Union[Dict[Any, str], str]] = None,
-    label_map: Optional[Dict[str, str]] = None,
+    label_map: Optional[Dict[Any, str]] = None,
     hue: Optional[str] = None,
     stacked: Optional[bool] = None,
     plot_legend: bool = True,

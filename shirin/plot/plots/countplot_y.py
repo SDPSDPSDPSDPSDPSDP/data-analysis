@@ -63,6 +63,7 @@ def _apply_label_mapping(
 ) -> pd.DataFrame:
     if not label_map:
         return df
+    df = df.copy()
     df.columns = [label_map.get(col, col) for col in df.columns]
     return df
 
