@@ -88,40 +88,30 @@ class PlotGraphs:
         stacked: bool = False,
         stacked_labels: Optional[str] = None,
         order_type: str = 'frequency',
+        normalized: bool = False,
+        show_labels: bool = True,
         output_name: str = 'countplot_x'
     ) -> None:
-        countplot_x(
-            df=df, x=x, hue=hue, palette=palette, label_map=label_map,
-            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-            figsize_width=figsize_width, stacked=stacked,
-            stacked_labels=stacked_labels, order_type=order_type
-        )
-        self._export_graph(output_name)
-
-    def countplot_x_normalized(
-        self,
-        df: pd.DataFrame,
-        x: str,
-        hue: str,
-        palette: Dict[Any, str],
-        label_map: Optional[Dict[Any, str]] = None,
-        xlabel: str = '',
-        ylabel: str = 'Percentage',
-        plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
-        top_n: Optional[int] = None,
-        figsize_width: Union[str, float] = 'dynamic',
-        order_type: str = 'frequency',
-        output_name: str = 'countplot_x_normalized'
-    ) -> None:
-        countplot_x_normalized(
-            df=df, x=x, hue=hue, palette=palette, label_map=label_map,
-            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-            figsize_width=figsize_width, order_type=order_type
-        )
+        if normalized:
+            if hue is None:
+                raise ValueError("hue must be provided when normalized=True")
+            if not isinstance(palette, dict):
+                raise ValueError("palette must be a dictionary when normalized=True")
+            countplot_x_normalized(
+                df=df, x=x, hue=hue, palette=palette, label_map=label_map,
+                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+                figsize_width=figsize_width, order_type=order_type,
+                show_labels=show_labels
+            )
+        else:
+            countplot_x(
+                df=df, x=x, hue=hue, palette=palette, label_map=label_map,
+                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+                figsize_width=figsize_width, stacked=stacked,
+                stacked_labels=stacked_labels, order_type=order_type
+            )
         self._export_graph(output_name)
 
     def countplot_y(
@@ -141,40 +131,30 @@ class PlotGraphs:
         stacked: bool = False,
         stacked_labels: Optional[str] = None,
         order_type: str = 'frequency',
+        normalized: bool = False,
+        show_labels: bool = True,
         output_name: str = 'countplot_y'
     ) -> None:
-        countplot_y(
-            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
-            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-            figsize_height=figsize_height, stacked=stacked,
-            stacked_labels=stacked_labels, order_type=order_type
-        )
-        self._export_graph(output_name)
-
-    def countplot_y_normalized(
-        self,
-        df: pd.DataFrame,
-        y: str,
-        hue: str,
-        palette: Dict[Any, str],
-        label_map: Optional[Dict[Any, str]] = None,
-        xlabel: str = 'Percentage',
-        ylabel: str = '',
-        plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
-        top_n: Optional[int] = None,
-        figsize_height: Union[str, float] = 'dynamic',
-        order_type: str = 'frequency',
-        output_name: str = 'countplot_y_normalized'
-    ) -> None:
-        countplot_y_normalized(
-            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
-            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-            figsize_height=figsize_height, order_type=order_type
-        )
+        if normalized:
+            if hue is None:
+                raise ValueError("hue must be provided when normalized=True")
+            if not isinstance(palette, dict):
+                raise ValueError("palette must be a dictionary when normalized=True")
+            countplot_y_normalized(
+                df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+                figsize_height=figsize_height, order_type=order_type,
+                show_labels=show_labels
+            )
+        else:
+            countplot_y(
+                df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+                figsize_height=figsize_height, stacked=stacked,
+                stacked_labels=stacked_labels, order_type=order_type
+            )
         self._export_graph(output_name)
 
     def histogram(
