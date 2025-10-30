@@ -37,7 +37,19 @@ class FigureSize(str, Enum):
     STANDARD = 'standard'
 
 
+class FillMissingValues(str, Enum):
+    """Strategy for filling missing values in lineplot.
+    
+    Options:
+        SHIFT: Forward fill (use previous value)
+        ZERO: Fill with zeros
+    """
+    SHIFT = 'shift'
+    ZERO = 'zero'
+
+
 # Type aliases that accept both Enum and string
 OrderTypeInput = Union[OrderType, str]
 StackedLabelTypeInput = Union[StackedLabelType, str, None]
 FigureSizeInput = Union[FigureSize, str, float]
+FillMissingValuesInput = Union[FillMissingValues, str, None]

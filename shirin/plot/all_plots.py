@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
+from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
 from .plots import (
     countplot_x,
     countplot_x_normalized,
@@ -217,7 +217,7 @@ class PlotGraphs:
         ylabel: str = '',
         rotation: int = 0,
         dynamic_x_ticks: Optional[int] = None,
-        fill_missing_values: Optional[str] = None,
+        fill_missing_values: FillMissingValuesInput = None,
         output_name: str = 'lineplot'
     ) -> None:
         lineplot(
