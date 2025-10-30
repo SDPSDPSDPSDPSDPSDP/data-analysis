@@ -9,42 +9,48 @@ from ..config import Colors, FigureSize
 from ..formatting import format_ticks, format_xy_labels
 
 
-def _data_preparation_for_lineplot(
-    df: pd.DataFrame, x: str, y: str, fill_missing_values: Optional[str]
-) -> pd.DataFrame:
-    """Prepare data for line plot by sorting and filling missing values."""
-    df = df.copy()
+def _sort_by_column(df: pd.DataFrame, x: str) -> pd.DataFrame:
+    return df.sort_values(by=x, ascending=True)
 
-    if df[x].dtype == 'str':
-        return df
-
-    df = df.sort_values(by=x, ascending=True)
-
+def _create_full_range(df: pd.DataFrame, x: str) -> pd.Series:
     x_min = df[x].min()
     x_max = df[x].max()
     if df[x].dtype.kind in 'iufc':
-        x_range = pd.Series(np.arange(x_min, x_max + 1))
-    else:
-        x_range = pd.Series(pd.date_range(start=x_min, end=x_max))
+        return pd.Series(np.arange(x_min, x_max + 1))
+    return pd.Series(pd.date_range(start=x_min, end=x_max))
 
+def _fill_missing_with_shift(df: pd.DataFrame, y: str) -> pd.DataFrame:
+    df[y] = df[y].ffill()
+    return df
+
+def _fill_missing_with_zero(df: pd.DataFrame, y: str) -> pd.DataFrame:
+    df[y] = df[y].fillna(0)
+    return df
+
+def _merge_with_full_range(df: pd.DataFrame, x: str, x_range: pd.Series, y: str, fill_strategy: str) -> pd.DataFrame:
+    all_x = pd.DataFrame({x: x_range})
+    df = pd.merge(all_x, df, on=x, how='left')
+    
+    if fill_strategy == 'shift':
+        return _fill_missing_with_shift(df, y)
+    if fill_strategy == 'zero':
+        return _fill_missing_with_zero(df, y)
+    raise ValueError(f"Unsupported fill_missing_values strategy: {fill_strategy}")
+
+def _prepare_lineplot_data(df: pd.DataFrame, x: str, y: str, fill_missing_values: Optional[str]) -> pd.DataFrame:
+    df = df.copy()
+    if df[x].dtype == 'str':
+        return df
+
+    df = _sort_by_column(df, x)
     if fill_missing_values is not None:
-        all_x = pd.DataFrame({x: x_range})
-        df = pd.merge(all_x, df, on=x, how='left')
-        
-        if fill_missing_values == 'shift':
-            df[y] = df[y].ffill()
-        elif fill_missing_values == 'zero':
-            df[y] = df[y].fillna(0)
-        else:
-            raise ValueError(
-                f"Unsupported fill_missing_values strategy: {fill_missing_values}"
-            )
+        x_range = _create_full_range(df, x)
+        df = _merge_with_full_range(df, x, x_range, y, fill_missing_values)
 
     df[x] = df[x].astype(str)
     return df
 
-def _format_dynamic_xticks(plot: Any, dynamic_x_ticks: Optional[int] = None) -> None:
-    """Format x-axis ticks to show only every nth label."""
+def _apply_dynamic_xticks(plot: Any, dynamic_x_ticks: Optional[int]) -> None:
     if dynamic_x_ticks is None:
         return
         
@@ -67,19 +73,7 @@ def lineplot(
     dynamic_x_ticks: Optional[int] = None,
     fill_missing_values: Optional[str] = None
 ) -> None:
-    """Create a line plot with optional data filling and customization.
-    
-    Args:
-        df: Input DataFrame
-        x: Column name for x-axis
-        y: Column name for y-axis
-        xlabel: Label for x-axis
-        ylabel: Label for y-axis
-        rotation: Rotation angle for x-axis labels
-        dynamic_x_ticks: Show every nth tick label
-        fill_missing_values: Strategy for missing values ('shift' or 'zero')
-    """
-    df = _data_preparation_for_lineplot(df, x, y, fill_missing_values)
+    df = _prepare_lineplot_data(df, x, y, fill_missing_values)
 
     plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.5))
     plot = sns.lineplot(
@@ -89,4 +83,4 @@ def lineplot(
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_ticks(plot, y_grid=True, numeric_y=True, rotation=rotation)
-    _format_dynamic_xticks(plot, dynamic_x_ticks)
+    _apply_dynamic_xticks(plot, dynamic_x_ticks)

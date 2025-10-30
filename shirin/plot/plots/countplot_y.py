@@ -14,53 +14,59 @@ from ..formatting import (
 )
 from ..utils import filter_top_n_categories, handle_palette
 
-def _dynamic_figsize_height(
-    df: pd.DataFrame, y: str, figsize_height: Union[str, float] = 'dynamic'
-) -> float:
-    """Calculate dynamic figure height based on number of categories."""
+def _calculate_figsize_height(df: pd.DataFrame, y: str, figsize_height: Union[str, float]) -> float:
     if figsize_height == 'dynamic':
         return (len(df[y].value_counts()) / 2) + 1
-    elif figsize_height == 'standard':
+    if figsize_height == 'standard':
         return FigureSize.HEIGHT
     return float(figsize_height)
 
-def _transpose_data_for_stacked_plot(
-    df: pd.DataFrame, hue: str, y: str, order_type: str = 'frequency'
-) -> pd.DataFrame:
-    """Transpose data into pivot format for stacked horizontal bar plot."""
-    # Create pivot table from value counts
+def _create_pivot_table(df: pd.DataFrame, hue: str, y: str) -> pd.DataFrame:
     df_subset = df[[hue, y]].copy()
     value_counts = df_subset.value_counts()
     value_counts_frame = value_counts.to_frame(name="count").reset_index()
-    df_transposed = value_counts_frame.pivot(index=y, columns=hue, values="count")
-    df_transposed = df_transposed.fillna(0).astype(int)
+    return value_counts_frame.pivot(index=y, columns=hue, values="count").fillna(0).astype(int)
 
-    # Sort rows based on ordering type
-    if order_type == 'frequency':
-        df_transposed['_order'] = df_transposed.sum(axis=1)
-        df_transposed = df_transposed.sort_values(by='_order', ascending=True)
-        df_transposed = df_transposed.drop(columns=['_order'])
-    elif order_type == 'alphabetical':
-        df_transposed = df_transposed.sort_index(ascending=False)
-
-    return df_transposed
-
-def _generate_stacked_plot(
-    df_transposed: pd.DataFrame, colors: list[str]
-) -> Any:
-    """Generate a stacked horizontal bar plot."""
-    ax = plt.gca()
-    return df_transposed.plot(
+def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
+    return df.plot(
         kind='barh',
         stacked=True,
         color=colors,
         edgecolor='none',
-        ax=ax,
+        ax=plt.gca(),
         alpha=1,
         width=0.8
     )
 
-def _stacked_plot(
+def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
+    df_pivot['_order'] = df_pivot.sum(axis=1)
+    df_sorted = df_pivot.sort_values(by='_order', ascending=True)
+    return df_sorted.drop(columns=['_order'])
+
+def _sort_alphabetically(df_pivot: pd.DataFrame) -> pd.DataFrame:
+    return df_pivot.sort_index(ascending=False)
+
+def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: str) -> pd.DataFrame:
+    if order_type == 'frequency':
+        return _sort_by_frequency(df_pivot)
+    if order_type == 'alphabetical':
+        return _sort_alphabetically(df_pivot)
+    return df_pivot
+
+def _apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -> pd.DataFrame:
+    if not label_map:
+        return df
+    df.columns = [label_map.get(col, col) for col in df.columns]
+    return df
+
+def _create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
+    return [palette[col] for col in df.columns]
+
+def _prepare_stacked_data(df: pd.DataFrame, hue: str, y: str, order_type: str) -> pd.DataFrame:
+    df_pivot = _create_pivot_table(df, hue, y)
+    return _sort_pivot_table(df_pivot, order_type)
+
+def _create_stacked_plot(
     df: pd.DataFrame,
     hue: str,
     y: str,
@@ -68,17 +74,28 @@ def _stacked_plot(
     label_map: Optional[Dict[Any, str]],
     order_type: str
 ) -> tuple[Any, pd.DataFrame]:
-    """Create stacked plot with properly formatted data and labels."""
-    df_transposed = _transpose_data_for_stacked_plot(df, hue, y, order_type)
+    df_prepared = _prepare_stacked_data(df, hue, y, order_type)
+    df_labeled = _apply_label_mapping(df_prepared, label_map)
+    colors = _create_colors_list(df_prepared, palette)
+    plot = _plot_stacked_bars(df_labeled, colors)
+    return plot, df_labeled
 
-    colors = [palette[col] for col in df_transposed.columns]
-    if label_map:
-        df_transposed.columns = [
-            label_map.get(col, col) for col in df_transposed.columns
-        ]
+def _get_category_order(df: pd.DataFrame, y: str, order_type: str) -> Optional[Any]:
+    if order_type == 'frequency':
+        return df[y].value_counts().index
+    if order_type == 'alphabetical':
+        return sorted(df[y].unique())
+    return None
 
-    plot = _generate_stacked_plot(df_transposed, colors)
-    return plot, df_transposed  
+def _create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
+    return {key: key for key in df[hue].unique()}
+
+def _plot_standard_countplot(df: pd.DataFrame, y: str, hue: Optional[str], order: Any, color: Optional[str], palette: Any) -> Any:
+    return sns.countplot(
+        data=df, y=y, hue=hue, order=order,
+        color=color, palette=palette,
+        alpha=1, edgecolor='none', saturation=1
+    )  
 
 def countplot_y(
     df: pd.DataFrame,
@@ -97,56 +114,26 @@ def countplot_y(
     stacked_labels: Optional[str] = None,
     order_type: str = 'frequency',
 ) -> None:
-    """Create a horizontal count plot with optional stacking and customization.
-    
-    Args:
-        df: Input DataFrame
-        y: Column name for y-axis (categories)
-        hue: Column name for color grouping
-        palette: Color mapping or single color
-        label_map: Mapping for legend labels
-        xlabel: Label for x-axis
-        ylabel: Label for y-axis
-        plot_legend: Whether to display legend
-        legend_offset: Position offset for legend
-        ncol: Number of columns in legend
-        top_n: Limit to top N categories
-        figsize_height: Figure height ('dynamic', 'standard', or numeric)
-        stacked: Whether to create stacked bars
-        stacked_labels: Label style for stacked bars ('reversed' or None)
-        order_type: Sorting order ('frequency' or 'alphabetical')
-    """
     df = df.copy()
     df[y] = df[y].astype(str)
     
     if top_n is not None:
         df = filter_top_n_categories(df, y, top_n)
 
-    figsize_height = _dynamic_figsize_height(df, y, figsize_height)
-
-    if order_type == 'frequency':
-        order = df[y].value_counts().index
-    elif order_type == 'alphabetical':
-        order = sorted(df[y].unique())
-    else:
-        order = None
-
+    figsize_height = _calculate_figsize_height(df, y, figsize_height)
+    order = _get_category_order(df, y, order_type)
     color, palette = handle_palette(palette)
 
     plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
     
     if stacked and hue is not None and isinstance(palette, dict):
-        plot, df_transposed = _stacked_plot(df, hue, y, palette, label_map, order_type)
+        plot, df_transposed = _create_stacked_plot(df, hue, y, palette, label_map, order_type)
     else:
-        plot = sns.countplot(
-            data=df, y=y, hue=hue, order=order,
-            color=color, palette=palette,
-            alpha=1, edgecolor='none', saturation=1
-        )
+        plot = _plot_standard_countplot(df, y, hue, order, color, palette)
         df_transposed = None
 
     if label_map is None and plot_legend and hue is not None:
-        label_map = {key: key for key in df[hue].unique()}
+        label_map = _create_default_label_map(df, hue)
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)

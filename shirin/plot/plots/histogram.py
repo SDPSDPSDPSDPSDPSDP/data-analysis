@@ -8,65 +8,52 @@ from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
 from ..utils import handle_palette
 
-def _limit_x_axis(
-    df: pd.DataFrame, x: str, xlimit: Optional[Union[float, int]]
-) -> pd.DataFrame:
-    """Filter dataframe to values below x-axis limit."""
+def _limit_x_axis(df: pd.DataFrame, x: str, xlimit: Optional[Union[float, int]]) -> pd.DataFrame:
     if xlimit is not None:
         return df[df[x] <= xlimit]
     return df
 
-def _dynamic_bins(df: pd.DataFrame, x: str, bins: int) -> int:
-    """Adjust bins dynamically if max value is less than requested bins."""
+def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
     max_value_x = int(df[x].max())
     return min(bins, max_value_x)
 
-def _handle_stacking(
-    hue: Optional[str] = None, stacked: Optional[bool] = None
-) -> Literal['stack', 'dodge']:
-    """Determine stacking strategy for histogram bars."""
+def _determine_multiple_strategy(hue: Optional[str], stacked: Optional[bool]) -> Literal['stack', 'dodge']:
     if hue is None:
         return 'stack'
-    
     if stacked is True:
         return 'stack'
-    elif stacked is False:
+    if stacked is False:
         return 'dodge'
-    else:
-        return 'stack'
+    return 'stack'
 
-def _ensure_correct_dtypes(
-    df: pd.DataFrame, x: str, hue: Optional[str], label_map: Optional[dict], palette: Any
-) -> tuple[pd.DataFrame, Optional[dict], Optional[dict]]:
-    """Ensure correct data types for histogram plotting."""
+def _convert_to_int(df: pd.DataFrame, x: str) -> pd.DataFrame:
     df = df.copy()
     df[x] = df[x].astype(int)
-    
+    return df
+
+def _convert_hue_to_string(df: pd.DataFrame, hue: Optional[str]) -> pd.DataFrame:
     if hue is not None:
         df[hue] = df[hue].astype(str)
-    
-    if label_map is not None:
-        label_map = {str(key): value for key, value in label_map.items()}
-    
-    if isinstance(palette, dict):
-        palette = {str(key): value for key, value in palette.items()}
+    return df
 
+def _convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
+    if isinstance(d, dict):
+        return {str(key): value for key, value in d.items()}
+    return d
+
+def _prepare_data_types(df: pd.DataFrame, x: str, hue: Optional[str], label_map: Optional[dict], palette: Any) -> tuple[pd.DataFrame, Optional[dict], Any]:
+    df = _convert_to_int(df, x)
+    df = _convert_hue_to_string(df, hue)
+    label_map = _convert_dict_keys_to_string(label_map)
+    palette = _convert_dict_keys_to_string(palette)
     return df, label_map, palette
 
-def _detect_years(df: pd.DataFrame, x: str) -> bool:
-    """Detect whether column contains year values (1600-2300).
-    
-    Returns:
-        True if not year-like (use numeric formatting)
-        False if year-like (use year formatting)
-    """
+def _is_year_column(df: pd.DataFrame, x: str) -> bool:
     min_value = df[x].min()
     max_value = df[x].max()
-
     if 1600 < min_value and max_value < 2300:
         if len(str(min_value)) == 4 and len(str(max_value)) == 4:
             return False
-
     return True
  
 def histogram(
@@ -84,28 +71,11 @@ def histogram(
     legend_offset: float = 1.13,
     ncol: int = 2
 ) -> None:
-    """Create a histogram with optional grouping and customization.
-    
-    Args:
-        df: Input DataFrame
-        x: Column name for x-axis (numeric values)
-        xlabel: Label for x-axis
-        ylabel: Label for y-axis
-        xlimit: Maximum value for x-axis
-        bins: Number of bins for histogram
-        palette: Color mapping or single color
-        label_map: Mapping for legend labels
-        hue: Column name for color grouping
-        stacked: Whether to stack bars (True) or dodge (False)
-        plot_legend: Whether to display legend
-        legend_offset: Position offset for legend
-        ncol: Number of columns in legend
-    """
     df = _limit_x_axis(df, x, xlimit)
-    bins = _dynamic_bins(df, x, bins)
+    bins = _calculate_bins(df, x, bins)
     color, palette = handle_palette(palette)
-    multiple = _handle_stacking(hue, stacked)
-    df, label_map, palette = _ensure_correct_dtypes(df, x, hue, label_map, palette)
+    multiple = _determine_multiple_strategy(hue, stacked)
+    df, label_map, palette = _prepare_data_types(df, x, hue, label_map, palette)
         
     plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
     plot = sns.histplot(
@@ -116,5 +86,5 @@ def histogram(
     )
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
-    format_ticks(plot, y_grid=True, numeric_x=_detect_years(df, x), numeric_y=True)
+    format_ticks(plot, y_grid=True, numeric_x=_is_year_column(df, x), numeric_y=True)
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
