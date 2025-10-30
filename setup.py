@@ -10,6 +10,7 @@ setup(
         "numpy",
         "pandas"
     ],
+    python_requires=">=3.9",  # or whatever minimum version you need
     author="Shirin",
     description="Custom visualization tools for data science projects",
 )
