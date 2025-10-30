@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.container import BarContainer
-from typing import List#, Dict
+from typing import List, Dict
 import pandas as pd
 
 from ..config import TextColors, FontSizes
+from .text_contrast import get_text_color_for_background
 
 def _calculate_label_offset(
     patches: List[Patch], label_offset: float, orientation: str
@@ -67,77 +68,107 @@ def format_datalabels(
     label_offset = _calculate_label_offset(patches, label_offset, orientation)
     _format_labels(patches, label_offset, formatting, orientation)
 
-def format_datalabels_stacked(plot:BarContainer, pivot_data: pd.DataFrame, reverse: bool = False) -> None:
+def format_datalabels_stacked(
+    plot: BarContainer,
+    pivot_data: pd.DataFrame,
+    palette: Dict,
+    orientation: str = 'horizontal'
+) -> None:
+    """Format data labels for stacked bar plots with automatic text color selection.
+    
+    Args:
+        plot: The matplotlib plot object
+        pivot_data: The pivot data used to generate the plot
+        palette: Dictionary mapping category names to hex colors
+        orientation: 'horizontal' or 'vertical'
+    """
     max_count = pivot_data.sum(axis=1).max()
     threshold = 0.04 * max_count
+    ax = plt.gca()
 
     for index, row_values in enumerate(pivot_data.values):
         total = row_values.sum()
         cumulative_sum = 0
 
-        for value in row_values:
-            # calculating the percentage
+        for col_index, value in enumerate(row_values):
+            # Get the category name and its color
+            category = pivot_data.columns[col_index]
+            bg_color = palette.get(category, '#000000')  # Default to black if not found
+            
+            # Determine text color based on background luminance
+            text_color = get_text_color_for_background(bg_color)
+            
+            # Calculate percentage
             value_percentage = (value / total) * 100
             cumulative_sum += value
             
-            # label formatting
-            if value >= threshold: # only plot if the bar is visible
-                if reverse:
-                    color = TextColors.BLACK if cumulative_sum - value / 2 < max_count / 2 else TextColors.WHITE
-                else:
-                    color = TextColors.WHITE if cumulative_sum - value / 2 < max_count / 2 else TextColors.BLACK
-                plot.text(cumulative_sum - value / 2, index, 
-                          f"{value_percentage:.0f}%", 
-                          ha='center', va='center', 
-                          color=color, 
-                          fontsize=FontSizes.DATALABELS)
-                
-# def format_datalabels_stacked(
-#     plot: BarContainer, 
-#     pivot_data: pd.DataFrame, 
-#     reverse: bool = False
-# ) -> None:
-#     """
-#     Formats data labels for a stacked bar plot with dynamic text colors based on bar categories.
+            # Only show label if bar is visible enough
+            if value >= threshold:
+                if orientation == 'horizontal':
+                    ax.text(
+                        cumulative_sum - value / 2, index,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )
+                else:  # vertical
+                    ax.text(
+                        index, cumulative_sum - value / 2,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )
 
-#     Args:
-#         plot (BarContainer): The matplotlib plot object.
-#         pivot_data (pd.DataFrame): The pivot data used to generate the plot.
-#         reverse (bool): If True, reverse the color mapping for the categories.
-#     """
-#     max_count = pivot_data.sum(axis=1).max()
-#     threshold = 0.04 * max_count  # Minimum size of bar to display label
 
-#     # Handle the case for exactly two categories
-#     if len(pivot_data.columns) == 2:
-#         category_to_color = {
-#             pivot_data.columns[0]: TextColors.WHITE if reverse else TextColors.BLACK,
-#             pivot_data.columns[1]: TextColors.BLACK if reverse else TextColors.WHITE,
-#         }
-#     else:  # For more than two categories, use a default fallback
-#         category_to_color = {
-#             pivot_data.columns[0]: TextColors.WHITE if reverse else TextColors.BLACK,
-#         }
-#         for column in pivot_data.columns[1:]:
-#             category_to_color[column] = TextColors.BLACK
+def format_datalabels_stacked_normalized(
+    plot: BarContainer,
+    pivot_data: pd.DataFrame,
+    palette: Dict,
+    orientation: str = 'horizontal'
+) -> None:
+    """Format percentage labels for normalized stacked bar plots with automatic text color selection.
+    
+    Args:
+        plot: The matplotlib plot object
+        pivot_data: The normalized pivot data (values between 0 and 1)
+        palette: Dictionary mapping category names to hex colors
+        orientation: 'horizontal' or 'vertical'
+    """
+    threshold = 0.04  # Show label only if segment is at least 4%
+    ax = plt.gca()
 
-#     for index, row_values in enumerate(pivot_data.values):  # Iterate through rows in the pivot data
-#         total = row_values.sum()
-#         cumulative_sum = plot.patches[index * len(row_values)].get_x()  # Starting position
-#         for col_index, value in enumerate(row_values):
-#             hue_category = pivot_data.columns[col_index]
-#             text_color = category_to_color.get(hue_category, TextColors.BLACK)
+    for index, row_values in enumerate(pivot_data.values):
+        cumulative_sum = 0
+
+        for col_index, value in enumerate(row_values):
+            # Get the category name and its color
+            category = pivot_data.columns[col_index]
+            bg_color = palette.get(category, '#000000')  # Default to black if not found
             
-#             # Draw percentage labels only for visible bars
-#             if value >= threshold:
-#                 value_percentage = (value / total) * 100
-#                 plt.text(
-#                     x=cumulative_sum + value / 2,
-#                     y=index,
-#                     s=f"{value_percentage:.0f}%",
-#                     ha="center",
-#                     va="center",
-#                     color=text_color,
-#                     fontsize=FontSizes.DATALABELS,
-#                 )
-#             cumulative_sum += value  # Update cumulative position for the next bar
+            # Determine text color based on background luminance
+            text_color = get_text_color_for_background(bg_color)
+            
+            # Calculate percentage (value is already normalized between 0-1)
+            value_percentage = value * 100
+            cumulative_sum += value
+            
+            # Only show label if bar is visible enough
+            if value >= threshold:
+                if orientation == 'horizontal':
+                    ax.text(
+                        cumulative_sum - value / 2, index,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )
+                else:  # vertical
+                    ax.text(
+                        index, cumulative_sum - value / 2,
+                        f"{value_percentage:.0f}%",
+                        ha='center', va='center',
+                        color=text_color,
+                        fontsize=FontSizes.DATALABELS
+                    )

@@ -1,9 +1,10 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
 from ..config import FigureSize, FontSizes, TextColors
+from ..formatting.text_contrast import get_text_color_for_background
 
 VALUE_DATALABEL = 5
 
@@ -52,26 +53,16 @@ def _prepare_pie_colors_and_labels(
     legend_labels = _format_legend_labels(mapped_labels, values)
     return mapped_colors, legend_labels
 
-def _set_white_text_color(
+def _apply_automatic_text_colors(
     autotexts: List[Any],
-    original_labels: List[str],
-    white_text_labels: Union[str, List[str]]
+    palette: Dict[Any, str],
+    original_labels: List[str]
 ) -> None:
-    if not isinstance(white_text_labels, list):
-        white_text_labels = [white_text_labels]
-    
+    """Apply automatic text color based on background color luminance."""
     for label, autotext in zip(original_labels, autotexts):
-        if label in white_text_labels:
-            autotext.set_color('white')
-
-def _apply_white_text_labels(
-    white_text_labels: Optional[Union[str, List[str]]],
-    original_labels: List[str],
-    autotexts: List[Any]
-) -> None:
-    if not white_text_labels:
-        return
-    _set_white_text_color(autotexts, original_labels, white_text_labels)
+        bg_color = palette.get(label, '#000000')
+        text_color = get_text_color_for_background(bg_color)
+        autotext.set_color(text_color)
 
 def _create_pie_legend(legend_labels: List[str]) -> None:
     legend = plt.legend(
@@ -97,7 +88,6 @@ def pie_base(
     label: str,
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]] = None,
-    white_text_labels: Optional[Union[str, List[str]]] = None,
     n_after_comma: int = 0,
     value_datalabel: int = VALUE_DATALABEL,
     donut: bool = False
@@ -125,4 +115,4 @@ def pie_base(
     plt.axis('equal')
 
     _create_pie_legend(legend_labels)
-    _apply_white_text_labels(white_text_labels, original_labels, autotexts)
+    _apply_automatic_text_colors(autotexts, palette, original_labels)
