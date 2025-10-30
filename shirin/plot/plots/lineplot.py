@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from ..config import Colors, FigureSize
+from ..config import Colors, FigureSize, FillMissingValuesInput
 from ..formatting import format_ticks, format_xy_labels
 
 
@@ -49,7 +49,7 @@ def _prepare_lineplot_data(
     df: pd.DataFrame,
     x: str,
     y: str,
-    fill_missing_values: Optional[str]
+    fill_missing_values: FillMissingValuesInput
 ) -> pd.DataFrame:
     df = df.copy()
     if df[x].dtype == 'str':
@@ -87,7 +87,7 @@ def lineplot(
     ylabel: str = '',
     rotation: int = 0,
     dynamic_x_ticks: Optional[int] = None,
-    fill_missing_values: Optional[str] = None
+    fill_missing_values: FillMissingValuesInput = None
 ) -> None:
     df = _prepare_lineplot_data(df, x, y, fill_missing_values)
 
