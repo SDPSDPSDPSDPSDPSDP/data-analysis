@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ..config import FigureSize
+from ..config import FigureSize, OrderTypeInput, FigureSizeInput
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels, format_datalabels_stacked_normalized
 from ..utils import (
     convert_palette_to_strings,
@@ -79,8 +79,8 @@ def countplot_y_normalized(
     legend_offset: float = 1.13,
     ncol: int = 2,
     top_n: Optional[int] = None,
-    figsize_height: Union[str, float] = 'dynamic',
-    order_type: str = 'frequency',
+    figsize_height: FigureSizeInput = 'dynamic',
+    order_type: OrderTypeInput = 'frequency',
     show_labels: bool = True,
 ) -> None:
     _validate_palette_keys(df, hue, palette)

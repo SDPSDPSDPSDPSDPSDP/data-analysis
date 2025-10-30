@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from .plots import (
     countplot_x,
     countplot_x_normalized,
@@ -84,10 +85,10 @@ class PlotGraphs:
         legend_offset: float = 1.13,
         ncol: int = 2,
         top_n: Optional[int] = None,
-        figsize_width: Union[str, float] = 'dynamic',
+        figsize_width: FigureSizeInput = 'dynamic',
         stacked: bool = False,
-        stacked_labels: Optional[str] = None,
-        order_type: str = 'frequency',
+        stacked_labels: StackedLabelTypeInput = None,
+        order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
         output_name: str = 'countplot_x'
@@ -127,10 +128,10 @@ class PlotGraphs:
         legend_offset: float = 1.13,
         ncol: int = 2,
         top_n: Optional[int] = None,
-        figsize_height: Union[str, float] = 'dynamic',
+        figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
-        stacked_labels: Optional[str] = None,
-        order_type: str = 'frequency',
+        stacked_labels: StackedLabelTypeInput = None,
+        order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
         output_name: str = 'countplot_y'

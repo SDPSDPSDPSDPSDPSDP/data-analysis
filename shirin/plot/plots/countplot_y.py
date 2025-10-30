@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from ..config import FigureSize
+from ..config import FigureSize, OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..formatting import (
     format_datalabels,
     format_datalabels_stacked,
@@ -17,7 +17,7 @@ from ..utils import ensure_column_is_string, filter_top_n_categories, handle_pal
 def _calculate_figsize_height(
     df: pd.DataFrame,
     y: str,
-    figsize_height: Union[str, float]
+    figsize_height: FigureSizeInput
 ) -> float:
     if figsize_height == 'dynamic':
         return (len(df[y].value_counts()) / 2) + 1
@@ -50,7 +50,7 @@ def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
 def _sort_alphabetically(df_pivot: pd.DataFrame) -> pd.DataFrame:
     return df_pivot.sort_index(ascending=False)
 
-def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: str) -> pd.DataFrame:
+def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput) -> pd.DataFrame:
     if order_type == 'frequency':
         return _sort_by_frequency(df_pivot)
     if order_type == 'alphabetical':
@@ -74,7 +74,7 @@ def _prepare_stacked_data(
     df: pd.DataFrame,
     hue: str,
     y: str,
-    order_type: str
+    order_type: OrderTypeInput
 ) -> pd.DataFrame:
     df_pivot = _create_pivot_table(df, hue, y)
     return _sort_pivot_table(df_pivot, order_type)
@@ -85,7 +85,7 @@ def _create_stacked_plot(
     y: str,
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]],
-    order_type: str
+    order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, y, order_type)
     df_labeled = _apply_label_mapping(df_prepared, label_map)
@@ -96,7 +96,7 @@ def _create_stacked_plot(
 def _get_category_order(
     df: pd.DataFrame,
     y: str,
-    order_type: str
+    order_type: OrderTypeInput
 ) -> Optional[Any]:
     if order_type == 'frequency':
         return df[y].value_counts().index
@@ -133,10 +133,10 @@ def countplot_y(
     legend_offset: float = 1.13,
     ncol: int = 2,
     top_n: Optional[int] = None,
-    figsize_height: Union[str, float] = 'dynamic',
+    figsize_height: FigureSizeInput = 'dynamic',
     stacked: bool = False,
-    stacked_labels: Optional[str] = None,
-    order_type: str = 'frequency',
+    stacked_labels: StackedLabelTypeInput = None,
+    order_type: OrderTypeInput = 'frequency',
 ) -> None:
     df = ensure_column_is_string(df, y)
     

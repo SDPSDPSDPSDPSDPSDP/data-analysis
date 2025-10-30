@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from ..config import FigureSize
+from ..config import FigureSize, OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..formatting import (
     format_datalabels,
     format_datalabels_stacked,
@@ -17,7 +17,7 @@ from ..utils import ensure_column_is_string, filter_top_n_categories, handle_pal
 def _calculate_figsize_width(
     df: pd.DataFrame,
     x: str,
-    figsize_width: Union[str, float]
+    figsize_width: FigureSizeInput
 ) -> float:
     if figsize_width == 'dynamic':
         return (len(df[x].value_counts()) * 1) + 1
@@ -50,7 +50,7 @@ def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
 def _sort_alphabetically(df_pivot: pd.DataFrame) -> pd.DataFrame:
     return df_pivot.sort_index(ascending=True)
 
-def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: str) -> pd.DataFrame:
+def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput) -> pd.DataFrame:
     if order_type == 'frequency':
         return _sort_by_frequency(df_pivot)
     if order_type == 'alphabetical':
@@ -74,7 +74,7 @@ def _prepare_stacked_data(
     df: pd.DataFrame,
     hue: str,
     x: str,
-    order_type: str
+    order_type: OrderTypeInput
 ) -> pd.DataFrame:
     df_pivot = _create_pivot_table(df, hue, x)
     return _sort_pivot_table(df_pivot, order_type)
@@ -85,7 +85,7 @@ def _create_stacked_plot(
     x: str,
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]],
-    order_type: str
+    order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, x, order_type)
     df_labeled = _apply_label_mapping(df_prepared, label_map)
@@ -96,7 +96,7 @@ def _create_stacked_plot(
 def _get_category_order(
     df: pd.DataFrame,
     x: str,
-    order_type: str
+    order_type: OrderTypeInput
 ) -> Optional[Any]:
     if order_type == 'frequency':
         return df[x].value_counts().index
@@ -133,10 +133,10 @@ def countplot_x(
     legend_offset: float = 1.13,
     ncol: int = 2,
     top_n: Optional[int] = None,
-    figsize_width: Union[str, float] = 'dynamic',
+    figsize_width: FigureSizeInput = 'dynamic',
     stacked: bool = False,
-    stacked_labels: Optional[str] = None,
-    order_type: str = 'frequency',
+    stacked_labels: StackedLabelTypeInput = None,
+    order_type: OrderTypeInput = 'frequency',
 ) -> None:
     df = ensure_column_is_string(df, x)
     
