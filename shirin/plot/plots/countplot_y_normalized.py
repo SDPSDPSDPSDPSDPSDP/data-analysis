@@ -5,7 +5,12 @@ import pandas as pd
 
 from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
-from ..utils import filter_top_n_categories
+from ..utils import (
+    convert_palette_to_strings,
+    create_label_map,
+    ensure_column_is_string,
+    filter_top_n_categories,
+)
 from .countplot_y import _calculate_figsize_height, _sort_pivot_table
 
 
@@ -45,9 +50,8 @@ def _create_normalized_plot(
     )
 
 def _ensure_strings(df: pd.DataFrame, y: str, hue: str) -> pd.DataFrame:
-    df = df.copy()
-    df[y] = df[y].astype(str)
-    df[hue] = df[hue].astype(str)
+    df = ensure_column_is_string(df, y)
+    df = ensure_column_is_string(df, hue)
     return df
 
 def _validate_palette_keys(
@@ -61,17 +65,6 @@ def _validate_palette_keys(
         raise ValueError(
             f"Palette missing keys for hue values: {missing_keys}"
         )
-
-def _convert_palette_to_strings(palette: Dict[Any, str]) -> Dict[str, str]:
-    return {str(k): str(v) for k, v in palette.items()}
-
-def _create_string_label_map(
-    label_map: Optional[Dict[Any, str]],
-    hue_values: Any
-) -> Dict[str, str]:
-    if label_map is None:
-        return {str(key): str(key) for key in hue_values}
-    return {str(key): str(value) for key, value in label_map.items()}
 
 
 def countplot_y_normalized(
@@ -92,7 +85,7 @@ def countplot_y_normalized(
     _validate_palette_keys(df, hue, palette)
     
     df = _ensure_strings(df, y, hue)
-    palette = _convert_palette_to_strings(palette)
+    palette = convert_palette_to_strings(palette)
     
     if top_n is not None:
         df = filter_top_n_categories(df, y, top_n)
@@ -105,7 +98,7 @@ def countplot_y_normalized(
     plot = _create_normalized_plot(normalized_pivot, palette)
     
     normalized_df = _calculate_normalized_counts(df, y, hue)
-    label_map = _create_string_label_map(
+    label_map = create_label_map(
         label_map if not plot_legend else label_map,
         normalized_df[hue].unique()
     )

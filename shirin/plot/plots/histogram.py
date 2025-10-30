@@ -6,7 +6,12 @@ import seaborn as sns
 
 from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
-from ..utils import handle_palette
+from ..utils import (
+    convert_dict_keys_to_string,
+    ensure_column_is_int,
+    ensure_column_is_string,
+    handle_palette,
+)
 
 def _limit_x_axis(
     df: pd.DataFrame,
@@ -33,21 +38,6 @@ def _determine_multiple_strategy(
         return 'dodge'
     return 'stack'
 
-def _convert_to_int(df: pd.DataFrame, x: str) -> pd.DataFrame:
-    df = df.copy()
-    df[x] = df[x].astype(int)
-    return df
-
-def _convert_hue_to_string(df: pd.DataFrame, hue: Optional[str]) -> pd.DataFrame:
-    if hue is not None:
-        df[hue] = df[hue].astype(str)
-    return df
-
-def _convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
-    if isinstance(d, dict):
-        return {str(key): value for key, value in d.items()}
-    return d
-
 def _prepare_data_types(
     df: pd.DataFrame,
     x: str,
@@ -55,10 +45,11 @@ def _prepare_data_types(
     label_map: Optional[dict],
     palette: Any
 ) -> tuple[pd.DataFrame, Optional[dict], Any]:
-    df = _convert_to_int(df, x)
-    df = _convert_hue_to_string(df, hue)
-    label_map = _convert_dict_keys_to_string(label_map)
-    palette = _convert_dict_keys_to_string(palette)
+    df = ensure_column_is_int(df, x)
+    if hue is not None:
+        df = ensure_column_is_string(df, hue)
+    label_map = convert_dict_keys_to_string(label_map)
+    palette = convert_dict_keys_to_string(palette)
     return df, label_map, palette
 
 def _is_year_column(df: pd.DataFrame, x: str) -> bool:
