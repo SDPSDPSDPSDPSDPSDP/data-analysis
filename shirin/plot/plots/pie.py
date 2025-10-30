@@ -7,22 +7,35 @@ from ..config import FigureSize, FontSizes, TextColors
 
 VALUE_DATALABEL = 5
 
-def _extract_values_and_labels(df: pd.DataFrame, value: str, label: str) -> Tuple[List[float], List[str]]:
+def _extract_values_and_labels(
+    df: pd.DataFrame,
+    value: str,
+    label: str
+) -> Tuple[List[float], List[str]]:
     df = df.copy()
     df[value] = df[value].fillna(0).astype(float)
     values = df[value].tolist()
     labels = df[label].tolist()
     return values, labels
 
-def _apply_label_map_to_labels(original_labels: List[str], label_map: Optional[Dict[str, str]]) -> List[str]:
+def _apply_label_map_to_labels(
+    original_labels: List[str],
+    label_map: Optional[Dict[str, str]]
+) -> List[str]:
     if not label_map:
         return original_labels
     return [label_map.get(label, label) for label in original_labels]
 
-def _create_colors_from_palette(original_labels: List[str], palette: Dict[str, str]) -> List[str]:
+def _create_colors_from_palette(
+    original_labels: List[str],
+    palette: Dict[str, str]
+) -> List[str]:
     return [palette[label] for label in original_labels]
 
-def _format_legend_labels(mapped_labels: List[str], values: List[float]) -> List[str]:
+def _format_legend_labels(
+    mapped_labels: List[str],
+    values: List[float]
+) -> List[str]:
     return [
         f'{mapped_label}: {value:,.0f}'.replace(",", ".")
         for mapped_label, value in zip(mapped_labels, values)
@@ -39,7 +52,11 @@ def _prepare_pie_colors_and_labels(
     legend_labels = _format_legend_labels(mapped_labels, values)
     return mapped_colors, legend_labels
 
-def _set_white_text_color(autotexts: List[Any], original_labels: List[str], white_text_labels: Union[str, List[str]]) -> None:
+def _set_white_text_color(
+    autotexts: List[Any],
+    original_labels: List[str],
+    white_text_labels: Union[str, List[str]]
+) -> None:
     if not isinstance(white_text_labels, list):
         white_text_labels = [white_text_labels]
     
@@ -47,7 +64,11 @@ def _set_white_text_color(autotexts: List[Any], original_labels: List[str], whit
         if label in white_text_labels:
             autotext.set_color('white')
 
-def _apply_white_text_labels(white_text_labels: Optional[Union[str, List[str]]], original_labels: List[str], autotexts: List[Any]) -> None:
+def _apply_white_text_labels(
+    white_text_labels: Optional[Union[str, List[str]]],
+    original_labels: List[str],
+    autotexts: List[Any]
+) -> None:
     if not white_text_labels:
         return
     _set_white_text_color(autotexts, original_labels, white_text_labels)

@@ -14,7 +14,11 @@ from ..formatting import (
 )
 from ..utils import filter_top_n_categories, handle_palette
 
-def _calculate_figsize_height(df: pd.DataFrame, y: str, figsize_height: Union[str, float]) -> float:
+def _calculate_figsize_height(
+    df: pd.DataFrame,
+    y: str,
+    figsize_height: Union[str, float]
+) -> float:
     if figsize_height == 'dynamic':
         return (len(df[y].value_counts()) / 2) + 1
     if figsize_height == 'standard':
@@ -53,7 +57,10 @@ def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: str) -> pd.DataFrame:
         return _sort_alphabetically(df_pivot)
     return df_pivot
 
-def _apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -> pd.DataFrame:
+def _apply_label_mapping(
+    df: pd.DataFrame,
+    label_map: Optional[Dict[Any, str]]
+) -> pd.DataFrame:
     if not label_map:
         return df
     df.columns = [label_map.get(col, col) for col in df.columns]
@@ -62,7 +69,12 @@ def _apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) 
 def _create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
     return [palette[col] for col in df.columns]
 
-def _prepare_stacked_data(df: pd.DataFrame, hue: str, y: str, order_type: str) -> pd.DataFrame:
+def _prepare_stacked_data(
+    df: pd.DataFrame,
+    hue: str,
+    y: str,
+    order_type: str
+) -> pd.DataFrame:
     df_pivot = _create_pivot_table(df, hue, y)
     return _sort_pivot_table(df_pivot, order_type)
 
@@ -80,7 +92,11 @@ def _create_stacked_plot(
     plot = _plot_stacked_bars(df_labeled, colors)
     return plot, df_labeled
 
-def _get_category_order(df: pd.DataFrame, y: str, order_type: str) -> Optional[Any]:
+def _get_category_order(
+    df: pd.DataFrame,
+    y: str,
+    order_type: str
+) -> Optional[Any]:
     if order_type == 'frequency':
         return df[y].value_counts().index
     if order_type == 'alphabetical':
@@ -90,7 +106,14 @@ def _get_category_order(df: pd.DataFrame, y: str, order_type: str) -> Optional[A
 def _create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
     return {key: key for key in df[hue].unique()}
 
-def _plot_standard_countplot(df: pd.DataFrame, y: str, hue: Optional[str], order: Any, color: Optional[str], palette: Any) -> Any:
+def _plot_standard_countplot(
+    df: pd.DataFrame,
+    y: str,
+    hue: Optional[str],
+    order: Any,
+    color: Optional[str],
+    palette: Any
+) -> Any:
     return sns.countplot(
         data=df, y=y, hue=hue, order=order,
         color=color, palette=palette,

@@ -19,7 +19,12 @@ def _validate_format(format: str) -> None:
             f"Supported formats are {supported_formats}."
         )
 
-def _create_filepath(output_dir: str, prefix: Optional[str], output_name: str, format: str) -> str:
+def _create_filepath(
+    output_dir: str,
+    prefix: Optional[str],
+    output_name: str,
+    format: str
+) -> str:
     if prefix:
         return os.path.join(output_dir, f"{prefix}_{output_name}.{format}")
     return os.path.join(output_dir, f"{output_name}.{format}")
@@ -30,10 +35,10 @@ def _save_plot(filepath: str, format: str) -> None:
 class PlotGraphs:
 
     def __init__(
-        self, 
-        export: bool = True, 
-        output_dir: str = os.path.expanduser("./plot_output/"), 
-        prefix: Optional[str] = None, 
+        self,
+        export: bool = True,
+        output_dir: str = os.path.expanduser("./plot_output/"),
+        prefix: Optional[str] = None,
         format: str = 'png'
     ) -> None:
         self.config = {
@@ -58,24 +63,63 @@ class PlotGraphs:
             _save_plot(filepath, self.format)
         plt.show()
 
-    def countplot_y(self, df: pd.DataFrame, y: str, output_name: str = 'countplot_y', **kwargs) -> None:
+    def countplot_y(
+        self,
+        df: pd.DataFrame,
+        y: str,
+        output_name: str = 'countplot_y',
+        **kwargs
+    ) -> None:
         countplot_y(df, y, **kwargs)
         self._export_graph(output_name)
 
-    def countplot_y_normalized(self, df: pd.DataFrame, y: str, hue: str, output_name: str = 'countplot_y_normalized', **kwargs) -> None:
+    def countplot_y_normalized(
+        self,
+        df: pd.DataFrame,
+        y: str,
+        hue: str,
+        output_name: str = 'countplot_y_normalized',
+        **kwargs
+    ) -> None:
         countplot_y_normalized(df, y, hue, **kwargs)
         self._export_graph(output_name)
 
-    def histogram(self, df: pd.DataFrame, x: str, output_name: str = 'histogram', **kwargs) -> None:
+    def histogram(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        output_name: str = 'histogram',
+        **kwargs
+    ) -> None:
         histogram(df, x, **kwargs)
         self._export_graph(output_name)
 
-    def pie(self, df: pd.DataFrame, col: str, palette: Dict[Any, str], output_name: str = 'pie_value_counts', **kwargs) -> None:
+    def pie(
+        self,
+        df: pd.DataFrame,
+        col: str,
+        palette: Dict[Any, str],
+        output_name: str = 'pie_value_counts',
+        **kwargs
+    ) -> None:
         df_value_counts = _calculate_value_counts(df, col)
-        pie_base(df=df_value_counts, value="count", label=col, palette=palette, **kwargs)
+        pie_base(
+            df=df_value_counts,
+            value="count",
+            label=col,
+            palette=palette,
+            **kwargs
+        )
         self._export_graph(output_name)
 
 
-    def lineplot(self, df: pd.DataFrame, x: str, y: str, output_name: str = 'lineplot', **kwargs) -> None:
+    def lineplot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        output_name: str = 'lineplot',
+        **kwargs
+    ) -> None:
         lineplot(df, x, y, **kwargs)
         self._export_graph(output_name)

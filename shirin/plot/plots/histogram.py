@@ -8,7 +8,11 @@ from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
 from ..utils import handle_palette
 
-def _limit_x_axis(df: pd.DataFrame, x: str, xlimit: Optional[Union[float, int]]) -> pd.DataFrame:
+def _limit_x_axis(
+    df: pd.DataFrame,
+    x: str,
+    xlimit: Optional[Union[float, int]]
+) -> pd.DataFrame:
     if xlimit is not None:
         return df[df[x] <= xlimit]
     return df
@@ -17,7 +21,10 @@ def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
     max_value_x = int(df[x].max())
     return min(bins, max_value_x)
 
-def _determine_multiple_strategy(hue: Optional[str], stacked: Optional[bool]) -> Literal['stack', 'dodge']:
+def _determine_multiple_strategy(
+    hue: Optional[str],
+    stacked: Optional[bool]
+) -> Literal['stack', 'dodge']:
     if hue is None:
         return 'stack'
     if stacked is True:
@@ -41,7 +48,13 @@ def _convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
         return {str(key): value for key, value in d.items()}
     return d
 
-def _prepare_data_types(df: pd.DataFrame, x: str, hue: Optional[str], label_map: Optional[dict], palette: Any) -> tuple[pd.DataFrame, Optional[dict], Any]:
+def _prepare_data_types(
+    df: pd.DataFrame,
+    x: str,
+    hue: Optional[str],
+    label_map: Optional[dict],
+    palette: Any
+) -> tuple[pd.DataFrame, Optional[dict], Any]:
     df = _convert_to_int(df, x)
     df = _convert_hue_to_string(df, hue)
     label_map = _convert_dict_keys_to_string(label_map)
@@ -86,5 +99,9 @@ def histogram(
     )
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
-    format_ticks(plot, y_grid=True, numeric_x=_is_year_column(df, x), numeric_y=True)
-    format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
+    format_ticks(
+        plot, y_grid=True, numeric_x=_is_year_column(df, x), numeric_y=True
+    )
+    format_optional_legend(
+        plot, hue, plot_legend, label_map, ncol, legend_offset
+    )

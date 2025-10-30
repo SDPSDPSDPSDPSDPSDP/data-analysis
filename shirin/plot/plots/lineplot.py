@@ -27,7 +27,13 @@ def _fill_missing_with_zero(df: pd.DataFrame, y: str) -> pd.DataFrame:
     df[y] = df[y].fillna(0)
     return df
 
-def _merge_with_full_range(df: pd.DataFrame, x: str, x_range: pd.Series, y: str, fill_strategy: str) -> pd.DataFrame:
+def _merge_with_full_range(
+    df: pd.DataFrame,
+    x: str,
+    x_range: pd.Series,
+    y: str,
+    fill_strategy: str
+) -> pd.DataFrame:
     all_x = pd.DataFrame({x: x_range})
     df = pd.merge(all_x, df, on=x, how='left')
     
@@ -35,9 +41,16 @@ def _merge_with_full_range(df: pd.DataFrame, x: str, x_range: pd.Series, y: str,
         return _fill_missing_with_shift(df, y)
     if fill_strategy == 'zero':
         return _fill_missing_with_zero(df, y)
-    raise ValueError(f"Unsupported fill_missing_values strategy: {fill_strategy}")
+    raise ValueError(
+        f"Unsupported fill_missing_values strategy: {fill_strategy}"
+    )
 
-def _prepare_lineplot_data(df: pd.DataFrame, x: str, y: str, fill_missing_values: Optional[str]) -> pd.DataFrame:
+def _prepare_lineplot_data(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    fill_missing_values: Optional[str]
+) -> pd.DataFrame:
     df = df.copy()
     if df[x].dtype == 'str':
         return df
@@ -50,7 +63,10 @@ def _prepare_lineplot_data(df: pd.DataFrame, x: str, y: str, fill_missing_values
     df[x] = df[x].astype(str)
     return df
 
-def _apply_dynamic_xticks(plot: Any, dynamic_x_ticks: Optional[int]) -> None:
+def _apply_dynamic_xticks(
+    plot: Any,
+    dynamic_x_ticks: Optional[int]
+) -> None:
     if dynamic_x_ticks is None:
         return
         
