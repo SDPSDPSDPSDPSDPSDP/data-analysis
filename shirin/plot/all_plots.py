@@ -1,25 +1,52 @@
 import os
+from typing import Any, Dict, Optional, Union
+
 import matplotlib.pyplot as plt
-from .plots import countplot_y, histogram, pie_base, lineplot, countplot_y_normalized
 import pandas as pd
-# from .config import Colors
-from typing import Dict
+
+from .plots import (
+    countplot_y,
+    countplot_y_normalized,
+    histogram,
+    lineplot,
+    pie_base,
+)
 
 def _calculate_value_counts(df: pd.DataFrame, col: str) -> pd.DataFrame:
     df_value_counts = df[col].value_counts().to_frame().reset_index()
     df_value_counts.columns = [col, "count"]
     return df_value_counts
 
+def _validate_format(format: str) -> None:
+    supported_formats = ['png', 'svg']
+    if format not in supported_formats:
+        raise ValueError(
+            f"Unsupported format '{format}'. "
+            f"Supported formats are {supported_formats}."
+        )
+
+def _create_filepath(
+    output_dir: str,
+    prefix: Optional[str],
+    output_name: str,
+    format: str
+) -> str:
+    if prefix:
+        return os.path.join(output_dir, f"{prefix}_{output_name}.{format}")
+    return os.path.join(output_dir, f"{output_name}.{format}")
+
+def _save_plot(filepath: str, format: str) -> None:
+    plt.savefig(filepath, bbox_inches="tight", dpi=300, format=format)
+
 class PlotGraphs:
 
     def __init__(
-        self, 
-        export: bool = True, 
-        output_dir: str = os.path.expanduser("./plot_output/"), 
-        prefix: str = None, 
+        self,
+        export: bool = True,
+        output_dir: str = os.path.expanduser("./plot_output/"),
+        prefix: Optional[str] = None,
         format: str = 'png'
-        ) -> None:
-
+    ) -> None:
         self.config = {
             "export": export,
             "output_dir": output_dir,
@@ -30,127 +57,120 @@ class PlotGraphs:
         self.format = format.lower()
 
     def _export_graph(self, output_name: str) -> None:
-
-        # Check if the format is supported
-        supported_formats = ['png', 'svg']
-
-        if self.format not in supported_formats:
-            raise ValueError(f"Unsupported format '{self.format}'. Supported formats are {supported_formats}.")
+        _validate_format(self.format)
         
-        # Create the output file path
         if self.config["export"]:
-            if self.config["prefix"]:
-                filepath = os.path.join(
-                    self.config["output_dir"],
-                    f"{self.config['prefix']}_{output_name}.{self.format}"
-                )
-            else:
-                filepath = os.path.join(self.config["output_dir"], f"{output_name}.{self.format}")
-            
-            # Save the graph in the specified format, if export is True
-            plt.savefig(filepath, bbox_inches="tight", dpi=300, format=self.format)
+            filepath = _create_filepath(
+                self.config["output_dir"],
+                self.config["prefix"],
+                output_name,
+                self.format
+            )
+            _save_plot(filepath, self.format)
         plt.show()
 
     def countplot_y(
-            self, 
-            df: pd.DataFrame, 
-            y: str, 
-            output_name: str='countplot_y', 
-            **kwargs
-            ) -> None:
-        
-        countplot_y(df, y, **kwargs)
+        self,
+        df: pd.DataFrame,
+        y: str,
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = 'Count',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_height: Union[str, float] = 'dynamic',
+        stacked: bool = False,
+        stacked_labels: Optional[str] = None,
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_y'
+    ) -> None:
+        countplot_y(
+            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_height=figsize_height, stacked=stacked,
+            stacked_labels=stacked_labels, order_type=order_type
+        )
         self._export_graph(output_name)
 
     def countplot_y_normalized(
-        self, 
-        df: pd.DataFrame, 
-        y: str, 
-        hue: str, 
-        output_name: str='countplot_y_normalized', 
-        **kwargs
-        ) -> None:
-    
-        countplot_y_normalized(df, y, hue, **kwargs)
+        self,
+        df: pd.DataFrame,
+        y: str,
+        hue: str,
+        palette: Dict[Any, str],
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = 'Percentage',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_height: Union[str, float] = 'dynamic',
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_y_normalized'
+    ) -> None:
+        countplot_y_normalized(
+            df=df, y=y, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_height=figsize_height, order_type=order_type
+        )
         self._export_graph(output_name)
 
     def histogram(
-            self, 
-            df: pd.DataFrame, 
-            x: str, 
-            output_name: str='histogram', 
-            **kwargs
-            ) -> None:
-        
-        histogram(df, x, **kwargs)
+        self,
+        df: pd.DataFrame,
+        x: str,
+        xlabel: str = '',
+        ylabel: str = 'Count',
+        xlimit: Optional[Union[float, int]] = None,
+        bins: int = 100,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        hue: Optional[str] = None,
+        stacked: Optional[bool] = None,
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        output_name: str = 'histogram'
+    ) -> None:
+        histogram(
+            df=df, x=x, xlabel=xlabel, ylabel=ylabel, xlimit=xlimit,
+            bins=bins, palette=palette, label_map=label_map, hue=hue,
+            stacked=stacked, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol
+        )
         self._export_graph(output_name)
-
-    # def pie_TO_DO(
-    #         self, 
-    #         df: pd.DataFrame, 
-    #         value: float,
-    #         label: str, 
-    #         palette: dict[str, str],
-    #         output_name: str='pie', 
-    #         **kwargs
-    #         ) -> None:
-        
-    #     pie_base(df, value, label, palette, **kwargs)
-    #     self._export_graph(output_name)
-
-    # def pie_binary(self, 
-    #         input: Dict[bool, int],
-    #         palette: Dict[bool, str] = {True: Colors.GREEN, False: Colors.RED},
-    #         output_name: str='pie_binary',
-    #         **kwargs
-    #     ) -> None:
-    #     """Wrapper function for binary pie chart"""
-
-    #     df_binary = pd.DataFrame({
-    #         'key': input.keys(),
-    #         'value': input.values()
-    #     })
-
-    #     pie_base(df=df_binary, value="value", label="key", palette=palette, label_map=None, **kwargs)
-    #     self._export_graph(output_name)
-
-    # def pie_missing_values(
-    #     self,
-    #     df: pd.DataFrame, 
-    #     col: str,
-    #     color_missing: str = Colors.RED, 
-    #     color_non_missing: str = Colors.GREEN, 
-    #     output_name: str='pie_missing_values',
-    #     **kwargs
-    # ) -> None:
-    #     """Wrapper function for pie chart generation for missing values."""
-
-    #     # Count missing and non-missing values
-    #     missing_count = df[col].isna().sum()
-    #     non_missing_count = len(df) - missing_count
-        
-    #     # Create a new DataFrame to hold counts
-    #     df_missing_values = pd.DataFrame({
-    #         col: ["Missing Values", "Non-Missing Values"],
-    #         "count": [missing_count, non_missing_count]
-    #     })
-    #     palette={"Missing Values": color_missing, "Non-Missing Values": color_non_missing}
-
-    #     pie_base(df=df_missing_values, value="count", label=col, palette=palette, label_map=None, **kwargs)
-    #     self._export_graph(output_name)
 
     def pie(
         self,
-        df: pd.DataFrame, 
-        col: str, 
-        palette: Dict[str, str], 
-        output_name: str='pie_value_counts',
-        **kwargs
+        df: pd.DataFrame,
+        col: str,
+        palette: Dict[Any, str],
+        label_map: Optional[Dict[Any, str]] = None,
+        white_text_labels: Optional[Union[str, list[str]]] = None,
+        n_after_comma: int = 0,
+        value_datalabel: int = 5,
+        donut: bool = False,
+        output_name: str = 'pie_value_counts'
     ) -> None:
-        
-        """Wrapper function for pie chart generation."""
         df_value_counts = _calculate_value_counts(df, col)
-        pie_base(df=df_value_counts, value="count", label=col, palette=palette, **kwargs)
+        pie_base(
+            df=df_value_counts,
+            value="count",
+            label=col,
+            palette=palette,
+            label_map=label_map,
+            white_text_labels=white_text_labels,
+            n_after_comma=n_after_comma,
+            value_datalabel=value_datalabel,
+            donut=donut
+        )
         self._export_graph(output_name)
 
 
@@ -159,9 +179,16 @@ class PlotGraphs:
         df: pd.DataFrame,
         x: str,
         y: str,
-        output_name: str='lineplot',
-        **kwargs
+        xlabel: str = '',
+        ylabel: str = '',
+        rotation: int = 0,
+        dynamic_x_ticks: Optional[int] = None,
+        fill_missing_values: Optional[str] = None,
+        output_name: str = 'lineplot'
     ) -> None:
-
-        lineplot(df, x, y, **kwargs)
+        lineplot(
+            df=df, x=x, y=y, xlabel=xlabel, ylabel=ylabel,
+            rotation=rotation, dynamic_x_ticks=dynamic_x_ticks,
+            fill_missing_values=fill_missing_values
+        )
         self._export_graph(output_name)
