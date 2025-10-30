@@ -1,123 +1,107 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-from typing import Optional, Union, Dict
+from typing import Any, Dict, Literal, Optional, Union
 
-from ..formatting import format_ticks, format_xy_labels, format_optional_legend
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
 from ..config import FigureSize
+from ..formatting import format_optional_legend, format_ticks, format_xy_labels
 from ..utils import handle_palette
 
-def _limit_x_axis(data: pd.DataFrame, x: str, xlimit: Optional[Union[float, int]]) -> pd.DataFrame:
+def _limit_x_axis(
+    df: pd.DataFrame,
+    x: str,
+    xlimit: Optional[Union[float, int]]
+) -> pd.DataFrame:
     if xlimit is not None:
-        data = data[data[x] <= xlimit]
-    return data
+        return df[df[x] <= xlimit]
+    return df
 
-def _dynamic_bins(data: pd.DataFrame, x: str, bins: int) -> int:
-    max_value_x: int = int(data[x].max())
-    if max_value_x < bins:
-        bins = max_value_x
-    return bins
+def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
+    max_value_x = int(df[x].max())
+    return min(bins, max_value_x)
 
-def _handle_stacking(hue: Optional[str] = None, stacked: Optional[bool] = None) -> Optional[str]:
-    STANDARD_MULTIPLE = 'stack'
+def _determine_multiple_strategy(
+    hue: Optional[str],
+    stacked: Optional[bool]
+) -> Literal['stack', 'dodge']:
+    if hue is None:
+        return 'stack'
+    if stacked is True:
+        return 'stack'
+    if stacked is False:
+        return 'dodge'
+    return 'stack'
+
+def _convert_to_int(df: pd.DataFrame, x: str) -> pd.DataFrame:
+    df = df.copy()
+    df[x] = df[x].astype(int)
+    return df
+
+def _convert_hue_to_string(df: pd.DataFrame, hue: Optional[str]) -> pd.DataFrame:
     if hue is not None:
-        if stacked is True:
-            multiple = 'stack'
-        elif stacked is False:
-            multiple = 'dodge'
-        else:
-            multiple = STANDARD_MULTIPLE
-    else:
-        multiple = STANDARD_MULTIPLE
-    return multiple
+        df[hue] = df[hue].astype(str)
+    return df
 
-def _ensure_correct_dtypes(data: pd.DataFrame, x: str, hue: str, label_map: dict, palette: dict):
-    data = data.copy()
-    if hue is not None:
-        data[hue] = data[hue].astype(str)
-    if label_map is not None:
-        label_map = {str(key): value for key, value in label_map.items()}
-    if palette is not None:
-        palette = {str(key): value for key, value in palette.items()}
+def _convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
+    if isinstance(d, dict):
+        return {str(key): value for key, value in d.items()}
+    return d
 
-    data[x] = data[x].astype(int)
+def _prepare_data_types(
+    df: pd.DataFrame,
+    x: str,
+    hue: Optional[str],
+    label_map: Optional[dict],
+    palette: Any
+) -> tuple[pd.DataFrame, Optional[dict], Any]:
+    df = _convert_to_int(df, x)
+    df = _convert_hue_to_string(df, hue)
+    label_map = _convert_dict_keys_to_string(label_map)
+    palette = _convert_dict_keys_to_string(palette)
+    return df, label_map, palette
 
-    return data, label_map, palette
-
-def _detect_years(df: pd.DataFrame, x: str) -> bool:
-    """
-    Detect whether the column `x` in the DataFrame `df` contains year-like values (between 1600 and 2300).
-    Returns True if `x` is numeric and not year-like, otherwise False.
-    """
-    numeric_x = True # standard is True
-
+def _is_year_column(df: pd.DataFrame, x: str) -> bool:
     min_value = df[x].min()
     max_value = df[x].max()
-
-    len_min_value = len(str(min_value))
-    len_max_value = len(str(max_value))
-
-    if min_value > 1600 and max_value < 2300:
-        if len_min_value == 4 and len_max_value == 4:
-            numeric_x = False
-
-    return numeric_x
+    if 1600 < min_value and max_value < 2300:
+        if len(str(min_value)) == 4 and len(str(max_value)) == 4:
+            return False
+    return True
  
 def histogram(
-    data: pd.DataFrame,
+    df: pd.DataFrame,
     x: str,
     xlabel: str = '',
     ylabel: str = 'Count',
     xlimit: Optional[Union[float, int]] = None,
     bins: int = 100,
-    palette: Optional[Union[Dict[str, str], str]] = None,
-    label_map: Optional[Dict[str, str]] = None,
+    palette: Optional[Union[Dict[Any, str], str]] = None,
+    label_map: Optional[Dict[Any, str]] = None,
     hue: Optional[str] = None,
     stacked: Optional[bool] = None,
     plot_legend: bool = True,
     legend_offset: float = 1.13,
     ncol: int = 2
 ) -> None:
-    
-    # Limit x-axis
-    data = _limit_x_axis(data, x, xlimit)
-
-    # Dynamic bins
-    bins = _dynamic_bins(data, x, bins)
-
-    # If palette is not provided, use the default grey color, if palette is a singular value, use color instead of palette
+    df = _limit_x_axis(df, x, xlimit)
+    bins = _calculate_bins(df, x, bins)
     color, palette = handle_palette(palette)
-    multiple =_handle_stacking(hue, stacked)
-
-    # ensure correct data types
-    data, label_map, palette = _ensure_correct_dtypes(data, x, hue, label_map, palette)
+    multiple = _determine_multiple_strategy(hue, stacked)
+    df, label_map, palette = _prepare_data_types(df, x, hue, label_map, palette)
         
-    # Graph
-    plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT*0.7))
-    plot = sns.histplot(data=data, x=x, hue=hue, alpha=1, edgecolor='white', color=color, palette=palette, bins=bins, multiple=multiple)
+    plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
+    plot = sns.histplot(
+        data=df, x=x, hue=hue,
+        color=color, palette=palette,
+        bins=bins, multiple=multiple,
+        alpha=1, edgecolor='white'
+    )
 
-    # Formatting the plot
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
-    format_ticks(plot, y_grid=True, numeric_x=_detect_years(data, x), numeric_y=True)
-    format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
-
-# sns.histplot(
-#     data=df,
-#     x=x,
-#     hue=hue,
-#     multiple='dodge',  # Stack the histograms for better visualization
-#     palette=palette_has_content,
-#     bins=100,
-#     edgecolor='white',
-#     alpha=1
-# )
-# plt.show()
-
-
-# TO DO when needed: adding a palette
-#     # legend if palette is an option
-#     if hue is not None:
-#         format_legend(label_map=label_map, ncol=2, bbox_to_anchor=(0, 1.04))
-#     else:
-#         if hasattr(plot, 'legend_') and plot.legend_ is not None:
-#             plot.legend_.remove()
+    format_ticks(
+        plot, y_grid=True, numeric_x=_is_year_column(df, x), numeric_y=True
+    )
+    format_optional_legend(
+        plot, hue, plot_legend, label_map, ncol, legend_offset
+    )
