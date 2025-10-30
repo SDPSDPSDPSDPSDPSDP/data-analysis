@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from .plots import (
+    countplot_x,
+    countplot_x_normalized,
     countplot_y,
     countplot_y_normalized,
     histogram,
@@ -68,6 +70,59 @@ class PlotGraphs:
             )
             _save_plot(filepath, self.format)
         plt.show()
+
+    def countplot_x(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = '',
+        ylabel: str = 'Count',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_width: Union[str, float] = 'dynamic',
+        stacked: bool = False,
+        stacked_labels: Optional[str] = None,
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_x'
+    ) -> None:
+        countplot_x(
+            df=df, x=x, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_width=figsize_width, stacked=stacked,
+            stacked_labels=stacked_labels, order_type=order_type
+        )
+        self._export_graph(output_name)
+
+    def countplot_x_normalized(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        hue: str,
+        palette: Dict[Any, str],
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = '',
+        ylabel: str = 'Percentage',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        top_n: Optional[int] = None,
+        figsize_width: Union[str, float] = 'dynamic',
+        order_type: str = 'frequency',
+        output_name: str = 'countplot_x_normalized'
+    ) -> None:
+        countplot_x_normalized(
+            df=df, x=x, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, top_n=top_n,
+            figsize_width=figsize_width, order_type=order_type
+        )
+        self._export_graph(output_name)
 
     def countplot_y(
         self,
