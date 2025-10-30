@@ -20,7 +20,7 @@ def _extract_values_and_labels(
 
 def _apply_label_map_to_labels(
     original_labels: List[str],
-    label_map: Optional[Dict[str, str]]
+    label_map: Optional[Dict[Any, str]]
 ) -> List[str]:
     if not label_map:
         return original_labels
@@ -28,7 +28,7 @@ def _apply_label_map_to_labels(
 
 def _create_colors_from_palette(
     original_labels: List[str],
-    palette: Dict[str, str]
+    palette: Dict[Any, str]
 ) -> List[str]:
     return [palette[label] for label in original_labels]
 
@@ -42,9 +42,9 @@ def _format_legend_labels(
     ]
 
 def _prepare_pie_colors_and_labels(
-    label_map: Optional[Dict[str, str]],
+    label_map: Optional[Dict[Any, str]],
     original_labels: List[str],
-    palette: Dict[str, str],
+    palette: Dict[Any, str],
     values: List[float]
 ) -> Tuple[List[str], List[str]]:
     mapped_labels = _apply_label_map_to_labels(original_labels, label_map)
@@ -95,8 +95,8 @@ def pie_base(
     df: pd.DataFrame,
     value: str,
     label: str,
-    palette: Dict[str, str],
-    label_map: Optional[Dict[str, str]] = None,
+    palette: Dict[Any, str],
+    label_map: Optional[Dict[Any, str]] = None,
     white_text_labels: Optional[Union[str, List[str]]] = None,
     n_after_comma: int = 0,
     value_datalabel: int = VALUE_DATALABEL,
