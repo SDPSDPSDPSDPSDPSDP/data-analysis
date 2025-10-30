@@ -11,7 +11,18 @@ from ..utils import (
     ensure_column_is_string,
     filter_top_n_categories,
 )
-from .countplot_x import _calculate_figsize_width, _sort_pivot_table
+from .countplot_x import _sort_pivot_table
+
+
+def _calculate_figsize_width_normalized(
+    df_pivot: pd.DataFrame,
+    figsize_width: Union[str, float]
+) -> float:
+    if figsize_width == 'dynamic':
+        return (len(df_pivot) * 1) + 1
+    if figsize_width == 'standard':
+        return FigureSize.WIDTH
+    return float(figsize_width)
 
 
 def _calculate_normalized_counts(
@@ -45,7 +56,7 @@ def _create_normalized_plot(
         color=colors,
         edgecolor='none',
         alpha=1,
-        width=0.8,
+        width=0.6,
         ax=plt.gca()
     )
 
@@ -92,7 +103,7 @@ def countplot_x_normalized(
 
     normalized_pivot = _create_normalized_pivot(df, x, hue)
     normalized_pivot = _sort_pivot_table(normalized_pivot, order_type)
-    figsize_width = _calculate_figsize_width(df, x, figsize_width)
+    figsize_width = _calculate_figsize_width_normalized(normalized_pivot, figsize_width)
 
     plt.figure(figsize=(figsize_width, FigureSize.STANDARD_HEIGHT))
     plot = _create_normalized_plot(normalized_pivot, palette)

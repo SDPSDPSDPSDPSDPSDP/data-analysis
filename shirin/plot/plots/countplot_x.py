@@ -39,7 +39,7 @@ def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
         edgecolor='none',
         ax=plt.gca(),
         alpha=1,
-        width=0.4
+        width=0.6
     )
 
 def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
