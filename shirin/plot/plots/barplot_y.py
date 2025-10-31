@@ -41,7 +41,7 @@ def _create_stacked_plot(
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame]:
-    df_prepared = prepare_stacked_data(df, hue, y, order_type, value_col=value)
+    df_prepared = prepare_stacked_data(df, hue, y, order_type, value_col=value, orientation='horizontal')
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
     plot = df_labeled.plot(

@@ -10,8 +10,10 @@ def prepare_stacked_data(
     hue: str,
     category_col: str,
     order_type: OrderTypeInput,
-    value_col: Optional[str] = None
+    value_col: Optional[str] = None,
+    orientation: str = 'vertical'
 ) -> pd.DataFrame:
+
     if value_col:
         # For barplots: pivot with explicit values
         df_pivot = df.pivot(index=category_col, columns=hue, values=value_col).fillna(0)
@@ -24,4 +26,9 @@ def prepare_stacked_data(
     
     # For frequency, use descending; for alphabetical, use ascending
     ascending = False if order_type == 'frequency' else True
+    
+    # Horizontal plots (barh) draw bottom-to-top, so reverse the order
+    if orientation == 'horizontal':
+        ascending = not ascending
+    
     return sort_pivot_table(df_pivot, order_type, ascending=ascending)
