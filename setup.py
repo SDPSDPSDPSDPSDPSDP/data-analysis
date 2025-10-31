@@ -6,9 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "matplotlib",
-        "seaborn",
-        "numpy",
-        "pandas"
+        "seaborn"
     ],
     python_requires=">=3.9",
     author="Shirin",
