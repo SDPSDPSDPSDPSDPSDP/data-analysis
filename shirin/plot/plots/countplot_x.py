@@ -72,7 +72,7 @@ def _get_category_order(
     order_type: OrderTypeInput
 ) -> Optional[Any]:
     if order_type == 'frequency':
-        return df[x].value_counts().index
+        return df[x].value_counts().sort_values(ascending=False).index
     if order_type == 'alphabetical':
         return sorted(df[x].unique())
     return None
