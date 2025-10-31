@@ -1,12 +1,13 @@
-from typing import Any, Dict, List, Optional, Tuple
-
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..config import FigureSize, FontSizes, TextColors
 from ..formatting.text_contrast import get_text_color_for_background
 
+
 VALUE_DATALABEL = 5
+
 
 def _extract_values_and_labels(
     df: pd.DataFrame,
@@ -19,40 +20,6 @@ def _extract_values_and_labels(
     labels = df[label].tolist()
     return values, labels
 
-def _apply_label_map_to_labels(
-    original_labels: List[str],
-    label_map: Optional[Dict[Any, str]]
-) -> List[str]:
-    if not label_map:
-        return original_labels
-    return [label_map.get(label, label) for label in original_labels]
-
-def _create_colors_from_palette(
-    original_labels: List[str],
-    palette: Dict[Any, str]
-) -> List[str]:
-    return [palette[label] for label in original_labels]
-
-def _format_legend_labels(
-    mapped_labels: List[str],
-    values: List[float]
-) -> List[str]:
-    return [
-        f'{mapped_label}: {value:,.0f}'.replace(",", ".")
-        for mapped_label, value in zip(mapped_labels, values)
-    ]
-
-def _prepare_pie_colors_and_labels(
-    label_map: Optional[Dict[Any, str]],
-    original_labels: List[str],
-    palette: Dict[Any, str],
-    values: List[float]
-) -> Tuple[List[str], List[str]]:
-    mapped_labels = _apply_label_map_to_labels(original_labels, label_map)
-    mapped_colors = _create_colors_from_palette(original_labels, palette)
-    legend_labels = _format_legend_labels(mapped_labels, values)
-    return mapped_colors, legend_labels
-
 def _apply_automatic_text_colors(
     autotexts: List[Any],
     palette: Dict[Any, str],
@@ -63,18 +30,6 @@ def _apply_automatic_text_colors(
         bg_color = palette.get(label, '#000000')
         text_color = get_text_color_for_background(bg_color)
         autotext.set_color(text_color)
-
-def _create_pie_legend(legend_labels: List[str]) -> None:
-    legend = plt.legend(
-        legend_labels,
-        loc="lower center",
-        bbox_to_anchor=(0.5, 0.98),
-        fontsize=FontSizes.LEGEND,
-        framealpha=0.0,
-        ncol=1,
-    )
-    for text in legend.get_texts():
-        text.set_color(TextColors.DARK_GREY)
 
 def _create_donut_center() -> None:
     from matplotlib.patches import Circle
@@ -93,9 +48,13 @@ def pie_base(
     donut: bool = False
 ) -> None:
     values, original_labels = _extract_values_and_labels(df, value, label)
-    mapped_colors, legend_labels = _prepare_pie_colors_and_labels(
-        label_map, original_labels, palette, values
-    )
+    
+    mapped_labels = original_labels if not label_map else [label_map.get(label, label) for label in original_labels]
+    mapped_colors = [palette[label] for label in original_labels]
+    legend_labels = [
+        f'{mapped_label}: {val:,.0f}'.replace(",", ".")
+        for mapped_label, val in zip(mapped_labels, values)
+    ]
 
     plt.figure(figsize=(FigureSize.PIE, FigureSize.PIE))
     result = plt.pie(
@@ -114,5 +73,15 @@ def pie_base(
     
     plt.axis('equal')
 
-    _create_pie_legend(legend_labels)
+    legend = plt.legend(
+        legend_labels,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.98),
+        fontsize=FontSizes.LEGEND,
+        framealpha=0.0,
+        ncol=1,
+    )
+    for text in legend.get_texts():
+        text.set_color(TextColors.DARK_GREY)
+        
     _apply_automatic_text_colors(autotexts, palette, original_labels)
