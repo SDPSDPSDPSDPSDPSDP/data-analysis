@@ -1,40 +1,75 @@
-# generate fake datasets
-
-import pandas as pd
-import numpy as np
 import random
-import os
+import numpy as np
+import pandas as pd
+from pandas.core.frame import DataFrame
 
-df = pd.DataFrame({
-    "label": ["A", "B", "A", "C", "B", "B", "C", "A", "A", "C", "D", "E", "F", "A", "B", "C"],
-    "values": [5, 3, 8, 9, 4, 7, 6, 3, 2, 8, 1, 2, 3, 6, 5, 4],
-})
-df["hue"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
-df["label"] = "Label " + df["label"]
 
-# Enlarge the Dataset
-original_length = len(df)
-multiplier = 10000
-df = pd.concat([df] * multiplier, ignore_index=True)
+def _create_base_dataframe() -> DataFrame:
+    initial_labels = ["A", "B", "A", "C", "B", "B", "C", "A", "A", "C", "D", "E", "F", "A", "B", "C"]
+    initial_values = [5, 3, 8, 9, 4, 7, 6, 3, 2, 8, 1, 2, 3, 6, 5, 4]
+    
+    df = pd.DataFrame({
+        "label": initial_labels,
+        "values": initial_values,
+    })
+    
+    df["label"] = "Label " + df["label"]
+    
+    return df
 
-# Ensure more middle values (range: 1-100, higher weights closer to 50)
-weights = [100 - abs(50 - x) for x in range(1, 101)]  # Higher weights for middle values
-middle_distribution = [random.choices(range(1, 101), weights=weights)[0] for _ in range(len(df))]
-df["values"] = middle_distribution
 
-df["hue"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
-df['hue2'] = df['hue'] == 'category_1'
-# Generate a fake dataset
-np.random.seed(42)  # Set a seed for reproducibility
+def _expand_dataframe(df: DataFrame, multiplier: int = 10000) -> DataFrame:
+    return pd.concat([df] * multiplier, ignore_index=True)
 
-# Create fake data
-years = range(2000, 2023)  # Years from 2000 to 2022
-cumul_total_docs = np.cumsum(np.random.randint(50, 150, size=len(years)))  # Cumulative document count
 
-# Build the DataFrame
-df_documents_by_year = pd.DataFrame({
-    'year': years,  # Year values as integers
-    'cumul_total_docs': cumul_total_docs  # Cumulative total documents
-})
+def _generate_middle_weighted_values(num_rows: int, value_range: tuple[int, int] = (1, 101)) -> list[int]:
+    min_val, max_val = value_range
+    midpoint = (min_val + max_val) // 2
+    
+    weights = [100 - abs(midpoint - x) for x in range(min_val, max_val)]
+    values = [random.choices(range(min_val, max_val), weights=weights)[0] for _ in range(num_rows)]
+    
+    return values
 
-df_documents_by_year
+
+def _add_category_columns(df: DataFrame) -> DataFrame:
+    df["hue"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
+    df['hue2'] = df['hue'] == 'category_1'
+    return df
+
+
+def _create_documents_by_year_dataframe() -> DataFrame:
+    np.random.seed(42)
+    
+    start_year = 2000
+    end_year = 2023
+    years = range(start_year, end_year)
+    
+    min_docs_per_year = 50
+    max_docs_per_year = 150
+    random_doc_counts = np.random.randint(min_docs_per_year, max_docs_per_year, size=len(years))
+    cumulative_docs = np.cumsum(random_doc_counts)
+    
+    df_documents = pd.DataFrame({
+        'year': years,
+        'cumul_total_docs': cumulative_docs
+    })
+    
+    cutoff_year = 2010
+    df_documents['hue'] = df_documents['year'] < cutoff_year
+    
+    return df_documents
+
+
+def generate_fake_data() -> tuple[DataFrame, DataFrame]:
+    df = _create_base_dataframe()
+    df = _expand_dataframe(df)
+    df["values"] = _generate_middle_weighted_values(len(df))
+    df = _add_category_columns(df)
+    
+    df_documents_by_year = _create_documents_by_year_dataframe()
+    
+    return df, df_documents_by_year
+
+
+df, df_documents_by_year = generate_fake_data()
