@@ -1,11 +1,13 @@
 import os
-from typing import Any, Dict, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
+from pandas.core.frame import DataFrame
+from typing import Any, Dict, Optional, Union
+import matplotlib.pyplot as plt
 
 from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
 from .plots import (
+    barplot_x,
+    barplot_y,
     countplot_x,
     countplot_x_normalized,
     countplot_y,
@@ -16,7 +18,7 @@ from .plots import (
 )
 
 def _calculate_value_counts(df: pd.DataFrame, col: str) -> pd.DataFrame:
-    df_value_counts = df[col].value_counts().to_frame().reset_index()
+    df_value_counts: DataFrame | Any = df[col].value_counts().to_frame().reset_index()
     df_value_counts.columns = [col, "count"]
     return df_value_counts
 
@@ -224,5 +226,65 @@ class PlotGraphs:
             df=df, x=x, y=y, xlabel=xlabel, ylabel=ylabel,
             rotation=rotation, dynamic_x_ticks=dynamic_x_ticks,
             fill_missing_values=fill_missing_values
+        )
+        self._export_graph(output_name)
+
+    def barplot_x(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        value: str,
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = '',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        figsize_width: FigureSizeInput = 'dynamic',
+        stacked: bool = False,
+        stacked_labels: StackedLabelTypeInput = None,
+        order_type: OrderTypeInput = 'frequency',
+        percentage_labels: bool = False,
+        output_name: str = 'barplot_x'
+    ) -> None:
+        barplot_x(
+            df=df, x=x, value=value, hue=hue, palette=palette,
+            label_map=label_map, xlabel=xlabel, ylabel=ylabel,
+            plot_legend=plot_legend, legend_offset=legend_offset,
+            ncol=ncol, figsize_width=figsize_width, stacked=stacked,
+            stacked_labels=stacked_labels, order_type=order_type,
+            percentage_labels=percentage_labels
+        )
+        self._export_graph(output_name)
+
+    def barplot_y(
+        self,
+        df: pd.DataFrame,
+        y: str,
+        value: str,
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+        xlabel: str = '',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        figsize_height: FigureSizeInput = 'dynamic',
+        stacked: bool = False,
+        stacked_labels: StackedLabelTypeInput = None,
+        order_type: OrderTypeInput = 'frequency',
+        percentage_labels: bool = False,
+        output_name: str = 'barplot_y'
+    ) -> None:
+        barplot_y(
+            df=df, y=y, value=value, hue=hue, palette=palette,
+            label_map=label_map, xlabel=xlabel, ylabel=ylabel,
+            plot_legend=plot_legend, legend_offset=legend_offset,
+            ncol=ncol, figsize_height=figsize_height, stacked=stacked,
+            stacked_labels=stacked_labels, order_type=order_type,
+            percentage_labels=percentage_labels
         )
         self._export_graph(output_name)

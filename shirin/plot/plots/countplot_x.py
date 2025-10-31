@@ -13,6 +13,12 @@ from ..formatting import (
     format_xy_labels,
 )
 from ..utils import ensure_column_is_string, filter_top_n_categories, handle_palette
+from ..utils.sorting import (
+    apply_label_mapping,
+    create_colors_list,
+    create_default_label_map,
+    sort_pivot_table,
+)
 
 def _calculate_figsize_width(
     df: pd.DataFrame,
@@ -42,33 +48,8 @@ def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
         width=0.6
     )
 
-def _sort_by_frequency(df_pivot: pd.DataFrame) -> pd.DataFrame:
-    df_pivot['_order'] = df_pivot.sum(axis=1)
-    df_sorted = df_pivot.sort_values(by='_order', ascending=False)
-    return df_sorted.drop(columns=['_order'])
-
-def _sort_alphabetically(df_pivot: pd.DataFrame) -> pd.DataFrame:
-    return df_pivot.sort_index(ascending=True)
-
 def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput) -> pd.DataFrame:
-    if order_type == 'frequency':
-        return _sort_by_frequency(df_pivot)
-    if order_type == 'alphabetical':
-        return _sort_alphabetically(df_pivot)
-    return df_pivot
-
-def _apply_label_mapping(
-    df: pd.DataFrame,
-    label_map: Optional[Dict[Any, str]]
-) -> pd.DataFrame:
-    if not label_map:
-        return df
-    df = df.copy()
-    df.columns = [label_map.get(col, col) for col in df.columns]
-    return df
-
-def _create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
-    return [palette[col] for col in df.columns]
+    return sort_pivot_table(df_pivot, order_type, ascending=False)
 
 def _prepare_stacked_data(
     df: pd.DataFrame,
@@ -88,8 +69,8 @@ def _create_stacked_plot(
     order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, x, order_type)
-    df_labeled = _apply_label_mapping(df_prepared, label_map)
-    colors = _create_colors_list(df_prepared, palette)
+    df_labeled = apply_label_mapping(df_prepared, label_map)
+    colors = create_colors_list(df_prepared, palette)
     plot = _plot_stacked_bars(df_labeled, colors)
     return plot, df_labeled, df_prepared
 
@@ -105,7 +86,7 @@ def _get_category_order(
     return None
 
 def _create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return {key: key for key in df[hue].unique()}
+    return create_default_label_map(df, hue)
 
 def _plot_standard_countplot(
     df: pd.DataFrame,
