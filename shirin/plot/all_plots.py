@@ -299,8 +299,14 @@ class PlotGraphs:
         df: pd.DataFrame,
         x: str,
         y: str,
+        hue: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = '',
         ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
         rotation: int = 0,
         dynamic_x_ticks: Optional[int] = None,
         fill_missing_values: FillMissingValuesInput = None,
@@ -312,8 +318,15 @@ class PlotGraphs:
             df: DataFrame containing the data to plot.
             x: Column name for the x-axis.
             y: Column name for the y-axis values.
+            hue: Column name for grouping data by color. *Optional*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
             rotation: Rotation angle for x-axis labels in degrees. *Default: `0`*.
             dynamic_x_ticks: Show every Nth x-axis tick to reduce clutter. *Optional*.
             fill_missing_values: How to handle missing values. **Options:** `'shift'` (interpolate),
@@ -321,9 +334,10 @@ class PlotGraphs:
             output_name: Name for the exported file. *Default: `'lineplot'`*.
         """
         lineplot(
-            df=df, x=x, y=y, xlabel=xlabel, ylabel=ylabel,
-            rotation=rotation, dynamic_x_ticks=dynamic_x_ticks,
-            fill_missing_values=fill_missing_values
+            df=df, x=x, y=y, hue=hue, palette=palette, label_map=label_map,
+            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
+            legend_offset=legend_offset, ncol=ncol, rotation=rotation,
+            dynamic_x_ticks=dynamic_x_ticks, fill_missing_values=fill_missing_values
         )
         self._export_graph(output_name)
 
