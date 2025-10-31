@@ -75,7 +75,13 @@ def countplot_y_normalized(
         df = filter_top_n_categories(df, y, top_n)
 
     normalized_pivot = _create_normalized_pivot(df, y, hue)
-    normalized_pivot = sort_pivot_table(normalized_pivot, order_type, ascending=False)
+    
+    # For frequency, use descending; for alphabetical, use ascending
+    # Horizontal plots draw bottom-to-top, so reverse for correct display
+    ascending = False if order_type == 'frequency' else True
+    ascending = not ascending  # Reverse for horizontal orientation
+    normalized_pivot = sort_pivot_table(normalized_pivot, order_type, ascending=ascending)
+    
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
 
     plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
