@@ -24,6 +24,8 @@ def _limit_x_axis(
 
 def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
     max_value_x = int(df[x].max())
+    if max_value_x == 0: # For continuous data (max < 1), don't limit bins
+        return bins
     return min(bins, max_value_x)
 
 def _determine_multiple_strategy(
