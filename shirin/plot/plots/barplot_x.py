@@ -1,8 +1,7 @@
-from typing import Any, Dict, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+from typing import Any, Dict, Optional, Union
 
 from ..config import FigureSize, OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..formatting import (
@@ -32,23 +31,6 @@ def _calculate_figsize_width(
         return FigureSize.WIDTH
     return float(figsize_width)
 
-def _create_pivot_table(df: pd.DataFrame, hue: str, x: str, value: str) -> pd.DataFrame:
-    return df.pivot(index=x, columns=hue, values=value).fillna(0)
-
-def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
-    return df.plot(
-        kind='bar',
-        stacked=True,
-        color=colors,
-        edgecolor='none',
-        ax=plt.gca(),
-        alpha=1,
-        width=0.4
-    )
-
-def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput) -> pd.DataFrame:
-    return sort_pivot_table(df_pivot, order_type, ascending=False)
-
 def _prepare_stacked_data(
     df: pd.DataFrame,
     hue: str,
@@ -56,8 +38,8 @@ def _prepare_stacked_data(
     value: str,
     order_type: OrderTypeInput
 ) -> pd.DataFrame:
-    df_pivot = _create_pivot_table(df, hue, x, value)
-    return _sort_pivot_table(df_pivot, order_type)
+    df_pivot = df.pivot(index=x, columns=hue, values=value).fillna(0)
+    return sort_pivot_table(df_pivot, order_type, ascending=False)
 
 def _create_stacked_plot(
     df: pd.DataFrame,
@@ -71,7 +53,15 @@ def _create_stacked_plot(
     df_prepared = _prepare_stacked_data(df, hue, x, value, order_type)
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
-    plot = _plot_stacked_bars(df_labeled, colors)
+    plot = df_labeled.plot(
+        kind='bar',
+        stacked=True,
+        color=colors,
+        edgecolor='none',
+        ax=plt.gca(),
+        alpha=1,
+        width=0.4
+    )
     return plot, df_prepared
 
 def _get_category_order(
@@ -86,24 +76,6 @@ def _get_category_order(
         return sorted(df[x].unique())
     return None
 
-def _create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return create_default_label_map(df, hue)
-
-def _plot_standard_barplot(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: Optional[str],
-    order: Any,
-    color: Optional[str],
-    palette: Any
-) -> Any:
-    return sns.barplot(
-        data=df, x=x, y=y, hue=hue, order=order,
-        color=color, palette=palette,
-        alpha=1, edgecolor='none', saturation=1,
-        errorbar=None
-    )
 
 def barplot_x(
     df: pd.DataFrame,
@@ -135,18 +107,23 @@ def barplot_x(
     if stacked and hue is not None and isinstance(palette, dict):
         plot, df_unlabeled = _create_stacked_plot(df, hue, x, value, palette, label_map, order_type)
     else:
-        plot = _plot_standard_barplot(df, x, value, hue, order, color, palette)
+        plot = sns.barplot(
+            data=df, x=x, y=value, hue=hue, order=order,
+            color=color, palette=palette,
+            alpha=1, edgecolor='none', saturation=1,
+            errorbar=None
+        )
         df_unlabeled = None
 
     if label_map is None and plot_legend and hue is not None:
-        label_map = _create_default_label_map(df, hue)
+        label_map = create_default_label_map(df, hue)
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
     format_ticks(plot, y_grid=True, numeric_y=True)
     
     if stacked and stacked_labels is not None and df_unlabeled is not None and original_palette is not None:
-        format_datalabels_stacked(plot, df_unlabeled, original_palette, orientation='vertical')
+        format_datalabels_stacked(plot, df_unlabeled, original_palette, orientation='vertical') #type: ignore
     elif not stacked:
         formatting = 'percentage' if percentage_labels else 'totals'
-        format_datalabels(plot, label_offset=0.007, orientation='vertical', formatting=formatting)
+        format_datalabels(plot, label_offset=0.007, orientation='vertical', formatting=formatting) #type: ignore

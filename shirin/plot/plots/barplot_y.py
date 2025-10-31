@@ -1,8 +1,7 @@
-from typing import Any, Dict, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+from typing import Any, Dict, Optional, Union
 
 from ..config import FigureSize, OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..formatting import (
