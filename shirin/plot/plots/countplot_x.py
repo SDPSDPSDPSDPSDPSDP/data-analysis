@@ -11,6 +11,8 @@ from ..formatting import (
     format_ticks,
     format_xy_labels,
 )
+from ..utils.sorting import get_category_order
+from ..utils.stacked_plots import prepare_stacked_data
 from ..utils.data_conversion import ensure_column_is_string
 from ..utils.data_filtering import filter_top_n_categories
 from ..utils.palette_handling import handle_palette
@@ -18,7 +20,6 @@ from ..utils.sorting import (
     apply_label_mapping,
     create_colors_list,
     create_default_label_map,
-    sort_pivot_table,
 )
 
 def _calculate_figsize_width(
@@ -32,18 +33,6 @@ def _calculate_figsize_width(
         return FigureSize.WIDTH
     return float(figsize_width)
 
-def _prepare_stacked_data(
-    df: pd.DataFrame,
-    hue: str,
-    x: str,
-    order_type: OrderTypeInput
-) -> pd.DataFrame:
-    df_subset = df[[hue, x]].copy()
-    value_counts = df_subset.value_counts()
-    value_counts_frame = value_counts.to_frame(name="count").reset_index()
-    df_pivot = value_counts_frame.pivot(index=x, columns=hue, values="count").fillna(0).astype(int)
-    return sort_pivot_table(df_pivot, order_type, ascending=False)
-
 def _create_stacked_plot(
     df: pd.DataFrame,
     hue: str,
@@ -52,7 +41,7 @@ def _create_stacked_plot(
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame]:
-    df_prepared = _prepare_stacked_data(df, hue, x, order_type)
+    df_prepared = prepare_stacked_data(df, hue, x, order_type)
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
     plot = df_labeled.plot(
@@ -65,18 +54,6 @@ def _create_stacked_plot(
         width=0.6
     )
     return plot, df_prepared
-
-def _get_category_order(
-    df: pd.DataFrame,
-    x: str,
-    order_type: OrderTypeInput
-) -> Optional[Any]:
-    if order_type == 'frequency':
-        return df[x].value_counts().index
-    if order_type == 'alphabetical':
-        return sorted(df[x].unique())
-    return None
-
 
 def countplot_x(
     df: pd.DataFrame,
@@ -101,7 +78,7 @@ def countplot_x(
         df = filter_top_n_categories(df, x, top_n)
 
     figsize_width = _calculate_figsize_width(df, x, figsize_width)
-    order = _get_category_order(df, x, order_type)
+    order = get_category_order(df, x, order_type)
     color, palette = handle_palette(palette)
     original_palette = palette if isinstance(palette, dict) else None
 

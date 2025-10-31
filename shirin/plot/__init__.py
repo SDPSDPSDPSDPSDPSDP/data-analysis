@@ -4,10 +4,8 @@ import matplotlib.pyplot as plt
 # import seaborn as sns
 # from matplotlib import font_manager
 
-# FONT_PATH = "./plot/fonts/Roboto-Regular.ttf"
-# font_prop = font_manager.FontProperties(fname=FONT_PATH)
-# plt.rcParams['font.family'] = font_prop.get_name()
-
+# Use a font with naturally wider letter spacing
+# Options: 'Segoe UI', 'Calibri', 'Century Gothic'
 plt.rcParams['font.family'] = 'Arial'
 
 # plt.rcParams['savefig.dpi'] = 300
