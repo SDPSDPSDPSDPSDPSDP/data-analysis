@@ -20,6 +20,7 @@ from ..utils.sorting import (
     create_colors_list,
     create_default_label_map,
     sort_pivot_table,
+    get_category_order,
 )
 
 def _calculate_figsize_height(
@@ -67,17 +68,6 @@ def _create_stacked_plot(
     )
     return plot, df_prepared
 
-def _get_category_order(
-    df: pd.DataFrame,
-    y: str,
-    order_type: OrderTypeInput
-) -> Optional[Any]:
-    if order_type == 'frequency':
-        return df[y].value_counts().sort_values(ascending=False).index
-    if order_type == 'alphabetical':
-        return sorted(df[y].unique())
-    return None
-
 def countplot_y(
     df: pd.DataFrame,
     y: str,
@@ -101,7 +91,7 @@ def countplot_y(
         df = filter_top_n_categories(df, y, top_n)
 
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
-    order = _get_category_order(df, y, order_type)
+    order = get_category_order(df, y, order_type)
     color, palette = handle_palette(palette)
     original_palette = palette if isinstance(palette, dict) else None
 

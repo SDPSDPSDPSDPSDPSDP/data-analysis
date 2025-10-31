@@ -11,6 +11,7 @@ from ..formatting import (
     format_ticks,
     format_xy_labels,
 )
+from ..utils.sorting import get_category_order
 from ..utils.data_conversion import ensure_column_is_string
 from ..utils.data_filtering import filter_top_n_categories
 from ..utils.palette_handling import handle_palette
@@ -66,18 +67,6 @@ def _create_stacked_plot(
     )
     return plot, df_prepared
 
-def _get_category_order(
-    df: pd.DataFrame,
-    x: str,
-    order_type: OrderTypeInput
-) -> Optional[Any]:
-    if order_type == 'frequency':
-        return df[x].value_counts().sort_values(ascending=False).index
-    if order_type == 'alphabetical':
-        return sorted(df[x].unique())
-    return None
-
-
 def countplot_x(
     df: pd.DataFrame,
     x: str,
@@ -101,7 +90,7 @@ def countplot_x(
         df = filter_top_n_categories(df, x, top_n)
 
     figsize_width = _calculate_figsize_width(df, x, figsize_width)
-    order = _get_category_order(df, x, order_type)
+    order = get_category_order(df, x, order_type)
     color, palette = handle_palette(palette)
     original_palette = palette if isinstance(palette, dict) else None
 

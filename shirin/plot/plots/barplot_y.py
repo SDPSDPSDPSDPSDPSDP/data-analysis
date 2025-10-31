@@ -18,6 +18,7 @@ from ..utils.sorting import (
     create_colors_list,
     create_default_label_map,
     sort_pivot_table,
+    get_category_order,
 )
 
 def _calculate_figsize_height(
@@ -64,18 +65,6 @@ def _create_stacked_plot(
     )
     return plot, df_prepared
 
-def _get_category_order(
-    df: pd.DataFrame,
-    y: str,
-    value: str,
-    order_type: OrderTypeInput
-) -> Optional[Any]:
-    if order_type == 'frequency':
-        return df.groupby(y)[value].sum().sort_values(ascending=False).index #type: ignore
-    if order_type == 'alphabetical':
-        return sorted(df[y].unique())
-    return None
-
 def barplot_y(
     df: pd.DataFrame,
     y: str,
@@ -97,7 +86,7 @@ def barplot_y(
     df = ensure_column_is_string(df, y)
 
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
-    order = _get_category_order(df, y, value, order_type)
+    order = get_category_order(df, y, order_type, value_column=value)
     color, palette = handle_palette(palette)
     original_palette = palette if isinstance(palette, dict) else None
 
