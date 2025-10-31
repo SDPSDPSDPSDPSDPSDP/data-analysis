@@ -1,17 +1,17 @@
-from typing import Any, Dict, Literal, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+from typing import Any, Dict, Literal, Optional, Union
 
 from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
-from ..utils import (
+from ..utils.data_conversion import (
     convert_dict_keys_to_string,
     ensure_column_is_int,
     ensure_column_is_string,
-    handle_palette,
 )
+from ..utils.palette_handling import handle_palette
+
 
 def _limit_x_axis(
     df: pd.DataFrame,
@@ -19,7 +19,7 @@ def _limit_x_axis(
     xlimit: Optional[Union[float, int]]
 ) -> pd.DataFrame:
     if xlimit is not None:
-        return df[df[x] <= xlimit]
+        return df[df[x] <= xlimit] #type: ignore
     return df
 
 def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
@@ -52,14 +52,7 @@ def _prepare_data_types(
     palette = convert_dict_keys_to_string(palette)
     return df, label_map, palette
 
-def _is_year_column(df: pd.DataFrame, x: str) -> bool:
-    min_value = df[x].min()
-    max_value = df[x].max()
-    if 1600 < min_value and max_value < 2300:
-        if len(str(min_value)) == 4 and len(str(max_value)) == 4:
-            return False
-    return True
- 
+
 def histogram(
     df: pd.DataFrame,
     x: str,
@@ -80,6 +73,13 @@ def histogram(
     color, palette = handle_palette(palette)
     multiple = _determine_multiple_strategy(hue, stacked)
     df, label_map, palette = _prepare_data_types(df, x, hue, label_map, palette)
+    
+    min_value = df[x].min()
+    max_value = df[x].max()
+    is_year_column = True
+    if 1600 < min_value and max_value < 2300:
+        if len(str(min_value)) == 4 and len(str(max_value)) == 4:
+            is_year_column = False
         
     plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
     plot = sns.histplot(
@@ -91,7 +91,7 @@ def histogram(
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_ticks(
-        plot, y_grid=True, numeric_x=_is_year_column(df, x), numeric_y=True
+        plot, y_grid=True, numeric_x=is_year_column, numeric_y=True
     )
     format_optional_legend(
         plot, hue, plot_legend, label_map, ncol, legend_offset
