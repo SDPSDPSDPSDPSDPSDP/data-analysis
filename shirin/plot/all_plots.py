@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from pandas.core.frame import DataFrame
 from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 
@@ -16,34 +15,31 @@ from .plots import (
     lineplot,
     pie_base,
 )
+from .utils.file_operations import (
+    calculate_value_counts,
+    validate_format,
+    create_filepath,
+    save_plot,
+)
 
-def _calculate_value_counts(df: pd.DataFrame, col: str) -> pd.DataFrame:
-    df_value_counts: DataFrame | Any = df[col].value_counts().to_frame().reset_index()
-    df_value_counts.columns = [col, "count"]
-    return df_value_counts
-
-def _validate_format(format: str) -> None:
-    supported_formats = ['png', 'svg']
-    if format not in supported_formats:
-        raise ValueError(
-            f"Unsupported format '{format}'. "
-            f"Supported formats are {supported_formats}."
-        )
-
-def _create_filepath(
-    output_dir: str,
-    prefix: Optional[str],
-    output_name: str,
-    format: str
-) -> str:
-    if prefix:
-        return os.path.join(output_dir, f"{prefix}_{output_name}.{format}")
-    return os.path.join(output_dir, f"{output_name}.{format}")
-
-def _save_plot(filepath: str, format: str) -> None:
-    plt.savefig(filepath, bbox_inches="tight", dpi=300, format=format)
 
 class PlotGraphs:
+    """A comprehensive plotting interface for creating and exporting data visualizations.
+    
+    This class provides methods for creating various types of plots including **count plots**,
+    **bar plots**, **histograms**, **line plots**, and **pie charts**. All plots can be automatically
+    exported to files with customizable settings.
+    
+    Args:
+        export: Whether to automatically export plots to files. *Default: `True`*.
+        output_dir: Directory where exported plots will be saved. *Default: `'./plot_output/'`*.
+        prefix: Optional prefix to add to all exported filenames. *Default: `None`*.
+        format: File format for exported plots. **Options:** `'png'`, `'svg'`. *Default: `'png'`*.
+    
+    Example:
+        >>> plot = PlotGraphs(export=True, output_dir='./charts/', prefix='analysis')
+        >>> plot.countplot_x(df, x='category', output_name='category_counts')
+    """
 
     def __init__(
         self,
@@ -62,16 +58,16 @@ class PlotGraphs:
         self.format = format.lower()
 
     def _export_graph(self, output_name: str) -> None:
-        _validate_format(self.format)
+        validate_format(self.format)
         
         if self.config["export"]:
-            filepath = _create_filepath(
+            filepath = create_filepath(
                 self.config["output_dir"],
                 self.config["prefix"],
                 output_name,
                 self.format
             )
-            _save_plot(filepath, self.format)
+            save_plot(filepath, self.format)
         plt.show()
 
     def countplot_x(
@@ -95,6 +91,33 @@ class PlotGraphs:
         show_labels: bool = True,
         output_name: str = 'countplot_x'
     ) -> None:
+        """Create a **vertical count plot** showing category frequencies.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name for the x-axis categories.
+            hue: Column name for grouping data by color. *Optional*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            top_n: Show only the top N most frequent categories. *Optional*.
+            figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
+                *Default: `'dynamic'`*.
+            stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
+            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
+                or `None`. *Default: `None`*.
+            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+                *Default: `'frequency'`*.
+            normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
+                *Default: `False`*.
+            show_labels: Whether to show data labels on bars. *Default: `True`*.
+            output_name: Name for the exported file. *Default: `'countplot_x'`*.
+        """
         if normalized:
             if hue is None:
                 raise ValueError("hue must be provided when normalized=True")
@@ -138,6 +161,33 @@ class PlotGraphs:
         show_labels: bool = True,
         output_name: str = 'countplot_y'
     ) -> None:
+        """Create a **horizontal count plot** showing category frequencies.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            y: Column name for the y-axis categories.
+            hue: Column name for grouping data by color. *Optional*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            xlabel: Label for the x-axis. *Default: `'Count'`*.
+            ylabel: Label for the y-axis. *Default: `''`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            top_n: Show only the top N most frequent categories. *Optional*.
+            figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
+                *Default: `'dynamic'`*.
+            stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
+            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
+                or `None`. *Default: `None`*.
+            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+                *Default: `'frequency'`*.
+            normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
+                *Default: `False`*.
+            show_labels: Whether to show data labels on bars. *Default: `True`*.
+            output_name: Name for the exported file. *Default: `'countplot_y'`*.
+        """
         if normalized:
             if hue is None:
                 raise ValueError("hue must be provided when normalized=True")
@@ -177,6 +227,25 @@ class PlotGraphs:
         ncol: int = 2,
         output_name: str = 'histogram'
     ) -> None:
+        """Create a **histogram** showing the distribution of continuous data.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name for the continuous variable to plot.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            xlimit: Maximum value for the x-axis. Values beyond this will be excluded. *Optional*.
+            bins: Number of bins for the histogram. *Default: `100`*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            hue: Column name for grouping data by color. *Optional*.
+            stacked: Whether to stack histograms when using `hue`. *Optional*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            output_name: Name for the exported file. *Default: `'histogram'`*.
+        """
         histogram(
             df=df, x=x, xlabel=xlabel, ylabel=ylabel, xlimit=xlimit,
             bins=bins, palette=palette, label_map=label_map, hue=hue,
@@ -196,7 +265,22 @@ class PlotGraphs:
         donut: bool = False,
         output_name: str = 'pie_value_counts'
     ) -> None:
-        df_value_counts = _calculate_value_counts(df, col)
+        """Create a **pie chart** showing the distribution of categories.
+        
+        The chart _automatically calculates value counts_ from the specified column.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            col: Column name to calculate value counts from.
+            palette: `Dict` mapping category values to hex colors. **Required**.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            n_after_comma: Number of decimal places for percentage labels. *Default: `0`*.
+            value_datalabel: Minimum percentage threshold to display labels. Segments below
+                this percentage won't show labels. *Default: `5`*.
+            donut: Whether to create a donut chart (pie with center hole). *Default: `False`*.
+            output_name: Name for the exported file. *Default: `'pie_value_counts'`*.
+        """
+        df_value_counts = calculate_value_counts(df, col)
         pie_base(
             df=df_value_counts,
             value="count",
@@ -222,6 +306,20 @@ class PlotGraphs:
         fill_missing_values: FillMissingValuesInput = None,
         output_name: str = 'lineplot'
     ) -> None:
+        """Create a **line plot** showing trends over time or across categories.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name for the x-axis.
+            y: Column name for the y-axis values.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `''`*.
+            rotation: Rotation angle for x-axis labels in degrees. *Default: `0`*.
+            dynamic_x_ticks: Show every Nth x-axis tick to reduce clutter. *Optional*.
+            fill_missing_values: How to handle missing values. **Options:** `'shift'` (interpolate),
+                `'zero'` (fill with 0), or `None`. *Default: `None`*.
+            output_name: Name for the exported file. *Default: `'lineplot'`*.
+        """
         lineplot(
             df=df, x=x, y=y, xlabel=xlabel, ylabel=ylabel,
             rotation=rotation, dynamic_x_ticks=dynamic_x_ticks,
@@ -249,6 +347,33 @@ class PlotGraphs:
         percentage_labels: bool = False,
         output_name: str = 'barplot_x'
     ) -> None:
+        """Create a **vertical bar plot** with pre-aggregated data.
+        
+        _Unlike countplot, this requires a column with pre-calculated values._
+        
+        Args:
+            df: DataFrame containing the pre-aggregated data.
+            x: Column name for the x-axis categories.
+            value: Column name containing the values to plot.
+            hue: Column name for grouping data by color. *Optional*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `''`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
+                *Default: `'dynamic'`*.
+            stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
+            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
+                or `None`. *Default: `None`*.
+            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+                *Default: `'frequency'`*.
+            percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
+            output_name: Name for the exported file. *Default: `'barplot_x'`*.
+        """
         barplot_x(
             df=df, x=x, value=value, hue=hue, palette=palette,
             label_map=label_map, xlabel=xlabel, ylabel=ylabel,
@@ -279,6 +404,33 @@ class PlotGraphs:
         percentage_labels: bool = False,
         output_name: str = 'barplot_y'
     ) -> None:
+        """Create a **horizontal bar plot** with pre-aggregated data.
+        
+        _Unlike countplot, this requires a column with pre-calculated values._
+        
+        Args:
+            df: DataFrame containing the pre-aggregated data.
+            y: Column name for the y-axis categories.
+            value: Column name containing the values to plot.
+            hue: Column name for grouping data by color. *Optional*.
+            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
+                categories to hex colors. *Optional*.
+            label_map: `Dict` mapping original category values to display labels. *Optional*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `''`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
+                *Default: `'dynamic'`*.
+            stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
+            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
+                or `None`. *Default: `None`*.
+            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+                *Default: `'frequency'`*.
+            percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
+            output_name: Name for the exported file. *Default: `'barplot_y'`*.
+        """
         barplot_y(
             df=df, y=y, value=value, hue=hue, palette=palette,
             label_map=label_map, xlabel=xlabel, ylabel=ylabel,
