@@ -1,17 +1,14 @@
-from typing import Any, Dict, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+from typing import Any, Dict, Optional
 
 from ..config import FigureSize, OrderTypeInput, FigureSizeInput
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels, format_datalabels_stacked_normalized
-from ..utils import (
-    convert_palette_to_strings,
-    create_label_map,
-    ensure_column_is_string,
-    filter_top_n_categories,
-)
-from .countplot_y import _calculate_figsize_height, _sort_pivot_table
+from ..utils.data_conversion import convert_palette_to_strings, ensure_column_is_string
+from ..utils.data_filtering import filter_top_n_categories
+from ..utils.label_mapping import create_label_map
+from ..utils.sorting import sort_pivot_table
+from .countplot_y import _calculate_figsize_height
 
 
 def _calculate_normalized_counts(
@@ -33,21 +30,6 @@ def _create_normalized_pivot(
         index=y, columns=hue, values="percentage"
     )
     return normalized_pivot.fillna(0)
-
-def _create_normalized_plot(
-    df_pivot: pd.DataFrame,
-    palette: Dict[Any, str]
-) -> Any:
-    colors = [palette[col] for col in df_pivot.columns]
-    return df_pivot.plot(
-        kind='barh',
-        stacked=True,
-        color=colors,
-        edgecolor='none',
-        alpha=1,
-        width=0.8,
-        ax=plt.gca()
-    )
 
 def _ensure_strings(df: pd.DataFrame, y: str, hue: str) -> pd.DataFrame:
     df = ensure_column_is_string(df, y)
@@ -93,11 +75,20 @@ def countplot_y_normalized(
         df = filter_top_n_categories(df, y, top_n)
 
     normalized_pivot = _create_normalized_pivot(df, y, hue)
-    normalized_pivot = _sort_pivot_table(normalized_pivot, order_type)
+    normalized_pivot = sort_pivot_table(normalized_pivot, order_type, ascending=False)
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
 
     plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
-    plot = _create_normalized_plot(normalized_pivot, palette)
+    colors = [palette[col] for col in normalized_pivot.columns]
+    plot = normalized_pivot.plot(
+        kind='barh',
+        stacked=True,
+        color=colors,
+        edgecolor='none',
+        alpha=1,
+        width=0.8,
+        ax=plt.gca()
+    )
     
     normalized_df = _calculate_normalized_counts(df, y, hue)
     label_map = create_label_map(
@@ -110,4 +101,4 @@ def countplot_y_normalized(
     format_ticks(plot=plot, x_grid=True, percentage_x=True)
     
     if show_labels:
-        format_datalabels_stacked_normalized(plot, normalized_pivot, original_palette, orientation='horizontal')
+        format_datalabels_stacked_normalized(plot, normalized_pivot, palette, orientation='horizontal') #type: ignore

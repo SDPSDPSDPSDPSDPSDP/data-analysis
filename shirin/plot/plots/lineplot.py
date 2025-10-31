@@ -1,9 +1,8 @@
-from typing import Any, Optional
-
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+from typing import Any, Optional
 
 from ..config import Colors, FigureSize, FillMissingValuesInput
 from ..formatting import format_ticks, format_xy_labels
@@ -19,14 +18,6 @@ def _create_full_range(df: pd.DataFrame, x: str) -> pd.Series:
         return pd.Series(np.arange(x_min, x_max + 1))
     return pd.Series(pd.date_range(start=x_min, end=x_max))
 
-def _fill_missing_with_shift(df: pd.DataFrame, y: str) -> pd.DataFrame:
-    df[y] = df[y].ffill()
-    return df
-
-def _fill_missing_with_zero(df: pd.DataFrame, y: str) -> pd.DataFrame:
-    df[y] = df[y].fillna(0)
-    return df
-
 def _merge_with_full_range(
     df: pd.DataFrame,
     x: str,
@@ -38,9 +29,11 @@ def _merge_with_full_range(
     df = pd.merge(all_x, df, on=x, how='left')
     
     if fill_strategy == 'shift':
-        return _fill_missing_with_shift(df, y)
+        df[y] = df[y].ffill()
+        return df
     if fill_strategy == 'zero':
-        return _fill_missing_with_zero(df, y)
+        df[y] = df[y].fillna(0)
+        return df
     raise ValueError(
         f"Unsupported fill_missing_values strategy: {fill_strategy}"
     )
@@ -78,6 +71,7 @@ def _apply_dynamic_xticks(
     ]
     plot.set_xticks(x_ticks)
     plot.set_xticklabels(new_labels)
+
 
 def lineplot(
     df: pd.DataFrame,
