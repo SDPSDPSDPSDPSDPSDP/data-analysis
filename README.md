@@ -1,9 +1,7 @@
-# Package for Data Science
-
 This is a reusable package to create data visualizations quickly, efficiently and uniformly. 
 As well as repetitive data cleaning tasks.
 
-## Example Usage
+### Example Usage
 
 The notebook (`example_notebook.ipynb`) is provided to demonstrate everything it has to offer:
 
