@@ -102,4 +102,4 @@ def countplot_x_normalized(
     format_ticks(plot=plot, y_grid=True, percentage_y=True)
     
     if show_labels:
-        format_datalabels_stacked_normalized(plot, normalized_pivot, original_palette, orientation='vertical') #type: ignore
+        format_datalabels_stacked_normalized(plot, normalized_pivot, palette, orientation='vertical') #type: ignore
