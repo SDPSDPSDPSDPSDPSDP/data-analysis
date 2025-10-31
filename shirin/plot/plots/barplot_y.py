@@ -32,23 +32,6 @@ def _calculate_figsize_height(
         return FigureSize.HEIGHT
     return float(figsize_height)
 
-def _create_pivot_table(df: pd.DataFrame, hue: str, y: str, value: str) -> pd.DataFrame:
-    return df.pivot(index=y, columns=hue, values=value).fillna(0)
-
-def _plot_stacked_bars(df: pd.DataFrame, colors: list[str]) -> Any:
-    return df.plot(
-        kind='barh',
-        stacked=True,
-        color=colors,
-        edgecolor='none',
-        ax=plt.gca(),
-        alpha=1,
-        width=0.8
-    )
-
-def _sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput) -> pd.DataFrame:
-    return sort_pivot_table(df_pivot, order_type, ascending=True)
-
 def _prepare_stacked_data(
     df: pd.DataFrame,
     hue: str,
@@ -56,8 +39,8 @@ def _prepare_stacked_data(
     value: str,
     order_type: OrderTypeInput
 ) -> pd.DataFrame:
-    df_pivot = _create_pivot_table(df, hue, y, value)
-    return _sort_pivot_table(df_pivot, order_type)
+    df_pivot = df.pivot(index=y, columns=hue, values=value).fillna(0)
+    return sort_pivot_table(df_pivot, order_type, ascending=False)
 
 def _create_stacked_plot(
     df: pd.DataFrame,
@@ -67,12 +50,20 @@ def _create_stacked_plot(
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
-) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
+) -> tuple[Any, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, y, value, order_type)
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
-    plot = _plot_stacked_bars(df_labeled, colors)
-    return plot, df_labeled, df_prepared
+    plot = df_labeled.plot(
+        kind='barh',
+        stacked=True,
+        color=colors,
+        edgecolor='none',
+        ax=plt.gca(),
+        alpha=1,
+        width=0.8
+    )
+    return plot, df_prepared
 
 def _get_category_order(
     df: pd.DataFrame,
@@ -81,29 +72,10 @@ def _get_category_order(
     order_type: OrderTypeInput
 ) -> Optional[Any]:
     if order_type == 'frequency':
-        return df.groupby(y)[value].sum().sort_values(ascending=True).index
+        return df.groupby(y)[value].sum().sort_values(ascending=False).index #type: ignore
     if order_type == 'alphabetical':
         return sorted(df[y].unique())
     return None
-
-def _create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return create_default_label_map(df, hue)
-
-def _plot_standard_barplot(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: Optional[str],
-    order: Any,
-    color: Optional[str],
-    palette: Any
-) -> Any:
-    return sns.barplot(
-        data=df, x=x, y=y, hue=hue, order=order,
-        color=color, palette=palette,
-        alpha=1, edgecolor='none', saturation=1,
-        errorbar=None
-    )
 
 def barplot_y(
     df: pd.DataFrame,
@@ -133,21 +105,25 @@ def barplot_y(
     plt.figure(figsize=(FigureSize.WIDTH, figsize_height))
     
     if stacked and hue is not None and isinstance(palette, dict):
-        plot, df_transposed, df_unlabeled = _create_stacked_plot(df, hue, y, value, palette, label_map, order_type)
+        plot, df_unlabeled = _create_stacked_plot(df, hue, y, value, palette, label_map, order_type)
     else:
-        plot = _plot_standard_barplot(df, value, y, hue, order, color, palette)
-        df_transposed = None
+        plot = sns.barplot(
+            data=df, x=value, y=y, hue=hue, order=order,
+            color=color, palette=palette,
+            alpha=1, edgecolor='none', saturation=1,
+            errorbar=None
+        )
         df_unlabeled = None
 
     if label_map is None and plot_legend and hue is not None:
-        label_map = _create_default_label_map(df, hue)
+        label_map = create_default_label_map(df, hue)
 
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
     format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
     format_ticks(plot, x_grid=True, numeric_x=True)
     
     if stacked and stacked_labels is not None and df_unlabeled is not None and original_palette is not None:
-        format_datalabels_stacked(plot, df_unlabeled, original_palette)
+        format_datalabels_stacked(plot, df_unlabeled, original_palette) #type: ignore
     elif not stacked:
         formatting = 'percentage' if percentage_labels else 'totals'
-        format_datalabels(plot, label_offset=0.007, orientation='horizontal', formatting=formatting)
+        format_datalabels(plot, label_offset=0.007, orientation='horizontal', formatting=formatting) #type: ignore
