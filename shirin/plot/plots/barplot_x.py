@@ -67,12 +67,12 @@ def _create_stacked_plot(
     palette: Dict[Any, str],
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
-) -> tuple[Any, pd.DataFrame, pd.DataFrame]:
+) -> tuple[Any, pd.DataFrame]:
     df_prepared = _prepare_stacked_data(df, hue, x, value, order_type)
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
     plot = _plot_stacked_bars(df_labeled, colors)
-    return plot, df_labeled, df_prepared
+    return plot, df_prepared
 
 def _get_category_order(
     df: pd.DataFrame,
@@ -81,7 +81,7 @@ def _get_category_order(
     order_type: OrderTypeInput
 ) -> Optional[Any]:
     if order_type == 'frequency':
-        return df.groupby(x)[value].sum().sort_values(ascending=False).index
+        return df.groupby(x)[value].sum().sort_values(ascending=False).index #type: ignore
     if order_type == 'alphabetical':
         return sorted(df[x].unique())
     return None
@@ -133,10 +133,9 @@ def barplot_x(
     plt.figure(figsize=(figsize_width, FigureSize.STANDARD_HEIGHT))
     
     if stacked and hue is not None and isinstance(palette, dict):
-        plot, df_transposed, df_unlabeled = _create_stacked_plot(df, hue, x, value, palette, label_map, order_type)
+        plot, df_unlabeled = _create_stacked_plot(df, hue, x, value, palette, label_map, order_type)
     else:
         plot = _plot_standard_barplot(df, x, value, hue, order, color, palette)
-        df_transposed = None
         df_unlabeled = None
 
     if label_map is None and plot_legend and hue is not None:
