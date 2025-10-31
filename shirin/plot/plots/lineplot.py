@@ -2,10 +2,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from typing import Any, Optional
+from typing import Any, Dict, Optional, Union
 
 from ..config import Colors, FigureSize, FillMissingValuesInput
-from ..formatting import format_ticks, format_xy_labels
+from ..formatting import format_ticks, format_xy_labels, format_optional_legend
+from ..utils.palette_handling import handle_palette
+from ..utils.sorting import create_default_label_map
 
 
 def _sort_by_column(df: pd.DataFrame, x: str) -> pd.DataFrame:
@@ -42,6 +44,7 @@ def _prepare_lineplot_data(
     df: pd.DataFrame,
     x: str,
     y: str,
+    hue: Optional[str],
     fill_missing_values: FillMissingValuesInput
 ) -> pd.DataFrame:
     df = df.copy()
@@ -50,8 +53,20 @@ def _prepare_lineplot_data(
 
     df = _sort_by_column(df, x)
     if fill_missing_values is not None:
-        x_range = _create_full_range(df, x)
-        df = _merge_with_full_range(df, x, x_range, y, fill_missing_values)
+        if hue is not None:
+            # For hue plots, fill missing values per hue group
+            dfs = []
+            for hue_value in df[hue].unique():
+                df_group = df[df[hue] == hue_value].copy()
+                assert isinstance(df_group, pd.DataFrame)
+                x_range = _create_full_range(df_group, x)
+                df_merged = _merge_with_full_range(df_group, x, x_range, y, fill_missing_values)
+                df_merged[hue] = hue_value
+                dfs.append(df_merged)
+            df = pd.concat(dfs, ignore_index=True)
+        else:
+            x_range = _create_full_range(df, x)
+            df = _merge_with_full_range(df, x, x_range, y, fill_missing_values)
 
     df[x] = df[x].astype(str)
     return df
@@ -77,20 +92,36 @@ def lineplot(
     df: pd.DataFrame,
     x: str,
     y: str,
+    hue: Optional[str] = None,
+    palette: Optional[Union[Dict[Any, str], str]] = None,
+    label_map: Optional[Dict[Any, str]] = None,
     xlabel: str = '',
     ylabel: str = '',
+    plot_legend: bool = True,
+    legend_offset: float = 1.13,
+    ncol: int = 2,
     rotation: int = 0,
     dynamic_x_ticks: Optional[int] = None,
     fill_missing_values: FillMissingValuesInput = None
 ) -> None:
-    df = _prepare_lineplot_data(df, x, y, fill_missing_values)
+    df = _prepare_lineplot_data(df, x, y, hue, fill_missing_values)
+
+    color, palette = handle_palette(palette)
+    
+    # When no hue and no palette, use black
+    if hue is None and palette is None and color is not None:
+        color = Colors.BLACK
 
     plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.5))
     plot = sns.lineplot(
-        data=df, x=x, y=y,
-        alpha=1, linewidth=2, color=Colors.BLACK
+        data=df, x=x, y=y, hue=hue,
+        alpha=1, linewidth=2, color=color, palette=palette
     )
 
+    if label_map is None and plot_legend and hue is not None:
+        label_map = create_default_label_map(df, hue)
+
     format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
+    format_optional_legend(plot, hue, plot_legend, label_map, ncol, legend_offset)
     format_ticks(plot, y_grid=True, numeric_y=True, rotation=rotation)
     _apply_dynamic_xticks(plot, dynamic_x_ticks)
