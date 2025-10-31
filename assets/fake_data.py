@@ -39,26 +39,43 @@ def _add_category_columns(df: DataFrame) -> DataFrame:
 
 
 def _create_documents_by_year_dataframe() -> DataFrame:
+    """Creates dataframe with 2 rows per year (one for each type: True/False)."""
     np.random.seed(42)
     
     start_year = 2000
     end_year = 2023
     years = range(start_year, end_year)
     
-    min_docs_per_year = 50
-    max_docs_per_year = 150
-    random_doc_counts = np.random.randint(min_docs_per_year, max_docs_per_year, size=len(years))
-    cumulative_docs = np.cumsum(random_doc_counts)
-    
-    df_documents = pd.DataFrame({
-        'year': years,
-        'cumul_total_docs': cumulative_docs
-    })
-    
     cutoff_year = 2010
-    df_documents['hue'] = df_documents['year'] < cutoff_year
     
-    return df_documents
+    rows = []
+    cumul_true = 0
+    cumul_false = 0
+    
+    for year in years:
+        hue_value = year < cutoff_year
+        
+        # Generate very different counts for each type
+        count_true = np.random.randint(80, 150)
+        count_false = np.random.randint(20, 60)
+        
+        cumul_true += count_true
+        cumul_false += count_false
+        
+        rows.append({
+            'year': year,
+            'cumul_total_docs': cumul_true,
+            'hue': hue_value,
+            'type': True
+        })
+        rows.append({
+            'year': year,
+            'cumul_total_docs': cumul_false,
+            'hue': hue_value,
+            'type': False
+        })
+    
+    return pd.DataFrame(rows)
 
 
 def generate_fake_data() -> tuple[DataFrame, DataFrame]:
