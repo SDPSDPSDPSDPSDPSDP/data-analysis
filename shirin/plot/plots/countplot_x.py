@@ -12,7 +12,9 @@ from ..formatting import (
     format_ticks,
     format_xy_labels,
 )
-from ..utils import ensure_column_is_string, filter_top_n_categories, handle_palette
+from ..utils.data_conversion import ensure_column_is_string
+from ..utils.data_filtering import filter_top_n_categories
+from ..utils.palette_handling import handle_palette
 from ..utils.sorting import (
     apply_label_mapping,
     create_colors_list,

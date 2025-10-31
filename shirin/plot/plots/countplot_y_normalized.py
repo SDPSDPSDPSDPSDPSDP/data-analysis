@@ -5,12 +5,9 @@ import pandas as pd
 
 from ..config import FigureSize, OrderTypeInput, FigureSizeInput
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels, format_datalabels_stacked_normalized
-from ..utils import (
-    convert_palette_to_strings,
-    create_label_map,
-    ensure_column_is_string,
-    filter_top_n_categories,
-)
+from ..utils.data_conversion import convert_palette_to_strings, ensure_column_is_string
+from ..utils.data_filtering import filter_top_n_categories
+from ..utils.label_mapping import create_label_map
 from .countplot_y import _calculate_figsize_height, _sort_pivot_table
 
 

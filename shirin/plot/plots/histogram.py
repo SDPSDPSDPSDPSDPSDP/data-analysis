@@ -6,12 +6,12 @@ import seaborn as sns
 
 from ..config import FigureSize
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels
-from ..utils import (
+from ..utils.data_conversion import (
     convert_dict_keys_to_string,
     ensure_column_is_int,
     ensure_column_is_string,
-    handle_palette,
 )
+from ..utils.palette_handling import handle_palette
 
 def _limit_x_axis(
     df: pd.DataFrame,
