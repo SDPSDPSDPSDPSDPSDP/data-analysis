@@ -1,7 +1,6 @@
-from typing import Any, Dict, Optional, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+from typing import Any, Dict, Optional
 
 from ..config import FigureSize, OrderTypeInput, FigureSizeInput
 from ..formatting import format_optional_legend, format_ticks, format_xy_labels, format_datalabels_stacked_normalized
