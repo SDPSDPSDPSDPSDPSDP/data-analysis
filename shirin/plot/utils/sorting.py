@@ -83,4 +83,4 @@ def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
 
 
 def create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return {key: key for key in df[hue].unique()}
+    return {key: str(key) for key in df[hue].unique()}
