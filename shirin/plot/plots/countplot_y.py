@@ -19,8 +19,9 @@ from ..utils.sorting import (
     apply_label_mapping,
     create_colors_list,
     create_default_label_map,
-    sort_pivot_table,
+    get_category_order,
 )
+from ..utils.stacked_plots import prepare_stacked_data
 
 def _calculate_figsize_height(
     df: pd.DataFrame,
@@ -33,18 +34,6 @@ def _calculate_figsize_height(
         return FigureSize.HEIGHT
     return float(figsize_height)
 
-def _prepare_stacked_data(
-    df: pd.DataFrame,
-    hue: str,
-    y: str,
-    order_type: OrderTypeInput
-) -> pd.DataFrame:
-    df_subset = df[[hue, y]].copy()
-    value_counts = df_subset.value_counts()
-    value_counts_frame = value_counts.to_frame(name="count").reset_index()
-    df_pivot = value_counts_frame.pivot(index=y, columns=hue, values="count").fillna(0).astype(int)
-    return sort_pivot_table(df_pivot, order_type, ascending=False)
-
 def _create_stacked_plot(
     df: pd.DataFrame,
     hue: str,
@@ -53,7 +42,7 @@ def _create_stacked_plot(
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame]:
-    df_prepared = _prepare_stacked_data(df, hue, y, order_type)
+    df_prepared = prepare_stacked_data(df, hue, y, order_type, orientation='horizontal')
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
     plot = df_labeled.plot(
@@ -66,17 +55,6 @@ def _create_stacked_plot(
         width=0.8
     )
     return plot, df_prepared
-
-def _get_category_order(
-    df: pd.DataFrame,
-    y: str,
-    order_type: OrderTypeInput
-) -> Optional[Any]:
-    if order_type == 'frequency':
-        return df[y].value_counts().index
-    if order_type == 'alphabetical':
-        return sorted(df[y].unique())
-    return None
 
 def countplot_y(
     df: pd.DataFrame,
@@ -101,7 +79,7 @@ def countplot_y(
         df = filter_top_n_categories(df, y, top_n)
 
     figsize_height = _calculate_figsize_height(df, y, figsize_height)
-    order = _get_category_order(df, y, order_type)
+    order = get_category_order(df, y, order_type)
     color, palette = handle_palette(palette)
     original_palette = palette if isinstance(palette, dict) else None
 
