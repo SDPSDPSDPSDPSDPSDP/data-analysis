@@ -17,9 +17,9 @@ from ..utils.sorting import (
     apply_label_mapping,
     create_colors_list,
     create_default_label_map,
-    sort_pivot_table,
     get_category_order,
 )
+from ..utils.stacked_plots import prepare_stacked_data
 
 def _calculate_figsize_height(
     df: pd.DataFrame,
@@ -32,16 +32,6 @@ def _calculate_figsize_height(
         return FigureSize.HEIGHT
     return float(figsize_height)
 
-def _prepare_stacked_data(
-    df: pd.DataFrame,
-    hue: str,
-    y: str,
-    value: str,
-    order_type: OrderTypeInput
-) -> pd.DataFrame:
-    df_pivot = df.pivot(index=y, columns=hue, values=value).fillna(0)
-    return sort_pivot_table(df_pivot, order_type, ascending=False)
-
 def _create_stacked_plot(
     df: pd.DataFrame,
     hue: str,
@@ -51,7 +41,7 @@ def _create_stacked_plot(
     label_map: Optional[Dict[Any, str]],
     order_type: OrderTypeInput
 ) -> tuple[Any, pd.DataFrame]:
-    df_prepared = _prepare_stacked_data(df, hue, y, value, order_type)
+    df_prepared = prepare_stacked_data(df, hue, y, order_type, value_col=value)
     df_labeled = apply_label_mapping(df_prepared, label_map)
     colors = create_colors_list(df_prepared, palette)
     plot = df_labeled.plot(

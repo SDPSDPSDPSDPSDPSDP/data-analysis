@@ -48,7 +48,7 @@ def sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput, ascendi
     if order_type == 'frequency':
         return sort_by_frequency(df_pivot, ascending=ascending)
     if order_type == 'alphabetical':
-        return _sort_dataframe_alphabetically(df_pivot, ascending=True)
+        return _sort_dataframe_alphabetically(df_pivot, ascending=ascending)
     return df_pivot
 
 
@@ -58,14 +58,6 @@ def get_category_order(
     order_type: OrderTypeInput,
     value_column: Optional[str] = None
 ) -> Optional[Any]:
-    """Get category order for plots.
-    
-    Args:
-        df: DataFrame containing the data
-        column: Column name to order by
-        order_type: How to order ('frequency', 'alphabetical', or None)
-        value_column: Optional value column for barplots (uses sum for frequency ordering)
-    """
     if order_type == 'frequency':
         if value_column:
             # For barplots: sum values by category
