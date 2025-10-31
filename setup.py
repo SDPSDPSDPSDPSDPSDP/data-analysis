@@ -4,10 +4,7 @@ setup(
     name="shirin",
     version="2.0.0",
     packages=find_packages(),
-    install_requires=[
-        "matplotlib",
-        "seaborn"
-    ],
+    install_requires=[],
     python_requires=">=3.9",
     author="Shirin",
     description="Custom visualization tools for data science projects",
