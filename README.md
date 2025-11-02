@@ -7,7 +7,7 @@ The notebook (`example_notebook.ipynb`) is provided to demonstrate everything it
 
 - **How to install** the package.
 - An overview of all the key functionalities across different modules.
-- Practical examples.
+- **Practical examples.**
 
 ---
 WIP: This package is and always will be a work in progress.
