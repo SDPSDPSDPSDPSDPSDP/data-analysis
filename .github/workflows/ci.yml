@@ -1,11 +1,11 @@
 name: CI
 
-# Run on push to main and on pull requests
+# Run on push to master and on pull requests
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   test:
