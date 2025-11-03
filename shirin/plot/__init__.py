@@ -1,8 +1,13 @@
+import pandas as pd
+
+import matplotlib.pyplot as plt
 from .all_plots import PlotGraphs
 from .config import FontSizes, FigureSize, Colors
-import matplotlib.pyplot as plt
-# import seaborn as sns
-# from matplotlib import font_manager
+
+
+pd.set_option("display.max_colwidth", None)
+pd.set_option("display.width", 0)
+
 
 # Use a font with naturally wider letter spacing
 # Options: 'Segoe UI', 'Calibri', 'Century Gothic'
@@ -37,5 +42,7 @@ plt.rcParams['font.size'] = FontSizes.TEXT
 plt.rcParams['axes.titlesize'] = FontSizes.TITLE
 plt.rcParams['xtick.labelsize'] = FontSizes.TICKS
 plt.rcParams['ytick.labelsize'] = FontSizes.TICKS
+
+
 
 __all__ = ['PlotGraphs', 'Colors']
