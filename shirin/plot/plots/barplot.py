@@ -2,27 +2,25 @@ from typing import Any, Optional, Dict
 
 import pandas as pd
 
-from ..base_plot import AbstractPlot
-from ..options import BarPlotOptions
-from ..strategies import (
-    get_ordering_strategy,
-    get_figure_size_strategy,
-    get_palette_strategy,
-)
-from ...formatting import (
+from ..core.base_plot import AbstractPlot
+from ..core.options import BarPlotOptions
+from ..common.strategies.ordering import get_ordering_strategy
+from ..common.strategies.figsize import get_figure_size_strategy
+from ..common.strategies.palette import get_palette_strategy
+from ..common.formatting import (
     format_datalabels,
     format_datalabels_stacked,
     format_optional_legend,
     format_ticks,
     format_xy_labels,
 )
-from ...utils.data_conversion import ensure_column_is_string
-from ...utils.sorting import (
+from ..common.data_conversion import ensure_column_is_string
+from ..common.sorting import (
     apply_label_mapping,
     create_colors_list,
     create_default_label_map,
 )
-from ...utils.stacked_plots import prepare_stacked_data
+from ..common.stacked_plots import prepare_stacked_data
 
 
 class BarPlot(AbstractPlot):

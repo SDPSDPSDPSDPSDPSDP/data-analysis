@@ -2,16 +2,16 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ..base_plot import AbstractPlot
-from ..options import LinePlotOptions
-from ..strategies import get_palette_strategy
-from ...formatting import (
+from ..core.base_plot import AbstractPlot
+from ..core.options import LinePlotOptions
+from ..common.strategies.palette import get_palette_strategy
+from ..common.formatting import (
     format_optional_legend,
     format_ticks,
     format_xy_labels,
 )
-from ...utils.label_mapping import create_label_map
-from ...utils.data_conversion import fill_missing_values_in_data
+from ..common.label_mapping import create_label_map
+from ..common.data_conversion import fill_missing_values_in_data
 
 
 class LinePlot(AbstractPlot):
@@ -46,7 +46,7 @@ class LinePlot(AbstractPlot):
         return df
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ...config import FigureSize
+        from ..config import FigureSize
         self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
         
         plot = self.renderer.render_lineplot(

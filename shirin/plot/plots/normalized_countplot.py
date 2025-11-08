@@ -3,19 +3,19 @@ from typing import Any, Optional, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from ..base_plot import AbstractPlot
-from ..options import NormalizedCountPlotOptions
-from ..strategies import get_figure_size_strategy, get_ordering_strategy
-from ...formatting import (
+from ..core.base_plot import AbstractPlot
+from ..core.options import NormalizedCountPlotOptions
+from ..common.strategies.figsize import get_figure_size_strategy
+from ..common.formatting import (
     format_optional_legend,
     format_ticks,
     format_xy_labels,
     format_datalabels_stacked_normalized,
 )
-from ...utils.data_conversion import convert_palette_to_strings, ensure_column_is_string
-from ...utils.data_filtering import filter_top_n_categories
-from ...utils.label_mapping import create_label_map
-from ...utils.sorting import sort_pivot_table
+from ..common.data_conversion import convert_palette_to_strings, ensure_column_is_string
+from ..common.data_filtering import filter_top_n_categories
+from ..common.label_mapping import create_label_map
+from ..common.sorting import sort_pivot_table
 
 
 class NormalizedCountPlot(AbstractPlot):
@@ -68,7 +68,7 @@ class NormalizedCountPlot(AbstractPlot):
         return df
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ...config import FigureSize
+        from ..config import FigureSize
         
         size_strategy = get_figure_size_strategy(self.options.figsize, self.options.orientation)
         figsize = size_strategy.calculate_size(

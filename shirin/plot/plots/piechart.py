@@ -1,12 +1,12 @@
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, List
 
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from ..base_plot import AbstractPlot
-from ..options import PiePlotOptions
-from ...utils.label_mapping import create_label_map
-from ...formatting.text_contrast import get_text_color_for_background
+from ..core.base_plot import AbstractPlot
+from ..core.options import PiePlotOptions
+from ..common.label_mapping import create_label_map
+from ..common.formatting.text_contrast import get_text_color_for_background
 
 
 class PieChart(AbstractPlot):
@@ -38,7 +38,7 @@ class PieChart(AbstractPlot):
         return df
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ...config import FigureSize
+        from ..config import FigureSize
         fig, ax = plt.subplots(figsize=(FigureSize.PIE, FigureSize.PIE))
         
         wedgeprops = dict(edgecolor='none', width=0.6 if self.options.donut else 1.0)
@@ -64,7 +64,7 @@ class PieChart(AbstractPlot):
         return ax
     
     def format_plot(self, plot: Any) -> None:
-        from ...config import FontSizes, TextColors
+        from ..config import FontSizes, TextColors
         
         # Create legend labels
         legend_labels = [

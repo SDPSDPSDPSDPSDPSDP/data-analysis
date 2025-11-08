@@ -4,7 +4,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ...config import OrderTypeInput
-from .utils.sorting import sort_alphabetically
+from ..sorting import sort_alphabetically
 
 
 class OrderingStrategy(ABC):

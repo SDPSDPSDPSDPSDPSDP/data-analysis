@@ -14,7 +14,7 @@ from .core import (
     NormalizedCountPlotOptions,
     create_plot,
 )
-from .utils.file_operations import calculate_value_counts
+from .common.file_operations import calculate_value_counts
 
 
 class PlotGraphs:

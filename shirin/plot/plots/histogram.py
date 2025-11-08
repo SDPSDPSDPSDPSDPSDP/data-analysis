@@ -1,17 +1,17 @@
-from typing import Any, Optional, Dict
+from typing import Any, Optional
 
 import pandas as pd
 
-from ..base_plot import AbstractPlot
-from ..options import HistogramOptions
-from ..strategies import get_palette_strategy
-from ...formatting import (
+from ..core.base_plot import AbstractPlot
+from ..core.options import HistogramOptions
+from ..common.strategies.palette import get_palette_strategy
+from ..common.formatting import (
     format_optional_legend,
     format_ticks,
     format_xy_labels,
 )
-from ...utils.label_mapping import create_label_map
-from ...utils.data_conversion import (
+from ..common.label_mapping import create_label_map
+from ..common.data_conversion import (
     convert_dict_keys_to_string,
     ensure_column_is_int,
     ensure_column_is_string,
@@ -58,7 +58,7 @@ class Histogram(AbstractPlot):
         return min(self.options.bins, max_value_x)
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ...config import FigureSize
+        from ..config import FigureSize
         self.renderer.create_figure((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
         
         # Determine multiple strategy
