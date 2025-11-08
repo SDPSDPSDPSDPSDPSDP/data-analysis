@@ -44,6 +44,7 @@ class PlotRenderer(ABC):
         x: str,
         bins: int,
         hue: Optional[str] = None,
+        color: Optional[str] = None,
         palette: Optional[Union[Dict[Any, str], str]] = None,
         stacked: Optional[bool] = None
     ) -> Any:
@@ -71,6 +72,18 @@ class PlotRenderer(ABC):
     ) -> Any:
         pass
     
+    @abstractmethod
+    def render_piechart(
+        self,
+        values: list[float],
+        colors: list[str],
+        donut: bool,
+        n_after_comma: int,
+        value_datalabel: int,
+        pctdistance: float
+    ) -> Any:
+        pass
+
     @abstractmethod
     def get_current_axes(self) -> Any:
         pass
@@ -133,17 +146,29 @@ class SeabornRenderer(PlotRenderer):
         x: str,
         bins: int,
         hue: Optional[str] = None,
+        color: Optional[str] = None,
         palette: Optional[Union[Dict[Any, str], str]] = None,
         stacked: Optional[bool] = None
     ) -> Any:
+        multiple = 'stack'
+        if hue is None:
+            multiple = 'stack'
+        elif stacked is True:
+            multiple = 'stack'
+        elif stacked is False:
+            multiple = 'dodge'
+        else:
+            multiple = 'stack'
+        
         return sns.histplot(
             data=df,
             x=x,
             bins=bins,
             hue=hue,
+            color=color,
             palette=palette,
-            multiple='stack' if stacked else 'layer',
-            edgecolor='none',
+            multiple=multiple,  # type: ignore
+            edgecolor='white',
             alpha=1
         )
     
@@ -185,5 +210,31 @@ class SeabornRenderer(PlotRenderer):
             width=width
         )
     
+    def render_piechart(
+        self,
+        values: list[float],
+        colors: list[str],
+        donut: bool,
+        n_after_comma: int,
+        value_datalabel: int,
+        pctdistance: float
+    ) -> Any:
+        ax = plt.gca()
+        wedgeprops = dict(edgecolor='none', width=0.6 if donut else 1.0)
+        result = ax.pie(
+            values,
+            colors=colors,
+            autopct=lambda p: f'{p:.{n_after_comma}f}%' if p >= value_datalabel else '',
+            wedgeprops=wedgeprops,
+            textprops={'fontsize': 10},
+            pctdistance=pctdistance,
+        )
+        if donut:
+            from matplotlib.patches import Circle
+            center_circle = Circle((0, 0), 0.6, color='white', fc='white', linewidth=0)
+            ax.add_artist(center_circle)
+        ax.axis('equal')
+        return result
+
     def get_current_axes(self) -> Any:
         return plt.gca()

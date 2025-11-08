@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import pandas as pd
 
@@ -30,7 +30,7 @@ class Histogram(AbstractPlot):
         df = self.options.df.copy()
         
         if self.options.xlimit is not None:
-            df = df[df[self.options.x] <= self.options.xlimit].copy()  # type: ignore
+            df = cast(pd.DataFrame, df[df[self.options.x] <= self.options.xlimit].copy())
         
         return df
     
@@ -61,27 +61,15 @@ class Histogram(AbstractPlot):
         from ..config import FigureSize
         self.renderer.create_figure((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
         
-        # Determine multiple strategy
-        if self.options.hue is None:
-            multiple = 'stack'
-        elif self.options.stacked is True:
-            multiple = 'stack'
-        elif self.options.stacked is False:
-            multiple = 'dodge'
-        else:
-            multiple = 'stack'
-        
-        import seaborn as sns
-        plot = sns.histplot(
-            data=data,
+
+        plot = self.renderer.render_histogram(
+            df=data,
             x=self.options.x,
+            bins=self._bins,
             hue=self.options.hue,
             color=self._color,
             palette=self._palette,
-            bins=self._bins,
-            multiple=multiple,  # type: ignore
-            alpha=1,
-            edgecolor='white'
+            stacked=self.options.stacked
         )
         
         return plot
