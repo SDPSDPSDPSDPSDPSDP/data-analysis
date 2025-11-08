@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from ..config import FigureSize, FigureSizeInput
+from ...config import FigureSize, FigureSizeInput
 
 
 class FigureSizeStrategy(ABC):

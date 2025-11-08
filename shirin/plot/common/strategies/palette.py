@@ -34,7 +34,7 @@ class DefaultPaletteStrategy(PaletteStrategy):
     def get_palette(
         self
     ) -> tuple[Optional[str], Optional[Union[Dict[Any, str], str]]]:
-        from ..config import Colors
+        from ...config import Colors
         return (Colors.GREY, None)
 
 

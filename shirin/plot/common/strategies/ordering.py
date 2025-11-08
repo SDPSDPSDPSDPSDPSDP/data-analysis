@@ -3,8 +3,8 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ..config import OrderTypeInput
-from .common.sorting import sort_alphabetically
+from ...config import OrderTypeInput
+from .utils.sorting import sort_alphabetically
 
 
 class OrderingStrategy(ABC):
