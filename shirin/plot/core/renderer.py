@@ -56,6 +56,7 @@ class PlotRenderer(ABC):
         x: str,
         y: str,
         hue: Optional[str] = None,
+        color: Optional[str] = None,
         palette: Optional[Union[Dict[Any, str], str]] = None
     ) -> Any:
         pass
@@ -152,6 +153,7 @@ class SeabornRenderer(PlotRenderer):
         x: str,
         y: str,
         hue: Optional[str] = None,
+        color: Optional[str] = None,
         palette: Optional[Union[Dict[Any, str], str]] = None
     ) -> Any:
         return sns.lineplot(
@@ -159,9 +161,11 @@ class SeabornRenderer(PlotRenderer):
             x=x,
             y=y,
             hue=hue,
+            color=color,
             palette=palette,
             marker='o',
-            markersize=4
+            markersize=4,
+            alpha=1
         )
     
     def render_stacked_barplot(

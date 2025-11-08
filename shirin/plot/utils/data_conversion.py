@@ -22,3 +22,23 @@ def ensure_column_is_int(df: pd.DataFrame, col: str) -> pd.DataFrame:
     df = df.copy()
     df[col] = df[col].astype(int)
     return df
+
+
+def fill_missing_values_in_data(
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    hue: Optional[str],
+    fill_method: str
+) -> pd.DataFrame:
+    df = df.copy()
+    
+    if fill_method == 'shift':
+        if hue is not None:
+            df[y] = df.groupby(hue)[y].transform(lambda group: group.interpolate())
+        else:
+            df[y] = df[y].interpolate()
+    elif fill_method == 'zero':
+        df[y] = df[y].fillna(0)
+    
+    return df

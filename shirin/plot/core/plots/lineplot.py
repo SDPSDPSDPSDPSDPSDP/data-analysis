@@ -39,6 +39,10 @@ class LinePlot(AbstractPlot):
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         
+        # Default to black when no hue is specified
+        if self.options.hue is None:
+            self._color = 'black'
+        
         return df
     
     def draw(self, data: pd.DataFrame) -> Any:
@@ -50,6 +54,7 @@ class LinePlot(AbstractPlot):
             x=self.options.x,
             y=self.options.y,
             hue=self.options.hue,
+            color=self._color,
             palette=self._palette
         )
         
@@ -78,6 +83,9 @@ class LinePlot(AbstractPlot):
             plot,
             y_grid=True,
             numeric_y=True,
-            rotation=self.options.rotation,
-            dynamic_x_ticks=self.options.dynamic_x_ticks
+            rotation=self.options.rotation
         )
+        
+        if self.options.dynamic_x_ticks is not None:
+            xticks = plot.get_xticks()
+            plot.set_xticks(xticks[::self.options.dynamic_x_ticks])
