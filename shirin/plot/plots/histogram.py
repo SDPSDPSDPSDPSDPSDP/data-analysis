@@ -1,100 +1,109 @@
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Any, Optional, cast
 
-from ..config import FigureSize
-from ..formatting import format_optional_legend, format_ticks, format_xy_labels
-from ..utils.data_conversion import (
+import pandas as pd
+
+from ..core.base_plot import AbstractPlot
+from ..core.options import HistogramOptions
+from ..common.strategies.palette import get_palette_strategy
+from ..common.formatting import (
+    format_optional_legend,
+    format_ticks,
+    format_xy_labels,
+)
+from ..common.label_mapping import create_label_map
+from ..common.data_conversion import (
     convert_dict_keys_to_string,
     ensure_column_is_int,
     ensure_column_is_string,
 )
-from ..utils.palette_handling import handle_palette
 
 
-def _limit_x_axis(
-    df: pd.DataFrame,
-    x: str,
-    xlimit: Optional[Union[float, int]]
-) -> pd.DataFrame:
-    if xlimit is not None:
-        return df[df[x] <= xlimit] #type: ignore
-    return df
-
-def _calculate_bins(df: pd.DataFrame, x: str, bins: int) -> int:
-    max_value_x = int(df[x].max())
-    if max_value_x == 0: # For continuous data (max < 1), don't limit bins
-        return bins
-    return min(bins, max_value_x)
-
-def _determine_multiple_strategy(
-    hue: Optional[str],
-    stacked: Optional[bool]
-) -> Literal['stack', 'dodge']:
-    if hue is None:
-        return 'stack'
-    if stacked is True:
-        return 'stack'
-    if stacked is False:
-        return 'dodge'
-    return 'stack'
-
-def _prepare_data_types(
-    df: pd.DataFrame,
-    x: str,
-    hue: Optional[str],
-    label_map: Optional[dict],
-    palette: Any
-) -> tuple[pd.DataFrame, Optional[dict], Any]:
-    df = ensure_column_is_int(df, x)
-    if hue is not None:
-        df = ensure_column_is_string(df, hue)
-    label_map = convert_dict_keys_to_string(label_map)
-    palette = convert_dict_keys_to_string(palette)
-    return df, label_map, palette
-
-
-def histogram(
-    df: pd.DataFrame,
-    x: str,
-    xlabel: str = '',
-    ylabel: str = 'Count',
-    xlimit: Optional[Union[float, int]] = None,
-    bins: int = 100,
-    palette: Optional[Union[Dict[Any, str], str]] = None,
-    label_map: Optional[Dict[Any, str]] = None,
-    hue: Optional[str] = None,
-    stacked: Optional[bool] = None,
-    plot_legend: bool = True,
-    legend_offset: float = 1.13,
-    ncol: int = 2
-) -> None:
-    df = _limit_x_axis(df, x, xlimit)
-    bins = _calculate_bins(df, x, bins)
-    color, palette = handle_palette(palette)
-    multiple = _determine_multiple_strategy(hue, stacked)
-    df, label_map, palette = _prepare_data_types(df, x, hue, label_map, palette)
+class Histogram(AbstractPlot):
+    def __init__(self, options: HistogramOptions, renderer=None):
+        super().__init__(options, renderer)
+        self.options: HistogramOptions = options
+        self._color: Optional[str] = None
+        self._palette: Optional[Any] = None
+        self._bins: int = 100
     
-    min_value = df[x].min()
-    max_value = df[x].max()
-    is_year_column = True
-    if 1600 < min_value and max_value < 2300:
-        if len(str(min_value)) == 4 and len(str(max_value)) == 4:
-            is_year_column = False
+    def preprocess(self) -> pd.DataFrame:
+        df = self.options.df.copy()
         
-    plt.figure(figsize=(FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
-    plot = sns.histplot(
-        data=df, x=x, hue=hue,
-        color=color, palette=palette,
-        bins=bins, multiple=multiple,
-        alpha=1, edgecolor='white'
-    )
+        if self.options.xlimit is not None:
+            df = cast(pd.DataFrame, df[df[self.options.x] <= self.options.xlimit].copy())
+        
+        return df
+    
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = ensure_column_is_int(df, self.options.x)
+        if self.options.hue is not None:
+            df = ensure_column_is_string(df, self.options.hue)
+        
+        self._bins = self._calculate_bins(df)
+        
+        palette_strategy = get_palette_strategy(self.options.palette)
+        self._color, self._palette = palette_strategy.get_palette()
+        
+        if self.options.label_map:
+            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
+        if isinstance(self._palette, dict):
+            self._palette = convert_dict_keys_to_string(self._palette)
+        
+        return df
+    
+    def _calculate_bins(self, df: pd.DataFrame) -> int:
+        max_value_x = int(df[self.options.x].max())
+        if max_value_x == 0:
+            return self.options.bins
+        return min(self.options.bins, max_value_x)
+    
+    def draw(self, data: pd.DataFrame) -> Any:
+        from ..config import FigureSize
+        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
+        
 
-    format_xy_labels(plot, xlabel=xlabel, ylabel=ylabel)
-    format_ticks(
-        plot, y_grid=True, numeric_x=is_year_column, numeric_y=True
-    )
-    format_optional_legend(
-        plot, hue, plot_legend, label_map, ncol, legend_offset
-    )
+        plot = self.renderer.render_histogram(
+            df=data,
+            x=self.options.x,
+            bins=self._bins,
+            hue=self.options.hue,
+            color=self._color,
+            palette=self._palette,
+            stacked=self.options.stacked
+        )
+        
+        return plot
+    
+    def format_plot(self, plot: Any) -> None:
+        label_map = None
+        if self.options.hue is not None and self.options.label_map is None:
+            label_map = create_label_map(
+                self.options.label_map,
+                self._preprocessed_df[self.options.hue].unique()  # type: ignore
+            )
+        else:
+            label_map = self.options.label_map
+        
+        # Check if it's a year column
+        min_value = self._preprocessed_df[self.options.x].min()  # type: ignore
+        max_value = self._preprocessed_df[self.options.x].max()  # type: ignore
+        is_year_column = True
+        if 1600 < min_value and max_value < 2300:
+            if len(str(min_value)) == 4 and len(str(max_value)) == 4:
+                is_year_column = False
+        
+        format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
+        format_ticks(
+            plot,
+            y_grid=True,
+            numeric_x=is_year_column,
+            numeric_y=True
+        )
+        format_optional_legend(
+            plot,
+            self.options.hue,
+            self.options.plot_legend,
+            label_map,
+            self.options.ncol,
+            self.options.legend_offset
+        )
