@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ...config import OrderTypeInput
+from ..config import OrderTypeInput
 from .common.sorting import sort_alphabetically
 
 
