@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from ..config import TextColors, FontSizes
+from ...config import TextColors, FontSizes
 from matplotlib.axes import Axes
 
 plt.rcParams['axes.labelsize'] = FontSizes.XYLABEL

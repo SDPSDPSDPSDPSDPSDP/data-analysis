@@ -4,8 +4,9 @@ from matplotlib.container import BarContainer
 from typing import List, Dict
 import pandas as pd
 
-from ..config import TextColors, FontSizes
+from ...config import TextColors, FontSizes
 from .text_contrast import get_text_color_for_background
+
 
 def _calculate_label_offset(
     patches: List[Patch], label_offset: float, orientation: str
@@ -13,6 +14,7 @@ def _calculate_label_offset(
     dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
     max_dimension = max(getattr(p, dimension_getter[orientation])() for p in patches)
     return max_dimension * label_offset
+
 
 def _format_labels(
     patches: List[Patch],
@@ -28,6 +30,7 @@ def _format_labels(
             elif formatting == 'percentage':
                 text: str = f'{dimension:,.1f}%'.replace(",", ".")
             _add_text(patch, dimension + label_offset, text, orientation)
+
 
 def _add_text(
     patch: Patch,
@@ -54,6 +57,7 @@ def _add_text(
             color=TextColors.LIGHT_GREY
         )
 
+
 def format_datalabels(
     plot: BarContainer,
     label_offset: float = 0.01,
@@ -63,6 +67,7 @@ def format_datalabels(
     patches: List[Patch] = plot.patches
     label_offset = _calculate_label_offset(patches, label_offset, orientation)
     _format_labels(patches, label_offset, formatting, orientation)
+
 
 def format_datalabels_stacked(
     plot: BarContainer,

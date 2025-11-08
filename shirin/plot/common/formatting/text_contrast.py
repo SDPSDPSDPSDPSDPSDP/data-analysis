@@ -1,4 +1,4 @@
-from ..config import TextColors
+from ...config import TextColors
 
 
 def get_luminance(hex_color: str) -> float:
