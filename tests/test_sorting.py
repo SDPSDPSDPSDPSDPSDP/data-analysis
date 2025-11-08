@@ -1,9 +1,8 @@
 import pandas as pd
 import pytest
-from shirin.plot.utils.sorting import (
+from shirin.plot.common.sorting import (
     sort_alphabetically,
     sort_by_frequency,
-    get_category_order,
     create_colors_list,
 )
 
@@ -44,29 +43,6 @@ def test_sort_by_frequency():
     assert list(result.index) == [2, 1, 0]
     assert 'A' in result.columns
     assert '_order' not in result.columns  # Should be removed
-
-
-def test_get_category_order_frequency():
-    """Test getting category order by frequency."""
-    df = pd.DataFrame({
-        'category': ['a', 'b', 'a', 'a', 'b', 'c']
-    })
-    
-    result = get_category_order(df, 'category', 'frequency')
-    
-    # 'a' appears 3 times, 'b' twice, 'c' once
-    assert list(result) == ['a', 'b', 'c']
-
-
-def test_get_category_order_alphabetical():
-    """Test getting category order alphabetically."""
-    df = pd.DataFrame({
-        'category': ['zebra', 'apple', 'banana']
-    })
-    
-    result = get_category_order(df, 'category', 'alphabetical')
-    
-    assert result == ['apple', 'banana', 'zebra']
 
 
 def test_create_colors_list():

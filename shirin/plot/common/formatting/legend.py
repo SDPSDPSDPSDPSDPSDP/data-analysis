@@ -1,11 +1,15 @@
 import matplotlib.pyplot as plt
 from typing import Any, Optional, Dict, Tuple, TYPE_CHECKING
-from ..config import TextColors, FontSizes
+
+from ...config import TextColors, FontSizes
+
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
 
+
 plt.rcParams['legend.fontsize'] = FontSizes.LEGEND
+
 
 def format_legend(
     label_map: Optional[Dict[Any, str]], 
@@ -39,6 +43,7 @@ def format_legend(
     # Apply dark grey color to all legend text
     for text in legend.get_texts():
         text.set_color(TextColors.DARK_GREY)
+
 
 def format_optional_legend(
     plot: Any, 
