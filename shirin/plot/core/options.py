@@ -24,53 +24,48 @@ class BasePlotOptions:
 
 
 @dataclass
-class CountPlotOptions(BasePlotOptions):
+class CategoricalPlotOptions(BasePlotOptions):
     axis_column: str = ''
     orientation: str = 'vertical'
-    top_n: Optional[int] = None
     figsize: FigureSizeInput = 'dynamic'
     stacked: bool = False
     stacked_labels: StackedLabelTypeInput = None
     order_type: OrderTypeInput = 'frequency'
-    normalized: bool = False
-    show_labels: bool = True
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.axis_column:
             raise ValueError("axis_column must be specified")
         if self.orientation not in ('vertical', 'horizontal'):
             raise ValueError("orientation must be 'vertical' or 'horizontal'")
-        if self.normalized:
-            if self.hue is None:
-                raise ValueError("hue must be provided when normalized=True")
-            if not isinstance(self.palette, dict):
-                raise ValueError("palette must be a dictionary when normalized=True")
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
 
 
 @dataclass
-class BarPlotOptions(BasePlotOptions):
-    axis_column: str = ''
+class CountPlotOptions(CategoricalPlotOptions):
+    top_n: Optional[int] = None
+    normalized: bool = False
+    show_labels: bool = True
+    
+    def validate(self) -> None:
+        super().validate()
+        if self.normalized:
+            if self.hue is None:
+                raise ValueError("hue must be provided when normalized=True")
+            if not isinstance(self.palette, dict):
+                raise ValueError("palette must be a dictionary when normalized=True")
+
+
+@dataclass
+class BarPlotOptions(CategoricalPlotOptions):
     value: str = ''
-    orientation: str = 'vertical'
-    figsize: FigureSizeInput = 'dynamic'
-    stacked: bool = False
-    stacked_labels: StackedLabelTypeInput = None
-    order_type: OrderTypeInput = 'frequency'
     percentage_labels: bool = False
     
     def validate(self) -> None:
         super().validate()
-        if not self.axis_column:
-            raise ValueError("axis_column must be specified")
         if not self.value:
             raise ValueError("value column must be specified")
-        if self.orientation not in ('vertical', 'horizontal'):
-            raise ValueError("orientation must be 'vertical' or 'horizontal'")
-        if self.stacked and self.hue is None:
-            raise ValueError("hue must be provided when stacked=True")
 
 
 @dataclass
@@ -109,8 +104,7 @@ class PiePlotOptions(BasePlotOptions):
     n_after_comma: int = 0
     value_datalabel: int = 5
     donut: bool = False
-    palette: Dict[Any, str] = field(default_factory=dict)
-    label_map: Optional[Dict[Any, str]] = None
+    palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     
     def validate(self) -> None:
         super().validate()
@@ -121,29 +115,15 @@ class PiePlotOptions(BasePlotOptions):
 
 
 @dataclass
-class NormalizedCountPlotOptions(BasePlotOptions):
-    axis_column: str = ''
-    orientation: str = 'vertical'
+class NormalizedCountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
-    figsize: FigureSizeInput = 'dynamic'
-    order_type: OrderTypeInput = 'frequency'
     show_labels: bool = True
-    palette: Dict[Any, str] = field(default_factory=dict)
-    label_map: Optional[Dict[Any, str]] = None
-    hue: str = ''
-    xlabel: str = ''
+    palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     ylabel: str = 'Percentage'
-    plot_legend: bool = True
-    legend_offset: float = 1.13
-    ncol: int = 2
     
     def validate(self) -> None:
         super().validate()
-        if not self.axis_column:
-            raise ValueError("axis_column must be specified")
         if not self.hue:
             raise ValueError("hue must be specified for normalized plots")
-        if self.orientation not in ('vertical', 'horizontal'):
-            raise ValueError("orientation must be 'vertical' or 'horizontal'")
         if not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary for normalized plots")
