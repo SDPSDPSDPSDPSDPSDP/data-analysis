@@ -4,13 +4,18 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 
 from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
-from .core import PlotExporter, CountPlotOptions, BarPlotOptions, create_plot
+from .core import (
+    PlotExporter,
+    CountPlotOptions,
+    BarPlotOptions,
+    HistogramOptions,
+    LinePlotOptions,
+    PiePlotOptions,
+    create_plot,
+)
 from .plots import (
     countplot_x_normalized,
     countplot_y_normalized,
-    histogram,
-    lineplot,
-    pie_base,
 )
 from .utils.file_operations import calculate_value_counts
 
@@ -238,31 +243,23 @@ class PlotGraphs:
         ncol: int = 2,
         output_name: str = 'histogram'
     ) -> None:
-        """Create a **histogram** showing the distribution of continuous data.
-        
-        Args:
-            df: DataFrame containing the data to plot.
-            x: Column name for the continuous variable to plot.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Count'`*.
-            xlimit: Maximum value for the x-axis. Values beyond this will be excluded. *Optional*.
-            bins: Number of bins for the histogram. *Default: `100`*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
-            hue: Column name for grouping data by color. *Optional*.
-            stacked: Whether to stack histograms when using `hue`. *Optional*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
-            output_name: Name for the exported file. *Default: `'histogram'`*.
-        """
-        histogram(
-            df=df, x=x, xlabel=xlabel, ylabel=ylabel, xlimit=xlimit,
-            bins=bins, palette=palette, label_map=label_map, hue=hue,
-            stacked=stacked, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol
+        options = HistogramOptions(
+            df=df,
+            x=x,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlimit=xlimit,
+            bins=bins,
+            palette=palette,
+            label_map=label_map,
+            hue=hue,
+            stacked=stacked,
+            plot_legend=plot_legend,
+            legend_offset=legend_offset,
+            ncol=ncol
         )
+        plot = create_plot('histogram', options)
+        plot.render()
         self._export_graph(output_name)
 
     def pie(
@@ -276,32 +273,18 @@ class PlotGraphs:
         donut: bool = False,
         output_name: str = 'pie_value_counts'
     ) -> None:
-        """Create a **pie chart** showing the distribution of categories.
-        
-        The chart _automatically calculates value counts_ from the specified column.
-        
-        Args:
-            df: DataFrame containing the data to plot.
-            col: Column name to calculate value counts from.
-            palette: `Dict` mapping category values to hex colors. **Required**.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
-            n_after_comma: Number of decimal places for percentage labels. *Default: `0`*.
-            value_datalabel: Minimum percentage threshold to display labels. Segments below
-                this percentage won't show labels. *Default: `5`*.
-            donut: Whether to create a donut chart (pie with center hole). *Default: `False`*.
-            output_name: Name for the exported file. *Default: `'pie_value_counts'`*.
-        """
         df_value_counts = calculate_value_counts(df, col)
-        pie_base(
-            df=df_value_counts,
-            value="count",
-            label=col,
+        options = PiePlotOptions(
+            df=df_value_counts.set_index(col),
+            col='count',
             palette=palette,
             label_map=label_map,
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
             donut=donut
         )
+        plot = create_plot('pie', options)
+        plot.render()
         self._export_graph(output_name)
 
 
@@ -323,33 +306,24 @@ class PlotGraphs:
         fill_missing_values: FillMissingValuesInput = None,
         output_name: str = 'lineplot'
     ) -> None:
-        """Create a **line plot** showing trends over time or across categories.
-        
-        Args:
-            df: DataFrame containing the data to plot.
-            x: Column name for the x-axis.
-            y: Column name for the y-axis values.
-            hue: Column name for grouping data by color. *Optional*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `''`*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
-            rotation: Rotation angle for x-axis labels in degrees. *Default: `0`*.
-            dynamic_x_ticks: Show every Nth x-axis tick to reduce clutter. *Optional*.
-            fill_missing_values: How to handle missing values. **Options:** `'shift'` (interpolate),
-                `'zero'` (fill with 0), or `None`. *Default: `None`*.
-            output_name: Name for the exported file. *Default: `'lineplot'`*.
-        """
-        lineplot(
-            df=df, x=x, y=y, hue=hue, palette=palette, label_map=label_map,
-            xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-            legend_offset=legend_offset, ncol=ncol, rotation=rotation,
-            dynamic_x_ticks=dynamic_x_ticks, fill_missing_values=fill_missing_values
+        options = LinePlotOptions(
+            df=df,
+            x=x,
+            y=y,
+            hue=hue,
+            palette=palette,
+            label_map=label_map,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            plot_legend=plot_legend,
+            legend_offset=legend_offset,
+            ncol=ncol,
+            rotation=rotation,
+            dynamic_x_ticks=dynamic_x_ticks,
+            fill_missing_values=fill_missing_values
         )
+        plot = create_plot('line', options)
+        plot.render()
         self._export_graph(output_name)
 
     def barplot_x(

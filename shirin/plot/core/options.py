@@ -105,18 +105,16 @@ class LinePlotOptions(BasePlotOptions):
 
 
 @dataclass
-class PiePlotOptions:
-    df: pd.DataFrame = field(default_factory=pd.DataFrame)
+class PiePlotOptions(BasePlotOptions):
     col: str = ''
-    palette: Dict[Any, str] = field(default_factory=dict)
-    label_map: Optional[Dict[Any, str]] = None
     n_after_comma: int = 0
     value_datalabel: int = 5
     donut: bool = False
+    palette: Dict[Any, str] = field(default_factory=dict)
+    label_map: Optional[Dict[Any, str]] = None
     
     def validate(self) -> None:
-        if self.df is None or self.df.empty:
-            raise ValueError("DataFrame cannot be None or empty")
+        super().validate()
         if not self.col:
             raise ValueError("col must be specified")
         if not isinstance(self.palette, dict):
