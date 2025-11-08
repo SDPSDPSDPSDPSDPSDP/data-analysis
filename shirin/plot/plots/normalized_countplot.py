@@ -1,7 +1,7 @@
 from typing import Any, Optional, Dict
 
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 from ..core.base_plot import AbstractPlot
 from ..core.options import NormalizedCountPlotOptions
@@ -68,7 +68,7 @@ class NormalizedCountPlot(AbstractPlot):
         return df
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ..config import FigureSize
+
         
         size_strategy = get_figure_size_strategy(self.options.figsize, self.options.orientation)
         figsize = size_strategy.calculate_size(
@@ -77,27 +77,24 @@ class NormalizedCountPlot(AbstractPlot):
             self.options.orientation
         )
         
-        plt.figure(figsize=figsize)
+        self.renderer.create_figure(figsize)
         colors = [self._palette[col] for col in self._normalized_pivot.columns]  # type: ignore
         
         plot_kind = 'bar' if self.options.orientation == 'vertical' else 'barh'
         width = 0.6 if self.options.orientation == 'vertical' else 0.8
         
-        plot = self._normalized_pivot.plot(  # type: ignore
+        plot = self.renderer.render_stacked_barplot(
+            df=self._normalized_pivot,  # type: ignore
             kind=plot_kind,
-            stacked=True,
-            color=colors,
-            edgecolor='none',
-            alpha=1,
-            width=width,
-            ax=plt.gca()
+            colors=colors,
+            width=width
         )
         
         return plot
     
     def format_plot(self, plot: Any) -> None:
         label_map = create_label_map(
-            self.options.label_map if not self.options.plot_legend else self.options.label_map,
+            self.options.label_map,
             self._preprocessed_df[self.options.hue].unique()  # type: ignore
         )
         
