@@ -2,17 +2,6 @@ from ..config import TextColors
 
 
 def get_luminance(hex_color: str) -> float:
-    """Calculate the relative luminance of a hex color.
-    
-    Uses the formula from WCAG 2.0:
-    https://www.w3.org/TR/WCAG20/#relativeluminancedef
-    
-    Args:
-        hex_color: Hex color string (with or without '#')
-        
-    Returns:
-        Relative luminance value between 0 (darkest) and 1 (lightest)
-    """
     # Remove '#' if present
     hex_color = hex_color.lstrip('#')
     
@@ -33,17 +22,6 @@ def get_luminance(hex_color: str) -> float:
 
 
 def get_text_color_for_background(bg_color: str) -> str:
-    """Determine optimal text color (white or black) based on background color.
-    
-    Uses WCAG 2.0 contrast ratio guidelines.
-    Returns white text for dark backgrounds, black text for light backgrounds.
-    
-    Args:
-        bg_color: Background hex color string
-        
-    Returns:
-        Text color (TextColors.WHITE or TextColors.BLACK)
-    """
     luminance = get_luminance(bg_color)
     # Threshold of 0.179 is the WCAG standard for proper contrast
     # Higher luminance = lighter color -> use black text

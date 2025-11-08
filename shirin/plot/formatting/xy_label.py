@@ -12,7 +12,6 @@ def format_xy_labels(
     y_offset: float = 0.5, 
     y_labelpad: int = 20
 ) -> None:
-    """Sets the X and Y labels along with their customization."""
     plt.xlabel(
         xlabel, 
         ha='center', 
