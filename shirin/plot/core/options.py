@@ -119,3 +119,32 @@ class PiePlotOptions(BasePlotOptions):
             raise ValueError("col must be specified")
         if not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary for pie charts")
+
+
+@dataclass
+class NormalizedCountPlotOptions(BasePlotOptions):
+    axis_column: str = ''
+    orientation: str = 'vertical'
+    top_n: Optional[int] = None
+    figsize: FigureSizeInput = 'dynamic'
+    order_type: OrderTypeInput = 'frequency'
+    show_labels: bool = True
+    palette: Dict[Any, str] = field(default_factory=dict)
+    label_map: Optional[Dict[Any, str]] = None
+    hue: str = ''
+    xlabel: str = ''
+    ylabel: str = 'Percentage'
+    plot_legend: bool = True
+    legend_offset: float = 1.13
+    ncol: int = 2
+    
+    def validate(self) -> None:
+        super().validate()
+        if not self.axis_column:
+            raise ValueError("axis_column must be specified")
+        if not self.hue:
+            raise ValueError("hue must be specified for normalized plots")
+        if self.orientation not in ('vertical', 'horizontal'):
+            raise ValueError("orientation must be 'vertical' or 'horizontal'")
+        if not isinstance(self.palette, dict):
+            raise ValueError("palette must be a dictionary for normalized plots")

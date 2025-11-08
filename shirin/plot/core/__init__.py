@@ -8,6 +8,7 @@ from .options import (
     HistogramOptions,
     LinePlotOptions,
     PiePlotOptions,
+    NormalizedCountPlotOptions,
 )
 from .renderer import PlotRenderer, SeabornRenderer
 from .strategies import (
@@ -33,6 +34,7 @@ __all__ = [
     'HistogramOptions',
     'LinePlotOptions',
     'PiePlotOptions',
+    'NormalizedCountPlotOptions',
     'get_ordering_strategy',
     'get_figure_size_strategy',
     'get_palette_strategy',

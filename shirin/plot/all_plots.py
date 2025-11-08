@@ -11,11 +11,8 @@ from .core import (
     HistogramOptions,
     LinePlotOptions,
     PiePlotOptions,
+    NormalizedCountPlotOptions,
     create_plot,
-)
-from .plots import (
-    countplot_x_normalized,
-    countplot_y_normalized,
 )
 from .utils.file_operations import calculate_value_counts
 
@@ -109,13 +106,25 @@ class PlotGraphs:
                 raise ValueError("hue must be provided when normalized=True")
             if not isinstance(palette, dict):
                 raise ValueError("palette must be a dictionary when normalized=True")
-            countplot_x_normalized(
-                df=df, x=x, hue=hue, palette=palette, label_map=label_map,
-                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-                figsize_width=figsize_width, order_type=order_type,
+            options = NormalizedCountPlotOptions(
+                df=df,
+                axis_column=x,
+                orientation='vertical',
+                hue=hue,
+                palette=palette,
+                label_map=label_map,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                plot_legend=plot_legend,
+                legend_offset=legend_offset,
+                ncol=ncol,
+                top_n=top_n,
+                figsize=figsize_width,
+                order_type=order_type,
                 show_labels=show_labels
             )
+            plot = create_plot('normalized_count', options)
+            plot.render()
         else:
             options = CountPlotOptions(
                 df=df,
@@ -194,13 +203,25 @@ class PlotGraphs:
                 raise ValueError("hue must be provided when normalized=True")
             if not isinstance(palette, dict):
                 raise ValueError("palette must be a dictionary when normalized=True")
-            countplot_y_normalized(
-                df=df, y=y, hue=hue, palette=palette, label_map=label_map,
-                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-                figsize_height=figsize_height, order_type=order_type,
+            options = NormalizedCountPlotOptions(
+                df=df,
+                axis_column=y,
+                orientation='horizontal',
+                hue=hue,
+                palette=palette,
+                label_map=label_map,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                plot_legend=plot_legend,
+                legend_offset=legend_offset,
+                ncol=ncol,
+                top_n=top_n,
+                figsize=figsize_height,
+                order_type=order_type,
                 show_labels=show_labels
             )
+            plot = create_plot('normalized_count', options)
+            plot.render()
         else:
             options = CountPlotOptions(
                 df=df,
