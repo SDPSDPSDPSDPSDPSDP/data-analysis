@@ -85,7 +85,3 @@ class LinePlot(AbstractPlot):
             numeric_y=True,
             rotation=self.options.rotation
         )
-        
-        if self.options.dynamic_x_ticks is not None:
-            xticks = plot.get_xticks()
-            plot.set_xticks(xticks[::self.options.dynamic_x_ticks])

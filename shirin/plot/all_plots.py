@@ -323,7 +323,6 @@ class PlotGraphs:
         legend_offset: float = 1.13,
         ncol: int = 2,
         rotation: int = 0,
-        dynamic_x_ticks: Optional[int] = None,
         fill_missing_values: FillMissingValuesInput = None,
         output_name: str = 'lineplot'
     ) -> None:
@@ -340,7 +339,6 @@ class PlotGraphs:
             legend_offset=legend_offset,
             ncol=ncol,
             rotation=rotation,
-            dynamic_x_ticks=dynamic_x_ticks,
             fill_missing_values=fill_missing_values
         )
         plot = create_plot('line', options)

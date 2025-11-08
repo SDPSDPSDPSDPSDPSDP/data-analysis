@@ -93,7 +93,6 @@ class LinePlotOptions(BasePlotOptions):
     x: str = ''
     y: str = ''
     rotation: int = 0
-    dynamic_x_ticks: Optional[int] = None
     fill_missing_values: FillMissingValuesInput = None
     
     def validate(self) -> None:

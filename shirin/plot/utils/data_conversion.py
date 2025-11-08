@@ -35,10 +35,13 @@ def fill_missing_values_in_data(
     
     if fill_method == 'shift':
         if hue is not None:
-            df[y] = df.groupby(hue)[y].transform(lambda group: group.interpolate())
+            df[y] = df.groupby(hue)[y].transform(lambda group: group.interpolate(method='linear', limit_direction='forward'))
         else:
-            df[y] = df[y].interpolate()
+            df[y] = df[y].interpolate(method='linear', limit_direction='forward')
     elif fill_method == 'zero':
-        df[y] = df[y].fillna(0)
+        if hue is not None:
+            df[y] = df.groupby(hue)[y].transform(lambda group: group.fillna(0))
+        else:
+            df[y] = df[y].fillna(0)
     
     return df
