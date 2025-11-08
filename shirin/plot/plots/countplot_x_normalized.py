@@ -9,7 +9,18 @@ from ..utils.data_conversion import convert_palette_to_strings, ensure_column_is
 from ..utils.data_filtering import filter_top_n_categories
 from ..utils.label_mapping import create_label_map
 from ..utils.sorting import sort_pivot_table
-from .countplot_x import _calculate_figsize_width
+
+
+def _calculate_figsize_width(
+    df: pd.DataFrame,
+    x: str,
+    figsize_width: FigureSizeInput
+) -> float:
+    if figsize_width == 'dynamic':
+        return (len(df[x].value_counts()) * 1) + 1
+    if figsize_width == 'standard':
+        return FigureSize.WIDTH
+    return float(figsize_width)
 
 
 def _calculate_normalized_counts(

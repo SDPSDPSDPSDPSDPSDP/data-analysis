@@ -4,23 +4,15 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 
 from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
+from .core import PlotExporter, CountPlotOptions, BarPlotOptions, create_plot
 from .plots import (
-    barplot_x,
-    barplot_y,
-    countplot_x,
     countplot_x_normalized,
-    countplot_y,
     countplot_y_normalized,
     histogram,
     lineplot,
     pie_base,
 )
-from .utils.file_operations import (
-    calculate_value_counts,
-    validate_format,
-    create_filepath,
-    save_plot,
-)
+from .utils.file_operations import calculate_value_counts
 
 
 class PlotGraphs:
@@ -48,27 +40,16 @@ class PlotGraphs:
         prefix: Optional[str] = None,
         format: str = 'png'
     ) -> None:
-        self.config = {
-            "export": export,
-            "output_dir": output_dir,
-            "prefix": prefix,
-        }
-        if self.config["export"]:
-            os.makedirs(self.config["output_dir"], exist_ok=True)
-        self.format = format.lower()
+        self._exporter = PlotExporter(
+            enabled=export,
+            output_dir=output_dir,
+            prefix=prefix,
+            format=format,
+            auto_show=True
+        )
 
     def _export_graph(self, output_name: str) -> None:
-        validate_format(self.format)
-        
-        if self.config["export"]:
-            filepath = create_filepath(
-                self.config["output_dir"],
-                self.config["prefix"],
-                output_name,
-                self.format
-            )
-            save_plot(filepath, self.format)
-        plt.show()
+        self._exporter.export_and_show(output_name)
 
     def countplot_x(
         self,
@@ -131,13 +112,28 @@ class PlotGraphs:
                 show_labels=show_labels
             )
         else:
-            countplot_x(
-                df=df, x=x, hue=hue, palette=palette, label_map=label_map,
-                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-                figsize_width=figsize_width, stacked=stacked,
-                stacked_labels=stacked_labels, order_type=order_type
+            options = CountPlotOptions(
+                df=df,
+                axis_column=x,
+                orientation='vertical',
+                hue=hue,
+                palette=palette,
+                label_map=label_map,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                plot_legend=plot_legend,
+                legend_offset=legend_offset,
+                ncol=ncol,
+                top_n=top_n,
+                figsize=figsize_width,
+                stacked=stacked,
+                stacked_labels=stacked_labels,
+                order_type=order_type,
+                normalized=False,
+                show_labels=show_labels
             )
+            plot = create_plot('count', options)
+            plot.render()
         self._export_graph(output_name)
 
     def countplot_y(
@@ -201,13 +197,28 @@ class PlotGraphs:
                 show_labels=show_labels
             )
         else:
-            countplot_y(
-                df=df, y=y, hue=hue, palette=palette, label_map=label_map,
-                xlabel=xlabel, ylabel=ylabel, plot_legend=plot_legend,
-                legend_offset=legend_offset, ncol=ncol, top_n=top_n,
-                figsize_height=figsize_height, stacked=stacked,
-                stacked_labels=stacked_labels, order_type=order_type
+            options = CountPlotOptions(
+                df=df,
+                axis_column=y,
+                orientation='horizontal',
+                hue=hue,
+                palette=palette,
+                label_map=label_map,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                plot_legend=plot_legend,
+                legend_offset=legend_offset,
+                ncol=ncol,
+                top_n=top_n,
+                figsize=figsize_height,
+                stacked=stacked,
+                stacked_labels=stacked_labels,
+                order_type=order_type,
+                normalized=False,
+                show_labels=show_labels
             )
+            plot = create_plot('count', options)
+            plot.render()
         self._export_graph(output_name)
 
     def histogram(
@@ -388,14 +399,27 @@ class PlotGraphs:
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             output_name: Name for the exported file. *Default: `'barplot_x'`*.
         """
-        barplot_x(
-            df=df, x=x, value=value, hue=hue, palette=palette,
-            label_map=label_map, xlabel=xlabel, ylabel=ylabel,
-            plot_legend=plot_legend, legend_offset=legend_offset,
-            ncol=ncol, figsize_width=figsize_width, stacked=stacked,
-            stacked_labels=stacked_labels, order_type=order_type,
+        options = BarPlotOptions(
+            df=df,
+            axis_column=x,
+            value=value,
+            orientation='vertical',
+            hue=hue,
+            palette=palette,
+            label_map=label_map,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            plot_legend=plot_legend,
+            legend_offset=legend_offset,
+            ncol=ncol,
+            figsize=figsize_width,
+            stacked=stacked,
+            stacked_labels=stacked_labels,
+            order_type=order_type,
             percentage_labels=percentage_labels
         )
+        plot = create_plot('bar', options)
+        plot.render()
         self._export_graph(output_name)
 
     def barplot_y(
@@ -445,12 +469,25 @@ class PlotGraphs:
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             output_name: Name for the exported file. *Default: `'barplot_y'`*.
         """
-        barplot_y(
-            df=df, y=y, value=value, hue=hue, palette=palette,
-            label_map=label_map, xlabel=xlabel, ylabel=ylabel,
-            plot_legend=plot_legend, legend_offset=legend_offset,
-            ncol=ncol, figsize_height=figsize_height, stacked=stacked,
-            stacked_labels=stacked_labels, order_type=order_type,
+        options = BarPlotOptions(
+            df=df,
+            axis_column=y,
+            value=value,
+            orientation='horizontal',
+            hue=hue,
+            palette=palette,
+            label_map=label_map,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            plot_legend=plot_legend,
+            legend_offset=legend_offset,
+            ncol=ncol,
+            figsize=figsize_height,
+            stacked=stacked,
+            stacked_labels=stacked_labels,
+            order_type=order_type,
             percentage_labels=percentage_labels
         )
+        plot = create_plot('bar', options)
+        plot.render()
         self._export_graph(output_name)

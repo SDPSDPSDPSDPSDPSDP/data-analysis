@@ -8,7 +8,18 @@ from ..utils.data_conversion import convert_palette_to_strings, ensure_column_is
 from ..utils.data_filtering import filter_top_n_categories
 from ..utils.label_mapping import create_label_map
 from ..utils.sorting import sort_pivot_table
-from .countplot_y import _calculate_figsize_height
+
+
+def _calculate_figsize_height(
+    df: pd.DataFrame,
+    y: str,
+    figsize_height: FigureSizeInput
+) -> float:
+    if figsize_height == 'dynamic':
+        return (len(df[y].value_counts()) / 2) + 1
+    if figsize_height == 'standard':
+        return FigureSize.HEIGHT
+    return float(figsize_height)
 
 
 def _calculate_normalized_counts(
