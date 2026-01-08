@@ -1,11 +1,16 @@
 """SQL query execution utilities for IBM DB2 databases."""
 
-import json
 import os
 from pathlib import Path
 from typing import Dict, Optional, Union
 import pandas as pd
-from sqlalchemy import create_engine, text
+
+from .helpers import (
+    load_sql_query,
+    load_db_config,
+    convert_extension_types,
+    execute_query
+)
 
 
 try:
@@ -13,88 +18,6 @@ try:
 except AttributeError:
     # Ignore errors for older Python versions without add_dll_directory
     pass
-
-
-def _load_sql_query(sql_query: Union[str, Path]) -> str:
-    if isinstance(sql_query, Path):
-        if not sql_query.exists():
-            raise ValueError(
-                f"SQL file not found: {sql_query}"
-            )
-        with open(sql_query, 'r', encoding='utf-8') as f:
-            return f.read()
-
-    if isinstance(sql_query, str):
-        return sql_query
-
-    raise ValueError(
-        "sql_query must be a string or Path object."
-    )
-
-
-def _load_db_config(
-    db_config: Union[Dict[str, str], Path]
-) -> Dict[str, str]:
-    if isinstance(db_config, Path):
-        if not db_config.exists():
-            raise ValueError(
-                f"Database config file not found: {db_config}"
-            )
-        with open(db_config, 'r', encoding='utf-8') as f:
-            loaded_config = json.load(f)
-        if not isinstance(loaded_config, dict):
-            raise ValueError(
-                "Database config file must contain a JSON object."
-            )
-        return loaded_config
-
-    if isinstance(db_config, dict):
-        return db_config
-
-    raise ValueError(
-        "db_config must be a dictionary or Path object."
-    )
-
-
-def _convert_extension_types(df: pd.DataFrame) -> pd.DataFrame:
-    """Convert pandas extension types to standard types for PyArrow compatibility.
-    This prevents ArrowKeyError when saving to parquet format.
-    """
-    df_converted = pd.DataFrame()
-    
-    for col in df.columns:
-        dtype = df[col].dtype
-        
-        if pd.api.types.is_extension_array_dtype(dtype):
-            if hasattr(df[col], 'to_numpy'):
-                df_converted[col] = pd.Series(df[col].to_numpy(), index=df.index)
-            else:
-                df_converted[col] = df[col].astype(object)
-        else:
-            df_converted[col] = df[col]
-    
-    return df_converted
-
-
-def _execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
-    required_keys = ['user', 'password', 'host', 'port', 'db_name', 'schema']
-    missing_keys = [key for key in required_keys if key not in db_config]
-    if missing_keys:
-        raise KeyError(
-            f"Missing required database config keys: {missing_keys}"
-        )
-
-    connection_string = (
-        f"ibm_db_sa://{db_config['user']}:{db_config['password']}"
-        f"@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
-    )
-    engine = create_engine(connection_string)
-
-    with engine.connect() as connection:
-        connection.execute(text(f"SET SCHEMA {db_config['schema']}"))
-        df = pd.read_sql(sql_query, con=connection)
-
-    return df
 
 
 def run_sql_query(
@@ -130,13 +53,13 @@ def run_sql_query(
         ...     output_path=Path("results.parquet")
         ... )
     """
-    query_string = _load_sql_query(sql_query)
-    config_dict = _load_db_config(db_config)
-    df = _execute_query(query_string, config_dict)
+    query_string = load_sql_query(sql_query)
+    config_dict = load_db_config(db_config)
+    df = execute_query(query_string, config_dict)
 
     if output_path:
         # Convert extension types to avoid PyArrow compatibility issues
-        df_to_save = _convert_extension_types(df)
+        df_to_save = convert_extension_types(df)
         df_to_save.to_parquet(output_path, index=False)
         return None
 
