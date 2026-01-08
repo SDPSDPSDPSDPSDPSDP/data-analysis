@@ -56,6 +56,26 @@ def _load_db_config(
     )
 
 
+def _convert_extension_types(df: pd.DataFrame) -> pd.DataFrame:
+    """Convert pandas extension types to standard types for PyArrow compatibility.
+    This prevents ArrowKeyError when saving to parquet format.
+    """
+    df_converted = pd.DataFrame()
+    
+    for col in df.columns:
+        dtype = df[col].dtype
+        
+        if pd.api.types.is_extension_array_dtype(dtype):
+            if hasattr(df[col], 'to_numpy'):
+                df_converted[col] = pd.Series(df[col].to_numpy(), index=df.index)
+            else:
+                df_converted[col] = df[col].astype(object)
+        else:
+            df_converted[col] = df[col]
+    
+    return df_converted
+
+
 def _execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
     required_keys = ['user', 'password', 'host', 'port', 'db_name', 'schema']
     missing_keys = [key for key in required_keys if key not in db_config]
@@ -115,7 +135,9 @@ def run_sql_query(
     df = _execute_query(query_string, config_dict)
 
     if output_path:
-        df.to_parquet(output_path, index=False)
+        # Convert extension types to avoid PyArrow compatibility issues
+        df_to_save = _convert_extension_types(df)
+        df_to_save.to_parquet(output_path, index=False)
         return None
 
     return df
