@@ -67,7 +67,7 @@ def test_convert_dict_keys_mixed():
     
     mixed_dict = {
         True: "Boolean True",
-        1: "Integer One",
+        2: "Integer Two",
         "key": "String Key",
         2.5: "Float Value"
     }
@@ -75,7 +75,7 @@ def test_convert_dict_keys_mixed():
     converted = convert_dict_keys_to_string(mixed_dict)
     
     assert "True" in converted, "Boolean key should be converted"
-    assert "1" in converted, "Integer key should be converted"
+    assert "2" in converted, "Integer key should be converted"
     assert "key" in converted, "String key should remain"
     assert "2.5" in converted, "Float key should be converted"
     assert converted["True"] == "Boolean True", "Values should be preserved"
