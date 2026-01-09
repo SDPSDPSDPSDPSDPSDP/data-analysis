@@ -15,4 +15,5 @@ dependencies = [
 dev = [
     "jupyter",
     "ipykernel",
+    "pytest>=8.4.2",
 ]
