@@ -7,6 +7,7 @@ from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
 from ..common.label_mapping import create_label_map
 from ..common.formatting.text_contrast import get_text_color_for_background
+from ..common.data_conversion import convert_dict_keys_to_string
 
 
 class PieChart(AbstractPlot):
@@ -27,15 +28,21 @@ class PieChart(AbstractPlot):
         self._values = df[self.options.col].tolist()
         self._original_labels = df.index.tolist()
         
+        label_map_to_use = self.options.label_map
+        if label_map_to_use:
+            label_map_to_use = convert_dict_keys_to_string(label_map_to_use)
+        
         label_map = create_label_map(
-            self.options.label_map,
+            label_map_to_use,
             self._original_labels
         )
         
         original_labels = cast(list, self._original_labels)
-        self._labels = [label_map.get(val, str(val)) for val in original_labels]
+        self._labels = [label_map.get(str(val), str(val)) for val in original_labels]
+        
         palette_dict = cast(dict, self.options.palette)
-        self._colors = [palette_dict[val] for val in original_labels]
+        palette_dict_str = convert_dict_keys_to_string(palette_dict) if palette_dict else {}
+        self._colors = [palette_dict_str.get(str(val), '#000000') for val in original_labels]
         
         return df
     
