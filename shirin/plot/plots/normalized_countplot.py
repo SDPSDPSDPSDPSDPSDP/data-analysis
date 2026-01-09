@@ -12,7 +12,11 @@ from ..common.formatting import (
     format_xy_labels,
     format_datalabels_stacked_normalized,
 )
-from ..common.data_conversion import convert_palette_to_strings, ensure_column_is_string
+from ..common.data_conversion import (
+    convert_palette_to_strings,
+    ensure_column_is_string,
+    convert_dict_keys_to_string,
+)
 from ..common.data_filtering import filter_top_n_categories
 from ..common.label_mapping import create_label_map
 from ..common.sorting import sort_pivot_table
@@ -43,6 +47,9 @@ class NormalizedCountPlot(AbstractPlot):
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         self._palette = convert_palette_to_strings(self.options.palette)
+        
+        if self.options.label_map:
+            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
         
         counts = df.groupby([self.options.axis_column, self.options.hue]).size()
         normalized_counts = counts / counts.groupby(level=0).sum()

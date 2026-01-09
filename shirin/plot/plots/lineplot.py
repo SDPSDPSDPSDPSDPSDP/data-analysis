@@ -11,7 +11,10 @@ from ..common.formatting import (
     format_xy_labels,
 )
 from ..common.label_mapping import create_label_map
-from ..common.data_conversion import fill_missing_values_in_data
+from ..common.data_conversion import (
+    fill_missing_values_in_data,
+    convert_dict_keys_to_string,
+)
 
 
 class LinePlot(AbstractPlot):
@@ -29,7 +32,7 @@ class LinePlot(AbstractPlot):
                 df,
                 self.options.x,
                 self.options.y,
-                self.options.hue,
+                                self.options.hue,
                 self.options.fill_missing_values
             )
         
@@ -42,6 +45,12 @@ class LinePlot(AbstractPlot):
         # Default to black when no hue is specified
         if self.options.hue is None:
             self._color = 'black'
+        
+        # Convert label_map and palette keys to strings to match converted data columns
+        if self.options.label_map:
+            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
+        if isinstance(self._palette, dict):
+            self._palette = convert_dict_keys_to_string(self._palette)
         
         return df
     
