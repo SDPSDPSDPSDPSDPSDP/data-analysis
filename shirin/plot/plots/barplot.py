@@ -16,7 +16,6 @@ from ..common.formatting import (
 )
 from ..common.data_conversion import (
     ensure_column_is_string,
-    convert_dict_keys_to_string,
     prepare_legend_label_map,
 )
 from ..common.sorting import (
