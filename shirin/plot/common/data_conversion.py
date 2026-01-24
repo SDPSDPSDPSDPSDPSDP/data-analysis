@@ -8,6 +8,11 @@ def convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
     return d
 
 
+def prepare_legend_label_map(label_map: Optional[Dict[Any, str]]) -> Optional[Dict[str, str]]:
+    """Convert label_map keys to strings for legend formatting."""
+    return convert_dict_keys_to_string(label_map) if label_map else None
+
+
 def convert_palette_to_strings(palette: Dict[Any, str]) -> Dict[str, str]:
     return {str(k): str(v) for k, v in palette.items()}
 

@@ -14,6 +14,7 @@ from ..common.label_mapping import create_label_map
 from ..common.data_conversion import (
     fill_missing_values_in_data,
     convert_dict_keys_to_string,
+    prepare_legend_label_map,
 )
 
 
@@ -46,11 +47,8 @@ class LinePlot(AbstractPlot):
         if self.options.hue is None:
             self._color = 'black'
         
-        # Convert label_map and palette keys to strings to match converted data columns
-        if self.options.label_map:
-            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
-        if isinstance(self._palette, dict):
-            self._palette = convert_dict_keys_to_string(self._palette)
+        # Keep original types for palette keys to match data types
+        # Label map for legend will be prepared in format_plot
         
         return df
     
@@ -79,12 +77,15 @@ class LinePlot(AbstractPlot):
         else:
             label_map = self.options.label_map
         
+        # Prepare legend version with string keys
+        self._label_map_legend = prepare_legend_label_map(label_map)
+        
         format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
         format_optional_legend(
             plot,
             self.options.hue,
             self.options.plot_legend,
-            label_map,
+            self._label_map_legend,
             self.options.ncol,
             self.options.legend_offset
         )

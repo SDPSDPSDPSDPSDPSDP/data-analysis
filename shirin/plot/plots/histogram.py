@@ -15,6 +15,7 @@ from ..common.data_conversion import (
     convert_dict_keys_to_string,
     ensure_column_is_int,
     ensure_column_is_string,
+    prepare_legend_label_map,
 )
 
 
@@ -36,18 +37,17 @@ class Histogram(AbstractPlot):
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df = ensure_column_is_int(df, self.options.x)
-        if self.options.hue is not None:
-            df = ensure_column_is_string(df, self.options.hue)
+        # Keep hue in original type to match palette keys
+        # if self.options.hue is not None:
+        #     df = ensure_column_is_string(df, self.options.hue)
         
         self._bins = self._calculate_bins(df)
         
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         
-        if self.options.label_map:
-            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
-        if isinstance(self._palette, dict):
-            self._palette = convert_dict_keys_to_string(self._palette)
+        # Keep original types for palette keys to match data types
+        # Label map for legend will be prepared in format_plot
         
         return df
     
@@ -84,6 +84,9 @@ class Histogram(AbstractPlot):
         else:
             label_map = self.options.label_map
         
+        # Prepare legend version with string keys
+        self._label_map_legend = prepare_legend_label_map(label_map)
+        
         # Check if it's a year column
         min_value = self._preprocessed_df[self.options.x].min()  # type: ignore
         max_value = self._preprocessed_df[self.options.x].max()  # type: ignore
@@ -103,7 +106,7 @@ class Histogram(AbstractPlot):
             plot,
             self.options.hue,
             self.options.plot_legend,
-            label_map,
+            self._label_map_legend,
             self.options.ncol,
             self.options.legend_offset
         )

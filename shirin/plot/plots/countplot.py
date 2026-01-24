@@ -17,6 +17,7 @@ from ..common.formatting import (
 from ..common.data_conversion import (
     ensure_column_is_string,
     convert_dict_keys_to_string,
+    prepare_legend_label_map,
 )
 from ..common.data_filtering import filter_top_n_categories
 from ..common.sorting import (
@@ -54,10 +55,8 @@ class CountPlot(AbstractPlot):
         self._color, self._palette = palette_strategy.get_palette()
         self._original_palette = self._palette if isinstance(self._palette, dict) else None
         
-        if self.options.label_map:
-            self.options.label_map = convert_dict_keys_to_string(self.options.label_map)
-        if isinstance(self._palette, dict):
-            self._palette = convert_dict_keys_to_string(self._palette)
+        # Keep original types for palette keys to match data types
+        # Label map for legend will be prepared in format_plot
         
         return df
     
@@ -133,13 +132,16 @@ class CountPlot(AbstractPlot):
                 self.options.hue
             )
         
+        # Create legend version with string keys
+        self._label_map_legend = prepare_legend_label_map(self.options.label_map)
+        
         format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
         
         format_optional_legend(
             plot,
             self.options.hue,
             self.options.plot_legend,
-            self.options.label_map,
+            self._label_map_legend,
             self.options.ncol,
             self.options.legend_offset
         )
