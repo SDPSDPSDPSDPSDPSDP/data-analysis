@@ -1,7 +1,7 @@
 [project]
 name = "shirin"
-version = "2.1.0"
-description = "Add your description here"
+version = "2.2.0"
+description = "A data analysis toolkit for statistical computing, visualization, and SQL operations"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
@@ -9,11 +9,14 @@ dependencies = [
     "seaborn",
     "numpy",
     "pandas",
+    "ipykernel",
+    "ibm-db-sa",
+    "sqlalchemy",
+    "pyarrow",
 ]
 
 [dependency-groups]
 dev = [
     "jupyter",
-    "ipykernel",
     "pytest>=8.4.2",
 ]
