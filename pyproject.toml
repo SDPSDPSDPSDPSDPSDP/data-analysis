@@ -9,11 +9,11 @@ dependencies = [
     "seaborn",
     "numpy",
     "pandas",
+    "ipykernel",
 ]
 
 [dependency-groups]
 dev = [
     "jupyter",
-    "ipykernel",
     "pytest>=8.4.2",
 ]
