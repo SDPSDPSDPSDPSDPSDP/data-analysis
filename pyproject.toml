@@ -10,6 +10,9 @@ dependencies = [
     "numpy",
     "pandas",
     "ipykernel",
+    "ibm-db-sa",
+    "sqlalchemy",
+    "pyarrow",
 ]
 
 [dependency-groups]
