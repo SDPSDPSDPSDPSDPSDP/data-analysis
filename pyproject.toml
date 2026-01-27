@@ -20,3 +20,6 @@ dev = [
     "jupyter",
     "pytest>=8.4.2",
 ]
+
+[tool.setuptools]
+packages = ["shirin"]
