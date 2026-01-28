@@ -85,7 +85,13 @@ class NormalizedCountPlot(AbstractPlot):
         )
         
         self.renderer.create_figure(figsize)
-        colors = [self._palette[col] for col in self._normalized_pivot.columns]  # type: ignore
+        colors = []
+        for col in self._normalized_pivot.columns:
+            str_col = str(col)
+            if str_col in self._palette:
+                colors.append(self._palette[str_col])
+            else:
+                raise KeyError(f"Column '{col}' not found in palette. Available keys: {list(self._palette.keys())}")
         
         plot_kind = 'bar' if self.options.orientation == 'vertical' else 'barh'
         width = 0.6 if self.options.orientation == 'vertical' else 0.8

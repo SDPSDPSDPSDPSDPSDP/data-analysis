@@ -18,6 +18,7 @@ from ..common.sorting import (
 from ..common.data_conversion import (
     fill_missing_values_in_data,
     prepare_legend_label_map,
+    ensure_column_is_string,
 )
 
 
@@ -43,6 +44,10 @@ class LinePlot(AbstractPlot):
         return df
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Convert hue to string if present, so it matches normalized palette keys
+        if self.options.hue is not None:
+            df = ensure_column_is_string(df, self.options.hue)
+        
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         

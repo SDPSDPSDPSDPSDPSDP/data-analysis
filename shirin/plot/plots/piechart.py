@@ -39,13 +39,13 @@ class PieChart(AbstractPlot):
         )
         
         original_labels = cast(list, self._original_labels)
-        self._labels = [label_map.get(val, str(val)) for val in original_labels]
+        self._labels = [label_map.get(str(val), str(val)) for val in original_labels]
         
         palette_dict = cast(dict, self.options.palette)
-        # Keep original types for palette keys
-        # palette_dict_str = convert_dict_keys_to_string(palette_dict) if palette_dict else {}
-        # self._colors = [palette_dict_str.get(str(val), '#000000') for val in original_labels]
-        self._colors = [palette_dict.get(val, '#000000') if palette_dict else '#000000' for val in original_labels]
+        if palette_dict:
+            self._colors = [palette_dict.get(str(val), '#000000') for val in original_labels]
+        else:
+            self._colors = ['#000000'] * len(original_labels)
         
         return df
     

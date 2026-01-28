@@ -50,6 +50,10 @@ class CountPlot(AbstractPlot):
         ordering_strategy = get_ordering_strategy(self.options.order_type)
         self._order = ordering_strategy.get_order(df, self.options.axis_column)
         
+        # Convert hue to string if present, so it matches normalized palette keys
+        if self.options.hue is not None:
+            df = ensure_column_is_string(df, self.options.hue)
+        
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         self._original_palette = self._palette if isinstance(self._palette, dict) else None

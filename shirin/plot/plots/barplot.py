@@ -49,6 +49,10 @@ class BarPlot(AbstractPlot):
             value_column=self.options.value
                 )
         
+        # Convert hue to string if present, so it matches normalized palette keys
+        if self.options.hue is not None:
+            df = ensure_column_is_string(df, self.options.hue)
+        
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         self._original_palette = self._palette if isinstance(self._palette, dict) else None
