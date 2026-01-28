@@ -38,7 +38,7 @@ def format_legend(
         bbox_to_anchor=bbox_to_anchor, 
         loc='upper left', 
         ncol=ncol,
-        handletextpad=0.5, 
+        handletextpad=0.5,
         framealpha=0.0, 
         fontsize=FontSizes.LEGEND
     )
