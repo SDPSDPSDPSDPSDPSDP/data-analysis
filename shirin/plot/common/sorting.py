@@ -48,13 +48,23 @@ def apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -
     if not label_map:
         return df
     df = df.copy()
+    # Convert column names to strings for consistent lookup
+    df.columns = [str(col) for col in df.columns]
     df.columns = [label_map.get(col, col) for col in df.columns]
     return df
 
 
 def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
-    return [palette[col] for col in df.columns]
+    colors = []
+    for col in df.columns:
+        # Convert column name to string for consistent lookup
+        str_col = str(col)
+        if str_col in palette:
+            colors.append(palette[str_col])
+        else:
+            raise KeyError(f"Column '{col}' not found in palette. Available keys: {list(palette.keys())}")
+    return colors
 
 
 def create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return {key: str(key) for key in df[hue].unique()}
+    return {str(key): str(key) for key in df[hue].unique()}

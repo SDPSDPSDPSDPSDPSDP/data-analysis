@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 import pandas as pd
 
 from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
+from ..common.data_conversion import convert_dict_keys_to_string
 
 
 @dataclass
@@ -21,6 +22,12 @@ class BasePlotOptions:
     def validate(self) -> None:
         if self.df is None or self.df.empty:
             raise ValueError("DataFrame cannot be None or empty")
+        
+        # Normalize dictionary keys to strings to ensure consistency
+        if isinstance(self.palette, dict):
+            self.palette = convert_dict_keys_to_string(self.palette)
+        if isinstance(self.label_map, dict):
+            self.label_map = convert_dict_keys_to_string(self.label_map)
 
 
 @dataclass
