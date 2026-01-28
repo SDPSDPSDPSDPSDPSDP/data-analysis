@@ -40,9 +40,9 @@ class Histogram(AbstractPlot):
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df = ensure_column_is_int(df, self.options.x)
-        # Keep hue in original type to match palette keys
-        # if self.options.hue is not None:
-        #     df = ensure_column_is_string(df, self.options.hue)
+        # Convert hue to string if present, so it matches normalized palette keys
+        if self.options.hue is not None:
+            df = ensure_column_is_string(df, self.options.hue)
         
         self._bins = self._calculate_bins(df)
         
