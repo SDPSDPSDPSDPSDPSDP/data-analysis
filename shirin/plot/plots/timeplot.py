@@ -20,10 +20,15 @@ class TimePlot(AbstractPlot):
     
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
+        date_col = self.options.x
         
         # Ensure the column is datetime
-        if not pd.api.types.is_datetime64_any_dtype(df[self.options.x]):
-            df[self.options.x] = pd.to_datetime(df[self.options.x])
+        if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
+            df[date_col] = pd.to_datetime(df[date_col])
+        
+        # Validate that conversion was successful
+        if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
+            raise ValueError(f"Column '{date_col}' could not be converted to datetime")
         
         return df
     
@@ -31,12 +36,15 @@ class TimePlot(AbstractPlot):
         group_by = self.options.group_by
         date_col = self.options.x
         
+        # Get datetime series with proper type for accessor
+        datetime_series = pd.to_datetime(df[date_col])
+        
         if group_by == 'year':
-            df['_time_group'] = df[date_col].dt.to_period('Y').dt.to_timestamp()
+            df['_time_group'] = datetime_series.dt.to_period('Y').dt.to_timestamp()
         elif group_by == 'month':
-            df['_time_group'] = df[date_col].dt.to_period('M').dt.to_timestamp()
+            df['_time_group'] = datetime_series.dt.to_period('M').dt.to_timestamp()
         else:  # day
-            df['_time_group'] = df[date_col].dt.to_period('D').dt.to_timestamp()
+            df['_time_group'] = datetime_series.dt.to_period('D').dt.to_timestamp()
         
         # Count occurrences per time group
         self._aggregated_df = (
