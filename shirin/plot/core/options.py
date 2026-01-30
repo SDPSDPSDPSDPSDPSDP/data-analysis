@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Union
 
 import pandas as pd
 
-from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
+from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput, TimeGroupByInput
 from ..common.data_conversion import convert_dict_keys_to_string
 
 
@@ -134,3 +134,16 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
             raise ValueError("hue must be specified for normalized plots")
         if not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary for normalized plots")
+
+
+@dataclass
+class TimePlotOptions(BasePlotOptions):
+    x: str = ''
+    group_by: TimeGroupByInput = 'day'
+    
+    def validate(self) -> None:
+        super().validate()
+        if not self.x:
+            raise ValueError("x column must be specified")
+        if self.group_by not in ('year', 'month', 'day'):
+            raise ValueError("group_by must be 'year', 'month', or 'day'")

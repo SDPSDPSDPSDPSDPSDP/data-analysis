@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 
-from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput
+from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput, TimeGroupByInput
 from .core import (
     PlotExporter,
     CountPlotOptions,
@@ -12,6 +12,7 @@ from .core import (
     LinePlotOptions,
     PiePlotOptions,
     NormalizedCountPlotOptions,
+    TimePlotOptions,
     create_plot,
 )
 from .common.file_operations import calculate_value_counts
@@ -461,7 +462,7 @@ class PlotGraphs:
                 *Default: `'frequency'`*.
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             output_name: Name for the exported file. *Default: `'barplot_y'`*.
-        """
+                """
         options = BarPlotOptions(
             df=df,
             axis_column=y,
@@ -482,5 +483,43 @@ class PlotGraphs:
             percentage_labels=percentage_labels
         )
         plot = create_plot('bar', options)
+        plot.render()
+        self._export_graph(output_name)
+
+    def timeplot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        group_by: TimeGroupByInput = 'day',
+        xlabel: str = '',
+        ylabel: str = 'Count',
+        output_name: str = 'timeplot'
+    ) -> None:
+        """Create a **time series count plot** showing event frequencies over time.
+        
+        This plot counts occurrences of events in a datetime column and displays
+        them as a bar chart with properly formatted date axes.
+        
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name containing datetime values (`datetime64[ns]`).
+            group_by: Time period to group counts by. **Options:** `'year'`, `'month'`, `'day'`.
+                *Default: `'day'`*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            output_name: Name for the exported file. *Default: `'timeplot'`*.
+        
+        Example:
+            >>> plot = PlotGraphs()
+            >>> plot.timeplot(df, x='date', group_by='month', output_name='events_by_month')
+        """
+        options = TimePlotOptions(
+            df=df,
+            x=x,
+            group_by=group_by,
+            xlabel=xlabel,
+            ylabel=ylabel
+        )
+        plot = create_plot('time', options)
         plot.render()
         self._export_graph(output_name)
