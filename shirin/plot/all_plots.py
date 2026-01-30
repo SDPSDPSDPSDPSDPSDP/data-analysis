@@ -492,7 +492,7 @@ class PlotGraphs:
         x: str,
         group_by: TimeGroupByInput = 'day',
         xlabel: str = '',
-        ylabel: str = 'Count',
+        ylabel: str = 'Total',
         output_name: str = 'timeplot'
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.

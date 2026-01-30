@@ -3,6 +3,7 @@ from typing import Any
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.ticker import FuncFormatter
 
 from ..core.base_plot import AbstractPlot
 from ..core.options import TimePlotOptions
@@ -98,9 +99,15 @@ class TimePlot(AbstractPlot):
             ax.xaxis.set_major_locator(mdates.YearLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
         elif group_by == 'month':
+            # Show month names for each tick, but include the year only on January
             ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-            plt.xticks(rotation=45, ha='right')
+            def month_fmt(x, pos=None):
+                dt = mdates.num2date(x)
+                if dt.month == 1:
+                    return dt.strftime('%b\n%Y')
+                return dt.strftime('%b')
+            ax.xaxis.set_major_formatter(FuncFormatter(month_fmt))
+            plt.xticks(rotation=90, ha='right')
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))

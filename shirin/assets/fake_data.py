@@ -89,4 +89,31 @@ def generate_fake_data() -> tuple[DataFrame, DataFrame]:
     return df, df_documents_by_year
 
 
+def generate_time_series(
+    start_date: str = "2018-01-01",
+    end_date: str = "2023-12-31",
+    avg_events_per_day: float = 3.0,
+    seed: int = 42,
+) -> DataFrame:
+    """Generate a DataFrame of events with a `date` column for testing time plots.
+
+    Each day between `start_date` and `end_date` will have a Poisson-distributed
+    number of events (approx `avg_events_per_day`). The resulting DataFrame has
+    one row per event with a `date` datetime column and a `hue` category.
+    """
+    np.random.seed(seed)
+    dates = pd.date_range(start=start_date, end=end_date, freq="D")
+    counts = np.random.poisson(lam=avg_events_per_day, size=len(dates))
+
+    rows = []
+    for date, count in zip(dates, counts):
+        for _ in range(count):
+            rows.append({"date": date, "hue": random.choice(["category_1", "category_2"])})
+
+    return pd.DataFrame(rows)
+
+
+# Existing fake datasets
 df, df_documents_by_year = generate_fake_data()
+# Time-series fake dataset for testing `timeplot` grouping by day/month/year
+df_time = generate_time_series()

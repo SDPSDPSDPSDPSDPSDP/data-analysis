@@ -140,6 +140,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 class TimePlotOptions(BasePlotOptions):
     x: str = ''
     group_by: TimeGroupByInput = 'day'
+    ylabel: str = 'Total'
     
     def validate(self) -> None:
         super().validate()
