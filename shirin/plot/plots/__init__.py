@@ -4,5 +4,6 @@ from .histogram import Histogram
 from .lineplot import LinePlot
 from .piechart import PieChart
 from .normalized_countplot import NormalizedCountPlot
+from .timeplot import TimePlot
 
-__all__ = ['CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot']
+__all__ = ['CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot', 'TimePlot']
