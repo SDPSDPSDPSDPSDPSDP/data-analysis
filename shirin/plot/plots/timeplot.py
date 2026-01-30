@@ -11,6 +11,7 @@ from ..common.formatting import (
     format_ticks,
     format_xy_labels,
 )
+from ..config.colors import Colors
 
 
 class TimePlot(AbstractPlot):
@@ -54,6 +55,25 @@ class TimePlot(AbstractPlot):
             .reset_index(name='count')
             .sort_values('_time_group')
         )
+
+        # Ensure continuity on the x-axis by including empty periods with zero counts
+        if not self._aggregated_df.empty:
+            start = self._aggregated_df['_time_group'].min()
+            end = self._aggregated_df['_time_group'].max()
+            if group_by == 'year':
+                full_range = pd.date_range(start=start, end=end, freq='YS')
+            elif group_by == 'month':
+                full_range = pd.date_range(start=start, end=end, freq='MS')
+            else:  # day
+                full_range = pd.date_range(start=start, end=end, freq='D')
+
+            full_df = pd.DataFrame({'_time_group': full_range})
+            self._aggregated_df = (
+                full_df.merge(self._aggregated_df, on='_time_group', how='left')
+                .fillna({'count': 0})
+            )
+            # ensure integer counts
+            self._aggregated_df['count'] = self._aggregated_df['count'].astype(int)
         
         return self._aggregated_df
     
@@ -66,7 +86,7 @@ class TimePlot(AbstractPlot):
         ax.bar(
             data['_time_group'],
             data['count'],
-            color='steelblue',
+            color=Colors.GREY,
             edgecolor='none',
             alpha=1,
             width=self._get_bar_width()
@@ -99,15 +119,32 @@ class TimePlot(AbstractPlot):
             ax.xaxis.set_major_locator(mdates.YearLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
         elif group_by == 'month':
-            # Show month names for each tick, but include the year only on January
+            # Major ticks: months (short month names)
             ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-            def month_fmt(x, pos=None):
-                dt = mdates.num2date(x)
-                if dt.month == 1:
-                    return dt.strftime('%b\n%Y')
-                return dt.strftime('%b')
-            ax.xaxis.set_major_formatter(FuncFormatter(month_fmt))
-            plt.xticks(rotation=90, ha='right')
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+            # Rotate month labels 90° and add padding
+            ax.tick_params(axis='x', which='major', rotation=90, pad=6)
+
+            # Manually draw year labels below the months to ensure visibility
+            try:
+                start = self._aggregated_df['_time_group'].min()
+                end = self._aggregated_df['_time_group'].max()
+                years = pd.date_range(start=start, end=end, freq='YS')
+                # Add a bit more bottom margin to avoid clipping
+                ax.figure.subplots_adjust(bottom=0.30)
+                for y in years:
+                    ax.text(
+                        y,
+                        -0.12,
+                        str(y.year),
+                        transform=ax.get_xaxis_transform(),
+                        ha='center',
+                        va='top',
+                        fontsize=9,
+                        color=Colors.DARK_GREY,
+                    )
+            except Exception:
+                pass
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
