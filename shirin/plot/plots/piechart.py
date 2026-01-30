@@ -87,9 +87,7 @@ class PieChart(AbstractPlot):
         for text in legend.get_texts():
             text.set_color(TextColors.DARK_GREY)
         
-        # Apply automatic text colors
-        palette_dict = cast(dict, self.options.palette)
-        for label, autotext in zip(self._original_labels, self._autotexts):  # type: ignore
-            bg_color = palette_dict.get(label, '#000000')
+        # Apply automatic text colors based on slice background
+        for bg_color, autotext in zip(self._colors, self._autotexts):  # type: ignore
             text_color = get_text_color_for_background(bg_color)
             autotext.set_color(text_color)
