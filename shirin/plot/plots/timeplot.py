@@ -82,16 +82,31 @@ class TimePlot(AbstractPlot):
         self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
         
         ax = plt.gca()
-        
-        ax.bar(
-            data['_time_group'],
-            data['count'],
-            color=Colors.GREY,
-            edgecolor='none',
-            alpha=1,
-            width=self._get_bar_width()
-        )
-        
+        plot_type = getattr(self.options, 'plot_type', 'bar')
+
+        if plot_type == 'bar':
+            ax.bar(
+                data['_time_group'],
+                data['count'],
+                color=Colors.GREY,
+                edgecolor='none',
+                alpha=1,
+                width=self._get_bar_width()
+            )
+        else:  # line
+            ax.plot(
+                data['_time_group'],
+                data['count'],
+                color=Colors.BLACK,
+                linewidth=2,
+                marker='o',
+                markersize=3,
+                markerfacecolor=Colors.BLACK,
+                markeredgecolor=Colors.BLACK,
+                markeredgewidth=0,
+                alpha=0.9,
+            )
+
         return ax
     
     def _get_bar_width(self) -> float:
@@ -119,20 +134,26 @@ class TimePlot(AbstractPlot):
             ax.xaxis.set_major_locator(mdates.YearLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
         elif group_by == 'month':
-            # Major ticks: months (short month names)
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-            # Rotate month labels 90° and add padding
-            ax.tick_params(axis='x', which='major', rotation=90, pad=6)
+            if not getattr(self.options, 'display_month', True):
+                # Hide months: show only year labels as major ticks
+                ax.xaxis.set_major_locator(mdates.YearLocator())
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+                ax.tick_params(axis='x', which='major', rotation=0, pad=6)
+            else:
+                # Major ticks: months (short month names)
+                ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+                # Rotate month labels 90° and add padding
+                ax.tick_params(axis='x', which='major', rotation=90, pad=6)
 
-            # Manually draw year labels below the months to ensure visibility
-            try:
-                start = self._aggregated_df['_time_group'].min()
-                end = self._aggregated_df['_time_group'].max()
-                years = pd.date_range(start=start, end=end, freq='YS')
-                # Add a bit more bottom margin to avoid clipping
-                ax.figure.subplots_adjust(bottom=0.30)
-                for y in years:
+                # Manually draw year labels below the months to ensure visibility
+                try:
+                    start = self._aggregated_df['_time_group'].min()
+                    end = self._aggregated_df['_time_group'].max()
+                    years = pd.date_range(start=start, end=end, freq='YS')
+                    # Add a bit more bottom margin to avoid clipping
+                    ax.figure.subplots_adjust(bottom=0.30)
+                    for y in years:
                         # Match year label style to major tick labels
                         try:
                             major_lbls = ax.xaxis.get_majorticklabels()
@@ -160,8 +181,8 @@ class TimePlot(AbstractPlot):
                             fontfamily=label_family,
                             color=label_color,
                         )
-            except Exception:
-                pass
+                except Exception:
+                    pass
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))

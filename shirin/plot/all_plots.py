@@ -493,6 +493,8 @@ class PlotGraphs:
         group_by: TimeGroupByInput = 'day',
         xlabel: str = '',
         ylabel: str = 'Total',
+        type: str = 'bar',
+        display_month: bool = True,
         output_name: str = 'timeplot'
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
@@ -518,7 +520,9 @@ class PlotGraphs:
             x=x,
             group_by=group_by,
             xlabel=xlabel,
-            ylabel=ylabel
+            ylabel=ylabel,
+            plot_type=type,
+            display_month=display_month,
         )
         plot = create_plot('time', options)
         plot.render()

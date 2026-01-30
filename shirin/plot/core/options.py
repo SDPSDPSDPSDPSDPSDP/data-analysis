@@ -140,6 +140,8 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 class TimePlotOptions(BasePlotOptions):
     x: str = ''
     group_by: TimeGroupByInput = 'day'
+    plot_type: str = 'bar'
+    display_month: bool = True
     ylabel: str = 'Total'
     
     def validate(self) -> None:
@@ -148,3 +150,5 @@ class TimePlotOptions(BasePlotOptions):
             raise ValueError("x column must be specified")
         if self.group_by not in ('year', 'month', 'day'):
             raise ValueError("group_by must be 'year', 'month', or 'day'")
+        if self.plot_type not in ('bar', 'line'):
+            raise ValueError("plot_type must be 'bar' or 'line'")
