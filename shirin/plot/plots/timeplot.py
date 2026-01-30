@@ -11,7 +11,7 @@ from ..common.formatting import (
     format_ticks,
     format_xy_labels,
 )
-from ..config.colors import Colors
+from ..config.colors import Colors, TextColors
 
 
 class TimePlot(AbstractPlot):
@@ -133,16 +133,33 @@ class TimePlot(AbstractPlot):
                 # Add a bit more bottom margin to avoid clipping
                 ax.figure.subplots_adjust(bottom=0.30)
                 for y in years:
-                    ax.text(
-                        y,
-                        -0.12,
-                        str(y.year),
-                        transform=ax.get_xaxis_transform(),
-                        ha='center',
-                        va='top',
-                        fontsize=9,
-                        color=Colors.DARK_GREY,
-                    )
+                        # Match year label style to major tick labels
+                        try:
+                            major_lbls = ax.xaxis.get_majorticklabels()
+                            if major_lbls:
+                                label_color = major_lbls[0].get_color()
+                                label_size = major_lbls[0].get_fontsize()
+                                label_family = major_lbls[0].get_fontfamily()
+                            else:
+                                label_color = TextColors.DARK_GREY
+                                label_size = 9
+                                label_family = None
+                        except Exception:
+                            label_color = TextColors.DARK_GREY
+                            label_size = 9
+                            label_family = None
+
+                        ax.text(
+                            y,
+                            -0.18,
+                            str(y.year),
+                            transform=ax.get_xaxis_transform(),
+                            ha='center',
+                            va='top',
+                            fontsize=label_size,
+                            fontfamily=label_family,
+                            color=label_color,
+                        )
             except Exception:
                 pass
         else:  # day
