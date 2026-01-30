@@ -1,5 +1,4 @@
-import pytest
-
+"""Unit tests for text contrast utilities."""
 from shirin.plot.common.formatting.text_contrast import get_luminance, get_text_color_for_background
 from shirin.plot.config.colors import Colors, TextColors
 
