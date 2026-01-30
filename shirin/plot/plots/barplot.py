@@ -15,6 +15,7 @@ from ..common.formatting import (
     format_xy_labels,
 )
 from ..common.data_conversion import (
+    convert_palette_to_strings,
     ensure_column_is_string,
     prepare_legend_label_map,
 )
@@ -164,10 +165,12 @@ class BarPlot(AbstractPlot):
             self._df_unlabeled is not None and 
             self._original_palette is not None):
             orientation = 'vertical' if self.options.orientation == 'vertical' else 'horizontal'
+            # Convert palette keys to strings to match pivot table column names
+            palette_str = convert_palette_to_strings(self._original_palette)
             format_datalabels_stacked(
                 plot,
                 self._df_unlabeled,
-                self._original_palette,
+                palette_str,
                 orientation=orientation  # type: ignore
             )
         elif not self.options.stacked:
