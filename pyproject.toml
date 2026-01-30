@@ -1,6 +1,6 @@
 [project]
 name = "shirin"
-version = "2.2.0"
+version = "2.3.0"
 description = "A data analysis toolkit for statistical computing, visualization, and SQL operations"
 readme = "README.md"
 requires-python = ">=3.9"

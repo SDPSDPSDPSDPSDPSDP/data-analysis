@@ -9,6 +9,7 @@ from .options import (
     LinePlotOptions,
     PiePlotOptions,
     NormalizedCountPlotOptions,
+    TimePlotOptions,
 )
 from .renderer import PlotRenderer, SeabornRenderer
 from .strategies import (
@@ -35,6 +36,7 @@ __all__ = [
     'LinePlotOptions',
     'PiePlotOptions',
     'NormalizedCountPlotOptions',
+    'TimePlotOptions',
     'get_ordering_strategy',
     'get_figure_size_strategy',
     'get_palette_strategy',

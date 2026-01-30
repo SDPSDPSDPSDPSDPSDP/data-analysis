@@ -89,4 +89,62 @@ def generate_fake_data() -> tuple[DataFrame, DataFrame]:
     return df, df_documents_by_year
 
 
+def generate_time_series(
+    start_date: str = "2018-01-01",
+    end_date: str = "2023-12-31",
+    avg_events_per_day: float = 3.0,
+    seed: int = 42,
+    yearly_growth: float = 0.5,
+) -> DataFrame:
+    """Generate a DataFrame of events with a `date` column for testing time plots.
+
+    This generator ensures that yearly totals increase each year. For each
+    calendar year in the range, it computes a target number of events that is
+    at least slightly larger than the previous year's total (controlled by
+    `yearly_growth`), then randomly distributes those events across the days
+    of that year.
+    """
+    np.random.seed(seed)
+
+    start = pd.to_datetime(start_date)
+    end = pd.to_datetime(end_date)
+
+    years = list(range(start.year, end.year + 1))
+
+    rows = []
+    prev_total = 0
+    for year in years:
+        # determine date range for this year within the global bounds
+        year_start = max(start, pd.Timestamp(year=year, month=1, day=1))
+        year_end = min(end, pd.Timestamp(year=year, month=12, day=31))
+        days = pd.date_range(start=year_start, end=year_end, freq='D')
+        n_days = len(days)
+        if n_days == 0:
+            continue
+
+        # base expected events for the year (approx)
+        base_year_events = int(max(1, round(avg_events_per_day * n_days)))
+
+        # ensure strictly increasing yearly totals: choose an increment
+        min_increment = max(1, int(round(base_year_events * yearly_growth)))
+        noise = int(np.random.normal(loc=0, scale=max(1, base_year_events * 0.05)))
+        target_total = max(prev_total + min_increment, base_year_events + noise)
+
+        # distribute target_total across days randomly (multinomial)
+        probs = np.ones(n_days) / n_days
+        daily_counts = np.random.multinomial(target_total, probs)
+
+        for date, count in zip(days, daily_counts):
+            for _ in range(int(count)):
+                rows.append({"date": date, "hue": random.choice(["category_1", "category_2"])})
+
+        prev_total = target_total
+
+    return pd.DataFrame(rows)
+
+
+# Existing fake datasets
 df, df_documents_by_year = generate_fake_data()
+# Time-series fake dataset for testing `timeplot` grouping by day/month/year
+# Use larger yearly_growth by default to produce more extreme increasing totals
+df_time = generate_time_series(yearly_growth=0.5)

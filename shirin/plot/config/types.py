@@ -22,7 +22,14 @@ class FillMissingValues(str, Enum):
     ZERO = 'zero'
 
 
+class TimeGroupBy(str, Enum):
+    YEAR = 'year'
+    MONTH = 'month'
+    DAY = 'day'
+
+
 OrderTypeInput = Union[OrderType, str]
 StackedLabelTypeInput = Optional[Union[StackedLabelType, str]]
 FigureSizeInput = Union[FigureSize, str, float]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
+TimeGroupByInput = Union[TimeGroupBy, str]

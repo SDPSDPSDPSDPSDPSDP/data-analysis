@@ -4,10 +4,12 @@ from .types import (
     OrderType,
     StackedLabelType,
     FillMissingValues,
+    TimeGroupBy,
     OrderTypeInput,
     StackedLabelTypeInput,
     FigureSizeInput,
     FillMissingValuesInput,
+    TimeGroupByInput,
 )
 
 __all__ = [
@@ -18,8 +20,10 @@ __all__ = [
     'OrderType',
     'StackedLabelType',
     'FillMissingValues',
+    'TimeGroupBy',
     'OrderTypeInput',
     'StackedLabelTypeInput',
     'FigureSizeInput',
     'FillMissingValuesInput',
+    'TimeGroupByInput',
 ]
