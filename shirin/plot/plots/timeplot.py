@@ -58,13 +58,24 @@ class TimePlot(AbstractPlot):
 
         # Ensure continuity on the x-axis by including empty periods with zero counts
         if not self._aggregated_df.empty:
-            start = self._aggregated_df['_time_group'].min()
-            end = self._aggregated_df['_time_group'].max()
+            # Get the actual min/max from original datetime series to avoid extending beyond real data
+            original_min = datetime_series.min()
+            original_max = datetime_series.max()
+            
             if group_by == 'year':
+                # Convert to year start for proper range
+                start = pd.Timestamp(year=original_min.year, month=1, day=1)
+                end = pd.Timestamp(year=original_max.year, month=1, day=1)
                 full_range = pd.date_range(start=start, end=end, freq='YS')
             elif group_by == 'month':
+                # Convert to month start for proper range
+                start = pd.Timestamp(year=original_min.year, month=original_min.month, day=1)
+                end = pd.Timestamp(year=original_max.year, month=original_max.month, day=1)
                 full_range = pd.date_range(start=start, end=end, freq='MS')
             else:  # day
+                # Use the actual min/max dates for daily grouping
+                start = original_min.normalize()  # set to start of day
+                end = original_max.normalize()    # set to start of day
                 full_range = pd.date_range(start=start, end=end, freq='D')
 
             full_df = pd.DataFrame({'_time_group': full_range})
