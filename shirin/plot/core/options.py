@@ -143,6 +143,8 @@ class TimePlotOptions(BasePlotOptions):
     plot_type: str = 'bar'
     display_month: bool = True
     ylabel: str = 'Total'
+    cumulative: bool = False
+    rotation: int = 0
     
     def validate(self) -> None:
         super().validate()
