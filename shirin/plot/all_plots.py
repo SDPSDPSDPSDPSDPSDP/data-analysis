@@ -495,6 +495,8 @@ class PlotGraphs:
         ylabel: str = 'Total',
         type: str = 'bar',
         display_month: bool = True,
+        cumulative: bool = False,
+        rotation: int = 0,
         output_name: str = 'timeplot'
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
@@ -509,6 +511,8 @@ class PlotGraphs:
                 *Default: `'day'`*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `'Count'`*.
+            cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
+            rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
             output_name: Name for the exported file. *Default: `'timeplot'`*.
         
         Example:
@@ -523,6 +527,8 @@ class PlotGraphs:
             ylabel=ylabel,
             plot_type=type,
             display_month=display_month,
+            cumulative=cumulative,
+            rotation=rotation,
         )
         plot = create_plot('time', options)
         plot.render()

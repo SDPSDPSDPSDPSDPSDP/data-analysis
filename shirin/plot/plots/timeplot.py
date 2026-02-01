@@ -75,6 +75,10 @@ class TimePlot(AbstractPlot):
             # ensure integer counts
             self._aggregated_df['count'] = self._aggregated_df['count'].astype(int)
         
+        # Calculate cumulative values if requested
+        if self.options.cumulative:
+            self._aggregated_df['count'] = self._aggregated_df['count'].cumsum()
+        
         return self._aggregated_df
     
     def draw(self, data: pd.DataFrame) -> Any:
@@ -94,13 +98,21 @@ class TimePlot(AbstractPlot):
                 width=self._get_bar_width()
             )
         else:  # line
+            # Determine if we should show markers based on number of data points
+            show_markers = True
+            if self.options.group_by == 'day' and len(data) > 25:
+                show_markers = False
+            
+            marker = 'o' if show_markers else None
+            markersize = 3 if show_markers else 0
+            
             ax.plot(
                 data['_time_group'],
                 data['count'],
                 color=Colors.BLACK,
                 linewidth=2,
-                marker='o',
-                markersize=3,
+                marker=marker,
+                markersize=markersize,
                 markerfacecolor=Colors.BLACK,
                 markeredgecolor=Colors.BLACK,
                 markeredgewidth=0,
@@ -186,6 +198,6 @@ class TimePlot(AbstractPlot):
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            plt.xticks(rotation=45, ha='right')
+            plt.xticks(rotation=self.options.rotation, ha='right')
         
         plt.tight_layout()
