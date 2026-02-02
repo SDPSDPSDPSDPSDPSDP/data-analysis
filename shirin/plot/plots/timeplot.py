@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,6 +11,7 @@ from ..common.formatting import (
     format_ticks,
     format_xy_labels,
 )
+from ..common.strategies.palette import get_palette_strategy
 from ..config.colors import Colors, TextColors
 
 
@@ -19,6 +20,7 @@ class TimePlot(AbstractPlot):
         super().__init__(options, renderer)
         self.options: TimePlotOptions = options
         self._aggregated_df: pd.DataFrame = pd.DataFrame()
+        self._color: Optional[str] = None
     
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
@@ -35,6 +37,10 @@ class TimePlot(AbstractPlot):
         return df
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Get color from palette strategy (reuses same logic as other plots)
+        palette_strategy = get_palette_strategy(self.options.palette)
+        self._color, _ = palette_strategy.get_palette()
+        
         group_by = self.options.group_by
         date_col = self.options.x
         
@@ -103,7 +109,7 @@ class TimePlot(AbstractPlot):
             ax.bar(
                 data['_time_group'],
                 data['count'],
-                color=Colors.GREY,
+                color=self._color,
                 edgecolor='none',
                 alpha=1,
                 width=self._get_bar_width()
