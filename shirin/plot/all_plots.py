@@ -491,6 +491,7 @@ class PlotGraphs:
         df: pd.DataFrame,
         x: str,
         group_by: TimeGroupByInput = 'day',
+        palette: Optional[str] = None,
         xlabel: str = '',
         ylabel: str = 'Total',
         type: str = 'bar',
@@ -509,8 +510,9 @@ class PlotGraphs:
             x: Column name containing datetime values (`datetime64[ns]`).
             group_by: Time period to group counts by. **Options:** `'year'`, `'month'`, `'day'`.
                 *Default: `'day'`*.
+            palette: Color for the bars (single color string, e.g. `'#FF5733'`). *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            ylabel: Label for the y-axis. *Default: `'Total'`*.
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
             output_name: Name for the exported file. *Default: `'timeplot'`*.
@@ -523,6 +525,7 @@ class PlotGraphs:
             df=df,
             x=x,
             group_by=group_by,
+            palette=palette,
             xlabel=xlabel,
             ylabel=ylabel,
             plot_type=type,
