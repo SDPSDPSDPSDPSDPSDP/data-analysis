@@ -1,11 +1,25 @@
+from pathlib import Path
+
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
+
 from .formatting import FontSizes, FigureSize
+
+FONT_FAMILY = "Satoshi Shirin"
+
+
+def _register_fonts() -> None:
+    """Register bundled Satoshi Shirin fonts with matplotlib's font manager."""
+    fonts_dir = Path(__file__).resolve().parent.parent.parent / "assets" / "fonts" / "patched"
+    if not fonts_dir.exists():
+        return
+    for font_path in fonts_dir.glob("*.ttf"):
+        fm.fontManager.addfont(str(font_path))
 
 
 def configure_matplotlib():
-    # Use a font with naturally wider letter spacing
-    # Options: 'Segoe UI', 'Calibri', 'Century Gothic'
-    plt.rcParams['font.family'] = 'Arial'
+    _register_fonts()
+    plt.rcParams['font.family'] = FONT_FAMILY
 
     # plt.rcParams['savefig.dpi'] = 300
     # plt.rcParams['savefig.format'] = 'png'
