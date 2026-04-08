@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 
 from .config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput, TimeGroupByInput
+from .config.matplotlib import configure_matplotlib
 from .core import (
     PlotExporter,
     CountPlotOptions,
@@ -30,9 +31,14 @@ class PlotGraphs:
         output_dir: Directory where exported plots will be saved. *Default: `'./plot_output/'`*.
         prefix: Optional prefix to add to all exported filenames. *Default: `None`*.
         format: File format for exported plots. **Options:** `'png'`, `'svg'`. *Default: `'png'`*.
+        font: Font to use for all text. **Options:** `'satoshi'`, `None` (matplotlib default).
+            *Default: `None`*.
     
     Example:
         >>> plot = PlotGraphs(export=True, output_dir='./charts/', prefix='analysis')
+        >>> plot.countplot_x(df, x='category', output_name='category_counts')
+        
+        >>> plot = PlotGraphs(font='satoshi')
         >>> plot.countplot_x(df, x='category', output_name='category_counts')
     """
 
@@ -41,8 +47,12 @@ class PlotGraphs:
         export: bool = True,
         output_dir: str = os.path.expanduser("./plot_output/"),
         prefix: Optional[str] = None,
-        format: str = 'png'
+        format: str = 'png',
+        font: Optional[str] = None,
     ) -> None:
+        if font is not None:
+            configure_matplotlib(font=font)
+
         self._exporter = PlotExporter(
             enabled=export,
             output_dir=output_dir,

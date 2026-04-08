@@ -1,11 +1,45 @@
+from pathlib import Path
+from typing import Optional
+
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
+
 from .formatting import FontSizes, FigureSize
 
+FONT_FAMILY_SATOSHI = "Satoshi Shirin"
 
-def configure_matplotlib():
-    # Use a font with naturally wider letter spacing
-    # Options: 'Segoe UI', 'Calibri', 'Century Gothic'
-    plt.rcParams['font.family'] = 'Arial'
+_fonts_registered = False
+
+
+def _register_fonts() -> None:
+    """Register bundled Satoshi Shirin fonts with matplotlib's font manager."""
+    global _fonts_registered
+    if _fonts_registered:
+        return
+    fonts_dir = Path(__file__).resolve().parent.parent.parent / "assets" / "fonts" / "patched"
+    if not fonts_dir.exists():
+        return
+    for font_path in fonts_dir.glob("*.ttf"):
+        fm.fontManager.addfont(str(font_path))
+    _fonts_registered = True
+
+
+def configure_matplotlib(font: Optional[str] = None) -> None:
+    """Configure matplotlib defaults.
+
+    Args:
+        font: Font to use for all text. Pass ``'satoshi'`` to use the bundled
+            Satoshi Shirin font. ``None`` keeps the matplotlib default.
+    """
+    if font is not None:
+        font_lower = font.lower()
+        if font_lower == "satoshi":
+            _register_fonts()
+            plt.rcParams['font.family'] = FONT_FAMILY_SATOSHI
+        else:
+            raise ValueError(
+                f"Unknown font {font!r}. Supported values: 'satoshi', None."
+            )
 
     # plt.rcParams['savefig.dpi'] = 300
     # plt.rcParams['savefig.format'] = 'png'
