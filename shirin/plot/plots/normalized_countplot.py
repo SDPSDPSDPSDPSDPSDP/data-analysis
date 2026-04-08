@@ -38,7 +38,8 @@ class NormalizedCountPlot(AbstractPlot):
             raise ValueError(f"Palette missing keys for hue values: {missing_keys}")
         
         # Only convert to string if the column is not numeric
-        # This preserves numeric sorting when the axis column contains numbers        col_data = df[self.options.axis_column]
+        # This preserves numeric sorting when the axis column contains numbers
+        col_data = df[self.options.axis_column]
         try:
             # Check if all values can be converted to numeric
             pd.to_numeric(col_data)
