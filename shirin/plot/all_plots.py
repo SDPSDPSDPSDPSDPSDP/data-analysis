@@ -102,11 +102,9 @@ class PlotGraphs:
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             output_name: Name for the exported file. *Default: `'countplot_x'`*.
         """
-        if normalized:
-            if hue is None:
-                raise ValueError("hue must be provided when normalized=True")
+        if normalized and hue is not None:
             if not isinstance(palette, dict):
-                raise ValueError("palette must be a dictionary when normalized=True")
+                raise ValueError("palette must be a dictionary when normalized=True with hue")
             options = NormalizedCountPlotOptions(
                 df=df,
                 axis_column=x,
@@ -144,7 +142,7 @@ class PlotGraphs:
                 stacked=stacked,
                 stacked_labels=stacked_labels,
                 order_type=order_type,
-                normalized=False,
+                normalized=normalized,
                 show_labels=show_labels
             )
             plot = create_plot('count', options)
@@ -199,11 +197,9 @@ class PlotGraphs:
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             output_name: Name for the exported file. *Default: `'countplot_y'`*.
         """
-        if normalized:
-            if hue is None:
-                raise ValueError("hue must be provided when normalized=True")
+        if normalized and hue is not None:
             if not isinstance(palette, dict):
-                raise ValueError("palette must be a dictionary when normalized=True")
+                raise ValueError("palette must be a dictionary when normalized=True with hue")
             options = NormalizedCountPlotOptions(
                 df=df,
                 axis_column=y,
@@ -241,7 +237,7 @@ class PlotGraphs:
                 stacked=stacked,
                 stacked_labels=stacked_labels,
                 order_type=order_type,
-                normalized=False,
+                normalized=normalized,
                 show_labels=show_labels
             )
             plot = create_plot('count', options)
