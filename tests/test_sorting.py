@@ -56,3 +56,24 @@ def test_create_colors_list():
     result = create_colors_list(df, palette)
     
     assert result == ['#FF0000', '#0000FF']
+
+
+def test_sort_alphabetically_integers():
+    """Test numeric sorting with integers (not strings)."""
+    values = [10, 2, 1, 20, 3]
+    result = sort_alphabetically(values, ascending=True)
+    assert result == [1, 2, 3, 10, 20]
+
+
+def test_sort_alphabetically_integers_descending():
+    """Test numeric sorting with integers in descending order."""
+    values = [10, 2, 1, 20, 3]
+    result = sort_alphabetically(values, ascending=False)
+    assert result == [20, 10, 3, 2, 1]
+
+
+def test_sort_alphabetically_floats():
+    """Test numeric sorting with floats."""
+    values = [10.5, 2.1, 1.9, 20.0, 3.5]
+    result = sort_alphabetically(values, ascending=True)
+    assert result == [1.9, 2.1, 3.5, 10.5, 20.0]

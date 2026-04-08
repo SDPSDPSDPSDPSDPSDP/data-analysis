@@ -172,8 +172,10 @@ class CountPlot(AbstractPlot):
                 orientation=orientation  # type: ignore
             )
         elif not self.options.stacked:
+            formatting = 'percentage' if (self.options.normalized and self.options.hue is None) else 'totals'
             format_datalabels(
                 plot,
                 label_offset=0.007,
+                formatting=formatting,
                 orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal'  # type: ignore
             )
