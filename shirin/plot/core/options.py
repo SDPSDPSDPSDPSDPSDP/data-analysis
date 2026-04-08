@@ -58,10 +58,8 @@ class CountPlotOptions(CategoricalPlotOptions):
     def validate(self) -> None:
         super().validate()
         if self.normalized:
-            if self.hue is None:
-                raise ValueError("hue must be provided when normalized=True")
-            if not isinstance(self.palette, dict):
-                raise ValueError("palette must be a dictionary when normalized=True")
+            if self.hue is not None and not isinstance(self.palette, dict):
+                raise ValueError("palette must be a dictionary when normalized=True with hue")
 
 
 @dataclass
