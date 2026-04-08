@@ -40,17 +40,7 @@ class CountPlot(AbstractPlot):
     
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
-        
-        # Only convert to string if the column is not numeric
-        # This preserves numeric sorting when the axis column contains numbers
-        col_data = df[self.options.axis_column]
-        try:
-            # Check if all values can be converted to numeric
-            pd.to_numeric(col_data)
-            # If successful, keep as-is for proper numeric sorting
-        except (ValueError, TypeError):
-            # If not numeric, convert to string for consistent handling
-            df = ensure_column_is_string(df, self.options.axis_column)
+        df = ensure_column_is_string(df, self.options.axis_column)
         
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)

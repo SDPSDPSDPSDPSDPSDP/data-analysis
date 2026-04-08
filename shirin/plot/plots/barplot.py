@@ -39,16 +39,7 @@ class BarPlot(AbstractPlot):
     
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
-        # Only convert to string if the column is not numeric
-        # This preserves numeric sorting when the axis column contains numbers
-        col_data = df[self.options.axis_column]
-        try:
-            # Check if all values can be converted to numeric
-            pd.to_numeric(col_data)
-            # If successful, keep as-is for proper numeric sorting
-        except (ValueError, TypeError):
-            # If not numeric, convert to string for consistent handling
-            df = ensure_column_is_string(df, self.options.axis_column)
+        df = ensure_column_is_string(df, self.options.axis_column)
         return df
     
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
