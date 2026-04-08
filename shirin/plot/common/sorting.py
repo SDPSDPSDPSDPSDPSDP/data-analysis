@@ -14,6 +14,16 @@ def is_all_numeric(values: list) -> tuple[bool, list[float]]:
     return True, numeric_values
 
 
+def is_all_numeric(values: list) -> tuple[bool, list[float]]:
+    numeric_values = []
+    for v in values:
+        try:
+            numeric_values.append(float(str(v)))
+        except (ValueError, TypeError):
+            return False, []
+    return True, numeric_values
+
+
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
     values_list = list(values)
     is_numeric, numeric_vals = is_all_numeric(values_list)

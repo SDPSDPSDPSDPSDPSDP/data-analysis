@@ -37,7 +37,16 @@ class NormalizedCountPlot(AbstractPlot):
         if missing_keys:
             raise ValueError(f"Palette missing keys for hue values: {missing_keys}")
         
-        df = ensure_column_is_string(df, self.options.axis_column)
+        # Only convert to string if the column is not numeric
+        # This preserves numeric sorting when the axis column contains numbers        col_data = df[self.options.axis_column]
+        try:
+            # Check if all values can be converted to numeric
+            pd.to_numeric(col_data)
+            # If successful, keep as-is for proper numeric sorting
+        except (ValueError, TypeError):
+            # If not numeric, convert to string for consistent handling
+            df = ensure_column_is_string(df, self.options.axis_column)
+        
         df = ensure_column_is_string(df, self.options.hue)
         
         if self.options.top_n is not None:
