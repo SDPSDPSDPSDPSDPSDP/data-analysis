@@ -3,8 +3,22 @@ from typing import Any, Dict, Optional, Union
 
 import pandas as pd
 
-from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput, FillMissingValuesInput, TimeGroupByInput
 from ..common.data_conversion import convert_dict_keys_to_string
+from ..config import (
+    FigureSizeInput,
+    FillMissingValuesInput,
+    OrderType,
+    OrderTypeInput,
+    StackedLabelTypeInput,
+    TimeGroupByInput,
+)
+
+
+class InvalidOrderTypeError(ValueError):
+    """Raised when an unsupported order_type is provided."""
+
+
+VALID_ORDER_TYPES = tuple(order_type.value for order_type in OrderType)
 
 
 @dataclass
@@ -18,11 +32,11 @@ class BasePlotOptions:
     legend_offset: float = 1.13
     ncol: int = 2
     hue: Optional[str] = None
-    
+
     def validate(self) -> None:
         if self.df is None or self.df.empty:
             raise ValueError("DataFrame cannot be None or empty")
-        
+
         # Normalize dictionary keys to strings to ensure consistency
         if isinstance(self.palette, dict):
             self.palette = convert_dict_keys_to_string(self.palette)
@@ -45,6 +59,21 @@ class CategoricalPlotOptions(BasePlotOptions):
             raise ValueError("axis_column must be specified")
         if self.orientation not in ('vertical', 'horizontal'):
             raise ValueError("orientation must be 'vertical' or 'horizontal'")
+
+                # Validate order_type without normalization.
+        if isinstance(self.order_type, OrderType):
+            pass
+        elif isinstance(self.order_type, str):
+            if self.order_type not in VALID_ORDER_TYPES:
+                raise InvalidOrderTypeError(
+                    f"Invalid order_type '{self.order_type}'. Valid options are: {VALID_ORDER_TYPES}."
+                )
+        else:
+            raise InvalidOrderTypeError(
+                f"Invalid order_type type. Valid options are strings or OrderType enum values: {VALID_ORDER_TYPES}."
+            )
+
+
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
 
@@ -54,7 +83,7 @@ class CountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     normalized: bool = False
     show_labels: bool = True
-    
+
     def validate(self) -> None:
         super().validate()
         if self.normalized:
@@ -66,7 +95,7 @@ class CountPlotOptions(CategoricalPlotOptions):
 class BarPlotOptions(CategoricalPlotOptions):
     value: str = ''
     percentage_labels: bool = False
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.value:
@@ -79,7 +108,7 @@ class HistogramOptions(BasePlotOptions):
     xlimit: Optional[Union[float, int]] = None
     bins: int = 100
     stacked: Optional[bool] = None
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.x:
@@ -94,7 +123,7 @@ class LinePlotOptions(BasePlotOptions):
     y: str = ''
     rotation: int = 0
     fill_missing_values: FillMissingValuesInput = None
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.x:
@@ -110,7 +139,7 @@ class PiePlotOptions(BasePlotOptions):
     value_datalabel: int = 5
     donut: bool = False
     palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.col:
@@ -125,7 +154,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
     show_labels: bool = True
     palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     ylabel: str = 'Percentage'
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.hue:
@@ -143,7 +172,7 @@ class TimePlotOptions(BasePlotOptions):
     ylabel: str = 'Total'
     cumulative: bool = False
     rotation: int = 0
-    
+
     def validate(self) -> None:
         super().validate()
         if not self.x:
