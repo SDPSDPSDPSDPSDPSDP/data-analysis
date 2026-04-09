@@ -1,0 +1,2 @@
+global-exclude *.ipynb
+recursive-exclude docs *.ipynb
