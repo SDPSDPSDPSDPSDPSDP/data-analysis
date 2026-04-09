@@ -28,24 +28,26 @@ class NormalizedCountPlot(AbstractPlot):
         self.options: NormalizedCountPlotOptions = options
         self._palette: Dict[Any, str] = {}
         self._normalized_pivot: Optional[pd.DataFrame] = None
-    
+
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
-        
-        unique_hue_values = df[self.options.hue].unique()
-        missing_keys = [val for val in unique_hue_values if val not in self.options.palette]
-        if missing_keys:
-            raise ValueError(f"Palette missing keys for hue values: {missing_keys}")
-        
+
         df = ensure_column_is_string(df, self.options.axis_column)
         df = ensure_column_is_string(df, self.options.hue)
-        
+
+        palette = convert_dict_keys_to_string(self.options.palette) or {}
+        unique_hue_values = df[self.options.hue].unique()
+        missing_keys = [val for val in unique_hue_values if val not in palette]
+        if missing_keys:
+            raise ValueError(f"Palette missing keys for hue values: {missing_keys}")
+
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
-        
+
         return df
-    
+
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+
         self._palette = convert_palette_to_strings(self.options.palette)
         
         if self.options.label_map:
