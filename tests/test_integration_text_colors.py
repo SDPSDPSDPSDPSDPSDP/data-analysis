@@ -8,7 +8,14 @@ import pytest
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, PiePlotOptions, CountPlotOptions, BarPlotOptions
+from shirin.plot.core import (
+    create_plot,
+    PiePlotOptions,
+    CountPlotOptions,
+    BarPlotOptions,
+    NormalizedCountPlotOptions,
+)
+
 from shirin.plot.config.colors import Colors, TextColors
 from shirin.plot.common.formatting.text_contrast import get_text_color_for_background
 
@@ -179,7 +186,36 @@ class TestStackedBarPlotTextColors:
         assert plot._original_palette is not None
 
 
+class TestNormalizedCountPlotPaletteKeys:
+    """Integration tests for normalized count plot palette key handling."""
+
+    def test_normalized_countplot_boolean_palette_keys_do_not_raise(self):
+        """Test that normalized count plot accepts boolean hue values with boolean-keyed palette."""
+        df = pd.DataFrame({
+            'category': ['A', 'A', 'B', 'B'],
+            'status': [True, False, True, False]
+        })
+
+        palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
+
+        options = NormalizedCountPlotOptions(
+            df=df,
+            axis_column='category',
+            orientation='vertical',
+            hue='status',
+            palette=palette,
+            show_labels=False,
+        )
+
+        plot = create_plot('normalized_count', options)
+        plot.render()
+
+        assert plot._normalized_pivot is not None
+        assert list(plot._normalized_pivot.columns) == ['False', 'True']
+
+
 class TestIntegerPaletteKeys:
+
     """Integration tests for integer palette keys."""
     
     def test_pie_chart_integer_palette_keys(self):
