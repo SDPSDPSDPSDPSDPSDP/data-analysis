@@ -17,6 +17,17 @@ from ..config import (
 class InvalidOrderTypeError(ValueError):
     """Raised when an unsupported order_type is provided."""
 
+    def __init__(self, received: Any, valid_options: tuple[str, ...], type_error: bool = False):
+        if type_error:
+            message = (
+                f"Invalid order_type type '{type(received).__name__}'. "
+                f"Valid options are strings or OrderType enum values: {valid_options}."
+            )
+        else:
+            message = f"Invalid order_type '{received}'. Valid options are: {valid_options}."
+        super().__init__(message)
+
+
 
 VALID_ORDER_TYPES = tuple(order_type.value for order_type in OrderType)
 
@@ -60,18 +71,15 @@ class CategoricalPlotOptions(BasePlotOptions):
         if self.orientation not in ('vertical', 'horizontal'):
             raise ValueError("orientation must be 'vertical' or 'horizontal'")
 
-                # Validate order_type without normalization.
+                        # Validate order_type without normalization.
         if isinstance(self.order_type, OrderType):
             pass
         elif isinstance(self.order_type, str):
             if self.order_type not in VALID_ORDER_TYPES:
-                raise InvalidOrderTypeError(
-                    f"Invalid order_type '{self.order_type}'. Valid options are: {VALID_ORDER_TYPES}."
-                )
+                raise InvalidOrderTypeError(self.order_type, VALID_ORDER_TYPES)
         else:
-            raise InvalidOrderTypeError(
-                f"Invalid order_type type. Valid options are strings or OrderType enum values: {VALID_ORDER_TYPES}."
-            )
+            raise InvalidOrderTypeError(self.order_type, VALID_ORDER_TYPES, type_error=True)
+
 
 
         if self.stacked and self.hue is None:
