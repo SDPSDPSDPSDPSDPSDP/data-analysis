@@ -93,6 +93,10 @@ class AccuracyPlot(AbstractPlot):
             orientation='vertical',
         )
 
+        # Sort by accuracy (Correct column) descending — highest accuracy first
+        if _CORRECT_KEY in df_prepared.columns:
+            df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=False)
+
         # Correct is drawn first (bottom), Incorrect stacked on top
         cols_ordered = []
         for key in (_CORRECT_KEY, _INCORRECT_KEY):

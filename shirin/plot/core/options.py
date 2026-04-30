@@ -250,7 +250,6 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
         # These are fixed for accuracy plots – not exposed as user options.
         self.stacked = True
         self.hue = '__is_correct__'
-        self.order_type = 'alphabetical'
         self.figsize = 'dynamic'
         self.stacked_labels = 'standard'
         super().validate()
