@@ -70,9 +70,11 @@ class AccuracyPlot(AbstractPlot):
             orientation=orientation,
         )
 
-        # Correct drawn first (bottom); sort by accuracy descending
+                # Correct drawn first (bottom); sort so highest accuracy is
+        # leftmost (vertical) or topmost (horizontal).
         df_prepared = df_prepared[[_CORRECT_KEY, _INCORRECT_KEY]]
-        df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=False)
+        ascending = orientation == 'horizontal'
+        df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
 
         palette = self.options.palette  # type: ignore[assignment]
         df_labeled = apply_label_mapping(df_prepared, self.options.label_map)
@@ -91,8 +93,8 @@ class AccuracyPlot(AbstractPlot):
         palette = self.options.palette  # type: ignore[assignment]
 
         if orientation == 'horizontal':
-            format_xy_labels(plot, xlabel=self.options.xlabel, x_labelpad=0,
-                             ylabel=self.options.ylabel)
+            format_xy_labels(plot, xlabel=self.options.ylabel, x_labelpad=0,
+                             ylabel=self.options.xlabel)
         else:
             format_xy_labels(plot, xlabel=self.options.xlabel,
                              ylabel=self.options.ylabel, y_labelpad=0)
