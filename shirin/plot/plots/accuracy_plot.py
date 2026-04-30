@@ -77,11 +77,12 @@ class AccuracyPlot(AbstractPlot):
         return df_long
 
     def draw(self, data: pd.DataFrame) -> Any:
+        orientation = self.options.orientation
         size_strategy = get_figure_size_strategy(
             self.options.figsize,
-            'vertical',
+            orientation,
         )
-        figsize = size_strategy.calculate_size(data, self.options.axis_column, 'vertical')
+        figsize = size_strategy.calculate_size(data, self.options.axis_column, orientation)
         self.renderer.create_figure(figsize)
 
         df_prepared = prepare_stacked_data(
@@ -90,7 +91,7 @@ class AccuracyPlot(AbstractPlot):
             self.options.axis_column,
             self.options.order_type,
             value_col='__value__',
-            orientation='vertical',
+            orientation=orientation,
         )
 
         # Sort by accuracy (Correct column) descending — highest accuracy first
@@ -111,9 +112,10 @@ class AccuracyPlot(AbstractPlot):
         df_labeled = apply_label_mapping(df_prepared, self.options.label_map)
         colors = create_colors_list(df_prepared, self._palette)  # type: ignore
 
+        kind = 'barh' if self.options.orientation == 'horizontal' else 'bar'
         plot = self.renderer.render_stacked_barplot(
             df=df_labeled,
-            kind='bar',
+            kind=kind,
             colors=colors,
             width=0.6,
         )
@@ -122,6 +124,7 @@ class AccuracyPlot(AbstractPlot):
         return plot
 
     def format_plot(self, plot: Any) -> None:
+        orientation = self.options.orientation
         format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
 
         format_optional_legend(
@@ -134,12 +137,15 @@ class AccuracyPlot(AbstractPlot):
         )
 
         format_ticks(plot)
-        plot.yaxis.set_visible(False)
+        if orientation == 'horizontal':
+            plot.xaxis.set_visible(False)
+        else:
+            plot.yaxis.set_visible(False)
 
         if self._df_unlabeled is not None and self._palette is not None:
             format_datalabels_stacked(
                 plot,
                 self._df_unlabeled,
                 self._palette,
-                orientation='vertical',
+                orientation=orientation,
             )

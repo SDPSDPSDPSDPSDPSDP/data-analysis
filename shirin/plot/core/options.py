@@ -252,6 +252,11 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
         self.hue = '__is_correct__'
         self.figsize = 'dynamic'
         self.stacked_labels = 'standard'
+        _validate_str_or_enum_option(
+            option_name='orientation',
+            value=self.orientation,
+            valid_options=VALID_ORIENTATIONS,
+        )
         super().validate()
 
 

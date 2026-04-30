@@ -554,8 +554,9 @@ class PlotGraphs:
         color_incorrect: str = Colors.BAD_RED,
         xlabel: str = '',
         ylabel: str = 'Accuracy',
+        orientation: str = 'vertical',
         plot_legend: bool = False,
-        output_name: str = 'accuracy_plot_x',
+        output_name: str = 'accuracy_plot',
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
@@ -571,18 +572,21 @@ class PlotGraphs:
             color_incorrect: Hex colour for the incorrect segment. *Default: ``Colors.BAD_RED``*.
             xlabel: Label for the x-axis. *Default: ``''``*.
             ylabel: Label for the y-axis. *Default: ``'Accuracy'``*.
+            orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
+                ``'horizontal'`` (bars grow rightward). *Default: ``'vertical'``*.
             plot_legend: Whether to show the legend. *Default: ``False``*.
-            output_name: Name for the exported file. *Default: ``'accuracy_plot_x'``*.
+            output_name: Name for the exported file. *Default: ``'accuracy_plot'``*.
 
         Example:
             >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
             ...                    'accuracy':  [0.78,     0.78,   0.78]})
-            >>> plot.accuracy_plot_x(
+            >>> plot.accuracy_plot(
             ...     df,
             ...     x='run_name',
             ...     y='accuracy',
             ...     xlabel='Experiment Name',
             ...     ylabel='Accuracy',
+            ...     orientation='horizontal',
             ... )
         """
         options = AccuracyPlotOptions(
@@ -592,6 +596,7 @@ class PlotGraphs:
             palette={'Correct': color_correct, 'Incorrect': color_incorrect},
             xlabel=xlabel,
             ylabel=ylabel,
+            orientation=orientation,
             plot_legend=plot_legend,
         )
         plot = create_plot('accuracy', options)
