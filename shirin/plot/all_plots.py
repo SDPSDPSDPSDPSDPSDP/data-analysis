@@ -548,12 +548,12 @@ class PlotGraphs:
     def accuracy_plot(
         self,
         df: pd.DataFrame,
-        x: str,
-        y: str,
+        experiment: str,
+        accuracy: str,
         color_correct: str = Colors.GOOD_GREEN,
         color_incorrect: str = Colors.BAD_RED,
-        xlabel: str = '',
-        ylabel: str = 'Accuracy',
+        experiment_label: str = '',
+        accuracy_label: str = '',
         orientation: str = 'vertical',
         plot_legend: bool = False,
         output_name: str = 'accuracy_plot',
@@ -591,11 +591,11 @@ class PlotGraphs:
         """
         options = AccuracyPlotOptions(
             df=df,
-            axis_column=x,
-            value_column=y,
+            axis_column=experiment,
+            value_column=accuracy,
             palette={'Correct': color_correct, 'Incorrect': color_incorrect},
-            xlabel=xlabel,
-            ylabel=ylabel,
+            xlabel=experiment_label,
+            ylabel=accuracy_label,
             orientation=orientation,
             plot_legend=plot_legend,
         )

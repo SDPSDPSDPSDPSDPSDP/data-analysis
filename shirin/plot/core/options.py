@@ -252,6 +252,13 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
         self.hue = '__is_correct__'
         self.figsize = 'dynamic'
         self.stacked_labels = 'standard'
+        # Default palette: green for Correct, red for Incorrect
+        if not isinstance(self.palette, dict):
+            from ..config.colors import Colors
+            self.palette = {
+                'Correct': Colors.GOOD_GREEN,
+                'Incorrect': Colors.BAD_RED,
+            }
         _validate_str_or_enum_option(
             option_name='orientation',
             value=self.orientation,
