@@ -14,9 +14,11 @@ from .core import (
     PiePlotOptions,
     NormalizedCountPlotOptions,
     TimePlotOptions,
+    AccuracyPlotOptions,
     create_plot,
 )
 from .common.file_operations import calculate_value_counts
+from .config.colors import Colors
 
 
 class PlotGraphs:
@@ -540,5 +542,58 @@ class PlotGraphs:
             rotation=rotation,
         )
         plot = create_plot('time', options)
+        plot.render()
+        self._export_graph(output_name)
+
+    def accuracy_plot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        color_correct: str = Colors.GOOD_GREEN,
+        color_incorrect: str = Colors.BAD_RED,
+        xlabel: str = '',
+        ylabel: str = 'Accuracy',
+        plot_legend: bool = False,
+        output_name: str = 'accuracy_plot_x',
+    ) -> None:
+        """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
+
+        Each bar is split into two segments: *Correct* (the accuracy fraction) at
+        the bottom and *Incorrect* (1 − accuracy) stacked on top.
+
+        Args:
+            df: DataFrame with one row per run / category.
+            x: Column name for the x-axis categories (e.g. ``'run_name'``).
+            y: Column name containing accuracy values as fractions in **[0, 1]**
+                (e.g. ``0.78`` for 78 %).
+            color_correct: Hex colour for the correct segment. *Default: ``Colors.GOOD_GREEN``*.
+            color_incorrect: Hex colour for the incorrect segment. *Default: ``Colors.BAD_RED``*.
+            xlabel: Label for the x-axis. *Default: ``''``*.
+            ylabel: Label for the y-axis. *Default: ``'Accuracy'``*.
+            plot_legend: Whether to show the legend. *Default: ``False``*.
+            output_name: Name for the exported file. *Default: ``'accuracy_plot_x'``*.
+
+        Example:
+            >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
+            ...                    'accuracy':  [0.78,     0.78,   0.78]})
+            >>> plot.accuracy_plot_x(
+            ...     df,
+            ...     x='run_name',
+            ...     y='accuracy',
+            ...     xlabel='Experiment Name',
+            ...     ylabel='Accuracy',
+            ... )
+        """
+        options = AccuracyPlotOptions(
+            df=df,
+            axis_column=x,
+            value_column=y,
+            palette={'Correct': color_correct, 'Incorrect': color_incorrect},
+            xlabel=xlabel,
+            ylabel=ylabel,
+            plot_legend=plot_legend,
+        )
+        plot = create_plot('accuracy', options)
         plot.render()
         self._export_graph(output_name)

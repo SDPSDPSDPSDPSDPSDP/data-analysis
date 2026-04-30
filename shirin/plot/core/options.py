@@ -241,6 +241,22 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 
 @dataclass
+class AccuracyPlotOptions(CategoricalPlotOptions):
+    value_column: str = ''
+
+    def validate(self) -> None:
+        if not self.value_column:
+            raise ValueError("value_column must be specified")
+        # These are fixed for accuracy plots – not exposed as user options.
+        self.stacked = True
+        self.hue = '__is_correct__'
+        self.order_type = 'alphabetical'
+        self.figsize = 'dynamic'
+        self.stacked_labels = 'standard'
+        super().validate()
+
+
+@dataclass
 class TimePlotOptions(BasePlotOptions):
     x: str = ''
     group_by: TimeGroupByInput = 'day'
@@ -266,5 +282,3 @@ class TimePlotOptions(BasePlotOptions):
             value=self.plot_type,
             valid_options=VALID_TIME_PLOT_TYPES,
         )
-
-
