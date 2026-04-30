@@ -14,9 +14,11 @@ from .core import (
     PiePlotOptions,
     NormalizedCountPlotOptions,
     TimePlotOptions,
+    AccuracyPlotOptions,
     create_plot,
 )
 from .common.file_operations import calculate_value_counts
+from .config.colors import Colors
 
 
 class PlotGraphs:
@@ -540,5 +542,63 @@ class PlotGraphs:
             rotation=rotation,
         )
         plot = create_plot('time', options)
+        plot.render()
+        self._export_graph(output_name)
+
+    def accuracy_plot(
+        self,
+        df: pd.DataFrame,
+        experiment: str,
+        accuracy: str,
+        color_correct: str = Colors.GOOD_GREEN,
+        color_incorrect: str = Colors.BAD_RED,
+        experiment_label: str = '',
+        accuracy_label: str = '',
+        orientation: str = 'vertical',
+        plot_legend: bool = False,
+        output_name: str = 'accuracy_plot',
+    ) -> None:
+        """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
+
+        Each bar is split into two segments: *Correct* (the accuracy fraction) at
+        the bottom and *Incorrect* (1 − accuracy) stacked on top.
+
+        Args:
+            df: DataFrame with one row per run / category.
+            x: Column name for the x-axis categories (e.g. ``'run_name'``).
+            y: Column name containing accuracy values as fractions in **[0, 1]**
+                (e.g. ``0.78`` for 78 %).
+            color_correct: Hex colour for the correct segment. *Default: ``Colors.GOOD_GREEN``*.
+            color_incorrect: Hex colour for the incorrect segment. *Default: ``Colors.BAD_RED``*.
+            xlabel: Label for the x-axis. *Default: ``''``*.
+            ylabel: Label for the y-axis. *Default: ``'Accuracy'``*.
+            orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
+                ``'horizontal'`` (bars grow rightward). *Default: ``'vertical'``*.
+            plot_legend: Whether to show the legend. *Default: ``False``*.
+            output_name: Name for the exported file. *Default: ``'accuracy_plot'``*.
+
+        Example:
+            >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
+            ...                    'accuracy':  [0.78,     0.78,   0.78]})
+            >>> plot.accuracy_plot(
+            ...     df,
+            ...     x='run_name',
+            ...     y='accuracy',
+            ...     xlabel='Experiment Name',
+            ...     ylabel='Accuracy',
+            ...     orientation='horizontal',
+            ... )
+        """
+        options = AccuracyPlotOptions(
+            df=df,
+            axis_column=experiment,
+            value_column=accuracy,
+            palette={'Correct': color_correct, 'Incorrect': color_incorrect},
+            xlabel=experiment_label,
+            ylabel=accuracy_label,
+            orientation=orientation,
+            plot_legend=plot_legend,
+        )
+        plot = create_plot('accuracy', options)
         plot.render()
         self._export_graph(output_name)

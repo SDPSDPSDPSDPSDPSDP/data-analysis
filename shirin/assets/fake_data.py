@@ -142,6 +142,10 @@ def generate_time_series(
 
     return pd.DataFrame(rows)
 
+df_accuracy = pd.DataFrame({
+    'run_name': ['medium', 'nano', 'small'],
+    'accuracy': [0.99, 0.71, 0.85],
+})
 
 # Existing fake datasets
 df, df_documents_by_year = generate_fake_data()

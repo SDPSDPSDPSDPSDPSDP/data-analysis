@@ -10,6 +10,7 @@ from .options import (
     PiePlotOptions,
     NormalizedCountPlotOptions,
     TimePlotOptions,
+    AccuracyPlotOptions,
 )
 from .renderer import PlotRenderer, SeabornRenderer
 from .strategies import (

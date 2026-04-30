@@ -241,6 +241,33 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 
 @dataclass
+class AccuracyPlotOptions(CategoricalPlotOptions):
+    value_column: str = ''
+
+    def validate(self) -> None:
+        if not self.value_column:
+            raise ValueError("value_column must be specified")
+        # These are fixed for accuracy plots – not exposed as user options.
+        self.stacked = True
+        self.hue = '__is_correct__'
+        self.figsize = 'dynamic'
+        self.stacked_labels = 'standard'
+        # Default palette: green for Correct, red for Incorrect
+        if not isinstance(self.palette, dict):
+            from ..config.colors import Colors
+            self.palette = {
+                'Correct': Colors.GOOD_GREEN,
+                'Incorrect': Colors.BAD_RED,
+            }
+        _validate_str_or_enum_option(
+            option_name='orientation',
+            value=self.orientation,
+            valid_options=VALID_ORIENTATIONS,
+        )
+        super().validate()
+
+
+@dataclass
 class TimePlotOptions(BasePlotOptions):
     x: str = ''
     group_by: TimeGroupByInput = 'day'
@@ -266,5 +293,3 @@ class TimePlotOptions(BasePlotOptions):
             value=self.plot_type,
             valid_options=VALID_TIME_PLOT_TYPES,
         )
-
-
