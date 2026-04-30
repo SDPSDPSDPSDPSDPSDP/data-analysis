@@ -90,7 +90,12 @@ class AccuracyPlot(AbstractPlot):
         orientation = self.options.orientation
         palette = self.options.palette  # type: ignore[assignment]
 
-        format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
+        if orientation == 'horizontal':
+            format_xy_labels(plot, xlabel=self.options.xlabel, x_labelpad=0,
+                             ylabel=self.options.ylabel)
+        else:
+            format_xy_labels(plot, xlabel=self.options.xlabel,
+                             ylabel=self.options.ylabel, y_labelpad=0)
         format_optional_legend(
             plot,
             hue=_HUE_COL,
@@ -102,9 +107,11 @@ class AccuracyPlot(AbstractPlot):
 
         format_ticks(plot)
         if orientation == 'horizontal':
-            plot.xaxis.set_visible(False)
+            plot.set_xticklabels([])
+            plot.xaxis.set_ticks_position('none')
         else:
-            plot.yaxis.set_visible(False)
+            plot.set_yticklabels([])
+            plot.yaxis.set_ticks_position('none')
 
         if self._df_unlabeled is not None:
             format_datalabels_stacked(
