@@ -1,7 +1,10 @@
+from typing import Any, Dict, Optional
+
 from matplotlib.ticker import FuncFormatter
 from matplotlib.axes import Axes
 
 from ...config import TextColors
+
 
 def _configure_grid(plot: Axes, x_grid: bool = False, y_grid: bool = False) -> None:
     plot.set_axisbelow(True)  # Ensure the grid renders below elements
@@ -37,6 +40,31 @@ def _set_ticks(plot: Axes, numeric_x: bool = False, numeric_y: bool = False, per
 def _customize_ticks(plot: Axes, rotation: int) -> None:
     plot.tick_params(axis='x', colors=TextColors.DARK_GREY, which='both', color='white', rotation=rotation)
     plot.tick_params(axis='y', colors=TextColors.DARK_GREY, which='both', color='white')
+
+
+def format_categorical_tick_labels(
+    plot: Axes,
+    label_map: Optional[Dict[Any, str]],
+    axis: str,
+) -> None:
+    if not label_map:
+        return
+
+    if axis == 'x':
+        tick_labels = [tick.get_text() for tick in plot.get_xticklabels()]
+        mapped_labels = [label_map.get(label, label) for label in tick_labels]
+        plot.set_xticks(plot.get_xticks())
+        plot.set_xticklabels(mapped_labels)
+        return
+
+    if axis == 'y':
+        tick_labels = [tick.get_text() for tick in plot.get_yticklabels()]
+        mapped_labels = [label_map.get(label, label) for label in tick_labels]
+        plot.set_yticks(plot.get_yticks())
+        plot.set_yticklabels(mapped_labels)
+        return
+
+    raise ValueError("axis must be either 'x' or 'y'")
 
 
 def format_ticks(

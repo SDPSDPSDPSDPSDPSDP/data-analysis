@@ -8,6 +8,7 @@ from ..common.strategies.ordering import get_ordering_strategy
 from ..common.strategies.figsize import get_figure_size_strategy
 from ..common.strategies.palette import get_palette_strategy
 from ..common.formatting import (
+    format_categorical_tick_labels,
     format_datalabels,
     format_datalabels_stacked,
     format_optional_legend,
@@ -24,6 +25,7 @@ from ..common.sorting import (
     create_colors_list,
     create_default_label_map,
 )
+
 from ..common.stacked_plots import prepare_stacked_data
 
 
@@ -152,8 +154,10 @@ class BarPlot(AbstractPlot):
 
         if self.options.orientation == 'vertical':
             format_ticks(plot, y_grid=True, numeric_y=True)
+            format_categorical_tick_labels(plot, self._label_map_legend, axis='x')
         else:
             format_ticks(plot, x_grid=True, numeric_x=True)
+            format_categorical_tick_labels(plot, self._label_map_legend, axis='y')
 
         self._format_data_labels(plot)
 
@@ -182,5 +186,7 @@ class BarPlot(AbstractPlot):
                 orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal',
                 suffix=self.options.suffix,
             )
+
+
 
 

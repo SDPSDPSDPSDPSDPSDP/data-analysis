@@ -8,6 +8,7 @@ from ..common.strategies.ordering import get_ordering_strategy
 from ..common.strategies.figsize import get_figure_size_strategy
 from ..common.strategies.palette import get_palette_strategy
 from ..common.formatting import (
+    format_categorical_tick_labels,
     format_datalabels,
     format_datalabels_stacked,
     format_optional_legend,
@@ -21,6 +22,7 @@ from ..common.data_conversion import (
 )
 from ..common.data_filtering import filter_top_n_categories
 from ..common.sorting import (
+
     apply_label_mapping,
     create_colors_list,
     create_default_label_map,
@@ -149,19 +151,23 @@ class CountPlot(AbstractPlot):
             self.options.ncol,
             self.options.legend_offset
         )
-        
+
         if self.options.orientation == 'vertical':
             format_ticks(plot, y_grid=True, numeric_y=True)
+            format_categorical_tick_labels(plot, self._label_map_legend, axis='x')
         else:
             format_ticks(plot, x_grid=True, numeric_x=True)
-        
+            format_categorical_tick_labels(plot, self._label_map_legend, axis='y')
+
         self._format_data_labels(plot)
-    
+
     def _format_data_labels(self, plot: Any) -> None:
-        if (self.options.stacked and 
-            self.options.stacked_labels is not None and 
-            self._df_unlabeled is not None and 
-            self._original_palette is not None):
+        if (
+            self.options.stacked
+            and self.options.stacked_labels is not None
+            and self._df_unlabeled is not None
+            and self._original_palette is not None
+        ):
             orientation = 'vertical' if self.options.orientation == 'vertical' else 'horizontal'
             # Convert palette keys to strings to match pivot table column names
             palette_str = convert_palette_to_strings(self._original_palette)
@@ -182,4 +188,6 @@ class CountPlot(AbstractPlot):
                 orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal',  # type: ignore
                 suffix=self.options.suffix,
             )
+
+
 
