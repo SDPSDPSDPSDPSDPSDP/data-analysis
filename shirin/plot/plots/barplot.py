@@ -179,5 +179,7 @@ class BarPlot(AbstractPlot):
                 plot,
                 label_offset=0.007,
                 orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal',  # type: ignore
-                formatting=formatting
+                formatting=formatting,
+                suffix=self.options.datalabel_suffix,
             )
+

@@ -177,5 +177,7 @@ class CountPlot(AbstractPlot):
                 plot,
                 label_offset=0.007,
                 formatting=formatting,
-                orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal'  # type: ignore
+                orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal',  # type: ignore
+                suffix=self.options.datalabel_suffix,
             )
+

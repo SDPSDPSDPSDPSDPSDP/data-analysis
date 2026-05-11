@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.container import BarContainer
-from typing import List, Dict
+from typing import List, Dict, Optional
 import pandas as pd
 
 from ...config import TextColors, FontSizes
@@ -21,12 +21,13 @@ def _format_labels(
     label_offset: float,
     formatting: str,
     orientation: str,
+    suffix: Optional[str] = None,
 ) -> None:
     if formatting == 'percentage':
         # Calculate total dimension to convert counts to percentages
         dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
         total_dimension = sum(getattr(p, dimension_getter[orientation])() for p in patches)
-    
+
     for patch in patches:
         dimension = patch.get_height() if orientation == 'vertical' else patch.get_width()
         if dimension > 0:
@@ -34,8 +35,13 @@ def _format_labels(
                 text: str = f'{dimension:,.0f}'.replace(",", ".")
             elif formatting == 'percentage':
                 percentage = (dimension / total_dimension * 100) if total_dimension > 0 else 0
-                text: str = f'{percentage:,.1f}%'.replace(",", ".")
+                text = f'{percentage:,.1f}%'.replace(",", ".")
+            if suffix is not None and suffix.strip() != '':
+                text = f"{text} {suffix.strip()}"
             _add_text(patch, dimension + label_offset, text, orientation)
+
+
+
 
 
 def _add_text(
@@ -69,10 +75,14 @@ def format_datalabels(
     label_offset: float = 0.01,
     formatting: str = 'totals',
     orientation: str = 'vertical',
+    suffix: Optional[str] = None,
 ) -> None:
     patches: List[Patch] = plot.patches
     label_offset = _calculate_label_offset(patches, label_offset, orientation)
-    _format_labels(patches, label_offset, formatting, orientation)
+    _format_labels(patches, label_offset, formatting, orientation, suffix=suffix)
+
+
+
 
 
 def format_datalabels_stacked(

@@ -152,6 +152,8 @@ class CountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     normalized: bool = False
     show_labels: bool = True
+    datalabel_suffix: Optional[str] = None
+
 
     def validate(self) -> None:
         super().validate()
@@ -164,6 +166,8 @@ class CountPlotOptions(CategoricalPlotOptions):
 class BarPlotOptions(CategoricalPlotOptions):
     value: str = ''
     percentage_labels: bool = False
+    datalabel_suffix: Optional[str] = None
+
 
     def validate(self) -> None:
         super().validate()
