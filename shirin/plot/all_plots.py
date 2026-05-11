@@ -600,6 +600,7 @@ class PlotGraphs:
         experiment_label: str = '',
         accuracy_label: str = '',
         orientation: str = 'vertical',
+        reverse: Optional[bool] = None,
         reverse_order: bool = False,
         plot_legend: bool = False,
         suffix: Optional[str] = None,
@@ -623,11 +624,14 @@ class PlotGraphs:
             ylabel: Label for the y-axis. *Default: ``'Accuracy'``*.
                         orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
                 ``'horizontal'`` (bars grow rightward). *Default: ``'vertical'``*.
+                        reverse: Backward-compatible alias for ``reverse_order``.
+                If provided, it overrides ``reverse_order``.
             reverse_order: Whether to reverse the default sorting order.
                 - Vertical default is highest accuracy first; with ``True`` lowest is first.
                 - Horizontal default is highest at the top; with ``True`` lowest is at the top.
                 *Default: ``False``*.
             plot_legend: Whether to show the legend. *Default: ``False``*.
+
 
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
@@ -647,7 +651,10 @@ class PlotGraphs:
         """
         
 
+        resolved_reverse_order = reverse if reverse is not None else reverse_order
+
         options = AccuracyPlotOptions(
+
 
             df=df,
             axis_column=experiment,
@@ -656,7 +663,8 @@ class PlotGraphs:
             xlabel=experiment_label,
             ylabel=accuracy_label,
                         orientation=orientation,
-            reverse_order=reverse_order,
+                        reverse_order=resolved_reverse_order,
+
             plot_legend=plot_legend,
             suffix=suffix,
 
