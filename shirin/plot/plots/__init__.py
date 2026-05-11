@@ -5,6 +5,6 @@ from .lineplot import LinePlot
 from .piechart import PieChart
 from .normalized_countplot import NormalizedCountPlot
 from .timeplot import TimePlot
-from .accuracy_plot import AccuracyPlot
+from .accuracy import AccuracyPlot
 
 __all__ = ['CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot', 'TimePlot', 'AccuracyPlot']

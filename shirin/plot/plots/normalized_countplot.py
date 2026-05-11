@@ -133,5 +133,7 @@ class NormalizedCountPlot(AbstractPlot):
                 plot,
                 self._normalized_pivot,  # type: ignore
                 self._palette,
-                orientation=self.options.orientation
+                orientation=self.options.orientation,
+                suffix=self.options.suffix,
             )
+

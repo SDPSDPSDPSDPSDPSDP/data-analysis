@@ -66,6 +66,7 @@ class PlotGraphs:
     def _export_graph(self, output_name: str) -> None:
         self._exporter.export_and_show(output_name)
 
+    
     def countplot_x(
         self,
         df: pd.DataFrame,
@@ -85,10 +86,12 @@ class PlotGraphs:
         order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
+        suffix: Optional[str] = None,
         output_name: str = 'countplot_x'
+
     ) -> None:
         """Create a **vertical count plot** showing category frequencies.
-        
+
         Args:
             df: DataFrame containing the data to plot.
             x: Column name for the x-axis categories.
@@ -112,9 +115,14 @@ class PlotGraphs:
             normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
                 *Default: `False`*.
             show_labels: Whether to show data labels on bars. *Default: `True`*.
-            output_name: Name for the exported file. *Default: `'countplot_x'`*.
+            suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
+                *Default: `None`*.
+                        output_name: Name for the exported file. *Default: `'countplot_x'`*.
         """
+        
+
         if normalized and hue is not None:
+
             if not isinstance(palette, dict):
                 raise ValueError("palette must be a dictionary when normalized=True with hue")
             options = NormalizedCountPlotOptions(
@@ -132,8 +140,10 @@ class PlotGraphs:
                 top_n=top_n,
                 figsize=figsize_width,
                 order_type=order_type,
-                show_labels=show_labels
+                show_labels=show_labels,
+                suffix=suffix,
             )
+
             plot = create_plot('normalized_count', options)
             plot.render()
         else:
@@ -155,11 +165,14 @@ class PlotGraphs:
                 stacked_labels=stacked_labels,
                 order_type=order_type,
                 normalized=normalized,
-                show_labels=show_labels
+                show_labels=show_labels,
+                suffix=suffix,
             )
+
             plot = create_plot('count', options)
             plot.render()
         self._export_graph(output_name)
+
 
     def countplot_y(
         self,
@@ -180,10 +193,12 @@ class PlotGraphs:
         order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
+        suffix: Optional[str] = None,
         output_name: str = 'countplot_y'
+
     ) -> None:
         """Create a **horizontal count plot** showing category frequencies.
-        
+
         Args:
             df: DataFrame containing the data to plot.
             y: Column name for the y-axis categories.
@@ -207,9 +222,14 @@ class PlotGraphs:
             normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
                 *Default: `False`*.
             show_labels: Whether to show data labels on bars. *Default: `True`*.
-            output_name: Name for the exported file. *Default: `'countplot_y'`*.
+            suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
+                *Default: `None`*.
+                        output_name: Name for the exported file. *Default: `'countplot_y'`*.
         """
+        
+
         if normalized and hue is not None:
+
             if not isinstance(palette, dict):
                 raise ValueError("palette must be a dictionary when normalized=True with hue")
             options = NormalizedCountPlotOptions(
@@ -226,9 +246,11 @@ class PlotGraphs:
                 ncol=ncol,
                 top_n=top_n,
                 figsize=figsize_height,
-                order_type=order_type,
-                show_labels=show_labels
+                                order_type=order_type,
+                show_labels=show_labels,
+                suffix=suffix,
             )
+
             plot = create_plot('normalized_count', options)
             plot.render()
         else:
@@ -248,13 +270,16 @@ class PlotGraphs:
                 figsize=figsize_height,
                 stacked=stacked,
                 stacked_labels=stacked_labels,
-                order_type=order_type,
+                                order_type=order_type,
                 normalized=normalized,
-                show_labels=show_labels
+                show_labels=show_labels,
+                suffix=suffix,
             )
+
             plot = create_plot('count', options)
             plot.render()
         self._export_graph(output_name)
+
 
     def histogram(
         self,
@@ -372,12 +397,14 @@ class PlotGraphs:
         stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
+        suffix: Optional[str] = None,
         output_name: str = 'barplot_x'
+
     ) -> None:
         """Create a **vertical bar plot** with pre-aggregated data.
-        
+
         _Unlike countplot, this requires a column with pre-calculated values._
-        
+
         Args:
             df: DataFrame containing the pre-aggregated data.
             x: Column name for the x-axis categories.
@@ -399,9 +426,14 @@ class PlotGraphs:
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
-            output_name: Name for the exported file. *Default: `'barplot_x'`*.
+            suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
+                *Default: `None`*.
+                        output_name: Name for the exported file. *Default: `'barplot_x'`*.
         """
+        
+
         options = BarPlotOptions(
+
             df=df,
             axis_column=x,
             value=value,
@@ -418,8 +450,10 @@ class PlotGraphs:
             stacked=stacked,
             stacked_labels=stacked_labels,
             order_type=order_type,
-            percentage_labels=percentage_labels
+            percentage_labels=percentage_labels,
+            suffix=suffix,
         )
+
         plot = create_plot('bar', options)
         plot.render()
         self._export_graph(output_name)
@@ -440,14 +474,17 @@ class PlotGraphs:
         figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
-        order_type: OrderTypeInput = 'frequency',
+                order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
+        suffix: Optional[str] = None,
+
         output_name: str = 'barplot_y'
+
     ) -> None:
         """Create a **horizontal bar plot** with pre-aggregated data.
-        
+
         _Unlike countplot, this requires a column with pre-calculated values._
-        
+
         Args:
             df: DataFrame containing the pre-aggregated data.
             y: Column name for the y-axis categories.
@@ -469,9 +506,14 @@ class PlotGraphs:
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
-            output_name: Name for the exported file. *Default: `'barplot_y'`*.
-                """
+            suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
+                *Default: `None`*.
+                        output_name: Name for the exported file. *Default: `'barplot_y'`*.
+        """
+        
+
         options = BarPlotOptions(
+
             df=df,
             axis_column=y,
             value=value,
@@ -488,11 +530,14 @@ class PlotGraphs:
             stacked=stacked,
             stacked_labels=stacked_labels,
             order_type=order_type,
-            percentage_labels=percentage_labels
+                        percentage_labels=percentage_labels,
+            suffix=suffix,
         )
+
         plot = create_plot('bar', options)
         plot.render()
         self._export_graph(output_name)
+
 
     def timeplot(
         self,
@@ -545,7 +590,7 @@ class PlotGraphs:
         plot.render()
         self._export_graph(output_name)
 
-    def accuracy_plot(
+    def accuracy(
         self,
         df: pd.DataFrame,
         experiment: str,
@@ -555,8 +600,13 @@ class PlotGraphs:
         experiment_label: str = '',
         accuracy_label: str = '',
         orientation: str = 'vertical',
+        reverse: Optional[bool] = None,
+        reverse_order: bool = False,
         plot_legend: bool = False,
-        output_name: str = 'accuracy_plot',
+        suffix: Optional[str] = None,
+        output_name: str = 'accuracy',
+
+
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
@@ -572,15 +622,25 @@ class PlotGraphs:
             color_incorrect: Hex colour for the incorrect segment. *Default: ``Colors.BAD_RED``*.
             xlabel: Label for the x-axis. *Default: ``''``*.
             ylabel: Label for the y-axis. *Default: ``'Accuracy'``*.
-            orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
+                        orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
                 ``'horizontal'`` (bars grow rightward). *Default: ``'vertical'``*.
+                        reverse: Backward-compatible alias for ``reverse_order``.
+                If provided, it overrides ``reverse_order``.
+            reverse_order: Whether to reverse the default sorting order.
+                - Vertical default is highest accuracy first; with ``True`` lowest is first.
+                - Horizontal default is highest at the top; with ``True`` lowest is at the top.
+                *Default: ``False``*.
             plot_legend: Whether to show the legend. *Default: ``False``*.
-            output_name: Name for the exported file. *Default: ``'accuracy_plot'``*.
+
+
+            suffix: Optional suffix appended to stacked labels.
+                When omitted, accuracy labels keep their default ``%`` formatting.
+            output_name: Name for the exported file. *Default: ``'accuracy'``*.
 
         Example:
             >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
             ...                    'accuracy':  [0.78,     0.78,   0.78]})
-            >>> plot.accuracy_plot(
+            >>> plot.accuracy(
             ...     df,
             ...     x='run_name',
             ...     y='accuracy',
@@ -589,16 +649,27 @@ class PlotGraphs:
             ...     orientation='horizontal',
             ... )
         """
+        
+
+        resolved_reverse_order = reverse if reverse is not None else reverse_order
+
         options = AccuracyPlotOptions(
+
+
             df=df,
             axis_column=experiment,
             value_column=accuracy,
             palette={'Correct': color_correct, 'Incorrect': color_incorrect},
             xlabel=experiment_label,
             ylabel=accuracy_label,
-            orientation=orientation,
+                        orientation=orientation,
+                        reverse_order=resolved_reverse_order,
+
             plot_legend=plot_legend,
+            suffix=suffix,
+
         )
+
         plot = create_plot('accuracy', options)
         plot.render()
         self._export_graph(output_name)

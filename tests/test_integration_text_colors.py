@@ -214,8 +214,61 @@ class TestNormalizedCountPlotPaletteKeys:
         assert list(plot._normalized_pivot.columns) == ['False', 'True']
 
 
-class TestIntegerPaletteKeys:
+class TestAxisLabelMapping:
+    """Integration tests for axis tick label mapping in categorical plots."""
 
+    def test_countplot_applies_label_map_to_axis_ticks_without_legend(self):
+        """CountPlot should map categorical axis ticks using label_map even when legend is hidden."""
+        df = pd.DataFrame({
+            'is_contentious': [0, 0, 1, 1, 1],
+        })
+
+        options = CountPlotOptions(
+            df=df,
+            axis_column='is_contentious',
+            orientation='vertical',
+            label_map={0: 'Non-Contentious', 1: 'Contentious'},
+            plot_legend=False,
+            show_labels=False,
+        )
+
+        plot = create_plot('count', options)
+        ax = plot.render()
+
+        xtick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
+        assert 'Non-Contentious' in xtick_labels
+        assert 'Contentious' in xtick_labels
+        assert '0' not in xtick_labels
+        assert '1' not in xtick_labels
+
+    def test_barplot_applies_label_map_to_horizontal_axis_ticks(self):
+        """BarPlot should map horizontal categorical axis ticks using label_map."""
+        df = pd.DataFrame({
+            'is_contentious': [0, 1],
+            'count': [12, 7],
+        })
+
+        options = BarPlotOptions(
+            df=df,
+            axis_column='is_contentious',
+            value='count',
+            orientation='horizontal',
+            label_map={0: 'Non-Contentious', 1: 'Contentious'},
+            plot_legend=False,
+            percentage_labels=False,
+        )
+
+        plot = create_plot('bar', options)
+        ax = plot.render()
+
+        ytick_labels = [tick.get_text() for tick in ax.get_yticklabels()]
+        assert 'Non-Contentious' in ytick_labels
+        assert 'Contentious' in ytick_labels
+        assert '0' not in ytick_labels
+        assert '1' not in ytick_labels
+
+
+class TestIntegerPaletteKeys:
     """Integration tests for integer palette keys."""
     
     def test_pie_chart_integer_palette_keys(self):

@@ -1,8 +1,11 @@
 import pandas as pd
 
+from .number_format import format_thousands
+
 
 def print_rounded(name, value):
-    print(f"{name}: {value:,.0f}".replace(',', '.'))
+    print(f"{name}: {format_thousands(value)}")
+
 
 
 @pd.api.extensions.register_series_accessor("stats")
@@ -27,7 +30,7 @@ class StatsAccessor:
             print_rounded("Minimum", stats['min'])
             print_rounded("Maximum", stats['max'])
             if missing_values > 0:
-                print("\nMissing Values: {:,.0f}".format(missing_values).replace(',', '.'))
+                print(f"\nMissing Values: {format_thousands(missing_values)}")
             return None
         
         return stats
