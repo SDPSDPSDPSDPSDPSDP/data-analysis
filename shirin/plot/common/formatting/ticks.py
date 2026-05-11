@@ -4,6 +4,8 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.axes import Axes
 
 from ...config import TextColors
+from ....stats.number_format import format_thousands
+
 
 
 def _configure_grid(plot: Axes, x_grid: bool = False, y_grid: bool = False) -> None:
@@ -16,7 +18,8 @@ def _configure_grid(plot: Axes, x_grid: bool = False, y_grid: bool = False) -> N
 
 def _set_ticks(plot: Axes, numeric_x: bool = False, numeric_y: bool = False, percentage_x: bool = False, percentage_y: bool = False) -> None:
     def format_numeric(tick_val: float, pos: int) -> str:
-        return "{:,.0f}".format(tick_val).replace(",", ".")
+        return format_thousands(tick_val)
+
 
     def format_percentage(tick_val: float, pos: int) -> str:
         return f"{tick_val * 100:.0f}%"  # Scale tick values as percentages

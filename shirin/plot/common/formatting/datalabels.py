@@ -5,7 +5,9 @@ from typing import Dict, List, Optional
 import pandas as pd
 
 from ...config import FontSizes, TextColors
+from ....stats.number_format import format_thousands
 from .text_contrast import get_text_color_for_background
+
 
 
 def _calculate_label_offset(
@@ -31,7 +33,8 @@ def _format_labels(
         dimension = patch.get_height() if orientation == 'vertical' else patch.get_width()
         if dimension > 0:
             if formatting == 'totals':
-                text: str = f'{dimension:,.0f}'.replace(',', '.')
+                text: str = format_thousands(dimension)
+
             elif formatting == 'percentage':
                 percentage = (dimension / total_dimension * 100) if total_dimension > 0 else 0
                 text = f'{percentage:,.1f}%'.replace(',', '.')

@@ -8,6 +8,8 @@ from ..core.options import PiePlotOptions
 from ..common.label_mapping import create_label_map
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.data_conversion import convert_dict_keys_to_string
+from ...stats.number_format import format_thousands
+
 
 
 class PieChart(AbstractPlot):
@@ -72,9 +74,10 @@ class PieChart(AbstractPlot):
         
         # Create legend labels
         legend_labels = [
-            f'{label}: {val:,.0f}'.replace(",", ".")
+            f'{label}: {format_thousands(val)}'
             for label, val in zip(self._labels, self._values)  # type: ignore
         ]
+
         
         legend = plt.legend(
             legend_labels,
