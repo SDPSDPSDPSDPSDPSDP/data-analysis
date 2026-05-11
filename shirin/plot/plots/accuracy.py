@@ -70,11 +70,15 @@ class AccuracyPlot(AbstractPlot):
             orientation=orientation,
         )
 
-                # Correct drawn first (bottom); sort so highest accuracy is
-        # leftmost (vertical) or topmost (horizontal).
+        # Correct drawn first (bottom). Default sorting is highest-first for
+        # vertical plots and top-to-bottom for horizontal plots. reverse_order
+        # flips that behavior.
         df_prepared = df_prepared[[_CORRECT_KEY, _INCORRECT_KEY]]
         ascending = orientation == 'horizontal'
+        if self.options.reverse_order:
+            ascending = not ascending
         df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
+
 
         palette = self.options.palette  # type: ignore[assignment]
         df_labeled = apply_label_mapping(df_prepared, self.options.label_map)
@@ -121,6 +125,6 @@ class AccuracyPlot(AbstractPlot):
                 self._df_unlabeled,
                 palette,
                 orientation=orientation,
-                suffix=self.options.datalabel_suffix,
+                suffix=self.options.suffix,
             )
 

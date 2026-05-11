@@ -170,7 +170,7 @@ class CountPlot(AbstractPlot):
                 self._df_unlabeled,
                 palette_str,
                 orientation=orientation,  # type: ignore
-                suffix=self.options.datalabel_suffix,
+                suffix=self.options.suffix,
             )
 
         elif not self.options.stacked:
@@ -180,6 +180,6 @@ class CountPlot(AbstractPlot):
                 label_offset=0.007,
                 formatting=formatting,
                 orientation='vertical' if self.options.orientation == 'vertical' else 'horizontal',  # type: ignore
-                suffix=self.options.datalabel_suffix,
+                suffix=self.options.suffix,
             )
 
