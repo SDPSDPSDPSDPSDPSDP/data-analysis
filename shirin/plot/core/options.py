@@ -233,8 +233,10 @@ class PiePlotOptions(BasePlotOptions):
 class NormalizedCountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     show_labels: bool = True
+    datalabel_suffix: Optional[str] = None
     palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     ylabel: str = 'Percentage'
+
 
     def validate(self) -> None:
         super().validate()
@@ -247,6 +249,8 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
     value_column: str = ''
+    datalabel_suffix: Optional[str] = None
+
 
     def validate(self) -> None:
         if not self.value_column:

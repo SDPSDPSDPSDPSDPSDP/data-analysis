@@ -121,4 +121,6 @@ class AccuracyPlot(AbstractPlot):
                 self._df_unlabeled,
                 palette,
                 orientation=orientation,
+                suffix=self.options.datalabel_suffix,
             )
+

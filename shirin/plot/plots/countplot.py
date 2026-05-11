@@ -169,8 +169,10 @@ class CountPlot(AbstractPlot):
                 plot,
                 self._df_unlabeled,
                 palette_str,
-                orientation=orientation  # type: ignore
+                orientation=orientation,  # type: ignore
+                suffix=self.options.datalabel_suffix,
             )
+
         elif not self.options.stacked:
             formatting = 'percentage' if (self.options.normalized and self.options.hue is None) else 'totals'
             format_datalabels(
