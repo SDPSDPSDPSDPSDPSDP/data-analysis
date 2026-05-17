@@ -1,4 +1,5 @@
 from .colors import Colors, TextColors
+from .palettes import Palette, LabelMapping
 from .formatting import FontSizes, FigureSize
 from .types import (
     OrderType,
@@ -15,6 +16,8 @@ from .types import (
 __all__ = [
     'Colors',
     'TextColors',
+    'Palette',
+    'LabelMapping',
     'FontSizes',
     'FigureSize',
     'OrderType',

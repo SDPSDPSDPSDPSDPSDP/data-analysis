@@ -18,16 +18,18 @@ from .core import (
     create_plot,
 )
 from .common.file_operations import calculate_value_counts
+from .common.resolve_palette import resolve_palette
 from .config.colors import Colors
+from .config.palettes import Palette, LabelMapping
 
 
 class PlotGraphs:
     """A comprehensive plotting interface for creating and exporting data visualizations.
-    
+
     This class provides methods for creating various types of plots including **count plots**,
     **bar plots**, **histograms**, **line plots**, and **pie charts**. All plots can be automatically
     exported to files with customizable settings.
-    
+
     Args:
         export: Whether to automatically export plots to files. *Default: `True`*.
         output_dir: Directory where exported plots will be saved. *Default: `'./plot_output/'`*.
@@ -35,22 +37,27 @@ class PlotGraphs:
         format: File format for exported plots. **Options:** `'png'`, `'svg'`. *Default: `'png'`*.
         font: Font to use for all text. **Options:** `'satoshi'`, `None` (matplotlib default).
             *Default: `None`*.
-    
+        palette: A :class:`Palette` subclass with column-name attributes. When a plot uses
+            `hue=col`, the matching palette is resolved automatically.
+        label_mapping: A :class:`LabelMapping` subclass. Same resolution logic as `palette`.
+
     Example:
         >>> plot = PlotGraphs(export=True, output_dir='./charts/', prefix='analysis')
         >>> plot.countplot_x(df, x='category', output_name='category_counts')
-        
+
         >>> plot = PlotGraphs(font='satoshi')
         >>> plot.countplot_x(df, x='category', output_name='category_counts')
     """
 
     def __init__(
         self,
-        export: bool = True,
+        export: bool = False,
         output_dir: str = os.path.expanduser("./plot_output/"),
         prefix: Optional[str] = None,
         format: str = 'png',
         font: Optional[str] = None,
+        palette: Optional[type[Palette]] = None,
+        label_mapping: Optional[type[LabelMapping]] = None,
     ) -> None:
         if font is not None:
             configure_matplotlib(font=font)
@@ -62,18 +69,19 @@ class PlotGraphs:
             format=format,
             auto_show=True
         )
+        self._palette = palette
+        self._label_mapping = label_mapping
 
     def _export_graph(self, output_name: str) -> None:
         self._exporter.export_and_show(output_name)
 
-    
+
+    @resolve_palette
     def countplot_x(
         self,
         df: pd.DataFrame,
         x: str,
         hue: Optional[str] = None,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = '',
         ylabel: str = 'Count',
         plot_legend: bool = True,
@@ -87,8 +95,10 @@ class PlotGraphs:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        output_name: str = 'countplot_x'
-
+        output_name: str = 'countplot_x',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **vertical count plot** showing category frequencies.
 
@@ -96,9 +106,6 @@ class PlotGraphs:
             df: DataFrame containing the data to plot.
             x: Column name for the x-axis categories.
             hue: Column name for grouping data by color. *Optional*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `'Count'`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
@@ -119,8 +126,6 @@ class PlotGraphs:
                 *Default: `None`*.
                         output_name: Name for the exported file. *Default: `'countplot_x'`*.
         """
-        
-
         if normalized and hue is not None:
 
             if not isinstance(palette, dict):
@@ -174,13 +179,12 @@ class PlotGraphs:
         self._export_graph(output_name)
 
 
+    @resolve_palette
     def countplot_y(
         self,
         df: pd.DataFrame,
         y: str,
         hue: Optional[str] = None,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = 'Count',
         ylabel: str = '',
         plot_legend: bool = True,
@@ -194,8 +198,10 @@ class PlotGraphs:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        output_name: str = 'countplot_y'
-
+        output_name: str = 'countplot_y',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **horizontal count plot** showing category frequencies.
 
@@ -203,9 +209,6 @@ class PlotGraphs:
             df: DataFrame containing the data to plot.
             y: Column name for the y-axis categories.
             hue: Column name for grouping data by color. *Optional*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
             xlabel: Label for the x-axis. *Default: `'Count'`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
@@ -226,8 +229,6 @@ class PlotGraphs:
                 *Default: `None`*.
                         output_name: Name for the exported file. *Default: `'countplot_y'`*.
         """
-        
-
         if normalized and hue is not None:
 
             if not isinstance(palette, dict):
@@ -281,22 +282,24 @@ class PlotGraphs:
         self._export_graph(output_name)
 
 
+    @resolve_palette
     def histogram(
         self,
         df: pd.DataFrame,
         x: str,
+        hue: Optional[str] = None,
         xlabel: str = '',
         ylabel: str = 'Count',
         xlimit: Optional[Union[float, int]] = None,
         bins: int = 100,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
-        hue: Optional[str] = None,
         stacked: Optional[bool] = None,
         plot_legend: bool = True,
         legend_offset: float = 1.13,
         ncol: int = 2,
-        output_name: str = 'histogram'
+        output_name: str = 'histogram',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         options = HistogramOptions(
             df=df,
@@ -317,16 +320,18 @@ class PlotGraphs:
         plot.render()
         self._export_graph(output_name)
 
+    @resolve_palette
     def pie(
         self,
         df: pd.DataFrame,
         col: str,
-        palette: Dict[Any, str],
-        label_map: Optional[Dict[Any, str]] = None,
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
-        output_name: str = 'pie_value_counts'
+        output_name: str = 'pie_value_counts',
+        # injected by @resolve_palette
+        palette: Optional[Dict[Any, str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         df_value_counts = calculate_value_counts(df, col)
         options = PiePlotOptions(
@@ -343,14 +348,13 @@ class PlotGraphs:
         self._export_graph(output_name)
 
 
+    @resolve_palette
     def lineplot(
         self,
         df: pd.DataFrame,
         x: str,
         y: str,
         hue: Optional[str] = None,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
@@ -358,7 +362,10 @@ class PlotGraphs:
         ncol: int = 2,
         rotation: int = 0,
         fill_missing_values: FillMissingValuesInput = None,
-        output_name: str = 'lineplot'
+        output_name: str = 'lineplot',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         options = LinePlotOptions(
             df=df,
@@ -379,14 +386,13 @@ class PlotGraphs:
         plot.render()
         self._export_graph(output_name)
 
+    @resolve_palette
     def barplot_x(
         self,
         df: pd.DataFrame,
         x: str,
         value: str,
         hue: Optional[str] = None,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
@@ -398,8 +404,10 @@ class PlotGraphs:
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-        output_name: str = 'barplot_x'
-
+        output_name: str = 'barplot_x',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **vertical bar plot** with pre-aggregated data.
 
@@ -410,9 +418,6 @@ class PlotGraphs:
             x: Column name for the x-axis categories.
             value: Column name containing the values to plot.
             hue: Column name for grouping data by color. *Optional*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
@@ -430,10 +435,7 @@ class PlotGraphs:
                 *Default: `None`*.
                         output_name: Name for the exported file. *Default: `'barplot_x'`*.
         """
-        
-
         options = BarPlotOptions(
-
             df=df,
             axis_column=x,
             value=value,
@@ -458,14 +460,13 @@ class PlotGraphs:
         plot.render()
         self._export_graph(output_name)
 
+    @resolve_palette
     def barplot_y(
         self,
         df: pd.DataFrame,
         y: str,
         value: str,
         hue: Optional[str] = None,
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
@@ -474,12 +475,13 @@ class PlotGraphs:
         figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
-                order_type: OrderTypeInput = 'frequency',
+        order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-
-        output_name: str = 'barplot_y'
-
+        output_name: str = 'barplot_y',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **horizontal bar plot** with pre-aggregated data.
 
@@ -490,9 +492,6 @@ class PlotGraphs:
             y: Column name for the y-axis categories.
             value: Column name containing the values to plot.
             hue: Column name for grouping data by color. *Optional*.
-            palette: Color scheme. Can be a seaborn palette name (`str`) or a `dict` mapping
-                categories to hex colors. *Optional*.
-            label_map: `Dict` mapping original category values to display labels. *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
@@ -510,10 +509,7 @@ class PlotGraphs:
                 *Default: `None`*.
                         output_name: Name for the exported file. *Default: `'barplot_y'`*.
         """
-        
-
         options = BarPlotOptions(
-
             df=df,
             axis_column=y,
             value=value,
@@ -530,7 +526,7 @@ class PlotGraphs:
             stacked=stacked,
             stacked_labels=stacked_labels,
             order_type=order_type,
-                        percentage_labels=percentage_labels,
+            percentage_labels=percentage_labels,
             suffix=suffix,
         )
 
@@ -554,10 +550,10 @@ class PlotGraphs:
         output_name: str = 'timeplot'
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
-        
+
         This plot counts occurrences of events in a datetime column and displays
         them as a bar chart with properly formatted date axes.
-        
+
         Args:
             df: DataFrame containing the data to plot.
             x: Column name containing datetime values (`datetime64[ns]`).
@@ -569,7 +565,7 @@ class PlotGraphs:
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
             output_name: Name for the exported file. *Default: `'timeplot'`*.
-        
+
         Example:
             >>> plot = PlotGraphs()
             >>> plot.timeplot(df, x='date', group_by='month', output_name='events_by_month')
@@ -605,8 +601,6 @@ class PlotGraphs:
         plot_legend: bool = False,
         suffix: Optional[str] = None,
         output_name: str = 'accuracy',
-
-
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
@@ -631,8 +625,6 @@ class PlotGraphs:
                 - Horizontal default is highest at the top; with ``True`` lowest is at the top.
                 *Default: ``False``*.
             plot_legend: Whether to show the legend. *Default: ``False``*.
-
-
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
             output_name: Name for the exported file. *Default: ``'accuracy'``*.
@@ -649,25 +641,19 @@ class PlotGraphs:
             ...     orientation='horizontal',
             ... )
         """
-        
-
         resolved_reverse_order = reverse if reverse is not None else reverse_order
 
         options = AccuracyPlotOptions(
-
-
             df=df,
             axis_column=experiment,
             value_column=accuracy,
             palette={'Correct': color_correct, 'Incorrect': color_incorrect},
             xlabel=experiment_label,
             ylabel=accuracy_label,
-                        orientation=orientation,
-                        reverse_order=resolved_reverse_order,
-
+            orientation=orientation,
+            reverse_order=resolved_reverse_order,
             plot_legend=plot_legend,
             suffix=suffix,
-
         )
 
         plot = create_plot('accuracy', options)

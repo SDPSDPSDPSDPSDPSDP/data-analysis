@@ -33,8 +33,8 @@ def _generate_middle_weighted_values(num_rows: int, value_range: tuple[int, int]
 
 
 def _add_category_columns(df: DataFrame) -> DataFrame:
-    df["hue"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
-    df['hue2'] = df['hue'] == 'category_1'
+    df["example_hue_1"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
+    df['example_hue_2'] = df['example_hue_1'] == 'category_1'
     return df
 
 
@@ -65,14 +65,14 @@ def _create_documents_by_year_dataframe() -> DataFrame:
         rows.append({
             'year': year,
             'cumul_total_docs': cumul_true,
-            'hue': hue_value,
-            'type': True
+            'example_hue_4': hue_value,
+            'example_hue_3': True
         })
         rows.append({
             'year': year,
             'cumul_total_docs': cumul_false,
-            'hue': hue_value,
-            'type': False
+            'example_hue_4': hue_value,
+            'example_hue_3': False
         })
     
     return pd.DataFrame(rows)
@@ -81,7 +81,7 @@ def _create_documents_by_year_dataframe() -> DataFrame:
 def generate_fake_data() -> tuple[DataFrame, DataFrame]:
     df = _create_base_dataframe()
     df = _expand_dataframe(df)
-    df["values"] = _generate_middle_weighted_values(len(df))
+    df["example_hue_3"] = _generate_middle_weighted_values(len(df))
     df = _add_category_columns(df)
     
     df_documents_by_year = _create_documents_by_year_dataframe()
