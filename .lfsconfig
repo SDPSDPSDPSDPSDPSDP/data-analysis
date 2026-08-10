@@ -1,0 +1,5 @@
+[lfs]
+	# Consumers of this package (uv sync / pip install from git) never need the
+	# example notebook, so don't download LFS content on clone -- pointers only.
+	# Overridden locally in .git/config for development clones.
+	fetchexclude = *
