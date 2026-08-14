@@ -214,6 +214,20 @@ class LinePlotOptions(BasePlotOptions):
 
 
 @dataclass
+class ScatterPlotOptions(BasePlotOptions):
+    x: str = ''
+    y: str = ''
+    size: Optional[str] = None
+
+    def validate(self) -> None:
+        super().validate()
+        if not self.x:
+            raise ValueError("x column must be specified")
+        if not self.y:
+            raise ValueError("y column must be specified")
+
+
+@dataclass
 class PiePlotOptions(BasePlotOptions):
     col: str = ''
     n_after_comma: int = 0

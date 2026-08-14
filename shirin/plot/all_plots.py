@@ -15,6 +15,7 @@ from .core import (
     NormalizedCountPlotOptions,
     TimePlotOptions,
     AccuracyPlotOptions,
+    ScatterPlotOptions,
     create_plot,
 )
 from .common.file_operations import calculate_value_counts
@@ -383,6 +384,57 @@ class PlotGraphs:
             fill_missing_values=fill_missing_values
         )
         plot = create_plot('line', options)
+        plot.render()
+        self._export_graph(output_name)
+
+    @resolve_palette
+    def scatterplot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        hue: Optional[str] = None,
+        size: Optional[str] = None,
+        xlabel: str = '',
+        ylabel: str = '',
+        plot_legend: bool = True,
+        legend_offset: float = 1.13,
+        ncol: int = 2,
+        output_name: str = 'scatterplot',
+        # injected by @resolve_palette
+        palette: Optional[Union[Dict[Any, str], str]] = None,
+        label_map: Optional[Dict[Any, str]] = None,
+    ) -> None:
+        """Create a **scatter plot** showing the relationship between two numeric columns.
+
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name for the x-axis values.
+            y: Column name for the y-axis values.
+            hue: Column name for grouping data by color. *Optional*.
+            size: Column name for scaling point size. *Optional*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `''`*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            output_name: Name for the exported file. *Default: `'scatterplot'`*.
+        """
+        options = ScatterPlotOptions(
+            df=df,
+            x=x,
+            y=y,
+            hue=hue,
+            size=size,
+            palette=palette,
+            label_map=label_map,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            plot_legend=plot_legend,
+            legend_offset=legend_offset,
+            ncol=ncol,
+        )
+        plot = create_plot('scatter', options)
         plot.render()
         self._export_graph(output_name)
 

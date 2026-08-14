@@ -63,6 +63,19 @@ class PlotRenderer(ABC):
         pass
     
     @abstractmethod
+    def render_scatterplot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        hue: Optional[str] = None,
+        size: Optional[str] = None,
+        color: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None
+    ) -> Any:
+        pass
+
+    @abstractmethod
     def render_stacked_barplot(
         self,
         df: pd.DataFrame,
@@ -193,6 +206,28 @@ class SeabornRenderer(PlotRenderer):
             alpha=1
         )
     
+    def render_scatterplot(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        hue: Optional[str] = None,
+        size: Optional[str] = None,
+        color: Optional[str] = None,
+        palette: Optional[Union[Dict[Any, str], str]] = None
+    ) -> Any:
+        return sns.scatterplot(
+            data=df,
+            x=x,
+            y=y,
+            hue=hue,
+            size=size,
+            color=color,
+            palette=palette,
+            alpha=0.8,
+            edgecolor='none'
+        )
+
     def render_stacked_barplot(
         self,
         df: pd.DataFrame,

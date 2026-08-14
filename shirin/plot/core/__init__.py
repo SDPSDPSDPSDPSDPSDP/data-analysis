@@ -11,6 +11,7 @@ from .options import (
     NormalizedCountPlotOptions,
     TimePlotOptions,
     AccuracyPlotOptions,
+    ScatterPlotOptions,
 )
 from .renderer import PlotRenderer, SeabornRenderer
 from .strategies import (
@@ -38,6 +39,8 @@ __all__ = [
     'PiePlotOptions',
     'NormalizedCountPlotOptions',
     'TimePlotOptions',
+    'AccuracyPlotOptions',
+    'ScatterPlotOptions',
     'get_ordering_strategy',
     'get_figure_size_strategy',
     'get_palette_strategy',
