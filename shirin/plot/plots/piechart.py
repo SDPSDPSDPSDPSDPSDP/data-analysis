@@ -64,7 +64,10 @@ class PieChart(AbstractPlot):
             pctdistance=0.775 if self.options.donut else 0.6
         )
         
-        self._autotexts = result[2] if len(result) == 3 else []
+        try:
+            self._autotexts = result[2]
+        except IndexError:
+            self._autotexts = []
         
         ax = plt.gca()
         return ax
