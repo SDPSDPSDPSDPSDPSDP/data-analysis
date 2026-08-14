@@ -1,5 +1,5 @@
 from .factory import register_plot
-from ..plots import CountPlot, BarPlot, Histogram, LinePlot, PieChart, NormalizedCountPlot, TimePlot, AccuracyPlot
+from ..plots import CountPlot, BarPlot, Histogram, LinePlot, PieChart, NormalizedCountPlot, TimePlot, AccuracyPlot, ScatterPlot
 
 
 def register_all_plots() -> None:
@@ -11,6 +11,7 @@ def register_all_plots() -> None:
     register_plot('normalized_count', NormalizedCountPlot)
     register_plot('time', TimePlot)
     register_plot('accuracy', AccuracyPlot)
+    register_plot('scatter', ScatterPlot)
 
 
 register_all_plots()
