@@ -50,19 +50,15 @@ class LinePlot(AbstractPlot):
         
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
-        
-        # Default to black when no hue is specified
-        if self.options.hue is None:
-            self._color = 'black'
-        
+        self._color = self._resolve_color(self._color)
+
         # Keep original types for palette keys to match data types
         # Label map for legend will be prepared in format_plot
-        
+
         return df
-    
+
     def draw(self, data: pd.DataFrame) -> Any:
-        from ..config import FigureSize
-        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
+        self._create_standard_figure()
         
         plot = self.renderer.render_lineplot(
             df=data,
