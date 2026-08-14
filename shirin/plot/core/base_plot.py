@@ -47,3 +47,12 @@ class AbstractPlot(ABC):
     
     def finalize(self, plot: Any) -> None:
         pass
+
+    def _create_standard_figure(self) -> None:
+        from ..config import FigureSize
+        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
+
+    def _resolve_color(self, color: Optional[str]) -> Optional[str]:
+        if getattr(self.options, 'hue', None) is None:
+            return 'black'
+        return color

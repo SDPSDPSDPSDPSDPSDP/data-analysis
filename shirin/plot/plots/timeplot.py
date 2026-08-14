@@ -99,9 +99,8 @@ class TimePlot(AbstractPlot):
         return self._aggregated_df
     
     def draw(self, data: pd.DataFrame) -> Any:
-        from ..config import FigureSize
-        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
-        
+        self._create_standard_figure()
+
         ax = plt.gca()
         plot_type = getattr(self.options, 'plot_type', 'bar')
 

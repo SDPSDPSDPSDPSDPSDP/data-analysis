@@ -34,15 +34,12 @@ class ScatterPlot(AbstractPlot):
 
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
-
-        if self.options.hue is None:
-            self._color = 'black'
+        self._color = self._resolve_color(self._color)
 
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
-        from ..config import FigureSize
-        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
+        self._create_standard_figure()
 
         plot = self.renderer.render_scatterplot(
             df=data,
