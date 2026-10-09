@@ -23,4 +23,5 @@ wheels/
 .venv
 .env
 .vscode
-.claude
+.claude/*
+!.claude/settings.json
