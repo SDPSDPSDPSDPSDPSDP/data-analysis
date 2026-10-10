@@ -29,7 +29,6 @@ class Colors:
 @dataclass
 class TextColors:
     DARK_GREY = '#444444'
-    # LIGHT_GREY = '#888888'
     LIGHT_GREY = '#777777'
     BLACK = '#000000'
     WHITE = '#FFFFFF'

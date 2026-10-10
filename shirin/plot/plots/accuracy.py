@@ -1,10 +1,9 @@
-from typing import Any, Optional, Dict
+from typing import Any, Optional
 
 import pandas as pd
 
 from ..core.base_plot import AbstractPlot
 from ..core.options import AccuracyPlotOptions
-from ..common.strategies.figsize import get_figure_size_strategy
 from ..common.formatting import (
     format_datalabels_stacked,
     format_optional_legend,
@@ -14,6 +13,7 @@ from ..common.formatting import (
 from ..common.data_conversion import ensure_column_is_string
 from ..common.sorting import apply_label_mapping, create_colors_list
 from ..common.stacked_plots import prepare_stacked_data
+from .categorical import create_sized_figure
 
 _CORRECT_KEY = 'Correct'
 _INCORRECT_KEY = 'Incorrect'
@@ -38,9 +38,6 @@ class AccuracyPlot(AbstractPlot):
         self.options: AccuracyPlotOptions = options
         self._df_unlabeled: Optional[pd.DataFrame] = None
 
-    # ------------------------------------------------------------------
-    # AbstractPlot interface
-    # ------------------------------------------------------------------
 
     def preprocess(self) -> pd.DataFrame:
         return ensure_column_is_string(self.options.df, self.options.axis_column)
@@ -57,9 +54,7 @@ class AccuracyPlot(AbstractPlot):
 
     def draw(self, data: pd.DataFrame) -> Any:
         orientation = self.options.orientation
-        size_strategy = get_figure_size_strategy(self.options.figsize, orientation)
-        figsize = size_strategy.calculate_size(data, self.options.axis_column, orientation)
-        self.renderer.create_figure(figsize)
+        create_sized_figure(self, data)
 
         df_prepared = prepare_stacked_data(
             data,
@@ -78,7 +73,6 @@ class AccuracyPlot(AbstractPlot):
         if self.options.reverse_order:
             ascending = not ascending
         df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
-
 
         palette = self.options.palette  # type: ignore[assignment]
         df_labeled = apply_label_mapping(df_prepared, self.options.label_map)

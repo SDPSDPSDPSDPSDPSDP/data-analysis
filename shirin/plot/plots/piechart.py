@@ -5,9 +5,7 @@ import matplotlib.pyplot as plt
 
 from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
-from ..common.label_mapping import create_label_map
 from ..common.formatting.text_contrast import get_text_color_for_background
-from ..common.data_conversion import convert_dict_keys_to_string
 from ...stats.number_format import format_thousands
 
 
@@ -30,24 +28,11 @@ class PieChart(AbstractPlot):
         self._values = df[self.options.col].tolist()
         self._original_labels = df.index.tolist()
         
-        label_map_to_use = self.options.label_map
-        # Keep original types for label_map keys
-        # if label_map_to_use:
-        #     label_map_to_use = convert_dict_keys_to_string(label_map_to_use)
-        
-        label_map = create_label_map(
-            label_map_to_use,
-            self._original_labels
-        )
-        
-        original_labels = cast(list, self._original_labels)
-        self._labels = [label_map.get(str(val), str(val)) for val in original_labels]
-        
-        palette_dict = cast(dict, self.options.palette)
-        if palette_dict:
-            self._colors = [palette_dict.get(str(val), '#000000') for val in original_labels]
-        else:
-            self._colors = ['#000000'] * len(original_labels)
+        label_map = self.options.label_map or {}
+        self._labels = [label_map.get(str(val), str(val)) for val in self._original_labels]
+
+        palette = cast(dict, self.options.palette) or {}
+        self._colors = [palette.get(str(val), '#000000') for val in self._original_labels]
         
         return df
     
@@ -75,7 +60,6 @@ class PieChart(AbstractPlot):
     def format_plot(self, plot: Any) -> None:
         from ..config import FontSizes, TextColors
         
-        # Create legend labels
         legend_labels = [
             f'{label}: {format_thousands(val)}'
             for label, val in zip(self._labels, self._values)  # type: ignore
@@ -93,7 +77,6 @@ class PieChart(AbstractPlot):
         for text in legend.get_texts():
             text.set_color(TextColors.DARK_GREY)
         
-        # Apply automatic text colors based on slice background
         for bg_color, autotext in zip(self._colors, self._autotexts):  # type: ignore
             text_color = get_text_color_for_background(bg_color)
             autotext.set_color(text_color)

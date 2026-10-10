@@ -14,16 +14,6 @@ def is_all_numeric(values: list) -> tuple[bool, list[float]]:
     return True, numeric_values
 
 
-def is_all_numeric(values: list) -> tuple[bool, list[float]]:
-    numeric_values = []
-    for v in values:
-        try:
-            numeric_values.append(float(str(v)))
-        except (ValueError, TypeError):
-            return False, []
-    return True, numeric_values
-
-
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
     values_list = list(values)
     is_numeric, numeric_vals = is_all_numeric(values_list)
@@ -58,7 +48,6 @@ def apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -
     if not label_map:
         return df
     df = df.copy()
-    # Convert column names to strings for consistent lookup
     df.columns = [str(col) for col in df.columns]
     df.columns = [label_map.get(col, col) for col in df.columns]
     return df
@@ -67,7 +56,6 @@ def apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -
 def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
     colors = []
     for col in df.columns:
-        # Convert column name to string for consistent lookup
         str_col = str(col)
         if str_col in palette:
             colors.append(palette[str_col])

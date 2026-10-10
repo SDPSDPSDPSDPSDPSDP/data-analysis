@@ -1,5 +1,5 @@
 import pandas as pd
-from shirin.stats.descriptive_statistics import StatsAccessor  # Import to register the accessor
+from shirin.stats.descriptive_statistics import StatsAccessor  # registers the accessor
 
 
 def test_stats_accessor_calculation():
@@ -31,7 +31,7 @@ def test_stats_accessor_printing(capsys):
     
     result = series.stats(printing=True)
     
-    assert result is None  # Should return None when printing
+    assert result is None
     
     captured = capsys.readouterr()
     assert 'Mean: 20' in captured.out

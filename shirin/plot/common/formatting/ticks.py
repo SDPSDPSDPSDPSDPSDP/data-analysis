@@ -9,7 +9,7 @@ from ....stats.number_format import format_thousands
 
 
 def _configure_grid(plot: Axes, x_grid: bool = False, y_grid: bool = False) -> None:
-    plot.set_axisbelow(True)  # Ensure the grid renders below elements
+    plot.set_axisbelow(True)
     if y_grid:
         plot.yaxis.grid(y_grid, zorder=1)
     if x_grid:
@@ -22,7 +22,7 @@ def _set_ticks(plot: Axes, numeric_x: bool = False, numeric_y: bool = False, per
 
 
     def format_percentage(tick_val: float, pos: int) -> str:
-        return f"{tick_val * 100:.0f}%"  # Scale tick values as percentages
+        return f"{tick_val * 100:.0f}%"
 
     if numeric_x and percentage_x:
         raise ValueError("Cannot format ticks as both 'numeric' and 'percentage'. Choose one.")

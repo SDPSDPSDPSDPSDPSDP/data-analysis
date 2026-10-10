@@ -41,8 +41,6 @@ def configure_matplotlib(font: Optional[str] = None) -> None:
                 f"Unknown font {font!r}. Supported values: 'satoshi', None."
             )
 
-    # plt.rcParams['savefig.dpi'] = 300
-    # plt.rcParams['savefig.format'] = 'png'
     plt.rcParams['figure.figsize'] = [FigureSize.WIDTH, FigureSize.HEIGHT]
 
     linestyle_grid = 'dotted'

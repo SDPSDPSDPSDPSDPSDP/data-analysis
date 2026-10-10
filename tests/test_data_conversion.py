@@ -7,20 +7,17 @@ from shirin.plot.common.data_conversion import convert_dict_keys_to_string
 def test_convert_dict_keys_boolean():
     """Test that boolean keys are converted to strings"""
     
-    # Test with boolean keys
     label_map = {True: "Good", False: "Bad"}
     palette = {True: "#00FF00", False: "#FF0000"}
     
     converted_label_map = convert_dict_keys_to_string(label_map)
     converted_palette = convert_dict_keys_to_string(palette)
     
-    # Check that keys are now strings
     assert "True" in converted_label_map, "True key should be converted to string 'True'"
     assert "False" in converted_label_map, "False key should be converted to string 'False'"
     assert "True" in converted_palette, "Palette True key should be converted to string"
     assert "False" in converted_palette, "Palette False key should be converted to string"
     
-    # Check that values are preserved
     assert converted_label_map["True"] == "Good", "Label value should be preserved"
     assert converted_label_map["False"] == "Bad", "Label value should be preserved"
     assert converted_palette["True"] == "#00FF00", "Palette color should be preserved"

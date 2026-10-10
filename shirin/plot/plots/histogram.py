@@ -6,19 +6,11 @@ from ..core.base_plot import AbstractPlot
 from ..core.options import HistogramOptions
 from ..common.strategies.palette import get_palette_strategy
 from ..common.formatting import (
-    format_optional_legend,
     format_ticks,
-    format_xy_labels,
-)
-from ..common.sorting import (
-    apply_label_mapping,
-    create_colors_list,
-    create_default_label_map,
 )
 from ..common.data_conversion import (
     ensure_column_is_int,
     ensure_column_is_string,
-    prepare_legend_label_map,
 )
 
 
@@ -49,8 +41,6 @@ class Histogram(AbstractPlot):
         palette_strategy = get_palette_strategy(self.options.palette)
         self._color, self._palette = palette_strategy.get_palette()
         
-        # Keep original types for palette keys to match data types
-        # Label map for legend will be prepared in format_plot
         
         return df
     
@@ -78,37 +68,18 @@ class Histogram(AbstractPlot):
         return plot
     
     def format_plot(self, plot: Any) -> None:
-        if (self.options.label_map is None and 
-            self.options.plot_legend and 
-            self.options.hue is not None):
-            self.options.label_map = create_default_label_map(
-                self._preprocessed_df,  # type: ignore
-                self.options.hue
-            )
-        
-        # Prepare legend version with string keys
-        self._label_map_legend = prepare_legend_label_map(self.options.label_map)
-        
-        # Check if it's a year column
+        self._format_labels_and_legend(plot)
+
         min_value = self._preprocessed_df[self.options.x].min()  # type: ignore
         max_value = self._preprocessed_df[self.options.x].max()  # type: ignore
-        is_year_column = True
-        if 1600 < min_value and max_value < 2300:
-            if len(str(min_value)) == 4 and len(str(max_value)) == 4:
-                is_year_column = False
+        is_year_column = (
+            1600 < min_value and max_value < 2300
+            and len(str(min_value)) == 4 and len(str(max_value)) == 4
+        )
         
-        format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
         format_ticks(
             plot,
             y_grid=True,
-            numeric_x=is_year_column,
+            numeric_x=not is_year_column,
             numeric_y=True
-        )
-        format_optional_legend(
-            plot,
-            self.options.hue,
-            self.options.plot_legend,
-            self._label_map_legend,
-            self.options.ncol,
-            self.options.legend_offset
         )

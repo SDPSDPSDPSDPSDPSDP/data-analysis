@@ -22,18 +22,14 @@ class TestPaletteLookupWithBooleanKeys:
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
         palette_str = convert_palette_to_strings(palette)
         
-        # Simulate what happens in stacked plots - lookup by string key
         bg_color_true = palette_str.get('True', '#000000')
         bg_color_false = palette_str.get('False', '#000000')
         
-        # BAD_RED is dark -> white text
         assert get_text_color_for_background(bg_color_true) == TextColors.WHITE
-        # GOOD_GREEN is light -> black text
         assert get_text_color_for_background(bg_color_false) == TextColors.BLACK
     
     def test_direct_color_list_lookup(self):
         """Test that using pre-computed colors list works correctly (pie chart fix)."""
-        # Simulate pie chart scenario where _colors is already computed
         colors = [Colors.BAD_RED, Colors.GOOD_GREEN]
         
         text_colors = [get_text_color_for_background(c) for c in colors]

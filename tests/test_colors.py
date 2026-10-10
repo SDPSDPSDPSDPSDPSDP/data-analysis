@@ -18,4 +18,4 @@ def test_text_colors_exist():
 def test_colors_are_hex():
     """Test that colors are valid hex format."""
     assert Colors.GREY.startswith('#')
-    assert len(Colors.GREY) == 7  # #RRGGBB format
+    assert len(Colors.GREY) == 7

@@ -87,10 +87,7 @@ def convert_extension_types(df: pd.DataFrame) -> pd.DataFrame:
         dtype = df[col].dtype
         
         if pd.api.types.is_extension_array_dtype(dtype):
-            if hasattr(df[col], 'to_numpy'):
-                df_converted[col] = pd.Series(df[col].to_numpy(), index=df.index)
-            else:
-                df_converted[col] = df[col].astype(object)
+            df_converted[col] = pd.Series(df[col].to_numpy(), index=df.index)
         else:
             df_converted[col] = df[col]
     
@@ -126,6 +123,4 @@ def execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
 
     with engine.connect() as connection:
         connection.execute(text(f"SET SCHEMA {db_config['schema']}"))
-        df = pd.read_sql(sql_query, con=connection)
-
-    return df
+        return pd.read_sql(sql_query, con=connection)

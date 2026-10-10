@@ -9,7 +9,6 @@ from ....stats.number_format import format_thousands
 from .text_contrast import get_text_color_for_background
 
 
-
 def _calculate_label_offset(
     patches: List[Patch], label_offset: float, orientation: str
 ) -> float:
@@ -91,6 +90,34 @@ def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -
     return f'{value_percentage:.0f} {suffix.strip()}'
 
 
+def _add_stacked_labels(
+    pivot_data: pd.DataFrame,
+    percentages,
+    palette: Dict,
+    orientation: str,
+    suffix: Optional[str],
+    threshold: float,
+) -> None:
+    ax = plt.gca()
+    for index, (row_values, row_percentages) in enumerate(zip(pivot_data.values, percentages)):
+        cumulative_sum = 0
+        for category, value, value_percentage in zip(pivot_data.columns, row_values, row_percentages):
+            cumulative_sum += value
+            if value < threshold:
+                continue
+            center = cumulative_sum - value / 2
+            x, y = (center, index) if orientation == 'horizontal' else (index, center)
+            ax.text(
+                x,
+                y,
+                _format_stacked_percentage(value_percentage, suffix),
+                ha='center',
+                va='center',
+                color=get_text_color_for_background(palette.get(category, '#000000')),
+                fontsize=FontSizes.DATALABELS,
+            )
+
+
 def format_datalabels_stacked(
     plot: BarContainer,
     pivot_data: pd.DataFrame,
@@ -98,44 +125,10 @@ def format_datalabels_stacked(
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    max_count = pivot_data.sum(axis=1).max()
-    threshold = 0.04 * max_count
-    ax = plt.gca()
-
-    for index, row_values in enumerate(pivot_data.values):
-        total = row_values.sum()
-        cumulative_sum = 0
-
-        for col_index, value in enumerate(row_values):
-            category = pivot_data.columns[col_index]
-            bg_color = palette.get(category, '#000000')
-            text_color = get_text_color_for_background(bg_color)
-
-            value_percentage = (value / total) * 100
-            cumulative_sum += value
-
-            if value >= threshold:
-                text = _format_stacked_percentage(value_percentage, suffix)
-                if orientation == 'horizontal':
-                    ax.text(
-                        cumulative_sum - value / 2,
-                        index,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
-                else:
-                    ax.text(
-                        index,
-                        cumulative_sum - value / 2,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
+    values = pivot_data.values
+    percentages = values / values.sum(axis=1, keepdims=True) * 100
+    threshold = 0.04 * pivot_data.sum(axis=1).max()
+    _add_stacked_labels(pivot_data, percentages, palette, orientation, suffix, threshold)
 
 
 def format_datalabels_stacked_normalized(
@@ -145,39 +138,4 @@ def format_datalabels_stacked_normalized(
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    threshold = 0.04
-    ax = plt.gca()
-
-    for index, row_values in enumerate(pivot_data.values):
-        cumulative_sum = 0
-
-        for col_index, value in enumerate(row_values):
-            category = pivot_data.columns[col_index]
-            bg_color = palette.get(category, '#000000')
-            text_color = get_text_color_for_background(bg_color)
-
-            value_percentage = value * 100
-            cumulative_sum += value
-
-            if value >= threshold:
-                text = _format_stacked_percentage(value_percentage, suffix)
-                if orientation == 'horizontal':
-                    ax.text(
-                        cumulative_sum - value / 2,
-                        index,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
-                else:
-                    ax.text(
-                        index,
-                        cumulative_sum - value / 2,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
+    _add_stacked_labels(pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)

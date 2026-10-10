@@ -55,7 +55,6 @@ def _create_documents_by_year_dataframe() -> DataFrame:
     for year in years:
         hue_value = year < cutoff_year
         
-        # Generate very different counts for each type
         count_true = np.random.randint(80, 150)
         count_false = np.random.randint(20, 60)
         
@@ -114,7 +113,6 @@ def generate_time_series(
     rows = []
     prev_total = 0
     for year in years:
-        # determine date range for this year within the global bounds
         year_start = max(start, pd.Timestamp(year=year, month=1, day=1))
         year_end = min(end, pd.Timestamp(year=year, month=12, day=31))
         days = pd.date_range(start=year_start, end=year_end, freq='D')
@@ -122,15 +120,12 @@ def generate_time_series(
         if n_days == 0:
             continue
 
-        # base expected events for the year (approx)
         base_year_events = int(max(1, round(avg_events_per_day * n_days)))
 
-        # ensure strictly increasing yearly totals: choose an increment
         min_increment = max(1, int(round(base_year_events * yearly_growth)))
         noise = int(np.random.normal(loc=0, scale=max(1, base_year_events * 0.05)))
         target_total = max(prev_total + min_increment, base_year_events + noise)
 
-        # distribute target_total across days randomly (multinomial)
         probs = np.ones(n_days) / n_days
         daily_counts = np.random.multinomial(target_total, probs)
 
@@ -147,8 +142,6 @@ df_accuracy = pd.DataFrame({
     'accuracy': [0.99, 0.71, 0.85],
 })
 
-# Existing fake datasets
 df, df_documents_by_year = generate_fake_data()
-# Time-series fake dataset for testing `timeplot` grouping by day/month/year
 # Use larger yearly_growth by default to produce more extreme increasing totals
 df_time = generate_time_series(yearly_growth=0.5)

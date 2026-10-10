@@ -23,15 +23,10 @@ class DynamicSizeStrategy(FigureSizeStrategy):
         column: str,
         orientation: str
     ) -> tuple[float, float]:
+        n_categories = len(df[column].value_counts())
         if orientation == 'vertical':
-            n_categories = len(df[column].value_counts())
-            width = (n_categories * 1) + 1
-            height = FigureSize.STANDARD_HEIGHT
-        else:
-            n_categories = len(df[column].value_counts())
-            width = FigureSize.WIDTH
-            height = (n_categories / 2) + 1
-        return (width, height)
+            return (n_categories + 1, FigureSize.STANDARD_HEIGHT)
+        return (FigureSize.WIDTH, (n_categories / 2) + 1)
 
 
 class StandardSizeStrategy(FigureSizeStrategy):

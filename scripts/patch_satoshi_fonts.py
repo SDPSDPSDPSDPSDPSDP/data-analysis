@@ -12,7 +12,6 @@ Usage:
 """
 
 import argparse
-import shutil
 from pathlib import Path
 
 from fontTools.ttLib import TTFont
@@ -24,17 +23,10 @@ OUTPUT_DIR = Path("shirin/assets/fonts/patched")
 FONTS_TO_PATCH = [
     "Satoshi-Medium.ttf",
     "Satoshi-Bold.ttf",
-    # "Satoshi-Regular.ttf",
-    # "Satoshi-Light.ttf",
-    # "Satoshi-Italic.ttf",
-    # "Satoshi-MediumItalic.ttf",
-    # "Satoshi-BoldItalic.ttf",
-    # "Satoshi-LightItalic.ttf",
 ]
 
 NEW_FAMILY_NAME = "Satoshi Shirin"
 
-# Mapping from original style substring to name record style.
 # Medium is promoted to "Regular" so matplotlib uses it as the default weight.
 STYLE_MAP = {
     "BoldItalic": ("Bold Italic", "Satoshi Shirin Bold Italic"),
@@ -61,33 +53,26 @@ def patch_font(input_path: Path, output_path: Path, extra_spacing: int) -> None:
     font = TTFont(input_path)
     hmtx = font["hmtx"]
 
-    # Increase advance width for every glyph
     for glyph_name in hmtx.metrics:
         width, lsb = hmtx[glyph_name]
         hmtx[glyph_name] = (width + extra_spacing, lsb)
 
-    # Rename the font family so matplotlib sees it as a distinct font.
-    # We patch nameIDs 1, 2, 4, 6, 16, 17 to ensure matplotlib (which prefers
-    # nameID 16/17 when present) always resolves the correct family + style.
+    # matplotlib prefers nameID 16/17 when present, so patch all of them to resolve the right family + style.
     style, full_name = get_style_info(input_path.name)
     ps_name = full_name.replace(" ", "-")
-    name_table = font["name"]
-    for record in name_table.names:
-        if record.nameID == 1:  # Font Family
-            record.string = NEW_FAMILY_NAME
-        elif record.nameID == 2:  # Font Subfamily (style)
-            record.string = style
-        elif record.nameID == 4:  # Full Name
-            record.string = full_name
-        elif record.nameID == 6:  # PostScript Name
-            record.string = ps_name
-        elif record.nameID == 16:  # Typographic Family Name
-            record.string = NEW_FAMILY_NAME
-        elif record.nameID == 17:  # Typographic Subfamily Name
-            record.string = style
+    new_names = {
+        1: NEW_FAMILY_NAME,  # Font Family
+        2: style,  # Font Subfamily (style)
+        4: full_name,  # Full Name
+        6: ps_name,  # PostScript Name
+        16: NEW_FAMILY_NAME,  # Typographic Family Name
+        17: style,  # Typographic Subfamily Name
+    }
+    for record in font["name"].names:
+        if record.nameID in new_names:
+            record.string = new_names[record.nameID]
 
-    # If Medium is promoted to Regular, update OS/2 weight class so
-    # matplotlib's font matching treats it as the normal (400) weight.
+    # Promoted Medium must read as normal (400) weight for matplotlib's font matching.
     if style == "Regular":
         font["OS/2"].usWeightClass = 400
 
@@ -118,7 +103,6 @@ def main():
             print(f"  SKIP {font_file} (not found)")
             continue
 
-        # Derive output filename; Medium becomes Regular in the output
         output_name = font_file.replace("Satoshi-", "SatoshiShirin-")
         if "Medium" in font_file and "Italic" not in font_file:
             output_name = "SatoshiShirin-Regular.ttf"

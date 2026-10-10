@@ -59,6 +59,3 @@ def create_plot(
 ) -> AbstractPlot:
     return _global_factory.create_plot(plot_type, options, renderer)
 
-
-def get_factory() -> PlotFactory:
-    return _global_factory

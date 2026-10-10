@@ -40,13 +40,9 @@ class PlotExporter:
         return os.path.join(self.output_dir, filename)
     
     def export_and_show(self, output_name: str) -> None:
-        if self.enabled:
-            filepath = self._create_filepath(output_name)
-            plt.savefig(filepath, bbox_inches="tight", dpi=300, format=self.format)
-        
-        if self.auto_show:
-            plt.show()
-    
+        self.export_only(output_name)
+        self.show_only()
+
     def export_only(self, output_name: str) -> None:
         if self.enabled:
             filepath = self._create_filepath(output_name)
