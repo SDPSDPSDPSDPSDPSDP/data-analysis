@@ -37,7 +37,7 @@ plot.countplot(
 # %% Normalized share of total
 plot.countplot(
     df,
-    x='fruit',
+    y='fruit',
     normalized=True,
     title='Share of total',
 )
@@ -54,7 +54,7 @@ plot.countplot(
 # %% 100% stacked by hue
 plot.countplot(
     df,
-    x='fruit',
+    y='fruit',
     hue='ripe',
     normalized=True,
     legend=True,

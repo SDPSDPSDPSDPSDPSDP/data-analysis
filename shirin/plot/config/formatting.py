@@ -12,8 +12,8 @@ class FigureSize:
     WIDTH = 8.4
     PLOT_HEIGHT = 3.2
     CATEGORY_SLOT = 0.75  # plot width per category for vertical bars; sets the figure width
-    BAR_ROW = 0.4  # plot height per category for horizontal bars
-    HORIZONTAL_WIDTH = 5.5  # figure width for horizontal bars
+    BAR_ROW = 0.6  # plot height per category for horizontal bars
+    HORIZONTAL_WIDTH = 5  # figure width for horizontal bars
     BAR_GROUP_WIDTH = 0.65  # share of a category slot covered by its bars (dodged bars split it)
     DODGE_GAP = 0.06  # share of a category slot left between dodged bars
     PIE = 3.2
