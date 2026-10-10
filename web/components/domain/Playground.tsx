@@ -17,6 +17,7 @@ export default function Playground({ title, setup, examples }: Props) {
   return (
     <main className="page">
       <h1>shirin</h1>
+      <h2>Setup</h2>
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           <p>{cell.explanation}</p>
