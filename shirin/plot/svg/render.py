@@ -132,7 +132,8 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     tick_size = FontSizes.TICKS
 
     y_tick_width = max((text_width(label, tick_size) for _, label in y_ticks), default=0)
-    plot_left = Layout.PAD + (y_tick_width + Layout.TICK_GAP if y_tick_width else 0)
+    y_label_width = cap_height(FontSizes.XYLABEL) + Layout.LABEL_GAP if chart.y.label else 0
+    plot_left = Layout.PAD + y_label_width + (y_tick_width + Layout.TICK_GAP if y_tick_width else 0)
     plot_h = chart.plot_height * PT_PER_INCH
     fixed_width = chart.width is not None
     width = chart.width * PT_PER_INCH if fixed_width else plot_left + plot_h + Layout.PAD  # type: ignore[operator]
@@ -165,9 +166,6 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
             header.append(_text(x + Layout.SWATCH + Layout.SWATCH_GAP, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
             x += item_width + Layout.LEGEND_ITEM_GAP
         header_widths.append(x - Layout.LEGEND_ITEM_GAP - plot_left)
-    if chart.y.label:
-        row_top = header_row(FontSizes.XYLABEL)
-        header.append(_text(Layout.PAD, row_top + cap_height(FontSizes.XYLABEL), chart.y.label, FontSizes.XYLABEL, TextColors.BLACK))
     plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if header else top
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
@@ -200,8 +198,16 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
             x, baseline = _place(t, sx, sy)[:2]
             body.append(_text(x, baseline, t.text, t.size, t.color, _ANCHOR[t.ha]))
 
+    if chart.y.label:
+        # Rotated a quarter turn counterclockwise, so the baseline is the right edge of the text.
+        x, y = Layout.PAD + cap_height(FontSizes.XYLABEL), plot_top + plot_h / 2
+        body.append(
+            f'<text x="{x:.2f}" y="{y:.2f}" font-size="{FontSizes.XYLABEL}" fill="{TextColors.BLACK}" '
+            f'text-anchor="middle" transform="rotate(-90 {x:.2f} {y:.2f})">{escape(chart.y.label)}</text>'
+        )
+
     cap = cap_height(tick_size)
-    body += [_text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
+    body +=[_text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
              for t, label in y_ticks if label]
     bottom = plot_bottom
     labelled_x_ticks = [(t, label) for t, label in x_ticks if label]
