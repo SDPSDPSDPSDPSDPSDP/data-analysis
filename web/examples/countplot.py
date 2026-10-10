@@ -10,23 +10,23 @@ plot = PlotGraphs(
 )
 
 # %% Plain
-plot.countplot_x(
+plot.countplot(
     df,
     x='fruit',
 )
 
 # %% Title, axis label, top n, suffix
-plot.countplot_x(
+plot.countplot(
     df,
-    x='fruit',
+    y='fruit',
     title=['Fruit counts', 'Top 4 only'],
-    x_axis_label='Fruit',
+    y_axis_label='Fruit',
     top_n=4,
     suffix='pcs'
 )
 
 # %% Alphabetical, no data labels
-plot.countplot_x(
+plot.countplot(
     df,
     x='fruit',
     order_type='alphabetical',
@@ -35,7 +35,7 @@ plot.countplot_x(
 )
 
 # %% Normalized share of total
-plot.countplot_x(
+plot.countplot(
     df,
     x='fruit',
     normalized=True,
@@ -43,7 +43,7 @@ plot.countplot_x(
 )
 
 # %% Grouped by hue
-plot.countplot_x(
+plot.countplot(
     df,
     x='fruit',
     hue='ripe',
@@ -52,7 +52,7 @@ plot.countplot_x(
 )
 
 # %% 100% stacked by hue
-plot.countplot_x(
+plot.countplot(
     df,
     x='fruit',
     hue='ripe',

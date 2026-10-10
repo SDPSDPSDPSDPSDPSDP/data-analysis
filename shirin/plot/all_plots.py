@@ -42,7 +42,7 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
         ...     palette={'ripe': {True: '#e9d0ff', False: '#6f2525'}},
         ...     label_mapping={'ripe': {True: 'Ripe', False: 'Unripe'}},
         ... )
-        >>> plot.countplot_x(df, x='fruit', hue='ripe')
+        >>> plot.countplot(df, x='fruit', hue='ripe')
     """
 
     def __init__(

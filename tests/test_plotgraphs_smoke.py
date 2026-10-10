@@ -39,9 +39,9 @@ GROUP_LABELS = {'group': {'x': 'Ex'}}
 
 def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot = PlotGraphs(palette=GROUP_PALETTE)
-    plot.countplot_x(df, x='category')
-    plot.countplot_y(df, y='category', hue='group', stacked=True)
-    plot.countplot_x(df, x='category', hue='group', normalized=True)
+    plot.countplot(df, x='category')
+    plot.countplot(df, y='category', hue='group', stacked=True)
+    plot.countplot(df, x='category', hue='group', normalized=True)
     plot.barplot_x(df, x='category', value='value')
     plot.barplot_y(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
@@ -124,7 +124,7 @@ def test_barplot_uses_mean_per_category() -> None:
 
 
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).countplot_x(
+    PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).countplot(
         df, x='category', hue='group', title='Totals', legend=True
     )
     assert '>Totals</text>' in shown[0]
@@ -133,7 +133,7 @@ def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> N
 
 
 def test_hidden_legend(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot_x(df, x='category', hue='group')
+    PlotGraphs().countplot(df, x='category', hue='group')
     assert '>x</text>' not in shown[0]
 
 
@@ -182,8 +182,19 @@ def test_shift_fill_interpolates_in_x_order() -> None:
 
 
 def test_title_list_adds_subtitle(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot_x(df, x='category', title=['Totals', 'Per category'])
+    PlotGraphs().countplot(df, x='category', title=['Totals', 'Per category'])
     assert '>Totals</text>' in shown[0]
     assert '>Per category</text>' in shown[0]
     with pytest.raises(ValueError, match='title must be'):
-        PlotGraphs().countplot_x(df, x='category', title=['a', 'b', 'c'])
+        PlotGraphs().countplot(df, x='category', title=['a', 'b', 'c'])
+
+
+def test_countplot_direction_from_x_or_y(df: pd.DataFrame, shown: List[str]) -> None:
+    PlotGraphs().countplot(df, y='category')
+    PlotGraphs().countplot(df, y='category', x_axis_label='')
+    assert '>Count</text>' in shown[0]
+    assert '>Count</text>' not in shown[1]
+    with pytest.raises(ValueError, match='exactly one of x or y'):
+        PlotGraphs().countplot(df, x='category', y='category')
+    with pytest.raises(ValueError, match='exactly one of x or y'):
+        PlotGraphs().countplot(df)

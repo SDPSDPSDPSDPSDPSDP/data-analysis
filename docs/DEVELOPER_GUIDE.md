@@ -28,7 +28,7 @@ python -m pytest
 shirin/
   plot/
     all_plots.py   PlotGraphs: public entry point, composed of the graphs/ mixins
-    graphs/        public methods (countplot_x, pie, ...): build an Options object, pick the plot class
+    graphs/        public methods (countplot, pie, ...): build an Options object, pick the plot class
     core/          Options dataclasses + validation, AbstractPlot, renderer (fills a Chart with marks)
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)
@@ -40,7 +40,7 @@ shirin/
   assets/          bundled fonts and demo data
 ```
 
-Flow of one call: `PlotGraphs.countplot_x(...)` -> `CountPlotOptions` -> `CountPlot(options).render()`
+Flow of one call: `PlotGraphs.countplot(...)` -> `CountPlotOptions` -> `CountPlot(options).render()`
 (validates a copy of the options, fills a `Chart` in data coordinates) -> `svg.to_svg` lays it out and writes
 the SVG -> `all_plots.show` displays it in the notebook (the web worker replaces `show` to collect the SVG).
 
