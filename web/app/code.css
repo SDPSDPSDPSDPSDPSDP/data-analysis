@@ -1,0 +1,137 @@
+.code-block {
+  position: relative;
+  font-size: var(--font-size-code);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.code-block > div {
+  height: 100%;
+}
+
+/* Overrides the bluish CodeMirror dark theme. */
+.code-block .cm-editor,
+.code-block .cm-editor .cm-gutters {
+  background: var(--color-code-bg);
+  border: none;
+}
+
+.code-block .cm-editor {
+  color: var(--code-text);
+}
+
+.code-block .cm-scroller {
+  padding: var(--space-1) 0;
+}
+
+.code-block .cm-editor .cm-activeLine,
+.code-block .cm-editor .cm-activeLineGutter {
+  background: var(--color-code-highlight);
+}
+
+.copyable > .copy-button {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-button);
+  color: var(--text-on-dark-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transition: background var(--transition), opacity var(--transition);
+}
+
+.copyable:hover > .copy-button,
+.copy-button:focus-visible {
+  opacity: 1;
+}
+
+.copy-button:hover {
+  background: var(--color-button-hover);
+  color: var(--text-on-dark);
+}
+
+.chart > .copy-button {
+  background: var(--color-overlay-button);
+  color: var(--text-on-dark-pure);
+}
+
+.chart > .copy-button:hover {
+  background: var(--color-overlay-button-hover);
+  color: var(--text-on-dark-pure);
+}
+
+/* overflow: hidden clips the inner scroller to the rounded corners. */
+.code-block .cm-editor .cm-tooltip:has(.doc-tooltip) {
+  z-index: var(--z-tooltip);
+  border: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-tooltip);
+}
+
+.doc-tooltip {
+  margin: 0;
+  padding: var(--space-1-5) var(--space-2);
+  color: var(--text-primary);
+  line-height: 1.5;
+  max-width: var(--tooltip-max-width);
+  max-height: var(--tooltip-max-height);
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: var(--font-size-doc);
+}
+
+.doc-heading {
+  font-size: var(--font-size-doc-heading);
+  font-weight: var(--font-weight-doc-heading);
+}
+
+.doc-meta {
+  color: var(--text-secondary);
+}
+
+.doc-tooltip code {
+  padding: 0 var(--space-0-5);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: var(--font-size-small);
+}
+
+/* Native color picker shown as a small swatch in front of "#rrggbb" in editable code. */
+.color-swatch {
+  width: 1em;
+  height: 1em;
+  margin-right: var(--space-0-5);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-swatch);
+  background: none;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.color-swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+/* Separate rules: a selector list with an unknown vendor pseudo-element is dropped entirely. */
+.color-swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--radius-swatch);
+}
+
+.color-swatch::-moz-color-swatch {
+  border: none;
+  border-radius: var(--radius-swatch);
+}

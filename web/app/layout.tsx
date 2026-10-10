@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import "./globals.css";
+import "./nav.css";
+import "./code.css";
+import "./examples.css";
 
 const futura = localFont({
   src: "../public/fonts/FuturaND-Medium.woff2",

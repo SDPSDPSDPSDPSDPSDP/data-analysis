@@ -1,0 +1,145 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--nav-height);
+  padding: 0 var(--space-1) 0 var(--space-2);
+}
+
+/* Glass on a pseudo-element: backdrop-filter on .nav itself would stop the dropdown's own blur from seeing the page. */
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-brand {
+  font-size: var(--font-size-brand);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
+}
+
+.nav-menus {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+.nav-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  padding: var(--space-0-5);
+  white-space: nowrap;
+  border-radius: var(--radius);
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-tooltip);
+}
+
+.nav-menu:hover .nav-dropdown,
+.nav-menu:focus-within .nav-dropdown {
+  display: flex;
+}
+
+.nav-menu.nav-menu-closed .nav-dropdown {
+  display: none;
+}
+
+.nav-dropdown a {
+  font-weight: var(--font-weight-nav);
+  padding: var(--space-1) var(--space-1-5);
+  border-radius: var(--radius);
+  transition: background var(--transition);
+}
+
+.nav-dropdown a:hover {
+  background: var(--color-surface);
+}
+
+.switch {
+  display: inline-flex;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+/* Visually hidden but still focusable and announced as a switch. */
+.switch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
+  width: var(--switch-width);
+  height: var(--switch-height);
+  border-radius: var(--radius-pill);
+  background: var(--color-shimmer);
+  color: var(--text-secondary);
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: var(--focus-ring-width) solid var(--text-primary);
+  outline-offset: var(--focus-ring-width);
+}
+
+.switch-knob {
+  position: absolute;
+  top: var(--switch-padding);
+  left: var(--switch-padding);
+  display: grid;
+  place-items: center;
+  width: calc(var(--switch-height) - 2 * var(--switch-padding));
+  height: calc(var(--switch-height) - 2 * var(--switch-padding));
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-tooltip);
+  transition: transform var(--transition);
+}
+
+.switch-track svg {
+  width: var(--switch-icon-size);
+  height: var(--switch-icon-size);
+}
+
+.switch input:checked + .switch-track .switch-knob {
+  transform: translateX(calc(var(--switch-width) - var(--switch-height)));
+}
+
+.nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+}
