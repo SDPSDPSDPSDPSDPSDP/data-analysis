@@ -1,4 +1,4 @@
-# %% [setup] Install the sql extra with uv add "shirin[sql]". Put the DB2 credentials in a .env file in your project folder. Variables already set in the environment win over the file.
+# %% [setup] Environment variables. Database() uses these as defaults.
 DB2_USER=me
 DB2_PASSWORD=secret
 DB2_HOST=db2.example.com
@@ -6,7 +6,7 @@ DB2_PORT=50000
 DB2_DB_NAME=MYDB
 DB2_SCHEMA=MYSCHEMA
 
-# %% [setup] Create the database connection once and reuse it. Arguments left out are read from .env.
+# %% [setup] Create the database connection once and reuse it. Arguments left out are read from the environment variables.
 from shirin.sql import Database
 
 db = Database()
