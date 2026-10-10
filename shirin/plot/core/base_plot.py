@@ -6,13 +6,12 @@ import numpy as np
 import pandas as pd
 
 from .base_options import BasePlotOptions
-from . import renderer
 from ..common.colors import blend
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend, format_xy_labels
 from ..common.sorting import create_default_label_map
 from ..config import Colors, FigureSize, TitleInput
-from ..config.colors import DEFAULT_CYCLE
+from ..config.colors import DEFAULT_CYCLE, SHADE_BASE, SHADE_DARKEST_MIX
 from ..svg import Chart
 
 PaletteInput = Optional[Union[Dict[Any, str], str]]
@@ -48,7 +47,7 @@ def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str,
     keys = sorted(values.astype(str).unique())
     if color is None:
         return dict(zip(keys, default_colors(len(keys))))
-    return {key: blend('#333333', color, t) for key, t in zip(keys, np.linspace(1, 0.3, len(keys)))}
+    return {key: blend(SHADE_BASE, color, t) for key, t in zip(keys, np.linspace(1, SHADE_DARKEST_MIX, len(keys)))}
 
 
 class AbstractPlot(ABC):
@@ -91,7 +90,7 @@ class AbstractPlot(ABC):
 
     def _new_chart(self, width: Optional[float], plot_height: float) -> Chart:
         """width None makes the plot area square (pie)."""
-        self.chart = renderer.create_figure(width, plot_height)
+        self.chart = Chart(width=width, plot_height=plot_height)
         self.chart.title, self.chart.subtitle = split_title(self.options.title)
         return self.chart
 

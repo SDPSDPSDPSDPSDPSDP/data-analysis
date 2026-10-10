@@ -9,6 +9,7 @@ from ..common.formatting import (
     format_ticks,
     format_xy_labels,
 )
+from ..config import Marks
 from ..config.colors import Colors
 from ..svg import Chart
 from ..svg.ticks import to_days
@@ -36,7 +37,7 @@ class TimePlot(AbstractPlot):
         group_by = self.options.group_by
         date_col = self.options.x
 
-        period = {'year': 'Y', 'month': 'M'}.get(group_by, 'D')
+        period = {'year': 'Y', 'month': 'M', 'day': 'D'}[group_by]
         df['_time_group'] = df[date_col].dt.to_period(period).dt.to_timestamp()
 
         self._aggregated_df = (
@@ -52,7 +53,7 @@ class TimePlot(AbstractPlot):
             full_range = pd.date_range(
                 start=groups.min(),
                 end=groups.max(),
-                freq={'year': 'YS', 'month': 'MS'}.get(group_by, 'D'),
+                freq={'year': 'YS', 'month': 'MS', 'day': 'D'}[group_by],
             )
 
             full_df = pd.DataFrame({'_time_group': full_range})
@@ -71,18 +72,14 @@ class TimePlot(AbstractPlot):
         chart = self._standard_chart()
         days = to_days(data['_time_group'])
         if self.options.plot_type == 'bar':
-            return renderer.render_time_bars(chart, days, data['count'], color=self._color, width=self._get_bar_width())  # type: ignore[arg-type]
+            return renderer.render_time_bars(chart, days, data['count'], color=self._color, width=Marks.TIME_BAR_DAYS[self.options.group_by])  # type: ignore[arg-type]
         return renderer.render_time_line(
             chart,
             days,
             data['count'],
             color=self._color,  # type: ignore[arg-type]
-            show_markers=not (self.options.group_by == 'day' and len(data) > 25),
+            show_markers=not (self.options.group_by == 'day' and len(data) > Marks.TIME_LINE_MAX_MARKED_DAYS),
         )
-
-    def _get_bar_width(self) -> float:
-        """Bar width in days for the grouping."""
-        return {'year': 300, 'month': 25}.get(self.options.group_by, 0.8)
 
     def format_plot(self, plot: Any) -> None:
         format_xy_labels(plot, x_axis_label=self.options.x_axis_label, y_axis_label=self.options.y_axis_label)

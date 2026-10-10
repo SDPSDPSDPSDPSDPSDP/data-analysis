@@ -2,7 +2,7 @@ import pandas as pd
 from shirin.plot.common.sorting import (
     sort_alphabetically,
     sort_by_frequency,
-    create_colors_list,
+    palette_colors,
 )
 
 
@@ -42,16 +42,12 @@ def test_sort_by_frequency():
     assert '_order' not in result.columns
 
 
-def test_create_colors_list():
+def test_palette_colors():
     """Test creating color list from palette."""
-    df = pd.DataFrame({
-        'red': [1, 2],
-        'blue': [3, 4]
-    })
     palette = {'red': '#FF0000', 'blue': '#0000FF'}
-    
-    result = create_colors_list(df, palette)
-    
+
+    result = palette_colors(palette, ['red', 'blue'])
+
     assert result == ['#FF0000', '#0000FF']
 
 

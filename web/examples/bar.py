@@ -14,6 +14,15 @@ plot.bar(
     suffix='pcs',
 )
 
+# %% Counts grouped by hue
+plot.bar(
+    df,
+    x='fruit',
+    hue='is_ripe',
+    legend=True,
+    title='Grouped by ripeness',
+)
+
 # %% [hidden]
 from shirin.assets.data import df_fruit_counts as df
 

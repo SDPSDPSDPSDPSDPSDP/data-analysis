@@ -34,7 +34,6 @@ function formatDoc(doc: string): string {
 
 const DOCS: Record<string, string> = docstrings;
 
-// Docstring of the dotted name under the cursor, looked up by its last part.
 const docTooltip = hoverTooltip((view, pos) => {
   const line = view.state.doc.lineAt(pos);
   const offset = pos - line.from;

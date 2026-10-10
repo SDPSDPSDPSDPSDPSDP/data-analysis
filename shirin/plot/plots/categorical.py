@@ -5,14 +5,14 @@ import pandas as pd
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.categorical_options import CategoricalPlotOptions
-from ..config import FigureSize
+from ..config import FigureSize, Marks
 from ..common.formatting import (
     format_categorical_tick_labels,
     format_datalabels,
     format_datalabels_stacked,
     format_ticks,
 )
-from ..common.sorting import create_colors_list
+from ..common.sorting import get_order, palette_colors
 from ..common.stacked_plots import prepare_stacked_data
 from ..svg import Chart
 
@@ -34,15 +34,31 @@ class StackableCategoricalPlot(AbstractPlot):
     """Shared draw/format logic for count and bar plots (plain or stacked by hue)."""
 
     options: CategoricalPlotOptions
-    _horizontal_width = 0.8
+    _horizontal_width = Marks.HORIZONTAL_BAR_WIDTH
 
     def __init__(self, options: CategoricalPlotOptions):
         super().__init__(options)
         self._order: Optional[list] = None
         self._df_unlabeled: Optional[pd.DataFrame] = None
 
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        self._order = get_order(
+            self.options.sort, df, self.options.axis_column, value_column=self._value_column()
+        )
+        return self._resolve_hue_palette(df)
+
     def _draw_unstacked(self, chart: Chart, data: pd.DataFrame) -> Any:
-        raise NotImplementedError
+        return renderer.render_barplot(
+            chart,
+            df=data,
+            column=self.options.axis_column,
+            value=self._value_column(),
+            horizontal=self.options.orientation == 'horizontal',
+            hue=self.options.hue,
+            order=self._order,
+            color=self._color,
+            palette=self._palette,
+        )
 
     def _datalabel_formatting(self) -> str:
         return 'totals'
@@ -75,8 +91,8 @@ class StackableCategoricalPlot(AbstractPlot):
             chart,
             df=df_prepared,
             horizontal=horizontal,
-            colors=create_colors_list(df_prepared, self._palette),  # type: ignore[arg-type]
-            width=self._horizontal_width if horizontal else 0.6,
+            colors=palette_colors(self._palette, df_prepared.columns),  # type: ignore[arg-type]
+            width=self._horizontal_width if horizontal else Marks.BAR_WIDTH,
         )
         self._df_unlabeled = df_prepared
         return plot
@@ -97,14 +113,13 @@ class StackableCategoricalPlot(AbstractPlot):
 
     def _format_data_labels(self, plot: Any) -> None:
         if self.options.stacked:
-            if self._df_unlabeled is not None:
-                format_datalabels_stacked(
-                    plot,
-                    self._df_unlabeled,
-                    self._palette,  # type: ignore[arg-type]
-                    orientation=self.options.orientation,
-                    suffix=self.options.suffix,
-                )
+            format_datalabels_stacked(
+                plot,
+                self._df_unlabeled,  # type: ignore[arg-type]
+                self._palette,  # type: ignore[arg-type]
+                orientation=self.options.orientation,
+                suffix=self.options.suffix,
+            )
             return
         format_datalabels(
             plot,

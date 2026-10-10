@@ -1,5 +1,4 @@
 class Colors:
-    # greys
     GREY: str = '#d6dde6'
     DARK_GREY: str = '#B0B1B4'
     LIGHT_GREY_WARM: str = '#EAECF0'
@@ -8,7 +7,6 @@ class Colors:
     DARK_GREY_COOL: str = '#B4C0D5'
     BLACK: str = '#000000'
 
-    # colors
     BROWN: str = '#723746'
     PINK: str = '#FFD5FF'
     LIGHT_BLUE: str = '#c9e1ff'
@@ -16,7 +14,6 @@ class Colors:
     GREEN: str = '#dcffee'
     RED: str = '#A52B5A'
 
-    # good/bad
     GOOD_GREEN: str = '#dcffee'
     BAD_RED: str = '#A52B5A'
     GOOD_DARK_GREEN: str = '#89BCA3'
@@ -32,6 +29,9 @@ class TextColors:
 
 
 GRID_COLOR = '#f4f4f4'
+BACKGROUND_COLOR = '#ffffff'
+SHADE_BASE = '#333333'  # dark end when one color is spread over hue values
+SHADE_DARKEST_MIX = 0.3  # share of the color in the darkest shade
 
 # Colors for hue values without a palette (the tab10 cycle).
 DEFAULT_CYCLE = (

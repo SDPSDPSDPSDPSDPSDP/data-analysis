@@ -127,7 +127,6 @@ def _build_lazy_frames() -> dict:
         'df': df,
         'df_documents_by_year': df_documents_by_year,
         'df_fruit_counts': _count_fruit(df),
-        # Larger yearly_growth produces more extreme increasing totals.
         'df_time': generate_time_series(yearly_growth=0.5),
     }
 

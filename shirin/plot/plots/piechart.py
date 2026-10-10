@@ -7,7 +7,7 @@ from ..core.base_plot import AbstractPlot, default_colors
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.sorting import palette_colors
-from ..config import FigureSize
+from ..config import FigureSize, Marks
 from ..svg import Text
 from ...number_format import format_thousands
 
@@ -49,7 +49,7 @@ class PieChart(AbstractPlot):
             donut=self.options.donut,
             n_after_comma=self.options.n_after_comma,
             value_datalabel=self.options.value_datalabel,
-            pctdistance=0.8 if self.options.donut else 0.6
+            pctdistance=Marks.DONUT_LABEL_RADIUS if self.options.donut else Marks.PIE_LABEL_RADIUS
         )
         return chart
 

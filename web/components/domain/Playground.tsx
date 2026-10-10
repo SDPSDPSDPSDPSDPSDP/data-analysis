@@ -8,7 +8,6 @@ import {
   ChartPie,
   ChevronsDownUp,
   ChevronsUpDown,
-  Tally5,
   type LucideIcon,
 } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
@@ -17,7 +16,6 @@ import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/
 // Keyed by category or section title: icon components can't be passed from the server page.
 const NAV_ICONS: Record<string, LucideIcon> = {
   "Bar charts": ChartColumn,
-  Countplots: Tally5,
   Barplots: ChartBarBig,
   Histograms: ChartArea,
   "Pie charts": ChartPie,

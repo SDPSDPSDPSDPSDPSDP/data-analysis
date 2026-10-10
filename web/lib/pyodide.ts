@@ -20,7 +20,9 @@ export function load(): Promise<void> {
         if (msg.error) reject(new Error(msg.error));
         else resolve();
       } else if (msg.type === "result") {
-        pending.get(msg.id)?.(msg);
+        const resolveRun = pending.get(msg.id);
+        if (!resolveRun) throw new Error(`Result for unknown run id ${msg.id}`);
+        resolveRun(msg);
         pending.delete(msg.id);
       }
     };

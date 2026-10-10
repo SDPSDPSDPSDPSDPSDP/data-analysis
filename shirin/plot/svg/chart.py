@@ -2,6 +2,8 @@
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
+from ..config import Marks
+
 
 def plain_number(value: float) -> str:
     return f'{value:g}'
@@ -48,7 +50,7 @@ class Line:
     xs: List[float]
     ys: List[float]
     color: str
-    width: float = 1.5
+    width: float = Marks.LINE_WIDTH
     marker_radius: float = 0
     alpha: float = 1
 
@@ -81,7 +83,6 @@ class Axis:
     date_format: str = ''
     sticky: Tuple[float, ...] = ()  # data limits that get no margin, like the bar baseline
     grid: bool = False
-    show_tick_labels: bool = True
     visible: bool = True
     rotation: float = 0
     label: Optional[str] = None

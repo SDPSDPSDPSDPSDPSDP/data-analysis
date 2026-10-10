@@ -1,6 +1,6 @@
 from .colors import Colors, TextColors
 from .palettes import PaletteInput, LabelMappingInput
-from .formatting import FontSizes, FigureSize, Layout
+from .formatting import FontSizes, FigureSize, Layout, Marks
 from .types import (
     Sort,
     FillMissingValues,
@@ -19,6 +19,7 @@ __all__ = [
     'FontSizes',
     'FigureSize',
     'Layout',
+    'Marks',
     'Sort',
     'FillMissingValues',
     'TimeGroupBy',

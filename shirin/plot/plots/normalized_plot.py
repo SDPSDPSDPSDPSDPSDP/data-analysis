@@ -7,10 +7,10 @@ from ..core.categorical_options import NormalizedPlotOptions
 from ..core.base_plot import AbstractPlot
 from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
-from ..common.sorting import create_colors_list, palette_colors
+from ..common.sorting import palette_colors
 from ..common.stacked_plots import sort_stacked_pivot
 from ..common.colors import blend
-from ..config import TextColors
+from ..config import Marks, TextColors
 from ..config.colors import REMAINDER_TINT
 from .categorical import create_sized_figure
 
@@ -65,8 +65,8 @@ class NormalizedPlot(AbstractPlot):
             create_sized_figure(self, data),
             df=self._normalized_pivot,  # type: ignore[arg-type]
             horizontal=not vertical,
-            colors=create_colors_list(self._normalized_pivot, self._palette),  # type: ignore[arg-type]
-            width=0.6 if vertical else 0.8,
+            colors=palette_colors(self._palette, self._normalized_pivot.columns),  # type: ignore[arg-type, union-attr]
+            width=Marks.BAR_WIDTH if vertical else Marks.HORIZONTAL_BAR_WIDTH,
             overlap=len(self._normalized_pivot.columns) == 2,  # type: ignore[union-attr]
             row_colors=None if category_colors is None else [
                 (color, blend(color, TextColors.WHITE, REMAINDER_TINT)) for color in category_colors
