@@ -11,11 +11,22 @@ from ..common.colors import blend
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend, format_xy_labels
 from ..common.sorting import create_default_label_map
-from ..config import Colors, FigureSize
+from ..config import Colors, FigureSize, TitleInput
 from ..config.colors import DEFAULT_CYCLE
 from ..svg import Chart
 
 PaletteInput = Optional[Union[Dict[Any, str], str]]
+
+
+def split_title(title: Optional[TitleInput]) -> Tuple[str, str]:
+    """A str is the title alone; a [title, subtitle] list adds the grey subtitle line."""
+    if title is None:
+        return '', ''
+    if isinstance(title, str):
+        return title, ''
+    if isinstance(title, (list, tuple)) and len(title) == 2 and all(isinstance(t, str) for t in title):
+        return title[0], title[1]
+    raise ValueError(f"title must be a str or a [title, subtitle] list of two str, got {title!r}")
 
 
 def split_palette(palette: PaletteInput) -> Tuple[Optional[str], Optional[Dict[Any, str]]]:
@@ -81,7 +92,7 @@ class AbstractPlot(ABC):
     def _new_chart(self, width: Optional[float], plot_height: float) -> Chart:
         """width None makes the plot area square (pie)."""
         self.chart = renderer.create_figure(width, plot_height)
-        self.chart.title, self.chart.subtitle = self.options.title, self.options.subtitle
+        self.chart.title, self.chart.subtitle = split_title(self.options.title)
         return self.chart
 
     def _standard_chart(self) -> Chart:

@@ -1,15 +1,10 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 
 class OrderType(str, Enum):
     FREQUENCY = 'frequency'
     ALPHABETICAL = 'alphabetical'
-
-
-class StackedLabelType(str, Enum):
-    STANDARD = 'standard'
-    PERCENTAGE = 'percentage'
 
 
 class FillMissingValues(str, Enum):
@@ -24,6 +19,6 @@ class TimeGroupBy(str, Enum):
 
 
 OrderTypeInput = Union[OrderType, str]
-StackedLabelTypeInput = Optional[Union[StackedLabelType, str]]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
 TimeGroupByInput = Union[TimeGroupBy, str]
+TitleInput = Union[str, List[str]]

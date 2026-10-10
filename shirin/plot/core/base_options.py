@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, Optional, Union
 import pandas as pd
 
 from ..common.data_conversion import convert_dict_keys_to_string
-from ..config import FillMissingValues, OrderType, StackedLabelType, TimeGroupBy
+from ..config import TitleInput, FillMissingValues, OrderType, TimeGroupBy
 
 
 class InvalidOptionError(ValueError):
@@ -30,7 +30,6 @@ class InvalidOptionError(ValueError):
 
 VALID_ORDER_TYPES = tuple(order_type.value for order_type in OrderType)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
-VALID_STACKED_LABEL_TYPES = tuple(stacked_label.value for stacked_label in StackedLabelType)
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
 VALID_TIME_PLOT_TYPES = ('bar', 'line')
 VALID_FILL_MISSING_VALUES = tuple(fill_option.value for fill_option in FillMissingValues)
@@ -73,8 +72,7 @@ class BasePlotOptions:
     y_axis_label: str = ''
     legend: bool = False
     hue: Optional[str] = None
-    title: str = ''
-    subtitle: str = ''
+    title: Optional[TitleInput] = None
 
     def validate(self) -> None:
         if self.df is None or self.df.empty:

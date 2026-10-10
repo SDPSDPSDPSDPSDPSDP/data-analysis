@@ -44,7 +44,7 @@ class GroupLabels(LabelMapping):
 def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot = PlotGraphs(palette=GroupPalette)
     plot.countplot_x(df, x='category')
-    plot.countplot_y(df, y='category', hue='group', stacked=True, stacked_labels='standard')
+    plot.countplot_y(df, y='category', hue='group', stacked=True)
     plot.countplot_x(df, x='category', hue='group', normalized=True)
     plot.barplot_x(df, x='category', value='value')
     plot.barplot_y(df, y='category', value='value', hue='group', stacked=True)
@@ -176,3 +176,11 @@ def test_shift_fill_interpolates_in_x_order() -> None:
     df = pd.DataFrame({'x': [3, 1, 2], 'y': [30.0, 10.0, None]})
     filled = fill_missing_values_in_data(df, 'x', 'y', hue=None, fill_method='shift')
     assert filled.set_index('x').loc[2, 'y'] == 20.0
+
+
+def test_title_list_adds_subtitle(df: pd.DataFrame, shown: List[str]) -> None:
+    PlotGraphs().countplot_x(df, x='category', title=['Totals', 'Per category'])
+    assert '>Totals</text>' in shown[0]
+    assert '>Per category</text>' in shown[0]
+    with pytest.raises(ValueError, match='title must be'):
+        PlotGraphs().countplot_x(df, x='category', title=['a', 'b', 'c'])

@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Any, Optional
 
-from ..config import OrderTypeInput, StackedLabelTypeInput
+from ..config import TitleInput, OrderTypeInput
 from ..core import CountPlotOptions, NormalizedCountPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import CountPlot, NormalizedCountPlot
@@ -12,16 +12,12 @@ class CountPlotsMixin:
         self,
         normalized: bool,
         stacked: bool,
-        stacked_labels: StackedLabelTypeInput,
         **common: Any,
     ) -> None:
         if normalized and common['hue'] is not None:
             self._render(NormalizedCountPlot(NormalizedCountPlotOptions(**common)))
         else:
-            options = CountPlotOptions(
-                **common, stacked=stacked, stacked_labels=stacked_labels, normalized=normalized
-            )
-            self._render(CountPlot(options))
+            self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
 
     def countplot_x(
         self,
@@ -31,11 +27,9 @@ class CountPlotsMixin:
         x_axis_label: str = '',
         y_axis_label: str = 'Count',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
         top_n: Optional[int] = None,
         stacked: bool = False,
-        stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
@@ -50,24 +44,21 @@ class CountPlotsMixin:
             x_axis_label: Label for the x-axis. *Default: `''`*.
             y_axis_label: Label for the y-axis. *Default: `'Count'`*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
             top_n: Show only the top N most frequent categories. *Optional*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
-            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
-                or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
-            normalized: Whether to normalize counts to percentages (_requires `hue`_).
-                *Default: `False`*.
-            show_labels: Whether to show data labels on bars. *Default: `True`*.
+            normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
+                Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            show_labels: Whether to show data labels on bars (percentages on stacked bars). *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
         """
         self._countplot(
             normalized=normalized,
             stacked=stacked,
-            stacked_labels=stacked_labels,
             df=df,
             axis_column=x,
             orientation='vertical',
@@ -77,7 +68,6 @@ class CountPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
             top_n=top_n,
             order_type=order_type,
             show_labels=show_labels,
@@ -92,11 +82,9 @@ class CountPlotsMixin:
         x_axis_label: str = 'Count',
         y_axis_label: str = '',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
         top_n: Optional[int] = None,
         stacked: bool = False,
-        stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
         normalized: bool = False,
         show_labels: bool = True,
@@ -111,24 +99,21 @@ class CountPlotsMixin:
             x_axis_label: Label for the x-axis. *Default: `'Count'`*.
             y_axis_label: Label for the y-axis. *Default: `''`*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
             top_n: Show only the top N most frequent categories. *Optional*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
-            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
-                or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
-            normalized: Whether to normalize counts to percentages (_requires `hue`_).
-                *Default: `False`*.
-            show_labels: Whether to show data labels on bars. *Default: `True`*.
+            normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
+                Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            show_labels: Whether to show data labels on bars (percentages on stacked bars). *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
         """
         self._countplot(
             normalized=normalized,
             stacked=stacked,
-            stacked_labels=stacked_labels,
             df=df,
             axis_column=y,
             orientation='horizontal',
@@ -138,7 +123,6 @@ class CountPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
             top_n=top_n,
             order_type=order_type,
             show_labels=show_labels,

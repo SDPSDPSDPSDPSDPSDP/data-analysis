@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Optional, Union
 
-from ..config import FillMissingValuesInput
+from ..config import TitleInput, FillMissingValuesInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import Histogram, LinePlot, ScatterPlot
@@ -19,8 +19,7 @@ class NumericPlotsMixin:
         bins: int = 100,
         stacked: Optional[bool] = None,
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
     ) -> None:
         """Create a **histogram** of a numeric column.
 
@@ -35,8 +34,8 @@ class NumericPlotsMixin:
                 *Default: `100`*.
             stacked: With `hue`, `False` dodges the groups, otherwise they stack. *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
         """
         options = HistogramOptions(
             df=df,
@@ -50,7 +49,6 @@ class NumericPlotsMixin:
             stacked=stacked,
             legend=legend,
             title=title,
-            subtitle=subtitle,
         )
         self._render(Histogram(options))
 
@@ -63,8 +61,7 @@ class NumericPlotsMixin:
         x_axis_label: str = '',
         y_axis_label: str = '',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
         rotation: int = 0,
         fill_missing_values: FillMissingValuesInput = None,
     ) -> None:
@@ -78,7 +75,6 @@ class NumericPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
             rotation=rotation,
             fill_missing_values=fill_missing_values
         )
@@ -94,8 +90,7 @@ class NumericPlotsMixin:
         x_axis_label: str = '',
         y_axis_label: str = '',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
     ) -> None:
         """Create a **scatter plot** showing the relationship between two numeric columns.
 
@@ -108,8 +103,8 @@ class NumericPlotsMixin:
             x_axis_label: Label for the x-axis. *Default: `''`*.
             y_axis_label: Label for the y-axis. *Default: `''`*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
         """
         options = ScatterPlotOptions(
             df=df,
@@ -122,6 +117,5 @@ class NumericPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
         )
         self._render(ScatterPlot(options))

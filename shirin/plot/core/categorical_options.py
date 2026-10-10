@@ -2,11 +2,10 @@ from dataclasses import dataclass
 from typing import ClassVar, Optional
 
 from ..config.colors import Colors
-from ..config import OrderType, OrderTypeInput, StackedLabelType, StackedLabelTypeInput
+from ..config import OrderType, OrderTypeInput
 from .base_options import (
     VALID_ORDER_TYPES,
     VALID_ORIENTATIONS,
-    VALID_STACKED_LABEL_TYPES,
     BasePlotOptions,
     validate_str_or_enum_option,
 )
@@ -19,7 +18,6 @@ class CategoricalPlotOptions(BasePlotOptions):
     axis_column: str = ''
     orientation: str = 'vertical'
     stacked: bool = False
-    stacked_labels: StackedLabelTypeInput = None
     order_type: OrderTypeInput = 'frequency'
     show_labels: bool = True
     suffix: Optional[str] = None
@@ -42,13 +40,6 @@ class CategoricalPlotOptions(BasePlotOptions):
             enum_type=OrderType,
         )
 
-        validate_str_or_enum_option(
-            option_name='stacked_labels',
-            value=self.stacked_labels,
-            valid_options=VALID_STACKED_LABEL_TYPES,
-            enum_type=StackedLabelType,
-            allow_none=True,
-        )
 
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
@@ -77,7 +68,7 @@ class BarPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class NormalizedCountPlotOptions(CategoricalPlotOptions):
-    """Always a 100%-stacked plot of hue shares; `stacked`/`stacked_labels` are ignored."""
+    """Always a 100%-stacked plot of hue shares; `stacked` is ignored."""
 
     top_n: Optional[int] = None
     y_axis_label: str = 'Percentage'
@@ -92,7 +83,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
-    """`stacked`, `hue`, `stacked_labels` and `order_type` are fixed for accuracy plots."""
+    """`stacked`, `hue` and `order_type` are fixed for accuracy plots."""
 
     # hue is a synthetic column added in transform, so it is not checked against df.
     column_fields: ClassVar[tuple[str, ...]] = ('axis_column', 'value_column')
@@ -103,7 +94,6 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
     def __post_init__(self) -> None:
         self.stacked = True
         self.hue = '__is_correct__'
-        self.stacked_labels = 'standard'
         if not isinstance(self.palette, dict):
             self.palette = {'Correct': Colors.GOOD_GREEN, 'Incorrect': Colors.BAD_RED}
 

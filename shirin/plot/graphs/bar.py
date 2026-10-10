@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Optional
 
-from ..config import OrderTypeInput, StackedLabelTypeInput
+from ..config import TitleInput, OrderTypeInput
 from ..core import BarPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot
@@ -17,10 +17,8 @@ class BarPlotsMixin:
         x_axis_label: str = '',
         y_axis_label: str = '',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
         stacked: bool = False,
-        stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
@@ -37,11 +35,9 @@ class BarPlotsMixin:
             x_axis_label: Label for the x-axis. *Default: `''`*.
             y_axis_label: Label for the y-axis. *Default: `''`*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
-            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
-                or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
@@ -59,9 +55,7 @@ class BarPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
             stacked=stacked,
-            stacked_labels=stacked_labels,
             order_type=order_type,
             percentage_labels=percentage_labels,
             suffix=suffix,
@@ -78,10 +72,8 @@ class BarPlotsMixin:
         x_axis_label: str = '',
         y_axis_label: str = '',
         legend: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
         stacked: bool = False,
-        stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
@@ -98,11 +90,9 @@ class BarPlotsMixin:
             x_axis_label: Label for the x-axis. *Default: `''`*.
             y_axis_label: Label for the y-axis. *Default: `''`*.
             legend: Whether to show the legend. *Default: `False`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
-            stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
-                or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
@@ -120,9 +110,7 @@ class BarPlotsMixin:
             y_axis_label=y_axis_label,
             legend=legend,
             title=title,
-            subtitle=subtitle,
             stacked=stacked,
-            stacked_labels=stacked_labels,
             order_type=order_type,
             percentage_labels=percentage_labels,
             suffix=suffix,

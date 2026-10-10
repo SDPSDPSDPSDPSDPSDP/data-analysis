@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Optional
 
-from ..config import TimeGroupByInput
+from ..config import TitleInput, TimeGroupByInput
 from ..config.colors import Colors
 from ..core import AccuracyPlotOptions, PiePlotOptions, TimePlotOptions
 from ..common.resolve_palette import resolve_palette
@@ -18,8 +18,7 @@ class SpecializedPlotsMixin:
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
     ) -> None:
         # Reserved name: a user column called 'count' must not collide with the counts.
         options = PiePlotOptions(
@@ -30,7 +29,6 @@ class SpecializedPlotsMixin:
             value_datalabel=value_datalabel,
             donut=donut,
             title=title,
-            subtitle=subtitle,
         )
         self._render(PieChart(options))
 
@@ -45,8 +43,7 @@ class SpecializedPlotsMixin:
         display_month: bool = True,
         cumulative: bool = False,
         rotation: int = 0,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
 
@@ -65,8 +62,8 @@ class SpecializedPlotsMixin:
                 `False` shows only years. *Default: `True`*.
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
-            title: Chart title above the plot. *Default: `''`*.
-            subtitle: Grey line under the title. *Default: `''`*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
 
         Example:
             >>> plot = PlotGraphs()
@@ -83,7 +80,6 @@ class SpecializedPlotsMixin:
             cumulative=cumulative,
             rotation=rotation,
             title=title,
-            subtitle=subtitle,
         )
         self._render(TimePlot(options))
 
@@ -100,13 +96,12 @@ class SpecializedPlotsMixin:
         reverse_order: bool = False,
         legend: bool = False,
         suffix: Optional[str] = None,
-        title: str = '',
-        subtitle: str = '',
+        title: Optional[TitleInput] = None,
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
         Each bar is split into two segments: *Correct* (the accuracy fraction) at
-        the bottom and *Incorrect* (1 âˆ’ accuracy) stacked on top.
+        the bottom and *Incorrect* (1 ÃƒÂ¢Ã‹â€ Ã¢â‚¬â„¢ accuracy) stacked on top.
 
         Args:
             df: DataFrame with one row per run / category.
@@ -126,8 +121,8 @@ class SpecializedPlotsMixin:
             legend: Whether to show the legend. *Default: ``False``*.
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
-            title: Chart title above the plot. *Default: ``''``*.
-            subtitle: Grey line under the title. *Default: ``''``*.
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
 
         Example:
             >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
@@ -153,7 +148,6 @@ class SpecializedPlotsMixin:
             legend=legend,
             suffix=suffix,
             title=title,
-            subtitle=subtitle,
         )
 
         self._render(AccuracyPlot(options))

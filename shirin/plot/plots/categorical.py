@@ -97,7 +97,7 @@ class StackableCategoricalPlot(AbstractPlot):
 
     def _format_data_labels(self, plot: Any) -> None:
         if self.options.stacked:
-            if self.options.stacked_labels is not None and self._df_unlabeled is not None:
+            if self._df_unlabeled is not None:
                 format_datalabels_stacked(
                     plot,
                     self._df_unlabeled,

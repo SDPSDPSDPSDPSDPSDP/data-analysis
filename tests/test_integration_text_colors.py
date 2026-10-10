@@ -34,8 +34,7 @@ class TestStackedCountPlotTextColors:
             orientation='horizontal',
             hue='status',
             palette=palette,
-            stacked=True,
-            stacked_labels='percentage'
+            stacked=True
         )
         
         plot = CountPlot(options)
@@ -65,8 +64,7 @@ class TestStackedBarPlotTextColors:
             orientation='horizontal',
             hue='status',
             palette=palette,
-            stacked=True,
-            stacked_labels='percentage'
+            stacked=True
         )
         
         plot = BarPlot(options)
