@@ -15,6 +15,7 @@ class Rect:
     y1: float
     color: str
     stroke: Optional[str] = None
+    rounded: bool = False  # pill shape; off for stacked/adjacent rects where round ends leave gaps
 
     @property
     def width(self) -> float:

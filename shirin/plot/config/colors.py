@@ -30,7 +30,7 @@ class TextColors:
     WHITE = '#FFFFFF'
 
 
-GRID_COLOR = '#d3d3d3'
+GRID_COLOR = '#ececec'
 
 # Colors for hue values without a palette (the tab10 cycle).
 DEFAULT_CYCLE = (

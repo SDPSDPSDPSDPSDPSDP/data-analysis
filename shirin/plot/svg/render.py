@@ -87,7 +87,8 @@ def _rect(r: Rect, sx: Scale, sy: Scale) -> str:
     xa, xb = sorted((sx(r.x0), sx(r.x1)))
     ya, yb = sorted((sy(r.y0), sy(r.y1)))
     stroke = f' stroke="{r.stroke}" stroke-width="0.5"' if r.stroke else ''
-    return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{xb - xa:.2f}" height="{yb - ya:.2f}" fill="{r.color}"{stroke}/>'
+    radius = f' rx="{min(xb - xa, yb - ya) / 2:.2f}"' if r.rounded else ''
+    return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{xb - xa:.2f}" height="{yb - ya:.2f}"{radius} fill="{r.color}"{stroke}/>'
 
 
 def _line(line: Line, sx: Scale, sy: Scale) -> str:
@@ -191,7 +192,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     ]
 
     body: List[str] = []
-    grid = 'stroke="{}" stroke-width="0.5" stroke-dasharray="1 1.5"'.format(GRID_COLOR)
+    grid = 'stroke="{}" stroke-width="0.5"'.format(GRID_COLOR)
     if chart.y.grid:
         body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
     if chart.x.grid:

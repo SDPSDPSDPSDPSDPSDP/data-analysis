@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ..common.sorting import palette_colors
-from ..config import FontSizes, TextColors
+from ..config import FigureSize, FontSizes, TextColors
 from ..svg import Chart, Dots, Line, Rect, Text, Wedge
 from ..svg.ticks import to_days
 
@@ -24,12 +24,14 @@ def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
     chart.legend = [(color, str(label)) for color, label in zip(colors, labels)]
 
 
-def _bar(chart: Chart, center: float, width: float, base: float, value: float, color: str, horizontal: bool) -> None:
+def _bar(
+    chart: Chart, center: float, width: float, base: float, value: float, color: str, horizontal: bool, rounded: bool = False
+) -> None:
     lo, hi = center - width / 2, center + width / 2
     if horizontal:
-        chart.rects.append(Rect(base, base + value, lo, hi, color))
+        chart.rects.append(Rect(base, base + value, lo, hi, color, rounded=rounded))
     else:
-        chart.rects.append(Rect(lo, hi, base, base + value, color))
+        chart.rects.append(Rect(lo, hi, base, base + value, color, rounded=rounded))
 
 
 def _category_axis(chart: Chart, labels: List[str], horizontal: bool, top_down: bool) -> None:
@@ -46,12 +48,12 @@ def _draw_categorical_bars(
 ) -> Chart:
     """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
     n_columns = len(table.columns)
-    width = 0.8 / n_columns
+    width = FigureSize.BAR_GROUP_WIDTH / n_columns
     for i, (level, color) in enumerate(zip(table.columns, colors)):
         offset = (i - (n_columns - 1) / 2) * width
         for position, value in enumerate(table[level]):
             if pd.notna(value):
-                _bar(chart, position + offset, width, 0, float(value), color, horizontal)
+                _bar(chart, position + offset, width, 0, float(value), color, horizontal, rounded=True)
     _category_axis(chart, [str(category) for category in table.index], horizontal, top_down=True)
     if hue is not None:
         _set_legend(chart, colors, list(table.columns))

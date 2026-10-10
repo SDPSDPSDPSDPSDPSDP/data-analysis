@@ -48,6 +48,13 @@ def test_title_is_centered_over_plot() -> None:
     assert title_center('T') == pytest.approx(title_center('A much longer title'))
 
 
+def test_rounded_rect_is_pill_shaped() -> None:
+    c = Chart(width=6, plot_height=3)
+    c.rects.append(Rect(0, 1, 0, 5, '#123456', rounded=True))
+    rect = to_svg(c).split('<rect x=')[1]
+    assert _attr(rect, 'rx') == pytest.approx(min(_attr(rect, 'width'), _attr(rect, 'height')) / 2)
+
+
 def test_long_data_label_shrinks_plot_width() -> None:
     def bar_width(label: str) -> float:
         c = Chart(width=6, plot_height=1)

@@ -11,8 +11,9 @@ class FigureSize:
     """Inches. Figure height is the plot area plus whatever rows (title, legend, labels) are present."""
     WIDTH = 8.4
     PLOT_HEIGHT = 3.2
-    CATEGORY_SLOT = 0.8  # plot width per category for vertical bars
+    CATEGORY_SLOT = 0.75  # plot width per category for vertical bars; sets the figure width
     BAR_ROW = 0.4  # plot height per category for horizontal bars
+    BAR_GROUP_WIDTH = 0.65  # share of a category slot covered by its bars (dodged bars split it)
     PIE = 3.2
 
 
@@ -23,7 +24,7 @@ class Layout:
     PLOT_GAP = 12
     TICK_GAP = 6
     LABEL_GAP = 14
-    DATALABEL_GAP = 3
+    DATALABEL_GAP = 6
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
