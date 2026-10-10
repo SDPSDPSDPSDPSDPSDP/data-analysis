@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CodeMirror, { keymap, Prec } from "@uiw/react-codemirror";
-import { python } from "@codemirror/lang-python";
+import { keymap, Prec } from "@uiw/react-codemirror";
 import { load, run, type RunResult } from "@/lib/pyodide";
+import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
 
 // Shown above the editor and prepended to every run.
@@ -48,7 +48,7 @@ export default function Playground({ initialCode }: { initialCode: string }) {
     <main>
       <header className="header">
         <h1>Shirin</h1>
-        <pre className="setup">{SETUP}</pre>
+        <CodeBlock value={SETUP} />
       </header>
       <div className="playground">
         <section className="pane">
@@ -62,13 +62,7 @@ export default function Playground({ initialCode }: { initialCode: string }) {
             </button>
             <span className="hint">Ctrl+Enter</span>
           </div>
-          <CodeMirror
-            value={code}
-            onChange={setCode}
-            extensions={[python(), runKey]}
-            height="100%"
-            className="editor"
-          />
+          <CodeBlock value={code} onChange={setCode} extensions={[runKey]} className="editor" />
         </section>
         <section className="pane output">
           {result?.images.map((src, i) => (
