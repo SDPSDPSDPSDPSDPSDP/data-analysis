@@ -4,7 +4,7 @@ import RunnableCode from "@/components/domain/RunnableCode";
 const SETUP = `from shirin.plot import PlotGraphs
 from shirin.assets.data import df
 
-plot = PlotGraphs(font='satoshi')`;
+plot = PlotGraphs()`;
 
 export default function Playground({ initialCode }: { initialCode: string }) {
   return (

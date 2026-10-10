@@ -25,19 +25,19 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
 
     Args:
         font: Font to use for all text. **Options:** `'satoshi'` (embedded in the SVG),
-            `None` (the viewer's sans-serif). *Default: `None`*.
+            `None` (the viewer's sans-serif). *Default: `'satoshi'`*.
         palette: A :class:`Palette` subclass with column-name attributes. When a plot uses
             `hue=col`, the matching palette is resolved automatically.
         label_mapping: A :class:`LabelMapping` subclass. Same resolution logic as `palette`.
 
     Example:
-        >>> plot = PlotGraphs(font='satoshi')
+        >>> plot = PlotGraphs()
         >>> plot.countplot_x(df, x='category')
     """
 
     def __init__(
         self,
-        font: Optional[str] = None,
+        font: Optional[str] = 'satoshi',
         palette: Optional[type[Palette]] = None,
         label_mapping: Optional[type[LabelMapping]] = None,
     ) -> None:

@@ -4,7 +4,7 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 
-def _create_base_dataframe(rng: np.random.Generator, num_rows: int = 1000) -> DataFrame:
+def _create_base_dataframe(rng: np.random.Generator, num_rows: int = 10000) -> DataFrame:
     labels = ["Apple", "Banana", "Orange", "Grape", "Mango", "Kiwi"]
     weights = [0.28, 0.22, 0.17, 0.14, 0.11, 0.08]
     return pd.DataFrame({
