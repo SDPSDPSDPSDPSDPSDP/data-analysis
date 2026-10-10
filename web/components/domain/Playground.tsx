@@ -1,33 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ChartArea,
-  ChartBarBig,
-  ChartColumn,
-  ChartPie,
-  ChevronsDownUp,
-  ChevronsUpDown,
-  Database,
-  Hash,
-  Sigma,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
-
-// Keyed by category or section title: icon components can't be passed from the server page.
-const NAV_ICONS: Record<string, LucideIcon> = {
-  "Bar charts": ChartColumn,
-  Barplots: ChartBarBig,
-  Histograms: ChartArea,
-  "Pie charts": ChartPie,
-  Tools: Wrench,
-  "Number formatting": Hash,
-  Statistics: Sigma,
-  "DB2 queries": Database,
-};
+import SectionIcon from "@/components/domain/SectionIcon";
 
 type Category = {
   title: string;
@@ -38,12 +15,6 @@ type Props = {
   setup: SetupCell[];
   categories: Category[];
 };
-
-function NavIcon({ title }: { title: string }) {
-  const Icon = NAV_ICONS[title];
-  if (!Icon) throw new Error(`No nav icon for "${title}"`);
-  return <Icon size="1em" aria-hidden />;
-}
 
 export default function Playground({ setup, categories }: Props) {
   const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
@@ -66,7 +37,7 @@ export default function Playground({ setup, categories }: Props) {
               onMouseLeave={() => setDropdownClosed(false)}
             >
               <a href={`#${sectionId(category.title)}`} className="nav-link">
-                <NavIcon title={category.title} />
+                <SectionIcon title={category.title} />
                 {category.title}
               </a>
               {category.sections.length > 1 && (
@@ -81,7 +52,7 @@ export default function Playground({ setup, categories }: Props) {
                         setDropdownClosed(true);
                       }}
                     >
-                      <NavIcon title={section.title} />
+                      <SectionIcon title={section.title} />
                       {section.title}
                     </a>
                   ))}

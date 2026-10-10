@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
+import SectionIcon from "@/components/domain/SectionIcon";
 
 export type SetupCell = {
   explanation: string;
@@ -111,8 +112,10 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
         <details className="more-examples">
           <summary>
             <span className="more-examples-button">
-              {examples.length - 1} more examples
-              <ChevronDown size="1em" aria-hidden />
+              <SectionIcon title={title} />
+              <span className="more-examples-closed">{examples.length - 1} more examples</span>
+              <span className="more-examples-open">Hide examples</span>
+              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
             </span>
           </summary>
           {moreExamples}
