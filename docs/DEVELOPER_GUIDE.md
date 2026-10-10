@@ -36,7 +36,7 @@ shirin/
     svg/           Chart data model, nice/date ticks, font metrics, layout + SVG writer
   number_format.py Dutch number formatting, shared by plot and stats
   stats/           descriptive statistics accessor
-  sql/             DB2 query helpers (optional `sql` extra): engine.py config + pooled engine, helpers.py queries, parquet.py streaming export
+  sql/             DB2 query helpers (optional `sql` extra): __init__.py Database class, engine.py pooled engine, helpers.py queries, parquet.py streaming export
   assets/          bundled fonts and demo data
 ```
 

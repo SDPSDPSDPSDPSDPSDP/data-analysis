@@ -5,9 +5,7 @@ from typing import Any, Dict, List, Optional
 import pyarrow as pa
 import pyarrow.parquet as pq
 from sqlalchemy import text
-from sqlalchemy.engine import Connection, CursorResult
-
-from . import engine
+from sqlalchemy.engine import Connection, CursorResult, Engine
 
 PARQUET_CHUNK_ROWS = 100_000
 
@@ -40,7 +38,7 @@ def _widen(schema: pa.Schema) -> pa.Schema:
 
 def query_to_parquet(
     sql_query: str,
-    db_config: Dict[str, Any],
+    engine: Engine,
     output_path: Path,
     params: Optional[Dict[str, Any]] = None,
     chunk_rows: int = PARQUET_CHUNK_ROWS,
@@ -50,7 +48,7 @@ def query_to_parquet(
     The parquet schema is fixed once every column has a real type: chunks are buffered
     while a column is still all-NULL, then written, and every later chunk is cast to it.
     """
-    with engine.get_engine(db_config).connect() as connection:
+    with engine.connect() as connection:
         result = _execute_streaming(connection, sql_query, params, chunk_rows)
         columns = list(result.keys())
         # ponytail: a column that stays NULL for many rows keeps them all buffered in memory;

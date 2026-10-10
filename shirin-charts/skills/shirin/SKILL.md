@@ -119,13 +119,14 @@ format_compact(1500000)                    # '1,5M' (also 'k')
 
 ```python
 from pathlib import Path
-from shirin.sql import run_sql_query
+from shirin.sql import Database
 
-df = run_sql_query("SELECT * FROM t WHERE year = :year", Path('db_config.json'), params={'year': 2024})
-run_sql_query(Path('query.sql'), db_config, output_path=Path('out.parquet'))  # streams to Parquet, returns None
+db = Database(user='u', password='p', host='h', port=50000, db_name='d', schema='S1')  # create once, reuse
+df = db.sql("SELECT * FROM t WHERE year = :year", params={'year': 2024})
+db.sql(Path('query.sql'), output_path=Path('out.parquet'))  # streams to Parquet, returns None
 ```
 
-Config keys required: `user`, `password`, `host`, `port`, `db_name`, `schema`. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
+All six `Database` arguments required. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
 
 ## Tips
 

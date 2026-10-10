@@ -111,7 +111,7 @@ Accuracy charts: segments are now labelled with the value column name and `'Rema
 | `from shirin.stats import print_stats`; `print_stats(s)` (2.0) | `import shirin.stats`; `s.stats()` |
 | `from shirin.stats.number_format import format_thousands` | `from shirin.number_format import format_thousands` (`from shirin.stats import format_thousands` still works) |
 | `format_thousands(x)` always 0 decimals | Now picks decimals automatically for small values. Pass `decimals=0` for the old output. |
-| `run_sql_query(sql, config, output_path)` | Same. New optional `params={'name': value}` for `:name` placeholders. Replace f-string values in SQL with `params`. |
+| `run_sql_query(sql, config, output_path)` | `from shirin.sql import Database`; `db = Database(user=..., password=..., host=..., port=..., db_name=..., schema=...)` once, then `db.sql(sql, params={...}, output_path=...)`. No JSON config: load your own file and pass `Database(**json.load(f))`. Replace f-string values in SQL with `params` (`:name` placeholders). |
 
 ## After converting
 
