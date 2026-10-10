@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
+from dataclasses import dataclass
+from typing import Optional, Union
 
 from ..config import FillMissingValues, FillMissingValuesInput, TimeGroupBy, TimeGroupByInput
 from .base_options import (
@@ -7,16 +7,7 @@ from .base_options import (
     VALID_TIME_GROUP_BY,
     VALID_TIME_PLOT_TYPES,
     BasePlotOptions,
-    InvalidOptionError,
-    InvalidOrderTypeError,
     validate_str_or_enum_option,
-)
-from .categorical_options import (
-    AccuracyPlotOptions,
-    BarPlotOptions,
-    CategoricalPlotOptions,
-    CountPlotOptions,
-    NormalizedCountPlotOptions,
 )
 
 
@@ -78,14 +69,11 @@ class PiePlotOptions(BasePlotOptions):
     n_after_comma: int = 0
     value_datalabel: int = 5
     donut: bool = False
-    palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
 
     def validate(self) -> None:
         super().validate()
         if not self.col:
             raise ValueError("col must be specified")
-        if not isinstance(self.palette, dict):
-            raise ValueError("palette must be a dictionary for pie charts")
 
 
 @dataclass

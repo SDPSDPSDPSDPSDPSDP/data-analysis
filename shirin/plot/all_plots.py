@@ -1,8 +1,8 @@
-import os
 from typing import Optional
 
 from .config.matplotlib import configure_matplotlib
-from .core import PlotExporter, BasePlotOptions, create_plot
+from .core import PlotExporter, BasePlotOptions
+from .plots import create_plot
 from .config.palettes import Palette, LabelMapping
 from .graphs.bar import BarPlotsMixin
 from .graphs.count import CountPlotsMixin
@@ -18,12 +18,13 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
     exported to files with customizable settings.
 
     Args:
-        export: Whether to automatically export plots to files. *Default: `True`*.
+        export: Whether to automatically export plots to files. *Default: `False`*.
         output_dir: Directory where exported plots will be saved. *Default: `'./plot_output/'`*.
         prefix: Optional prefix to add to all exported filenames. *Default: `None`*.
         format: File format for exported plots. **Options:** `'png'`, `'svg'`. *Default: `'png'`*.
         font: Font to use for all text. **Options:** `'satoshi'`, `None` (matplotlib default).
-            *Default: `None`*.
+            *Default: `None`*. Styling (font, sizes, grid) is applied to matplotlib's global
+            ``rcParams`` when the instance is created, so it affects all later plots.
         palette: A :class:`Palette` subclass with column-name attributes. When a plot uses
             `hue=col`, the matching palette is resolved automatically.
         label_mapping: A :class:`LabelMapping` subclass. Same resolution logic as `palette`.
@@ -39,15 +40,14 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
     def __init__(
         self,
         export: bool = False,
-        output_dir: str = os.path.expanduser("./plot_output/"),
+        output_dir: str = "./plot_output/",
         prefix: Optional[str] = None,
         format: str = 'png',
         font: Optional[str] = None,
         palette: Optional[type[Palette]] = None,
         label_mapping: Optional[type[LabelMapping]] = None,
     ) -> None:
-        if font is not None:
-            configure_matplotlib(font=font)
+        configure_matplotlib(font=font)
 
         self._exporter = PlotExporter(
             enabled=export,

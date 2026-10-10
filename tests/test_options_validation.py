@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from shirin.plot.core.options import BarPlotOptions, InvalidOrderTypeError, LinePlotOptions, TimePlotOptions
+from shirin.plot.core import BarPlotOptions, InvalidOptionError, LinePlotOptions, TimePlotOptions
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ def test_order_type_invalid_raises(order_type: str, match: str) -> None:
     df = pd.DataFrame({"n_prediction": ["10", "2", "1"], "count": [1, 2, 3]})
     options = BarPlotOptions(df=df, axis_column="n_prediction", value="count", order_type=order_type)
 
-    with pytest.raises(InvalidOrderTypeError, match=match):
+    with pytest.raises(InvalidOptionError, match=match):
         options.validate()
 
 

@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Union
 import pandas as pd
 
 from ..common.data_conversion import convert_dict_keys_to_string
-from ..config import FillMissingValues, OrderType, StackedLabelType, TimeGroupBy
+from ..config import FigureSizeMode, FillMissingValues, OrderType, StackedLabelType, TimeGroupBy
 
 
 class InvalidOptionError(ValueError):
@@ -28,21 +28,9 @@ class InvalidOptionError(ValueError):
         super().__init__(message)
 
 
-class InvalidOrderTypeError(InvalidOptionError):
-    """Raised when an unsupported order_type is provided."""
-
-    def __init__(self, received: Any, valid_options: tuple[str, ...], type_error: bool = False) -> None:
-        super().__init__(
-            option_name='order_type',
-            received=received,
-            valid_options=valid_options,
-            expected='strings or OrderType enum values',
-            type_error=type_error,
-        )
-
-
 VALID_ORDER_TYPES = tuple(order_type.value for order_type in OrderType)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
+VALID_FIGURE_SIZES = tuple(size.value for size in FigureSizeMode)
 VALID_STACKED_LABEL_TYPES = tuple(stacked_label.value for stacked_label in StackedLabelType)
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
 VALID_TIME_PLOT_TYPES = ('bar', 'line')

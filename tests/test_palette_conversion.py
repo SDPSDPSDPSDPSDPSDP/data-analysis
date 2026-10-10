@@ -1,5 +1,5 @@
 """Unit tests for palette conversion with non-string keys (boolean, integer)."""
-from shirin.plot.common.data_conversion import convert_palette_to_strings
+from shirin.plot.common.data_conversion import convert_dict_keys_to_string as convert_palette_to_strings
 from shirin.plot.common.formatting.text_contrast import get_text_color_for_background
 from shirin.plot.config.colors import Colors, TextColors
 

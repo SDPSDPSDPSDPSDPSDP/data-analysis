@@ -1,3 +1,4 @@
+import functools
 import random
 import numpy as np
 import pandas as pd
@@ -142,6 +143,20 @@ df_accuracy = pd.DataFrame({
     'accuracy': [0.99, 0.71, 0.85],
 })
 
-df, df_documents_by_year = generate_fake_data()
-# Use larger yearly_growth by default to produce more extreme increasing totals
-df_time = generate_time_series(yearly_growth=0.5)
+
+@functools.lru_cache(maxsize=None)
+def _build_lazy_frames() -> dict:
+    df, df_documents_by_year = generate_fake_data()
+    return {
+        'df': df,
+        'df_documents_by_year': df_documents_by_year,
+        # Larger yearly_growth produces more extreme increasing totals.
+        'df_time': generate_time_series(yearly_growth=0.5),
+    }
+
+
+def __getattr__(name: str) -> DataFrame:
+    """Build the large demo frames on first access instead of at import time."""
+    if name in ('df', 'df_documents_by_year', 'df_time'):
+        return _build_lazy_frames()[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

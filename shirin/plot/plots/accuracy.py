@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ..core.base_plot import AbstractPlot
-from ..core.options import AccuracyPlotOptions
+from ..core.categorical_options import AccuracyPlotOptions
 from ..common.formatting import (
     format_datalabels_stacked,
     format_optional_legend,
@@ -29,15 +29,15 @@ class AccuracyPlot(AbstractPlot):
       - ``value_column``: accuracy as a fraction in [0, 1]
 
     The plot expands each row into two segments -- *Correct* (= accuracy) and
-    *Incorrect* (= 1 - accuracy) -- and renders them as a stacked bar chart
-    that reuses the exact same draw/format machinery as ``BarPlot``.
+    *Incorrect* (= 1 - accuracy) -- and renders them as a stacked bar chart,
+    sorted by accuracy, with the value axis hidden and percentage labels inside the bars.
     """
 
-    def __init__(self, options: AccuracyPlotOptions, renderer=None):
-        super().__init__(options, renderer)
-        self.options: AccuracyPlotOptions = options
-        self._df_unlabeled: Optional[pd.DataFrame] = None
+    options: AccuracyPlotOptions
 
+    def __init__(self, options: AccuracyPlotOptions):
+        super().__init__(options)
+        self._df_unlabeled: Optional[pd.DataFrame] = None
 
     def preprocess(self) -> pd.DataFrame:
         return ensure_column_is_string(self.options.df, self.options.axis_column)
@@ -60,7 +60,7 @@ class AccuracyPlot(AbstractPlot):
             data,
             _HUE_COL,
             self.options.axis_column,
-            self.options.order_type,
+            order_type=None,  # sorted by accuracy below
             value_col=_VALUE_COL,
             orientation=orientation,
         )

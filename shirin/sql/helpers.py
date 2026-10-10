@@ -1,10 +1,12 @@
 """Helper functions for SQL query execution."""
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, Union
 import pandas as pd
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL
 
 
 def load_sql_query(sql_query: Union[str, Path]) -> str:
@@ -115,12 +117,23 @@ def execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
             f"Missing required database config keys: {missing_keys}"
         )
 
-    connection_string = (
-        f"ibm_db_sa://{db_config['user']}:{db_config['password']}"
-        f"@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
-    )
-    engine = create_engine(connection_string)
+    schema = db_config['schema']
+    # SET SCHEMA can't take a bind parameter, so only allow plain identifiers.
+    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_$#@]*', schema):
+        raise ValueError(f"Invalid schema name: {schema!r}")
 
-    with engine.connect() as connection:
-        connection.execute(text(f"SET SCHEMA {db_config['schema']}"))
-        return pd.read_sql(sql_query, con=connection)
+    url = URL.create(
+        "ibm_db_sa",
+        username=db_config['user'],
+        password=db_config['password'],
+        host=db_config['host'],
+        port=int(db_config['port']),
+        database=db_config['db_name'],
+    )
+    engine = create_engine(url)
+    try:
+        with engine.connect() as connection:
+            connection.execute(text(f"SET SCHEMA {schema}"))
+            return pd.read_sql(sql_query, con=connection)
+    finally:
+        engine.dispose()

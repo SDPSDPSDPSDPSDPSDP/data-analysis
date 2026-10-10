@@ -6,8 +6,8 @@ are applied correctly to bar colors and axis tick labels.
 """
 import pandas as pd
 
+from shirin.plot.plots import create_plot
 from shirin.plot.core import (
-    create_plot,
     CountPlotOptions,
     BarPlotOptions,
     NormalizedCountPlotOptions,
@@ -41,8 +41,8 @@ class TestStackedCountPlotTextColors:
         plot = create_plot('count', options)
         plot.render()
         
-        assert plot._original_palette is not None
-        assert True in plot._original_palette or 'True' in plot._original_palette
+        assert plot._palette is not None
+        assert True in plot._palette or 'True' in plot._palette
 
 
 class TestStackedBarPlotTextColors:
@@ -72,7 +72,7 @@ class TestStackedBarPlotTextColors:
         plot = create_plot('bar', options)
         plot.render()
         
-        assert plot._original_palette is not None
+        assert plot._palette is not None
 
 
 class TestNormalizedCountPlotPaletteKeys:

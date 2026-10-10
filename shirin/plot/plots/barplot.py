@@ -2,33 +2,26 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ..core.options import BarPlotOptions
-from ..common.strategies.ordering import get_ordering_strategy
+from ..core.categorical_options import BarPlotOptions
 from ..common.data_conversion import ensure_column_is_string
+from ..common.sorting import get_order
 from .categorical import StackableCategoricalPlot
 
 
 class BarPlot(StackableCategoricalPlot):
     options: BarPlotOptions
 
-    @property
-    def value_column(self) -> Optional[str]:  # type: ignore[override]
+    def _value_column(self) -> Optional[str]:
         return self.options.value
 
     def preprocess(self) -> pd.DataFrame:
-        df = ensure_column_is_string(self.options.df.copy(), self.options.axis_column)
-        if self.options.hue is not None:
-            df = ensure_column_is_string(df, self.options.hue)
-        return df
+        return ensure_column_is_string(self.options.df, self.options.axis_column)
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        self._order = get_ordering_strategy(self.options.order_type).get_order(
-            df,
-            self.options.axis_column,
-            value_column=self.options.value,
+        self._order = get_order(
+            self.options.order_type, df, self.options.axis_column, value_column=self.options.value
         )
-        self._resolve_palette()
-        return df
+        return self._resolve_hue_palette(df)
 
     def _draw_unstacked(self, data: pd.DataFrame) -> Any:
         x, y = self.options.axis_column, self.options.value

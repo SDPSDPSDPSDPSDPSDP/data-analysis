@@ -1,45 +1,33 @@
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
 from ..core.base_plot import AbstractPlot
 from ..core.options import LinePlotOptions
-from ..common.formatting import (
-    format_ticks,
-)
-from ..common.data_conversion import (
-    fill_missing_values_in_data,
-)
+from ..common.formatting import format_ticks
+from ..common.data_conversion import fill_missing_values_in_data
 
 
 class LinePlot(AbstractPlot):
-    def __init__(self, options: LinePlotOptions, renderer=None):
-        super().__init__(options, renderer)
-        self.options: LinePlotOptions = options
-        self._color: Optional[str] = None
-        self._palette: Optional[Any] = None
-    
+    options: LinePlotOptions
+
     def preprocess(self) -> pd.DataFrame:
-        df = self.options.df.copy()
-        
-        if self.options.fill_missing_values is not None:
-            df = fill_missing_values_in_data(
-                df,
-                self.options.x,
-                self.options.y,
-                                self.options.hue,
-                self.options.fill_missing_values
-            )
-        
-        return df
-    
+        if self.options.fill_missing_values is None:
+            return self.options.df.copy()
+        return fill_missing_values_in_data(
+            self.options.df,
+            self.options.x,
+            self.options.y,
+            self.options.hue,
+            self.options.fill_missing_values
+        )
+
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self._resolve_hue_palette(df)
+        return self._resolve_hue_palette(df, no_hue_color='black')
 
     def draw(self, data: pd.DataFrame) -> Any:
         self._create_standard_figure()
-        
-        plot = self.renderer.render_lineplot(
+        return self.renderer.render_lineplot(
             df=data,
             x=self.options.x,
             y=self.options.y,
@@ -47,9 +35,7 @@ class LinePlot(AbstractPlot):
             color=self._color,
             palette=self._palette
         )
-        
-        return plot
-    
+
     def format_plot(self, plot: Any) -> None:
         self._format_labels_and_legend(plot)
         format_ticks(

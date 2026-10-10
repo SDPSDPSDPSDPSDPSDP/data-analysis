@@ -3,6 +3,7 @@ from .palettes import Palette, LabelMapping
 from .formatting import FontSizes, FigureSize
 from .types import (
     OrderType,
+    FigureSizeMode,
     StackedLabelType,
     FillMissingValues,
     TimeGroupBy,
@@ -21,6 +22,7 @@ __all__ = [
     'FontSizes',
     'FigureSize',
     'OrderType',
+    'FigureSizeMode',
     'StackedLabelType',
     'FillMissingValues',
     'TimeGroupBy',

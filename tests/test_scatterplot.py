@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, ScatterPlotOptions
+from shirin.plot.core import ScatterPlotOptions
+from shirin.plot.plots import create_plot
 
 
 @pytest.fixture(autouse=True)

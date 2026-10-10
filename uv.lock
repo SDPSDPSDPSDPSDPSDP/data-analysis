@@ -2700,40 +2700,49 @@ name = "shirin"
 version = "3.0.0"
 source = { editable = "." }
 dependencies = [
-    { name = "ibm-db-sa" },
-    { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "seaborn" },
+]
+
+[package.optional-dependencies]
+sql = [
+    { name = "ibm-db-sa" },
     { name = "pyarrow", version = "21.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "pyarrow", version = "23.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "seaborn" },
     { name = "sqlalchemy" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "fonttools" },
+    { name = "ipykernel" },
     { name = "jupyter" },
     { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "shirin", extra = ["sql"] },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "ibm-db-sa" },
-    { name = "ipykernel" },
+    { name = "ibm-db-sa", marker = "extra == 'sql'" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pyarrow" },
+    { name = "pyarrow", marker = "extra == 'sql'" },
     { name = "seaborn" },
-    { name = "sqlalchemy" },
+    { name = "sqlalchemy", marker = "extra == 'sql'" },
 ]
+provides-extras = ["sql"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "fonttools" },
+    { name = "ipykernel" },
     { name = "jupyter" },
     { name = "pytest", specifier = ">=8.4.2" },
+    { name = "shirin", extras = ["sql"] },
 ]
 
 [[package]]

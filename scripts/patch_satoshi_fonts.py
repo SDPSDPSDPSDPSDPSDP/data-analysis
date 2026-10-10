@@ -17,8 +17,9 @@ from pathlib import Path
 from fontTools.ttLib import TTFont
 
 
-SOURCE_DIR = Path("shirin/assets/Satoshi_Complete/WEB/fonts")
-OUTPUT_DIR = Path("shirin/assets/fonts/patched")
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SOURCE_DIR = REPO_ROOT / "scripts" / "fonts" / "Satoshi_Complete" / "WEB" / "fonts"
+OUTPUT_DIR = REPO_ROOT / "shirin" / "assets" / "fonts" / "patched"
 
 FONTS_TO_PATCH = [
     "Satoshi-Medium.ttf",
@@ -29,14 +30,8 @@ NEW_FAMILY_NAME = "Satoshi Shirin"
 
 # Medium is promoted to "Regular" so matplotlib uses it as the default weight.
 STYLE_MAP = {
-    "BoldItalic": ("Bold Italic", "Satoshi Shirin Bold Italic"),
-    "MediumItalic": ("Medium Italic", "Satoshi Shirin Medium Italic"),
-    "LightItalic": ("Light Italic", "Satoshi Shirin Light Italic"),
     "Bold": ("Bold", "Satoshi Shirin Bold"),
     "Medium": ("Regular", "Satoshi Shirin"),
-    "Light": ("Light", "Satoshi Shirin Light"),
-    "Italic": ("Italic", "Satoshi Shirin Italic"),
-    "Regular": ("Regular", "Satoshi Shirin"),
 }
 
 

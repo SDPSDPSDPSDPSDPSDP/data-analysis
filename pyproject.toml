@@ -13,7 +13,10 @@ dependencies = [
     "seaborn",
     "numpy",
     "pandas",
-    "ipykernel",
+]
+
+[project.optional-dependencies]
+sql = [
     "ibm-db-sa",
     "sqlalchemy",
     "pyarrow",
@@ -21,12 +24,18 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "shirin[sql]",
+    "ipykernel",
     "jupyter",
     "pytest>=8.4.2",
+    "fonttools",
 ]
 
 [tool.setuptools]
 include-package-data = false
+
+[tool.setuptools.package-data]
+shirin = ["assets/fonts/patched/*.ttf"]
 
 [tool.setuptools.packages.find]
 include = ["shirin*"]

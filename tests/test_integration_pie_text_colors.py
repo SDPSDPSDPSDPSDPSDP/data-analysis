@@ -1,7 +1,8 @@
 """Integration tests for pie chart data-label text color contrast."""
 import pandas as pd
 
-from shirin.plot.core import create_plot, PiePlotOptions
+from shirin.plot.core import PiePlotOptions
+from shirin.plot.plots import create_plot
 from shirin.plot.config.colors import Colors, TextColors
 from shirin.plot.common.formatting.text_contrast import get_text_color_for_background
 

@@ -1,50 +1,48 @@
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-from ..core.base_plot import AbstractPlot
+from ..core.base_plot import AbstractPlot, split_palette
 from ..core.options import TimePlotOptions
 from ..common.formatting import (
     format_ticks,
     format_xy_labels,
 )
-from ..common.strategies.palette import get_palette_strategy
 from ..config.colors import Colors, TextColors
 
 
 class TimePlot(AbstractPlot):
-    def __init__(self, options: TimePlotOptions, renderer=None):
-        super().__init__(options, renderer)
-        self.options: TimePlotOptions = options
+    options: TimePlotOptions
+
+    def __init__(self, options: TimePlotOptions):
+        super().__init__(options)
         self._aggregated_df: pd.DataFrame = pd.DataFrame()
-        self._color: Optional[str] = None
-    
+
     def preprocess(self) -> pd.DataFrame:
         df = self.options.df.copy()
         date_col = self.options.x
-        
+
         if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
             df[date_col] = pd.to_datetime(df[date_col])
-        
+
         if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
             raise ValueError(f"Column '{date_col}' could not be converted to datetime")
-        
+
         return df
-    
+
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        palette_strategy = get_palette_strategy(self.options.palette)
-        self._color, _ = palette_strategy.get_palette()
-        
+        self._color, _ = split_palette(self.options.palette)
+
         group_by = self.options.group_by
         date_col = self.options.x
-        
+
         datetime_series = pd.to_datetime(df[date_col])
-        
+
         period = {'year': 'Y', 'month': 'M'}.get(group_by, 'D')
         df['_time_group'] = datetime_series.dt.to_period(period).dt.to_timestamp()
-        
+
         self._aggregated_df = (
             df.groupby('_time_group')
             .size()
@@ -67,12 +65,12 @@ class TimePlot(AbstractPlot):
                 .fillna({'count': 0})
             )
             self._aggregated_df['count'] = self._aggregated_df['count'].astype(int)
-        
+
         if self.options.cumulative:
             self._aggregated_df['count'] = self._aggregated_df['count'].cumsum()
-        
+
         return self._aggregated_df
-    
+
     def draw(self, data: pd.DataFrame) -> Any:
         self._create_standard_figure()
 
@@ -90,7 +88,7 @@ class TimePlot(AbstractPlot):
             show_markers = not (self.options.group_by == 'day' and len(data) > 25)
             marker = 'o' if show_markers else None
             markersize = 3 if show_markers else 0
-            
+
             ax.plot(
                 data['_time_group'],
                 data['count'],
@@ -105,27 +103,27 @@ class TimePlot(AbstractPlot):
             )
 
         return ax
-    
+
     def _get_bar_width(self) -> float:
-        """Get appropriate bar width based on grouping."""
+        """Bar width in days for the grouping."""
         group_by = self.options.group_by
         if group_by == 'year':
-            return 300  # ~300 days width for yearly bars
+            return 300
         elif group_by == 'month':
-            return 25   # ~25 days width for monthly bars
+            return 25
         else:  # day
-            return 0.8  # ~0.8 days width for daily bars
-    
+            return 0.8
+
     def format_plot(self, plot: Any) -> None:
         format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
         format_ticks(plot, y_grid=True, numeric_y=True)
-        
+
         self._format_date_axis(plot)
-    
+
     def _format_date_axis(self, ax: Any) -> None:
         """Format x-axis with appropriate date labels based on grouping."""
         group_by = self.options.group_by
-        
+
         if group_by == 'year':
             ax.xaxis.set_major_locator(mdates.YearLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
@@ -138,40 +136,41 @@ class TimePlot(AbstractPlot):
                 ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
                 ax.tick_params(axis='x', which='major', rotation=90, pad=6)
-
-                # Manually draw year labels below the months to ensure visibility
-                try:
-                    start = self._aggregated_df['_time_group'].min()
-                    end = self._aggregated_df['_time_group'].max()
-                    years = pd.date_range(start=start, end=end, freq='YS')
-                    # Add a bit more bottom margin to avoid clipping
-                    ax.figure.subplots_adjust(bottom=0.30)
-                    major_lbls = ax.xaxis.get_majorticklabels()
-                    if major_lbls:
-                        label_color = major_lbls[0].get_color()
-                        label_size = major_lbls[0].get_fontsize()
-                        label_family = major_lbls[0].get_fontfamily()
-                    else:
-                        label_color = TextColors.DARK_GREY
-                        label_size = 9
-                        label_family = None
-                    for y in years:
-                        ax.text(
-                            y,
-                            -0.18,
-                            str(y.year),
-                            transform=ax.get_xaxis_transform(),
-                            ha='center',
-                            va='top',
-                            fontsize=label_size,
-                            fontfamily=label_family,
-                            color=label_color,
-                        )
-                except Exception:
-                    pass
+                self._draw_year_labels(ax)
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            plt.xticks(rotation=self.options.rotation, ha='right')
-        
-        plt.tight_layout()
+            plt.setp(ax.get_xticklabels(), rotation=self.options.rotation, ha='right')
+
+        ax.figure.tight_layout()
+
+    def _draw_year_labels(self, ax: Any) -> None:
+        """Year labels below the month ticks, so multi-year month axes stay readable."""
+        years = pd.date_range(
+            start=self._aggregated_df['_time_group'].min(),
+            end=self._aggregated_df['_time_group'].max(),
+            freq='YS',
+        )
+        # Extra bottom margin to avoid clipping the year row.
+        ax.figure.subplots_adjust(bottom=0.30)
+        major_lbls = ax.xaxis.get_majorticklabels()
+        if major_lbls:
+            label_color = major_lbls[0].get_color()
+            label_size = major_lbls[0].get_fontsize()
+            label_family = major_lbls[0].get_fontfamily()
+        else:
+            label_color = TextColors.DARK_GREY
+            label_size = 9
+            label_family = None
+        for year in years:
+            ax.text(
+                year,
+                -0.18,
+                str(year.year),
+                transform=ax.get_xaxis_transform(),
+                ha='center',
+                va='top',
+                fontsize=label_size,
+                fontfamily=label_family,
+                color=label_color,
+            )

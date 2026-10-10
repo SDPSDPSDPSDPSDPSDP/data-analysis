@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, PiePlotOptions
+from shirin.plot.core import PiePlotOptions
+from shirin.plot.plots import create_plot
 
 
 @pytest.fixture(autouse=True)

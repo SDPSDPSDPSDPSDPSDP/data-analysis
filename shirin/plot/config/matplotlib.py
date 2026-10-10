@@ -18,7 +18,7 @@ def _register_fonts() -> None:
         return
     fonts_dir = Path(__file__).resolve().parent.parent.parent / "assets" / "fonts" / "patched"
     if not fonts_dir.exists():
-        return
+        raise FileNotFoundError(f"Bundled fonts not found at {fonts_dir}; reinstall the package.")
     for font_path in fonts_dir.glob("*.ttf"):
         fm.fontManager.addfont(str(font_path))
     _fonts_registered = True
@@ -68,3 +68,5 @@ def configure_matplotlib(font: Optional[str] = None) -> None:
     plt.rcParams['axes.titlesize'] = FontSizes.TITLE
     plt.rcParams['xtick.labelsize'] = FontSizes.TICKS
     plt.rcParams['ytick.labelsize'] = FontSizes.TICKS
+    plt.rcParams['axes.labelsize'] = FontSizes.XYLABEL
+    plt.rcParams['legend.fontsize'] = FontSizes.LEGEND

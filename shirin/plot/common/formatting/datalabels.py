@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt
-from matplotlib.container import BarContainer
+from matplotlib.axes import Axes
 from matplotlib.patches import Patch
 from typing import Dict, List, Optional
 import pandas as pd
@@ -18,6 +17,7 @@ def _calculate_label_offset(
 
 
 def _format_labels(
+    plot: Axes,
     patches: List[Patch],
     label_offset: float,
     formatting: str,
@@ -39,17 +39,18 @@ def _format_labels(
                 text = f'{percentage:,.1f}%'.replace(',', '.')
             if suffix is not None and suffix.strip() != '':
                 text = f"{text} {suffix.strip()}"
-            _add_text(patch, dimension + label_offset, text, orientation)
+            _add_text(plot, patch, dimension + label_offset, text, orientation)
 
 
 def _add_text(
+    plot: Axes,
     patch: Patch,
     position: float,
     text: str,
     orientation: str,
 ) -> None:
     if orientation == 'vertical':
-        plt.text(
+        plot.text(
             patch.get_x() + patch.get_width() / 2.0,
             position,
             text,
@@ -59,7 +60,7 @@ def _add_text(
             color=TextColors.LIGHT_GREY,
         )
     elif orientation == 'horizontal':
-        plt.text(
+        plot.text(
             position,
             patch.get_y() + patch.get_height() / 2.0,
             text,
@@ -71,7 +72,7 @@ def _add_text(
 
 
 def format_datalabels(
-    plot: BarContainer,
+    plot: Axes,
     label_offset: float = 0.01,
     formatting: str = 'totals',
     orientation: str = 'vertical',
@@ -79,7 +80,7 @@ def format_datalabels(
 ) -> None:
     patches: List[Patch] = plot.patches
     label_offset = _calculate_label_offset(patches, label_offset, orientation)
-    _format_labels(patches, label_offset, formatting, orientation, suffix=suffix)
+    _format_labels(plot, patches, label_offset, formatting, orientation, suffix=suffix)
 
 
 def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -> str:
@@ -91,6 +92,7 @@ def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -
 
 
 def _add_stacked_labels(
+    plot: Axes,
     pivot_data: pd.DataFrame,
     percentages,
     palette: Dict,
@@ -98,7 +100,6 @@ def _add_stacked_labels(
     suffix: Optional[str],
     threshold: float,
 ) -> None:
-    ax = plt.gca()
     for index, (row_values, row_percentages) in enumerate(zip(pivot_data.values, percentages)):
         cumulative_sum = 0
         for category, value, value_percentage in zip(pivot_data.columns, row_values, row_percentages):
@@ -107,7 +108,7 @@ def _add_stacked_labels(
                 continue
             center = cumulative_sum - value / 2
             x, y = (center, index) if orientation == 'horizontal' else (index, center)
-            ax.text(
+            plot.text(
                 x,
                 y,
                 _format_stacked_percentage(value_percentage, suffix),
@@ -119,7 +120,7 @@ def _add_stacked_labels(
 
 
 def format_datalabels_stacked(
-    plot: BarContainer,
+    plot: Axes,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
@@ -128,14 +129,14 @@ def format_datalabels_stacked(
     values = pivot_data.values
     percentages = values / values.sum(axis=1, keepdims=True) * 100
     threshold = 0.04 * pivot_data.sum(axis=1).max()
-    _add_stacked_labels(pivot_data, percentages, palette, orientation, suffix, threshold)
+    _add_stacked_labels(plot, pivot_data, percentages, palette, orientation, suffix, threshold)
 
 
 def format_datalabels_stacked_normalized(
-    plot: BarContainer,
+    plot: Axes,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    _add_stacked_labels(pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)
+    _add_stacked_labels(plot, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)

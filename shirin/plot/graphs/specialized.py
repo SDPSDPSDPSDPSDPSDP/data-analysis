@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from ..config import TimeGroupByInput
 from ..config.colors import Colors
 from ..core import AccuracyPlotOptions, PiePlotOptions, TimePlotOptions
-from ..common.file_operations import calculate_value_counts
+from ..common.data_conversion import calculate_value_counts
 from ..common.resolve_palette import resolve_palette
 
 

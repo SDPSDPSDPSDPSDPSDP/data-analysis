@@ -1,13 +1,15 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Union
 
+from ..config.colors import Colors
 from ..config import FigureSizeInput, OrderType, OrderTypeInput, StackedLabelType, StackedLabelTypeInput
 from .base_options import (
     VALID_ORDER_TYPES,
     VALID_ORIENTATIONS,
     VALID_STACKED_LABEL_TYPES,
+    VALID_FIGURE_SIZES,
     BasePlotOptions,
-    InvalidOrderTypeError,
+    InvalidOptionError,
     validate_str_or_enum_option,
 )
 
@@ -20,6 +22,8 @@ class CategoricalPlotOptions(BasePlotOptions):
     stacked: bool = False
     stacked_labels: StackedLabelTypeInput = None
     order_type: OrderTypeInput = 'frequency'
+    show_labels: bool = True
+    suffix: Optional[str] = None
 
     def validate(self) -> None:
         super().validate()
@@ -32,13 +36,12 @@ class CategoricalPlotOptions(BasePlotOptions):
             valid_options=VALID_ORIENTATIONS,
         )
 
-        if isinstance(self.order_type, OrderType):
-            pass
-        elif isinstance(self.order_type, str):
-            if self.order_type not in VALID_ORDER_TYPES:
-                raise InvalidOrderTypeError(self.order_type, VALID_ORDER_TYPES)
-        else:
-            raise InvalidOrderTypeError(self.order_type, VALID_ORDER_TYPES, type_error=True)
+        validate_str_or_enum_option(
+            option_name='order_type',
+            value=self.order_type,
+            valid_options=VALID_ORDER_TYPES,
+            enum_type=OrderType,
+        )
 
         validate_str_or_enum_option(
             option_name='stacked_labels',
@@ -50,28 +53,22 @@ class CategoricalPlotOptions(BasePlotOptions):
 
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
+        if self.stacked and not isinstance(self.palette, dict):
+            raise ValueError("palette must be a dictionary when stacked=True")
+        if not isinstance(self.figsize, (int, float)) and self.figsize not in VALID_FIGURE_SIZES:
+            raise InvalidOptionError('figsize', self.figsize, VALID_FIGURE_SIZES, 'strings or numbers')
 
 
 @dataclass
 class CountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     normalized: bool = False
-    show_labels: bool = True
-    suffix: Optional[str] = None
-
-
-    def validate(self) -> None:
-        super().validate()
-        if self.normalized and self.hue is not None and not isinstance(self.palette, dict):
-            raise ValueError("palette must be a dictionary when normalized=True with hue")
 
 
 @dataclass
 class BarPlotOptions(CategoricalPlotOptions):
     value: str = ''
     percentage_labels: bool = False
-    suffix: Optional[str] = None
-
 
     def validate(self) -> None:
         super().validate()
@@ -81,9 +78,9 @@ class BarPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class NormalizedCountPlotOptions(CategoricalPlotOptions):
+    """Always a 100%-stacked plot of hue shares; `stacked`/`stacked_labels` are ignored."""
+
     top_n: Optional[int] = None
-    show_labels: bool = True
-    suffix: Optional[str] = None
     palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     ylabel: str = 'Percentage'
 
@@ -98,22 +95,20 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
+    """`stacked`, `hue`, `figsize`, `stacked_labels` and `order_type` are fixed for accuracy plots."""
+
     value_column: str = ''
-    suffix: Optional[str] = None
     reverse_order: bool = False
 
-    def validate(self) -> None:
-        if not self.value_column:
-            raise ValueError("value_column must be specified")
-        # These are fixed for accuracy plots – not exposed as user options.
+    def __post_init__(self) -> None:
         self.stacked = True
         self.hue = '__is_correct__'
         self.figsize = 'dynamic'
         self.stacked_labels = 'standard'
         if not isinstance(self.palette, dict):
-            from ..config.colors import Colors
-            self.palette = {
-                'Correct': Colors.GOOD_GREEN,
-                'Incorrect': Colors.BAD_RED,
-            }
+            self.palette = {'Correct': Colors.GOOD_GREEN, 'Incorrect': Colors.BAD_RED}
+
+    def validate(self) -> None:
+        if not self.value_column:
+            raise ValueError("value_column must be specified")
         super().validate()

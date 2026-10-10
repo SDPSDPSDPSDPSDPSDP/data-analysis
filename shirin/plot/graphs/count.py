@@ -16,8 +16,6 @@ class CountPlotsMixin:
         **common: Any,
     ) -> None:
         if normalized and common['hue'] is not None:
-            if not isinstance(common['palette'], dict):
-                raise ValueError("palette must be a dictionary when normalized=True with hue")
             self._render('normalized_count', NormalizedCountPlotOptions(**common), output_name)
         else:
             options = CountPlotOptions(

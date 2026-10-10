@@ -3,11 +3,10 @@ from typing import Any, Dict, Optional, Union
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from matplotlib.patches import Circle
 
-from .renderer_base import PlotRenderer
 
-
-class SeabornRenderer(PlotRenderer):
+class SeabornRenderer:
     def create_figure(self, figsize: tuple[float, float]) -> Any:
         return plt.figure(figsize=figsize)
     
@@ -149,7 +148,8 @@ class SeabornRenderer(PlotRenderer):
         n_after_comma: int,
         value_datalabel: int,
         pctdistance: float
-    ) -> Any:
+    ) -> tuple[Any, list]:
+        """Draw on the current axes; returns (axes, percentage text artists)."""
         ax = plt.gca()
         wedgeprops = dict(edgecolor='none', width=0.6 if donut else 1.0)
         result = ax.pie(
@@ -161,11 +161,8 @@ class SeabornRenderer(PlotRenderer):
             pctdistance=pctdistance,
         )
         if donut:
-            from matplotlib.patches import Circle
             center_circle = Circle((0, 0), 0.6, color='white', fc='white', linewidth=0)
             ax.add_artist(center_circle)
         ax.axis('equal')
-        return result
-
-    def get_current_axes(self) -> Any:
-        return plt.gca()
+        autotexts = result[2] if len(result) > 2 else []
+        return ax, autotexts

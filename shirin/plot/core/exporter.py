@@ -42,6 +42,7 @@ class PlotExporter:
     def export_and_show(self, output_name: str) -> None:
         self.export_only(output_name)
         self.show_only()
+        plt.close()
 
     def export_only(self, output_name: str) -> None:
         if self.enabled:

@@ -13,11 +13,10 @@ from .helpers import (
 )
 
 
-try:
-    os.add_dll_directory("C:\\Program Files\\IBM\\SQLLIB\\BIN")
-except AttributeError:
-    # Ignore errors for older Python versions without add_dll_directory
-    pass
+# Windows needs the DB2 client DLLs on the search path; override with DB2_DLL_DIR.
+_db2_dll_dir = os.environ.get("DB2_DLL_DIR", r"C:\Program Files\IBM\SQLLIB\BIN")
+if hasattr(os, "add_dll_directory") and os.path.isdir(_db2_dll_dir):
+    os.add_dll_directory(_db2_dll_dir)
 
 
 def run_sql_query(
