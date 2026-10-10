@@ -30,7 +30,7 @@ def df() -> pd.DataFrame:
 
 @pytest.fixture
 def plot() -> PlotGraphs:
-    return PlotGraphs(show=False)
+    return PlotGraphs()
 
 
 def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame) -> None:
@@ -47,7 +47,7 @@ def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame) -> None:
     plot.timeplot(df, x='date', group_by='month')
     plot.timeplot(df, x='date', group_by='day', plot_type='line', rotation=45)
     plot.accuracy(pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]}), experiment='run', accuracy='acc', reverse_order=True)
-    assert plt.get_fignums() == []  # exporter closes every figure
+    assert plt.get_fignums() == []  # _render closes every figure
 
 
 def test_countplot_show_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
@@ -102,18 +102,15 @@ def test_hue_without_dict_palette_has_no_seaborn_warning(df: pd.DataFrame, palet
     assert rendered._color is None
 
 
-def test_export_saves_file_and_leaves_other_figures_open(df: pd.DataFrame, tmp_path) -> None:
+def test_render_leaves_other_figures_open(df: pd.DataFrame) -> None:
     user_figure = plt.figure()
-    PlotGraphs(export=True, output_dir=str(tmp_path), prefix='run', show=False).countplot_x(
-        df, x='category', output_name='counts'
-    )
-    assert (tmp_path / 'run_counts.png').exists()
+    PlotGraphs().countplot_x(df, x='category')
     assert plt.get_fignums() == [user_figure.number]
 
 
 def test_styling_does_not_change_global_rcparams(df: pd.DataFrame) -> None:
     before = dict(plt.rcParams)
-    PlotGraphs(show=False).countplot_x(df, x='category')
+    PlotGraphs().countplot_x(df, x='category')
     assert dict(plt.rcParams) == before
 
 

@@ -1,5 +1,4 @@
 from .base_plot import AbstractPlot
-from .exporter import PlotExporter
 from .base_options import BasePlotOptions, InvalidOptionError
 from .categorical_options import (
     CategoricalPlotOptions,
@@ -18,7 +17,6 @@ from .options import (
 
 __all__ = [
     'AbstractPlot',
-    'PlotExporter',
     'BasePlotOptions',
     'InvalidOptionError',
     'CategoricalPlotOptions',

@@ -29,7 +29,7 @@ shirin/
   plot/
     all_plots.py   PlotGraphs: public entry point, composed of the graphs/ mixins
     graphs/        public methods (countplot_x, pie, ...): build an Options object, pick the plot class
-    core/          Options dataclasses + validation, AbstractPlot, renderer (seaborn/matplotlib calls), exporter
+    core/          Options dataclasses + validation, AbstractPlot, renderer (seaborn/matplotlib calls)
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)
     config/        colors, font sizes, palette/label-mapping base classes, matplotlib rc settings

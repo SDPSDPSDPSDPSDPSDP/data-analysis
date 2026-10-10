@@ -10,19 +10,18 @@ from ..plots import CountPlot, NormalizedCountPlot
 class CountPlotsMixin:
     def _countplot(
         self,
-        output_name: str,
         normalized: bool,
         stacked: bool,
         stacked_labels: StackedLabelTypeInput,
         **common: Any,
     ) -> None:
         if normalized and common['hue'] is not None:
-            self._render(NormalizedCountPlot(NormalizedCountPlotOptions(**common)), output_name)
+            self._render(NormalizedCountPlot(NormalizedCountPlotOptions(**common)))
         else:
             options = CountPlotOptions(
                 **common, stacked=stacked, stacked_labels=stacked_labels, normalized=normalized
             )
-            self._render(CountPlot(options), output_name)
+            self._render(CountPlot(options))
 
     @resolve_palette
     def countplot_x(
@@ -43,7 +42,6 @@ class CountPlotsMixin:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        output_name: str = 'countplot_x',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -72,10 +70,8 @@ class CountPlotsMixin:
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
-            output_name: Name for the exported file. *Default: `'countplot_x'`*.
         """
         self._countplot(
-            output_name=output_name,
             normalized=normalized,
             stacked=stacked,
             stacked_labels=stacked_labels,
@@ -116,7 +112,6 @@ class CountPlotsMixin:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        output_name: str = 'countplot_y',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -145,10 +140,8 @@ class CountPlotsMixin:
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
-            output_name: Name for the exported file. *Default: `'countplot_y'`*.
         """
         self._countplot(
-            output_name=output_name,
             normalized=normalized,
             stacked=stacked,
             stacked_labels=stacked_labels,

@@ -45,3 +45,6 @@ exclude = ["tests*", "docs*", "scripts*"]
 "*" = ["*.ipynb"]
 
 
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore:FigureCanvasAgg is non-interactive:UserWarning"]

@@ -22,7 +22,6 @@ class NumericPlotsMixin:
         plot_legend: bool = True,
         legend_offset: float = 1.13,
         ncol: int = 2,
-        output_name: str = 'histogram',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -42,7 +41,6 @@ class NumericPlotsMixin:
             plot_legend: Whether to show the legend. *Default: `True`*.
             legend_offset: Vertical position offset for legend. *Default: `1.13`*.
             ncol: Number of columns in the legend. *Default: `2`*.
-            output_name: Name for the exported file. *Default: `'histogram'`*.
         """
         options = HistogramOptions(
             df=df,
@@ -59,7 +57,7 @@ class NumericPlotsMixin:
             legend_offset=legend_offset,
             ncol=ncol
         )
-        self._render(Histogram(options), output_name)
+        self._render(Histogram(options))
 
     @resolve_palette
     def lineplot(
@@ -75,7 +73,6 @@ class NumericPlotsMixin:
         ncol: int = 2,
         rotation: int = 0,
         fill_missing_values: FillMissingValuesInput = None,
-        output_name: str = 'lineplot',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -95,7 +92,7 @@ class NumericPlotsMixin:
             rotation=rotation,
             fill_missing_values=fill_missing_values
         )
-        self._render(LinePlot(options), output_name)
+        self._render(LinePlot(options))
 
     @resolve_palette
     def scatterplot(
@@ -110,7 +107,6 @@ class NumericPlotsMixin:
         plot_legend: bool = True,
         legend_offset: float = 1.13,
         ncol: int = 2,
-        output_name: str = 'scatterplot',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -128,7 +124,6 @@ class NumericPlotsMixin:
             plot_legend: Whether to show the legend. *Default: `True`*.
             legend_offset: Vertical position offset for legend. *Default: `1.13`*.
             ncol: Number of columns in the legend. *Default: `2`*.
-            output_name: Name for the exported file. *Default: `'scatterplot'`*.
         """
         options = ScatterPlotOptions(
             df=df,
@@ -144,4 +139,4 @@ class NumericPlotsMixin:
             legend_offset=legend_offset,
             ncol=ncol,
         )
-        self._render(ScatterPlot(options), output_name)
+        self._render(ScatterPlot(options))

@@ -26,7 +26,6 @@ class BarPlotsMixin:
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-        output_name: str = 'barplot_x',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -55,7 +54,6 @@ class BarPlotsMixin:
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
-            output_name: Name for the exported file. *Default: `'barplot_x'`*.
         """
         options = BarPlotOptions(
             df=df,
@@ -78,7 +76,7 @@ class BarPlotsMixin:
             suffix=suffix,
         )
 
-        self._render(BarPlot(options), output_name)
+        self._render(BarPlot(options))
 
     @resolve_palette
     def barplot_y(
@@ -98,7 +96,6 @@ class BarPlotsMixin:
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-        output_name: str = 'barplot_y',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -127,7 +124,6 @@ class BarPlotsMixin:
             percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
                 *Default: `None`*.
-            output_name: Name for the exported file. *Default: `'barplot_y'`*.
         """
         options = BarPlotOptions(
             df=df,
@@ -150,4 +146,4 @@ class BarPlotsMixin:
             suffix=suffix,
         )
 
-        self._render(BarPlot(options), output_name)
+        self._render(BarPlot(options))

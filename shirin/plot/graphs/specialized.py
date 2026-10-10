@@ -19,7 +19,6 @@ class SpecializedPlotsMixin:
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
-        output_name: str = 'pie_value_counts',
         # injected by @resolve_palette
         palette: Optional[Dict[Any, str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -34,7 +33,7 @@ class SpecializedPlotsMixin:
             value_datalabel=value_datalabel,
             donut=donut
         )
-        self._render(PieChart(options), output_name)
+        self._render(PieChart(options))
 
     def timeplot(
         self,
@@ -48,7 +47,6 @@ class SpecializedPlotsMixin:
         display_month: bool = True,
         cumulative: bool = False,
         rotation: int = 0,
-        output_name: str = 'timeplot'
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
 
@@ -68,11 +66,10 @@ class SpecializedPlotsMixin:
                 `False` shows only years. *Default: `True`*.
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
-            output_name: Name for the exported file. *Default: `'timeplot'`*.
 
         Example:
             >>> plot = PlotGraphs()
-            >>> plot.timeplot(df, x='date', group_by='month', output_name='events_by_month')
+            >>> plot.timeplot(df, x='date', group_by='month')
         """
         options = TimePlotOptions(
             df=df,
@@ -86,7 +83,7 @@ class SpecializedPlotsMixin:
             cumulative=cumulative,
             rotation=rotation,
         )
-        self._render(TimePlot(options), output_name)
+        self._render(TimePlot(options))
 
     def accuracy(
         self,
@@ -101,7 +98,6 @@ class SpecializedPlotsMixin:
         reverse_order: bool = False,
         plot_legend: bool = False,
         suffix: Optional[str] = None,
-        output_name: str = 'accuracy',
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
@@ -126,7 +122,6 @@ class SpecializedPlotsMixin:
             plot_legend: Whether to show the legend. *Default: ``False``*.
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
-            output_name: Name for the exported file. *Default: ``'accuracy'``*.
 
         Example:
             >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
@@ -153,4 +148,4 @@ class SpecializedPlotsMixin:
             suffix=suffix,
         )
 
-        self._render(AccuracyPlot(options), output_name)
+        self._render(AccuracyPlot(options))
