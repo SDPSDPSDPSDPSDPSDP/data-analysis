@@ -15,16 +15,22 @@ type Props = {
 
 export default function Playground({ title, setup, examples }: Props) {
   const setupCode = setup.map((cell) => cell.code).join("\n\n");
+  const titleId = title.toLowerCase().replace(/\s+/g, "-");
   return (
     <>
       <nav className="nav">
         <a href="#" className="nav-brand">
           shirin
         </a>
-        <a href="#bar-charts" className="nav-link">
-          <ChartColumn size="1em" aria-hidden />
-          Bar charts
-        </a>
+        <div className="nav-menu">
+          <a href="#bar-charts" className="nav-link">
+            <ChartColumn size="1em" aria-hidden />
+            Bar charts
+          </a>
+          <div className="nav-dropdown">
+            <a href={`#${titleId}`}>{title}</a>
+          </div>
+        </div>
       </nav>
       <main className="page">
         <h2>Setup</h2>
@@ -35,7 +41,7 @@ export default function Playground({ title, setup, examples }: Props) {
           </section>
         ))}
         <h2 id="bar-charts">Bar charts</h2>
-        <h3>{title}</h3>
+        <h3 id={titleId}>{title}</h3>
         {examples.map((code, i) => (
           <RunnableCode key={i} initialCode={code} setup={setupCode} />
         ))}

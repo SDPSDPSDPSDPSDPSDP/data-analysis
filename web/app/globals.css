@@ -3,13 +3,23 @@
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-shimmer: rgba(0, 0, 0, 0.08);
   --color-error: #b00020;
-  --color-glass: rgba(240, 240, 242, 0.5);
+  --color-glass: rgba(255, 255, 255, 0.5);
   --glass-blur: 16px;
   --glass-saturate: 180%;
   /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
   --z-nav: 1000;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
+  /* Syntax colors, applied by CodeBlock's highlight style. */
+  --code-text: #d3d8e1;
+  --code-keyword: #ffffff;
+  --code-name: #f5c0ff;
+  --code-function: #d23cff;
+  --code-constant: #75bb75;
+  --code-class: #66ff00;
+  --code-operator: #feffff;
+  --code-string: #d6ffb9;
+  --code-comment: #7d8799;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
 
@@ -95,10 +105,46 @@ body {
   letter-spacing: var(--letter-spacing-heading);
 }
 
-.nav .nav-link {
+.nav-menu {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  padding: var(--space-0-5);
+  white-space: nowrap;
+  border-radius: var(--radius);
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-tooltip);
+}
+
+.nav-menu:hover .nav-dropdown,
+.nav-menu:focus-within .nav-dropdown {
+  display: flex;
+}
+
+.nav-dropdown a {
+  padding: var(--space-1) var(--space-1-5);
+  border-radius: var(--radius);
+  transition: background var(--transition);
+}
+
+.nav-dropdown a:hover {
+  background: var(--color-surface);
+}
+
+.nav .nav-link {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -149,6 +195,10 @@ body {
 .code-block .cm-editor .cm-gutters {
   background: var(--color-code-bg);
   border: none;
+}
+
+.code-block .cm-editor {
+  color: var(--code-text);
 }
 
 .code-block .cm-scroller {
