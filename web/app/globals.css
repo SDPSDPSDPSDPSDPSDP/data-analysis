@@ -3,6 +3,11 @@
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-shimmer: rgba(0, 0, 0, 0.08);
   --color-error: #b00020;
+  --color-glass: rgba(240, 240, 242, 0.5);
+  --glass-blur: 16px;
+  --glass-saturate: 180%;
+  /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
+  --z-nav: 1000;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
   --color-button: rgba(255, 255, 255, 0.08);
@@ -16,12 +21,15 @@
 
   --font-body: var(--font-satoshi), sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
-  --font-size-title: 48px;
+  --font-size-brand: 28px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
   --font-size-small: 13px;
   --font-size-code: 14px;
   --font-size-doc: 15px;
   --font-size-doc-heading: 19px;
   --font-weight-heading: 500;
+  --font-weight-nav: 500;
   --font-weight-doc-heading: 700;
   --letter-spacing-heading: 0.015em;
 
@@ -30,6 +38,7 @@
   --space-1-5: 12px;
   --space-2: 16px;
   --space-3: 24px;
+  --nav-height: 56px;
 
   --radius: 6px;
   --button-height: 28px;
@@ -61,21 +70,56 @@ body {
   padding: var(--space-3) var(--space-2);
 }
 
-.page h1,
-.page h2 {
-  text-align: center;
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--nav-height);
+  padding: 0 var(--space-2);
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 
-.page h1 {
-  margin: 0;
-  font-size: var(--font-size-title);
+.nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-brand {
+  font-size: var(--font-size-brand);
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
 }
 
+.nav .nav-link {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+}
+
+.page h2,
+.page h3 {
+  text-align: center;
+  scroll-margin-top: var(--nav-height);
+}
+
 .page h2 {
   margin: var(--space-3) 0 0;
+  font-size: var(--font-size-h2);
+}
+
+.page h3 {
+  margin: 0;
+  font-size: var(--font-size-h3);
 }
 
 .setup-cell {
