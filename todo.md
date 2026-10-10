@@ -1,6 +1,6 @@
 - no matplotlib
-- better fake data, in supabase
 - website
+- dark mode
 
 # later
 - portfolio
