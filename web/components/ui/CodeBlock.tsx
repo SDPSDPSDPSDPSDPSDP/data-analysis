@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import CodeMirror, { type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import CopyButton from "@/components/ui/CopyButton";
@@ -9,12 +8,10 @@ type Props = {
   value: string;
   onChange?: (value: string) => void;
   extensions?: Extension[];
-  // Overlaid in the bottom right corner, e.g. a run button.
-  children?: ReactNode;
 };
 
 // Read-only unless onChange is given.
-export default function CodeBlock({ value, onChange, extensions = [], children }: Props) {
+export default function CodeBlock({ value, onChange, extensions = [] }: Props) {
   return (
     <div className="code-block copyable">
       <CodeMirror
@@ -27,7 +24,6 @@ export default function CodeBlock({ value, onChange, extensions = [], children }
         height="100%"
       />
       <CopyButton copy={() => navigator.clipboard.writeText(value)} />
-      {children && <div className="code-actions">{children}</div>}
     </div>
   );
 }

@@ -5,9 +5,13 @@
   --color-error: #b00020;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
+  --color-button: rgba(255, 255, 255, 0.08);
+  --color-button-hover: rgba(255, 255, 255, 0.16);
 
   --text-primary: rgba(0, 0, 0, 0.93);
   --text-secondary: rgba(0, 0, 0, 0.53);
+  --text-on-dark: rgba(255, 255, 255, 0.93);
+  --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
 
   --font-body: system-ui, sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
@@ -23,6 +27,8 @@
 
   --border-width: 1px;
   --radius: 6px;
+  --button-height: 28px;
+  --transition: 120ms ease;
 
   --runnable-height: 75vh;
 }
@@ -75,28 +81,37 @@ body {
   background: var(--color-code-highlight);
 }
 
-.copyable .copy-button {
+.copyable > .copy-button {
   position: absolute;
   top: var(--space-1);
   right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--color-button);
+  color: var(--text-on-dark-secondary);
+  cursor: pointer;
   opacity: 0;
+  transition: background var(--transition), opacity var(--transition);
 }
 
-.copyable:hover .copy-button,
+.copyable:hover > .copy-button,
 .copy-button:focus-visible {
   opacity: 1;
 }
 
-.code-actions {
-  position: absolute;
-  right: var(--space-1);
-  bottom: var(--space-1);
+.copy-button:hover {
+  background: var(--color-button-hover);
+  color: var(--text-on-dark);
 }
 
-.run-button {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
+.chart > .copy-button {
+  background: var(--color-code-bg);
 }
 
 .runnable {
@@ -109,6 +124,15 @@ body {
 .runnable > * {
   min-width: 0;
   min-height: 0;
+}
+
+.runnable > .code-block {
+  align-self: start;
+}
+
+/* Bounded height lets .cm-scroller scroll long code instead of clipping. */
+.runnable > .code-block .cm-editor {
+  max-height: var(--runnable-height);
 }
 
 .output {
