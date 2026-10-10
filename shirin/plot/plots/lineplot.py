@@ -2,6 +2,7 @@ from typing import Any
 
 import pandas as pd
 
+from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import LinePlotOptions
 from ..common.formatting import format_ticks
@@ -26,8 +27,8 @@ class LinePlot(AbstractPlot):
         return self._resolve_hue_palette(df, no_hue_color='black')
 
     def draw(self, data: pd.DataFrame) -> Any:
-        self._create_standard_figure()
-        return self.renderer.render_lineplot(
+        return renderer.render_lineplot(
+            self._standard_axes(),
             df=data,
             x=self.options.x,
             y=self.options.y,

@@ -3,9 +3,11 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Tuple, Union
 
 import pandas as pd
+import seaborn as sns
+from matplotlib.axes import Axes
 
 from .base_options import BasePlotOptions
-from .renderer import SeabornRenderer
+from . import renderer
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend, format_xy_labels
 from ..common.sorting import create_default_label_map
@@ -23,10 +25,15 @@ def split_palette(palette: PaletteInput) -> Tuple[Optional[str], Optional[Dict[A
     return Colors.GREY, None
 
 
+def default_palette(values: pd.Series) -> Dict[str, str]:
+    keys = sorted(values.astype(str).unique())
+    return dict(zip(keys, sns.color_palette(n_colors=len(keys)).as_hex()))
+
+
 class AbstractPlot(ABC):
     def __init__(self, options: BasePlotOptions):
         self.options = options
-        self.renderer = SeabornRenderer()
+        self.ax: Optional[Axes] = None
         self.plot_object: Optional[Any] = None
         self._preprocessed_df: Optional[pd.DataFrame] = None
         self._color: Optional[str] = None
@@ -61,8 +68,12 @@ class AbstractPlot(ABC):
     def format_plot(self, plot: Any) -> None:
         pass
 
-    def _create_standard_figure(self) -> None:
-        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
+    def _new_axes(self, figsize: Tuple[float, float]) -> Axes:
+        self.ax = renderer.create_figure(figsize)
+        return self.ax
+
+    def _standard_axes(self) -> Axes:
+        return self._new_axes((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
 
     def _format_labels_and_legend(self, plot: Any) -> None:
         """Axis labels plus hue legend; builds a default label_map from the data when missing."""
@@ -82,17 +93,27 @@ class AbstractPlot(ABC):
             options.legend_offset,
         )
 
-    def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:
-        """Set _color/_palette and stringify hue so it matches the (stringified) palette keys."""
+    def _resolve_hue_palette(
+        self, df: pd.DataFrame, no_hue_color: Optional[str] = None, require_dict: bool = False
+    ) -> pd.DataFrame:
+        """Set _color/_palette and stringify hue so it matches the (stringified) palette keys.
+
+        require_dict: stacked plots need one color per hue value; without a palette, seaborn's
+        default categorical colors are assigned to the sorted hue values.
+        """
         self._color, self._palette = split_palette(self.options.palette)
         if self.options.hue is None:
             if no_hue_color is not None:
                 self._color = no_hue_color
             return df
-        if self._palette is None:
+        df = ensure_column_is_string(df, self.options.hue)
+        if self._palette is None and require_dict:
+            self._palette = default_palette(df[self.options.hue])
+            self._color = None
+        elif self._palette is None:
             # seaborn deprecated color= with hue: a single color becomes a gradient palette,
             # no palette falls back to seaborn's default categorical colors.
             if isinstance(self.options.palette, str):
                 self._palette = f'dark:{self.options.palette}'  # type: ignore[assignment]
             self._color = None
-        return ensure_column_is_string(df, self.options.hue)
+        return df

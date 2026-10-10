@@ -1,8 +1,7 @@
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
-from ..core.base_plot import AbstractPlot
 from ..core.categorical_options import AccuracyPlotOptions
 from ..common.formatting import (
     format_datalabels_stacked,
@@ -11,17 +10,15 @@ from ..common.formatting import (
     format_xy_labels,
 )
 from ..common.data_conversion import ensure_column_is_string
-from ..common.sorting import apply_label_mapping, create_colors_list
 from ..common.stacked_plots import prepare_stacked_data
-from .categorical import create_sized_figure
+from .categorical import StackableCategoricalPlot
 
 _CORRECT_KEY = 'Correct'
 _INCORRECT_KEY = 'Incorrect'
-_HUE_COL = '__is_correct__'
 _VALUE_COL = '__value__'
 
 
-class AccuracyPlot(AbstractPlot):
+class AccuracyPlot(StackableCategoricalPlot):
     """Stacked bar plot built from a per-run accuracy column.
 
     The DataFrame is expected to have one row per run with:
@@ -34,89 +31,61 @@ class AccuracyPlot(AbstractPlot):
     """
 
     options: AccuracyPlotOptions
-
-    def __init__(self, options: AccuracyPlotOptions):
-        super().__init__(options)
-        self._df_unlabeled: Optional[pd.DataFrame] = None
+    _horizontal_width = 0.6
 
     def preprocess(self) -> pd.DataFrame:
         return ensure_column_is_string(self.options.df, self.options.axis_column)
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         """Expand accuracy rows into long-format correct/incorrect rows."""
-        axis = self.options.axis_column
+        self._palette = self.options.palette  # type: ignore[assignment]
+        axis, hue = self.options.axis_column, self.options.hue
         accuracy = df[self.options.value_column].astype(float)
 
-        correct = pd.DataFrame({axis: df[axis], _HUE_COL: _CORRECT_KEY, _VALUE_COL: accuracy})
-        incorrect = pd.DataFrame({axis: df[axis], _HUE_COL: _INCORRECT_KEY, _VALUE_COL: 1.0 - accuracy})
-
+        correct = pd.DataFrame({axis: df[axis], hue: _CORRECT_KEY, _VALUE_COL: accuracy})
+        incorrect = pd.DataFrame({axis: df[axis], hue: _INCORRECT_KEY, _VALUE_COL: 1.0 - accuracy})
         return pd.concat([correct, incorrect], ignore_index=True)
 
-    def draw(self, data: pd.DataFrame) -> Any:
-        orientation = self.options.orientation
-        create_sized_figure(self, data)
-
-        df_prepared = prepare_stacked_data(
-            data,
-            _HUE_COL,
-            self.options.axis_column,
-            order_type=None,  # sorted by accuracy below
-            value_col=_VALUE_COL,
-            orientation=orientation,
-        )
-
+    def _prepare_stacked(self, data: pd.DataFrame) -> pd.DataFrame:
         # Correct drawn first (bottom). Default sorting is highest-first for
         # vertical plots and top-to-bottom for horizontal plots. reverse_order
         # flips that behavior.
-        df_prepared = df_prepared[[_CORRECT_KEY, _INCORRECT_KEY]]
-        ascending = (orientation == 'horizontal') != self.options.reverse_order
-        df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
-
-        palette = self.options.palette  # type: ignore[assignment]
-        df_labeled = apply_label_mapping(df_prepared, self.options.label_map)
-        colors = create_colors_list(df_prepared, palette)
-
-        kind = 'barh' if orientation == 'horizontal' else 'bar'
-        plot = self.renderer.render_stacked_barplot(
-            df=df_labeled, kind=kind, colors=colors, width=0.6,
-        )
-
-        self._df_unlabeled = df_prepared
-        return plot
+        df_prepared = prepare_stacked_data(
+            data,
+            self.options.hue,  # type: ignore[arg-type]
+            self.options.axis_column,
+            order_type=None,
+            value_col=_VALUE_COL,
+            orientation=self.options.orientation,
+        )[[_CORRECT_KEY, _INCORRECT_KEY]]
+        ascending = (self.options.orientation == 'horizontal') != self.options.reverse_order
+        return df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
 
     def format_plot(self, plot: Any) -> None:
-        orientation = self.options.orientation
-        palette = self.options.palette  # type: ignore[assignment]
-
-        if orientation == 'horizontal':
-            format_xy_labels(plot, xlabel=self.options.ylabel, x_labelpad=0,
-                             ylabel=self.options.xlabel)
+        if self.options.orientation == 'horizontal':
+            format_xy_labels(plot, xlabel=self.options.ylabel, x_labelpad=0, ylabel=self.options.xlabel)
+            value_axis = plot.xaxis
         else:
-            format_xy_labels(plot, xlabel=self.options.xlabel,
-                             ylabel=self.options.ylabel, y_labelpad=0)
+            format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel, y_labelpad=0)
+            value_axis = plot.yaxis
         format_optional_legend(
             plot,
-            hue=_HUE_COL,
+            hue=self.options.hue,
             plot_legend=self.options.plot_legend,
-            label_map=None,
+            label_map=self.options.label_map,
             ncol=self.options.ncol,
             legend_offset=self.options.legend_offset,
         )
 
         format_ticks(plot)
-        if orientation == 'horizontal':
-            plot.set_xticklabels([])
-            plot.xaxis.set_ticks_position('none')
-        else:
-            plot.set_yticklabels([])
-            plot.yaxis.set_ticks_position('none')
+        value_axis.set_ticklabels([])
+        value_axis.set_ticks_position('none')
 
         if self._df_unlabeled is not None:
             format_datalabels_stacked(
                 plot,
                 self._df_unlabeled,
-                palette,
-                orientation=orientation,
+                self._palette,  # type: ignore[arg-type]
+                orientation=self.options.orientation,
                 suffix=self.options.suffix,
             )
-

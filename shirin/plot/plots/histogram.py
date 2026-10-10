@@ -2,6 +2,7 @@ from typing import Any
 
 import pandas as pd
 
+from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import HistogramOptions
 from ..common.formatting import format_ticks
@@ -40,8 +41,8 @@ class Histogram(AbstractPlot):
         return not values.empty and _is_whole_numbers(values) and bool(values.between(1600, 2300).all())
 
     def draw(self, data: pd.DataFrame) -> Any:
-        self.renderer.create_figure((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7))
-        return self.renderer.render_histogram(
+        return renderer.render_histogram(
+            self._new_axes((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7)),
             df=data,
             x=self.options.x,
             bins=self._bins,

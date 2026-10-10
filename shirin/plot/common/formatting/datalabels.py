@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 import pandas as pd
 
 from ...config import FontSizes, TextColors
-from ....stats.number_format import format_thousands
+from ....number_format import format_thousands
 from .text_contrast import get_text_color_for_background
 
 
@@ -77,7 +77,7 @@ def _add_stacked_labels(
                 _format_stacked_percentage(value_percentage, suffix),
                 ha='center',
                 va='center',
-                color=get_text_color_for_background(palette.get(category, '#000000')),
+                color=get_text_color_for_background(palette[str(category)]),
                 fontsize=FontSizes.DATALABELS,
             )
 

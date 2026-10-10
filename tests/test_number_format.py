@@ -1,4 +1,4 @@
-from shirin.stats.number_format import format_thousands
+from shirin.number_format import format_thousands
 
 
 def test_format_thousands_for_int():

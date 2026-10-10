@@ -1,8 +1,9 @@
 from typing import Optional
 
-from .config.matplotlib import configure_matplotlib
-from .core import PlotExporter, BasePlotOptions
-from .plots import create_plot
+import matplotlib.pyplot as plt
+
+from .config.matplotlib import build_rc
+from .core import AbstractPlot, PlotExporter
 from .config.palettes import Palette, LabelMapping
 from .graphs.bar import BarPlotsMixin
 from .graphs.count import CountPlotsMixin
@@ -23,8 +24,9 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
         prefix: Optional prefix to add to all exported filenames. *Default: `None`*.
         format: File format for exported plots. **Options:** `'png'`, `'svg'`. *Default: `'png'`*.
         font: Font to use for all text. **Options:** `'satoshi'`, `None` (matplotlib default).
-            *Default: `None`*. Styling (font, sizes, grid) is applied to matplotlib's global
-            ``rcParams`` when the instance is created, so it affects all later plots.
+            *Default: `None`*. Styling (font, sizes, grid) only applies while this instance
+            draws; matplotlib's global ``rcParams`` stay untouched.
+        show: Whether to call ``plt.show()`` after each plot. *Default: `True`*.
         palette: A :class:`Palette` subclass with column-name attributes. When a plot uses
             `hue=col`, the matching palette is resolved automatically.
         label_mapping: A :class:`LabelMapping` subclass. Same resolution logic as `palette`.
@@ -46,19 +48,21 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
         font: Optional[str] = None,
         palette: Optional[type[Palette]] = None,
         label_mapping: Optional[type[LabelMapping]] = None,
+        show: bool = True,
     ) -> None:
-        configure_matplotlib(font=font)
+        self._rc = build_rc(font=font)
 
         self._exporter = PlotExporter(
             enabled=export,
             output_dir=output_dir,
             prefix=prefix,
             format=format,
-            auto_show=True
+            auto_show=show,
         )
         self._palette = palette
         self._label_mapping = label_mapping
 
-    def _render(self, plot_type: str, options: BasePlotOptions, output_name: str) -> None:
-        create_plot(plot_type, options).render()
-        self._exporter.export_and_show(output_name)
+    def _render(self, plot: AbstractPlot, output_name: str) -> None:
+        with plt.rc_context(self._rc):
+            plot.render()
+            self._exporter.export_and_show(plot.ax.figure, output_name)  # type: ignore[union-attr]

@@ -15,12 +15,10 @@ from .options import (
     TimePlotOptions,
     ScatterPlotOptions,
 )
-from .renderer import SeabornRenderer
 
 __all__ = [
     'AbstractPlot',
     'PlotExporter',
-    'SeabornRenderer',
     'BasePlotOptions',
     'InvalidOptionError',
     'CategoricalPlotOptions',

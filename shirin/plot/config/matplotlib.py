@@ -1,9 +1,8 @@
 import functools
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import matplotlib.font_manager as fm
-import matplotlib.pyplot as plt
 
 from .formatting import FontSizes, FigureSize
 
@@ -20,20 +19,21 @@ def _register_fonts() -> None:
         fm.fontManager.addfont(str(font_path))
 
 
-def configure_matplotlib(font: Optional[str] = None) -> None:
-    """Configure matplotlib defaults.
+def build_rc(font: Optional[str] = None) -> Dict[str, Any]:
+    """rcParams for shirin plots; applied with ``plt.rc_context`` so global settings stay untouched.
 
     Args:
         font: Font to use for all text. Pass ``'satoshi'`` to use the bundled
             Satoshi Shirin font. ``None`` keeps the matplotlib default.
     """
+    rc: Dict[str, Any] = {}
     if font is not None:
         if font.lower() != "satoshi":
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         _register_fonts()
-        plt.rcParams['font.family'] = FONT_FAMILY_SATOSHI
+        rc['font.family'] = FONT_FAMILY_SATOSHI
 
-    plt.rcParams.update({
+    rc.update({
         'figure.figsize': [FigureSize.WIDTH, FigureSize.HEIGHT],
         'axes.grid': False,
         'grid.color': 'lightgrey',
@@ -53,3 +53,4 @@ def configure_matplotlib(font: Optional[str] = None) -> None:
         'axes.labelsize': FontSizes.XYLABEL,
         'legend.fontsize': FontSizes.LEGEND,
     })
+    return rc

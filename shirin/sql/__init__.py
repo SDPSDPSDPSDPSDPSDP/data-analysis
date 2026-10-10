@@ -1,6 +1,5 @@
 """SQL query execution utilities for IBM DB2 databases."""
 
-import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 import pandas as pd
@@ -11,12 +10,6 @@ from .helpers import (
     execute_query,
     query_to_parquet,
 )
-
-
-# Windows needs the DB2 client DLLs on the search path; override with DB2_DLL_DIR.
-_db2_dll_dir = os.environ.get("DB2_DLL_DIR", r"C:\Program Files\IBM\SQLLIB\BIN")
-if hasattr(os, "add_dll_directory") and os.path.isdir(_db2_dll_dir):
-    os.add_dll_directory(_db2_dll_dir)
 
 
 def run_sql_query(

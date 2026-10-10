@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
+from dataclasses import dataclass
+from typing import ClassVar, Optional
 
 from ..config.colors import Colors
 from ..config import FigureSizeInput, OrderType, OrderTypeInput, StackedLabelType, StackedLabelTypeInput
@@ -16,6 +16,8 @@ from .base_options import (
 
 @dataclass
 class CategoricalPlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column')
+
     axis_column: str = ''
     orientation: str = 'vertical'
     figsize: FigureSizeInput = 'dynamic'
@@ -53,8 +55,8 @@ class CategoricalPlotOptions(BasePlotOptions):
 
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
-        if self.stacked and not isinstance(self.palette, dict):
-            raise ValueError("palette must be a dictionary when stacked=True")
+        if self.stacked and self.palette is not None and not isinstance(self.palette, dict):
+            raise ValueError("palette must be a dictionary (or None) when stacked=True")
         if not isinstance(self.figsize, (int, float)) and self.figsize not in VALID_FIGURE_SIZES:
             raise InvalidOptionError('figsize', self.figsize, VALID_FIGURE_SIZES, 'strings or numbers')
 
@@ -67,6 +69,8 @@ class CountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class BarPlotOptions(CategoricalPlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column', 'value')
+
     value: str = ''
     percentage_labels: bool = False
 
@@ -81,21 +85,22 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
     """Always a 100%-stacked plot of hue shares; `stacked`/`stacked_labels` are ignored."""
 
     top_n: Optional[int] = None
-    palette: Optional[Union[Dict[Any, str], str]] = field(default_factory=dict)
     ylabel: str = 'Percentage'
-
 
     def validate(self) -> None:
         super().validate()
         if not self.hue:
             raise ValueError("hue must be specified for normalized plots")
-        if not isinstance(self.palette, dict):
-            raise ValueError("palette must be a dictionary for normalized plots")
+        if self.palette is not None and not isinstance(self.palette, dict):
+            raise ValueError("palette must be a dictionary (or None) for normalized plots")
 
 
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
     """`stacked`, `hue`, `figsize`, `stacked_labels` and `order_type` are fixed for accuracy plots."""
+
+    # hue is a synthetic column added in transform, so it is not checked against df.
+    column_fields: ClassVar[tuple[str, ...]] = ('axis_column', 'value_column')
 
     value_column: str = ''
     reverse_order: bool = False
@@ -112,3 +117,6 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
         if not self.value_column:
             raise ValueError("value_column must be specified")
         super().validate()
+        accuracy = self.df[self.value_column].astype(float)
+        if not accuracy.between(0, 1).all():
+            raise ValueError(f"{self.value_column!r} must hold fractions in [0, 1]")

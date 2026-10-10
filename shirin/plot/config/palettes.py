@@ -9,7 +9,7 @@ class Palette:
     Built-in entries (``is_correct``) are inherited by subclasses.
 
     Subclass this and add class-level dicts where each attribute name is a
-    column name used as ``hue`` (or ``x``/``col``) in plot calls.
+    column name used as ``hue`` (or ``col`` for pie charts) in plot calls.
 
     Example::
 

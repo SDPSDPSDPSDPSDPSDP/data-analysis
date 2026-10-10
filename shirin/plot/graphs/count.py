@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..core import CountPlotOptions, NormalizedCountPlotOptions
 from ..common.resolve_palette import resolve_palette
+from ..plots import CountPlot, NormalizedCountPlot
 
 
 class CountPlotsMixin:
@@ -16,12 +17,12 @@ class CountPlotsMixin:
         **common: Any,
     ) -> None:
         if normalized and common['hue'] is not None:
-            self._render('normalized_count', NormalizedCountPlotOptions(**common), output_name)
+            self._render(NormalizedCountPlot(NormalizedCountPlotOptions(**common)), output_name)
         else:
             options = CountPlotOptions(
                 **common, stacked=stacked, stacked_labels=stacked_labels, normalized=normalized
             )
-            self._render('count', options, output_name)
+            self._render(CountPlot(options), output_name)
 
     @resolve_palette
     def countplot_x(

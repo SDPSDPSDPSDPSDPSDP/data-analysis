@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional
 from ..config import TimeGroupByInput
 from ..config.colors import Colors
 from ..core import AccuracyPlotOptions, PiePlotOptions, TimePlotOptions
-from ..common.data_conversion import calculate_value_counts
 from ..common.resolve_palette import resolve_palette
+from ..plots import AccuracyPlot, PieChart, TimePlot
 
 
 class SpecializedPlotsMixin:
@@ -24,17 +24,17 @@ class SpecializedPlotsMixin:
         palette: Optional[Dict[Any, str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
-        df_value_counts = calculate_value_counts(df, col)
+        # Reserved name: a user column called 'count' must not collide with the counts.
         options = PiePlotOptions(
-            df=df_value_counts.set_index(col),
-            col='count',
+            df=df[col].value_counts().rename('__count__').to_frame(),
+            col='__count__',
             palette=palette,
             label_map=label_map,
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
             donut=donut
         )
-        self._render('pie', options, output_name)
+        self._render(PieChart(options), output_name)
 
     def timeplot(
         self,
@@ -86,7 +86,7 @@ class SpecializedPlotsMixin:
             cumulative=cumulative,
             rotation=rotation,
         )
-        self._render('time', options, output_name)
+        self._render(TimePlot(options), output_name)
 
     def accuracy(
         self,
@@ -153,4 +153,4 @@ class SpecializedPlotsMixin:
             suffix=suffix,
         )
 
-        self._render('accuracy', options, output_name)
+        self._render(AccuracyPlot(options), output_name)

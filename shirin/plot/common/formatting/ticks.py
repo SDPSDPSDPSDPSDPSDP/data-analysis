@@ -4,7 +4,7 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.axes import Axes
 
 from ...config import TextColors
-from ....stats.number_format import format_thousands
+from ....number_format import format_thousands
 
 
 def _configure_grid(plot: Axes, x_grid: bool = False, y_grid: bool = False) -> None:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Union
+from typing import Any, ClassVar, Dict, Optional, Union
 
 import pandas as pd
 
@@ -64,6 +64,9 @@ def validate_str_or_enum_option(
 
 @dataclass
 class BasePlotOptions:
+    # Fields naming a df column; validate() checks each one that is set.
+    column_fields: ClassVar[tuple[str, ...]] = ('hue',)
+
     df: pd.DataFrame
     palette: Optional[Union[Dict[Any, str], str]] = None
     label_map: Optional[Dict[Any, str]] = None
@@ -77,6 +80,10 @@ class BasePlotOptions:
     def validate(self) -> None:
         if self.df is None or self.df.empty:
             raise ValueError("DataFrame cannot be None or empty")
+        for field_name in self.column_fields:
+            column = getattr(self, field_name)
+            if column and column not in self.df.columns:
+                raise ValueError(f"{field_name}={column!r} is not a column. Available columns: {list(self.df.columns)}")
 
         self.palette = convert_dict_keys_to_string(self.palette)
         self.label_map = convert_dict_keys_to_string(self.label_map)

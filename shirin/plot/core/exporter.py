@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 
 class PlotExporter:
@@ -39,16 +40,10 @@ class PlotExporter:
             filename = f"{output_name}.{self.format}"
         return os.path.join(self.output_dir, filename)
     
-    def export_and_show(self, output_name: str) -> None:
-        self.export_only(output_name)
-        self.show_only()
-        plt.close()
-
-    def export_only(self, output_name: str) -> None:
+    def export_and_show(self, figure: Figure, output_name: str) -> None:
+        """Save and show this figure only, then close it; other open figures are left alone."""
         if self.enabled:
-            filepath = self._create_filepath(output_name)
-            plt.savefig(filepath, bbox_inches="tight", dpi=300, format=self.format)
-    
-    def show_only(self) -> None:
+            figure.savefig(self._create_filepath(output_name), bbox_inches="tight", dpi=300, format=self.format)
         if self.auto_show:
             plt.show()
+        plt.close(figure)

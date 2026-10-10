@@ -19,12 +19,6 @@ def filter_top_n_categories(df: pd.DataFrame, col: str, top_n: int) -> pd.DataFr
     return df[df[col].isin(top_categories)].copy()
 
 
-def calculate_value_counts(df: pd.DataFrame, col: str) -> pd.DataFrame:
-    df_value_counts = df[col].value_counts().to_frame().reset_index()
-    df_value_counts.columns = [col, "count"]
-    return df_value_counts
-
-
 def fill_missing_values_in_data(
     df: pd.DataFrame,
     x: str,
@@ -36,7 +30,8 @@ def fill_missing_values_in_data(
         'shift': lambda s: s.interpolate(method='linear', limit_direction='forward'),
         'zero': lambda s: s.fillna(0),
     }
-    df = df.copy()
+    # 'shift' interpolates between neighbours along x, so rows must be in x order.
+    df = df.sort_values(x)
     fill = fills.get(fill_method)
     if fill is not None:
         df[y] = df.groupby(hue)[y].transform(fill) if hue is not None else fill(df[y])

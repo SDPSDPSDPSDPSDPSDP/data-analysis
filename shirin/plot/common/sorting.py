@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from ..config import OrderTypeInput
 
@@ -51,19 +51,17 @@ def sort_pivot_table(df_pivot: pd.DataFrame, order_type: Optional[OrderTypeInput
     return df_pivot
 
 
-def apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -> pd.DataFrame:
-    if not label_map:
-        return df
-    df = df.copy()
-    df.columns = [label_map.get(str(col), str(col)) for col in df.columns]
-    return df
+def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> list[str]:
+    """Color per key; every plot raises the same KeyError when the palette misses a key."""
+    keys = [str(key) for key in keys]
+    missing = [key for key in keys if key not in palette]
+    if missing:
+        raise KeyError(f"Palette missing keys: {missing}. Available keys: {list(palette.keys())}")
+    return [palette[key] for key in keys]
 
 
 def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
-    missing = [col for col in df.columns if str(col) not in palette]
-    if missing:
-        raise KeyError(f"Column '{missing[0]}' not found in palette. Available keys: {list(palette.keys())}")
-    return [palette[str(col)] for col in df.columns]
+    return palette_colors(palette, df.columns)
 
 
 def create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:

@@ -3,7 +3,8 @@ from typing import Any
 import pandas as pd
 import matplotlib.dates as mdates
 
-from ..core.base_plot import AbstractPlot, split_palette
+from ..core import renderer
+from ..core.base_plot import AbstractPlot
 from ..core.options import TimePlotOptions
 from ..common.formatting import (
     format_ticks,
@@ -25,14 +26,11 @@ class TimePlot(AbstractPlot):
 
         if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
             df[date_col] = pd.to_datetime(df[date_col])
-
-        if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
-            raise ValueError(f"Column '{date_col}' could not be converted to datetime")
-
         return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        self._color, _ = split_palette(self.options.palette)
+        # Bars default to grey, the line to black; a palette string overrides both.
+        self._color = self.options.palette or (Colors.BLACK if self.options.plot_type == 'line' else Colors.GREY)  # type: ignore[assignment]
 
         group_by = self.options.group_by
         date_col = self.options.x
@@ -69,16 +67,16 @@ class TimePlot(AbstractPlot):
         return self._aggregated_df
 
     def draw(self, data: pd.DataFrame) -> Any:
-        self._create_standard_figure()
-
+        ax = self._standard_axes()
         if self.options.plot_type == 'bar':
-            return self.renderer.render_time_bars(
-                data['_time_group'], data['count'], color=self._color, width=self._get_bar_width()
+            return renderer.render_time_bars(
+                ax, data['_time_group'], data['count'], color=self._color, width=self._get_bar_width()
             )
-        return self.renderer.render_time_line(
+        return renderer.render_time_line(
+            ax,
             data['_time_group'],
             data['count'],
-            color=Colors.BLACK,
+            color=self._color,
             show_markers=not (self.options.group_by == 'day' and len(data) > 25),
         )
 

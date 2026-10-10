@@ -1,5 +1,4 @@
 import functools
-import random
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -23,23 +22,25 @@ def _expand_dataframe(df: DataFrame, multiplier: int = 10000) -> DataFrame:
     return pd.concat([df] * multiplier, ignore_index=True)
 
 
-def _generate_middle_weighted_values(num_rows: int, value_range: tuple[int, int] = (1, 101)) -> list[int]:
+def _generate_middle_weighted_values(
+    rng: np.random.Generator, num_rows: int, value_range: tuple[int, int] = (1, 101)
+) -> np.ndarray:
     min_val, max_val = value_range
     midpoint = (min_val + max_val) // 2
-    
-    weights = [100 - abs(midpoint - x) for x in range(min_val, max_val)]
-    return random.choices(range(min_val, max_val), weights=weights, k=num_rows)
+
+    values = np.arange(min_val, max_val)
+    weights = 100 - np.abs(midpoint - values)
+    return rng.choice(values, size=num_rows, p=weights / weights.sum())
 
 
-def _add_category_columns(df: DataFrame) -> DataFrame:
-    df["example_hue_1"] = [random.choice(["category_1", "category_2"]) for _ in range(len(df))]
+def _add_category_columns(rng: np.random.Generator, df: DataFrame) -> DataFrame:
+    df["example_hue_1"] = rng.choice(["category_1", "category_2"], size=len(df))
     df['example_hue_2'] = df['example_hue_1'] == 'category_1'
     return df
 
 
-def _create_documents_by_year_dataframe() -> DataFrame:
+def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
     """Creates dataframe with 2 rows per year (one for each type: True/False)."""
-    np.random.seed(42)
     
     start_year = 2000
     end_year = 2023
@@ -54,8 +55,8 @@ def _create_documents_by_year_dataframe() -> DataFrame:
     for year in years:
         hue_value = year < cutoff_year
         
-        count_true = np.random.randint(80, 150)
-        count_false = np.random.randint(20, 60)
+        count_true = int(rng.integers(80, 150))
+        count_false = int(rng.integers(20, 60))
         
         cumul_true += count_true
         cumul_false += count_false
@@ -76,13 +77,14 @@ def _create_documents_by_year_dataframe() -> DataFrame:
     return pd.DataFrame(rows)
 
 
-def generate_fake_data() -> tuple[DataFrame, DataFrame]:
+def generate_fake_data(seed: int = 42) -> tuple[DataFrame, DataFrame]:
+    rng = np.random.default_rng(seed)
     df = _create_base_dataframe()
     df = _expand_dataframe(df)
-    df["example_hue_3"] = _generate_middle_weighted_values(len(df))
-    df = _add_category_columns(df)
-    
-    df_documents_by_year = _create_documents_by_year_dataframe()
+    df["example_hue_3"] = _generate_middle_weighted_values(rng, len(df))
+    df = _add_category_columns(rng, df)
+
+    df_documents_by_year = _create_documents_by_year_dataframe(rng)
     
     return df, df_documents_by_year
 
@@ -102,14 +104,14 @@ def generate_time_series(
     `yearly_growth`), then randomly distributes those events across the days
     of that year.
     """
-    np.random.seed(seed)
+    rng = np.random.default_rng(seed)
 
     start = pd.to_datetime(start_date)
     end = pd.to_datetime(end_date)
 
     years = list(range(start.year, end.year + 1))
 
-    rows = []
+    dates: list[pd.DatetimeIndex] = []
     prev_total = 0
     for year in years:
         year_start = max(start, pd.Timestamp(year=year, month=1, day=1))
@@ -122,24 +124,18 @@ def generate_time_series(
         base_year_events = int(max(1, round(avg_events_per_day * n_days)))
 
         min_increment = max(1, int(round(base_year_events * yearly_growth)))
-        noise = int(np.random.normal(loc=0, scale=max(1, base_year_events * 0.05)))
+        noise = int(rng.normal(loc=0, scale=max(1, base_year_events * 0.05)))
         target_total = max(prev_total + min_increment, base_year_events + noise)
 
         probs = np.ones(n_days) / n_days
-        daily_counts = np.random.multinomial(target_total, probs)
-
-        for date, count in zip(days, daily_counts):
-            for _ in range(int(count)):
-                rows.append({"date": date, "hue": random.choice(["category_1", "category_2"])})
+        daily_counts = rng.multinomial(target_total, probs)
+        dates.append(days.repeat(daily_counts))
 
         prev_total = target_total
 
-    return pd.DataFrame(rows)
-
-df_accuracy = pd.DataFrame({
-    'run_name': ['medium', 'nano', 'small'],
-    'accuracy': [0.99, 0.71, 0.85],
-})
+    all_dates = dates[0].append(dates[1:]) if dates else pd.DatetimeIndex([])
+    hues = rng.choice(["category_1", "category_2"], size=len(all_dates))
+    return pd.DataFrame({"date": all_dates, "hue": hues})
 
 
 @functools.lru_cache(maxsize=None)
@@ -150,11 +146,16 @@ def _build_lazy_frames() -> dict:
         'df_documents_by_year': df_documents_by_year,
         # Larger yearly_growth produces more extreme increasing totals.
         'df_time': generate_time_series(yearly_growth=0.5),
+        'df_accuracy': pd.DataFrame({
+            'run_name': ['medium', 'nano', 'small'],
+            'accuracy': [0.99, 0.71, 0.85],
+        }),
     }
 
 
 def __getattr__(name: str) -> DataFrame:
-    """Build the large demo frames on first access instead of at import time."""
-    if name in ('df', 'df_documents_by_year', 'df_time'):
-        return _build_lazy_frames()[name]
+    """Build the demo frames on first access; each access gets its own copy."""
+    frames = _build_lazy_frames() if name in ('df', 'df_documents_by_year', 'df_time', 'df_accuracy') else {}
+    if name in frames:
+        return frames[name].copy()
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

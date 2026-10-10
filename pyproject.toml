@@ -9,10 +9,10 @@ description = "A data analysis toolkit for statistical computing, visualization,
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "matplotlib",
-    "seaborn",
+    "matplotlib>=3.7",
+    "seaborn>=0.13",
     "numpy",
-    "pandas",
+    "pandas>=2.0",
 ]
 
 [project.optional-dependencies]

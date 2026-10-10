@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
 from ..core import BarPlotOptions
 from ..common.resolve_palette import resolve_palette
+from ..plots import BarPlot
 
 
 class BarPlotsMixin:
@@ -77,7 +78,7 @@ class BarPlotsMixin:
             suffix=suffix,
         )
 
-        self._render('bar', options, output_name)
+        self._render(BarPlot(options), output_name)
 
     @resolve_palette
     def barplot_y(
@@ -149,4 +150,4 @@ class BarPlotsMixin:
             suffix=suffix,
         )
 
-        self._render('bar', options, output_name)
+        self._render(BarPlot(options), output_name)

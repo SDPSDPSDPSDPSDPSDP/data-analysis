@@ -6,7 +6,7 @@ are applied correctly to bar colors and axis tick labels.
 """
 import pandas as pd
 
-from shirin.plot.plots import create_plot
+from shirin.plot.plots import BarPlot, CountPlot, NormalizedCountPlot
 from shirin.plot.core import (
     CountPlotOptions,
     BarPlotOptions,
@@ -38,7 +38,7 @@ class TestStackedCountPlotTextColors:
             stacked_labels='percentage'
         )
         
-        plot = create_plot('count', options)
+        plot = CountPlot(options)
         plot.render()
         
         assert plot._palette is not None
@@ -69,7 +69,7 @@ class TestStackedBarPlotTextColors:
             stacked_labels='percentage'
         )
         
-        plot = create_plot('bar', options)
+        plot = BarPlot(options)
         plot.render()
         
         assert plot._palette is not None
@@ -96,7 +96,7 @@ class TestNormalizedCountPlotPaletteKeys:
             show_labels=False,
         )
 
-        plot = create_plot('normalized_count', options)
+        plot = NormalizedCountPlot(options)
         plot.render()
 
         assert plot._normalized_pivot is not None
@@ -121,7 +121,7 @@ class TestAxisLabelMapping:
             show_labels=False,
         )
 
-        plot = create_plot('count', options)
+        plot = CountPlot(options)
         ax = plot.render()
 
         xtick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
@@ -147,7 +147,7 @@ class TestAxisLabelMapping:
             percentage_labels=False,
         )
 
-        plot = create_plot('bar', options)
+        plot = BarPlot(options)
         ax = plot.render()
 
         ytick_labels = [tick.get_text() for tick in ax.get_yticklabels()]

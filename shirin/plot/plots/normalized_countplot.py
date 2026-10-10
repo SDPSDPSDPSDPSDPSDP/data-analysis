@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 import pandas as pd
 
+from ..core import renderer
 from ..core.categorical_options import NormalizedCountPlotOptions
 from ..core.base_plot import AbstractPlot
 from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
@@ -20,12 +21,7 @@ class NormalizedCountPlot(AbstractPlot):
 
     def preprocess(self) -> pd.DataFrame:
         df = ensure_column_is_string(self.options.df, self.options.axis_column)
-        df = self._resolve_hue_palette(df)
-
-        missing_keys = [val for val in df[self.options.hue].unique() if val not in self._palette]  # type: ignore[operator]
-        if missing_keys:
-            raise ValueError(f"Palette missing keys for hue values: {missing_keys}")
-
+        df = self._resolve_hue_palette(df, require_dict=True)
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df
@@ -36,9 +32,9 @@ class NormalizedCountPlot(AbstractPlot):
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
-        create_sized_figure(self, data)
         vertical = self.options.orientation == 'vertical'
-        return self.renderer.render_stacked_barplot(
+        return renderer.render_stacked_barplot(
+            create_sized_figure(self, data),
             df=self._normalized_pivot,  # type: ignore[arg-type]
             kind='bar' if vertical else 'barh',
             colors=create_colors_list(self._normalized_pivot, self._palette),  # type: ignore[arg-type]

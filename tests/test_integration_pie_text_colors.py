@@ -2,7 +2,7 @@
 import pandas as pd
 
 from shirin.plot.core import PiePlotOptions
-from shirin.plot.plots import create_plot
+from shirin.plot.plots import PieChart
 from shirin.plot.config.colors import Colors, TextColors
 from shirin.plot.common.formatting.text_contrast import get_text_color_for_background
 
@@ -26,7 +26,7 @@ class TestPieChartTextColors:
             label_map=label_map
         )
         
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         
         assert plot._colors is not None
@@ -52,7 +52,7 @@ class TestPieChartTextColors:
             palette=palette
         )
         
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         
         for bg_color, autotext in zip(plot._colors, plot._autotexts):
@@ -75,7 +75,7 @@ class TestPieChartTextColors:
             palette=palette
         )
         
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         
         assert plot._autotexts[0].get_color() == TextColors.WHITE
@@ -95,7 +95,7 @@ class TestPieChartTextColors:
             palette=palette
         )
         
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         
         assert plot._autotexts[0].get_color() == TextColors.BLACK
@@ -120,7 +120,7 @@ class TestIntegerPaletteKeys:
             label_map=label_map
         )
         
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         
         for bg_color, autotext in zip(plot._colors, plot._autotexts):

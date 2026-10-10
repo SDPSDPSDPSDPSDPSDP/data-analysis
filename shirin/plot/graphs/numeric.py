@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Union
 from ..config import FillMissingValuesInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
 from ..common.resolve_palette import resolve_palette
+from ..plots import Histogram, LinePlot, ScatterPlot
 
 
 class NumericPlotsMixin:
@@ -26,6 +27,23 @@ class NumericPlotsMixin:
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
+        """Create a **histogram** of a numeric column.
+
+        Args:
+            df: DataFrame containing the data to plot.
+            x: Column name with the numeric values.
+            hue: Column name for grouping data by color. *Optional*.
+            xlabel: Label for the x-axis. *Default: `''`*.
+            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            xlimit: Upper bound only: rows with `x` above it are dropped. *Optional*.
+            bins: Maximum number of bins; whole-number data gets at most one bin per value.
+                *Default: `100`*.
+            stacked: With `hue`, `False` dodges the groups, otherwise they stack. *Optional*.
+            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
+            ncol: Number of columns in the legend. *Default: `2`*.
+            output_name: Name for the exported file. *Default: `'histogram'`*.
+        """
         options = HistogramOptions(
             df=df,
             x=x,
@@ -41,7 +59,7 @@ class NumericPlotsMixin:
             legend_offset=legend_offset,
             ncol=ncol
         )
-        self._render('histogram', options, output_name)
+        self._render(Histogram(options), output_name)
 
     @resolve_palette
     def lineplot(
@@ -77,7 +95,7 @@ class NumericPlotsMixin:
             rotation=rotation,
             fill_missing_values=fill_missing_values
         )
-        self._render('line', options, output_name)
+        self._render(LinePlot(options), output_name)
 
     @resolve_palette
     def scatterplot(
@@ -126,4 +144,4 @@ class NumericPlotsMixin:
             legend_offset=legend_offset,
             ncol=ncol,
         )
-        self._render('scatter', options, output_name)
+        self._render(ScatterPlot(options), output_name)

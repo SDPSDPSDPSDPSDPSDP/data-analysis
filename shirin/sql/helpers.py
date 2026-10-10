@@ -2,6 +2,7 @@
 
 import functools
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Union
@@ -99,10 +100,19 @@ def _validate_db_config(db_config: Dict[str, Any]) -> None:
         raise ValueError(f"Invalid schema name: {db_config['schema']!r}")
 
 
+@functools.lru_cache(maxsize=None)
+def _add_db2_dll_directory() -> None:
+    """Windows needs the DB2 client DLLs on the search path; override with DB2_DLL_DIR."""
+    dll_dir = os.environ.get("DB2_DLL_DIR", r"C:\Program Files\IBM\SQLLIB\BIN")
+    if hasattr(os, "add_dll_directory") and os.path.isdir(dll_dir):
+        os.add_dll_directory(dll_dir)
+
+
 # ponytail: one pooled engine per (connection, schema) for the process lifetime; unbounded,
 # fine for a handful of configs. Add eviction/dispose if configs are generated dynamically.
 @functools.lru_cache(maxsize=None)
 def _get_engine(url: URL, schema: str) -> Engine:
+    _add_db2_dll_directory()
     engine = create_engine(url, pool_pre_ping=True)
 
     @event.listens_for(engine, "connect")

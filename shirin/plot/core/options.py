@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import ClassVar, Optional, Union
 
 from ..config import FillMissingValues, FillMissingValuesInput, TimeGroupBy, TimeGroupByInput
 from .base_options import (
@@ -13,6 +13,8 @@ from .base_options import (
 
 @dataclass
 class HistogramOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x')
+
     x: str = ''
     xlimit: Optional[Union[float, int]] = None
     bins: int = 100
@@ -28,6 +30,8 @@ class HistogramOptions(BasePlotOptions):
 
 @dataclass
 class LinePlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y')
+
     x: str = ''
     y: str = ''
     rotation: int = 0
@@ -51,6 +55,8 @@ class LinePlotOptions(BasePlotOptions):
 
 @dataclass
 class ScatterPlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y', 'size')
+
     x: str = ''
     y: str = ''
     size: Optional[str] = None
@@ -65,6 +71,8 @@ class ScatterPlotOptions(BasePlotOptions):
 
 @dataclass
 class PiePlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('col',)
+
     col: str = ''
     n_after_comma: int = 0
     value_datalabel: int = 5
@@ -78,6 +86,8 @@ class PiePlotOptions(BasePlotOptions):
 
 @dataclass
 class TimePlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('x',)
+
     x: str = ''
     group_by: TimeGroupByInput = 'day'
     plot_type: str = 'bar'
@@ -90,6 +100,8 @@ class TimePlotOptions(BasePlotOptions):
         super().validate()
         if not self.x:
             raise ValueError("x column must be specified")
+        if self.palette is not None and not isinstance(self.palette, str):
+            raise ValueError("palette must be a single color string for time plots")
 
         validate_str_or_enum_option(
             option_name='group_by',

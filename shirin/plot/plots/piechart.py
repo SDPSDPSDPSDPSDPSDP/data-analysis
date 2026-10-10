@@ -3,11 +3,13 @@ from typing import Any, List
 import pandas as pd
 import seaborn as sns
 
+from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
+from ..common.sorting import palette_colors
 from ..config import FigureSize, FontSizes, TextColors
-from ...stats.number_format import format_thousands
+from ...number_format import format_thousands
 
 
 class PieChart(AbstractPlot):
@@ -33,15 +35,16 @@ class PieChart(AbstractPlot):
 
         palette = self.options.palette
         if isinstance(palette, dict):
-            self._colors = [palette.get(key, '#000000') for key in keys]
+            self._colors = palette_colors(palette, keys)
         else:
             # No palette or a named seaborn palette: one distinct color per slice.
             self._colors = sns.color_palette(palette, n_colors=len(keys)).as_hex()
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
-        self.renderer.create_figure((FigureSize.PIE, FigureSize.PIE))
-        ax, self._autotexts = self.renderer.render_piechart(
+        ax = self._new_axes((FigureSize.PIE, FigureSize.PIE))
+        self._autotexts = renderer.render_piechart(
+            ax,
             values=self._values,
             colors=self._colors,
             donut=self.options.donut,

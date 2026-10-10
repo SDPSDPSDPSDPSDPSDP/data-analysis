@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .number_format import format_thousands
+from ..number_format import format_thousands
 
 
 def print_rounded(name, value):
