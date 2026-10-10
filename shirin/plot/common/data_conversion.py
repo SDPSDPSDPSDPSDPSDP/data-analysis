@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Optional
 
 REMAINDER_SHARE_COL = '__share__'
+REMAINDER_LABEL = 'Remainder'
 
 
 def convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:

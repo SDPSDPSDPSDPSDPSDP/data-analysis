@@ -50,11 +50,12 @@ def _draw_categorical_bars(
     chart: Chart, table: pd.DataFrame, colors: List[str], horizontal: bool, hue: Optional[str]
 ) -> Chart:
     """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
-    n_columns = len(table.columns)
-    width = FigureSize.BAR_GROUP_WIDTH / n_columns
-    bar_width = width - FigureSize.DODGE_GAP if n_columns > 1 else width
+    # hue equal to the category column fills one cell per row: draw full-width bars, no dodge.
+    n_slots = len(table.columns) if (table.notna().sum(axis=1) > 1).any() else 1
+    width = FigureSize.BAR_GROUP_WIDTH / n_slots
+    bar_width = width - FigureSize.DODGE_GAP if n_slots > 1 else width
     for i, (level, color) in enumerate(zip(table.columns, colors)):
-        offset = (i - (n_columns - 1) / 2) * width
+        offset = (i - (n_slots - 1) / 2) * width if n_slots > 1 else 0
         for position, value in enumerate(table[level]):
             if pd.notna(value):
                 _bar(chart, position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)

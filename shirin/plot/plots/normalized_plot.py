@@ -75,6 +75,9 @@ class NormalizedPlot(AbstractPlot):
 
     def format_plot(self, plot: Any) -> None:
         self._format_labels_and_legend(plot)
+        if self.options.remainder is not None:
+            shown_name = (self._label_map_legend or {}).get(self.options.remainder, self.options.remainder)
+            plot.legend = [item for item in plot.legend if item[1] != shown_name]
 
         if self.options.orientation == 'vertical':
             format_ticks(plot, y_grid=True, percentage_y=True)

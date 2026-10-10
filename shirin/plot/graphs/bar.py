@@ -4,7 +4,7 @@ from typing import Optional
 from ..config import TitleInput, SortInput
 from ..core import BarPlotOptions, NormalizedPlotOptions
 from ..core.base_plot import default_palette
-from ..common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
+from ..common.data_conversion import REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder
 from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot, NormalizedPlot
 
@@ -26,7 +26,7 @@ class BarPlotsMixin:
         stacked: bool = False,
         normalized: bool = False,
         sort: SortInput = 'frequency',
-        remainder: Optional[str] = None,
+        remainder: bool = False,
     ) -> None:
         """Create a **bar plot** with pre-aggregated data.
 
@@ -54,9 +54,9 @@ class BarPlotsMixin:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
-            remainder: Label for the gap up to 100% when `value` holds fractions in [0, 1]
-                (e.g. `value='accuracy', remainder='Incorrect'`). Needs `normalized=True` and no `hue`.
-                The filled segment is labelled with the `value` column name. Pass `hue` equal to `x`/`y`
+            remainder: Fill each bar up to 100% with a lighter segment when `value` holds fractions
+                in [0, 1] (e.g. `value='accuracy'`). Needs `normalized=True`. The filled segment is
+                labelled with the `value` column name, the rest with `'Remainder'`. Pass `hue` equal to `x`/`y`
                 to color each bar by its category instead. *Optional*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
@@ -79,7 +79,7 @@ class BarPlotsMixin:
             data_labels=data_labels,
             sort=sort,
         )
-        if remainder is not None:
+        if remainder:
             if not normalized:
                 raise ValueError('remainder needs normalized=True.')
             if hue is not None and hue != common['axis_column']:
@@ -90,15 +90,15 @@ class BarPlotsMixin:
                     category_palette = default_palette(df[hue], category_palette)
                 common['category_palette'] = category_palette
             common.update(
-                df=fill_remainder(df, common['axis_column'], value, remainder),
+                df=fill_remainder(df, common['axis_column'], value, REMAINDER_LABEL),
                 value=REMAINDER_SHARE_COL,
                 hue=value,
-                remainder=remainder,
+                remainder=REMAINDER_LABEL,
                 **resolve_palette(self, value),
             )
             if isinstance(common['palette'], str):
                 common['palette'] = {value: common['palette']}
-        if normalized and common['hue'] is not None:
+        if normalized and common['hue'] is not None and common['hue'] != common['axis_column']:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
             self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))

@@ -7,6 +7,7 @@ import pytest
 
 from shirin.plot import PlotGraphs
 from shirin.plot.common.colors import blend
+from shirin.plot.config import FigureSize
 from shirin.plot.config.colors import REMAINDER_TINT
 from shirin.plot.common.data_conversion import REMAINDER_SHARE_COL, fill_missing_values_in_data, fill_remainder
 from shirin.plot.core import (
@@ -235,7 +236,7 @@ def test_normalized_barplot_accepts_duplicate_index() -> None:
 
 def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
-    plot.barplot(df, x='run', value='acc', normalized=True, remainder='Incorrect')
+    plot.barplot(df, x='run', value='acc', normalized=True, remainder=True)
     shares = fill_remainder(df, 'run', 'acc', 'Incorrect')
     plot_obj = NormalizedPlot(NormalizedPlotOptions(df=shares, axis_column='run', hue='acc', value=REMAINDER_SHARE_COL, remainder='Incorrect'))
     plot_obj.render()
@@ -245,7 +246,7 @@ def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> 
 
 def test_barplot_remainder_rejects_non_fractions(plot: PlotGraphs) -> None:
     with pytest.raises(ValueError, match=r"fractions in \[0, 1\]"):
-        plot.barplot(pd.DataFrame({'run': ['a'], 'acc': [78]}), x='run', value='acc', normalized=True, remainder='Incorrect')
+        plot.barplot(pd.DataFrame({'run': ['a'], 'acc': [78]}), x='run', value='acc', normalized=True, remainder=True)
 
 
 def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
@@ -260,7 +261,7 @@ def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
 
 def test_barplot_remainder_rejects_conflicting_fractions(plot: PlotGraphs) -> None:
     with pytest.raises(ValueError, match='same on every row'):
-        plot.barplot(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder='Incorrect')
+        plot.barplot(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder=True)
 
 
 def test_fill_remainder_collapses_repeated_fraction() -> None:
@@ -287,10 +288,25 @@ def test_barplot_remainder_with_category_hue_colors_each_bar(plot: PlotGraphs) -
     chart = nplot.draw(nplot.transform(nplot.preprocess()))
     fronts = [rect.color for rect in chart.rects[1::2]]
     assert fronts == ['#0000ff', '#ff0000']
-    plot.barplot(df, y='run', value='acc', hue='run', remainder='Incorrect', normalized=True)
+    plot.barplot(df, y='run', value='acc', hue='run', remainder=True, normalized=True)
 
 
 def test_barplot_remainder_rejects_other_hue(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a'], 'acc': [0.7], 'g': ['x']})
     with pytest.raises(ValueError, match='hue must be the category column'):
-        plot.barplot(df, x='run', value='acc', hue='g', remainder='Incorrect', normalized=True)
+        plot.barplot(df, x='run', value='acc', hue='g', remainder=True, normalized=True)
+
+
+def test_remainder_not_in_legend() -> None:
+    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
+    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect', legend=True))
+    plot.render()
+    assert [label for _, label, _ in plot.chart.legend] == ['acc']
+
+
+def test_normalized_barplot_hue_equal_to_axis_draws_full_width_share_bars() -> None:
+    df = pd.DataFrame({'fruit': ['a', 'b'], 'count': [3, 1]})
+    plot = BarPlot(BarPlotOptions(df=df, axis_column='fruit', value='count', hue='fruit', normalized=True))
+    plot.render()
+    assert {round(rect.x1 - rect.x0, 3) for rect in plot.chart.rects} == {FigureSize.BAR_GROUP_WIDTH}
+    assert sorted(text.text for text in plot.chart.texts) == ['25.0%', '75.0%']

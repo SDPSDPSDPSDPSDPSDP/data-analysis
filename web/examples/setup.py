@@ -15,7 +15,7 @@ plot = PlotGraphs(
             'Fig': "#9f5090",
             'Mango': "#ffb752",
         },
-        'sold_share': "#000000",
+        'sold_share': "#9ca2b0",
     },
     label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},
 )

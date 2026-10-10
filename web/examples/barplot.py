@@ -23,6 +23,7 @@ plot.barplot(
     df,
     x='fruit',
     value='count',
+    hue='fruit',
     sort='alphabetical',
     data_labels=False,
     title='Alphabetical',
@@ -63,8 +64,9 @@ plot.barplot(
     df,
     x='fruit',
     value='sold_share',
-    remainder='Unsold',
+    remainder=True,
     normalized=True,
+    data_labels=False,
     title='Share sold',
 )
 
@@ -74,7 +76,7 @@ plot.barplot(
     y='fruit',
     value='sold_share',
     hue='fruit',
-    remainder='Unsold',
+    remainder=True,
     normalized=True,
     title='Share sold per fruit',
 )
