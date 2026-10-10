@@ -20,6 +20,7 @@ export default function CodeBlock({ value, onChange, extensions = [], className 
         onChange={onChange}
         editable={Boolean(onChange)}
         readOnly={!onChange}
+        theme="dark"
         extensions={[python(), ...extensions]}
         height="100%"
       />
