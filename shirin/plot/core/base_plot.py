@@ -1,10 +1,12 @@
 import dataclasses
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import seaborn as sns
 from matplotlib.axes import Axes
+from matplotlib.colors import LinearSegmentedColormap, to_hex
 
 from .base_options import BasePlotOptions
 from . import renderer
@@ -25,9 +27,19 @@ def split_palette(palette: PaletteInput) -> Tuple[Optional[str], Optional[Dict[A
     return Colors.GREY, None
 
 
-def default_palette(values: pd.Series) -> Dict[str, str]:
+def default_colors(n: int) -> List[str]:
+    """First n colors of matplotlib's color cycle, repeating when n is larger."""
+    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    return [cycle[i % len(cycle)] for i in range(n)]
+
+
+def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:
+    """Color per sorted value: shades of color when given, else the default color cycle."""
     keys = sorted(values.astype(str).unique())
-    return dict(zip(keys, sns.color_palette(n_colors=len(keys)).as_hex()))
+    if color is None:
+        return dict(zip(keys, default_colors(len(keys))))
+    shades = LinearSegmentedColormap.from_list('', ['#333333', color])(np.linspace(1, 0.3, len(keys)))
+    return dict(zip(keys, map(to_hex, shades)))
 
 
 class AbstractPlot(ABC):
@@ -93,13 +105,11 @@ class AbstractPlot(ABC):
             options.legend_offset,
         )
 
-    def _resolve_hue_palette(
-        self, df: pd.DataFrame, no_hue_color: Optional[str] = None, require_dict: bool = False
-    ) -> pd.DataFrame:
+    def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:
         """Set _color/_palette and stringify hue so it matches the (stringified) palette keys.
 
-        require_dict: stacked plots need one color per hue value; without a palette, seaborn's
-        default categorical colors are assigned to the sorted hue values.
+        With hue, _palette always maps every hue value to a color: a single palette color
+        becomes shades of that color, no palette uses the default color cycle.
         """
         self._color, self._palette = split_palette(self.options.palette)
         if self.options.hue is None:
@@ -107,13 +117,8 @@ class AbstractPlot(ABC):
                 self._color = no_hue_color
             return df
         df = ensure_column_is_string(df, self.options.hue)
-        if self._palette is None and require_dict:
-            self._palette = default_palette(df[self.options.hue])
-            self._color = None
-        elif self._palette is None:
-            # seaborn deprecated color= with hue: a single color becomes a gradient palette,
-            # no palette falls back to seaborn's default categorical colors.
-            if isinstance(self.options.palette, str):
-                self._palette = f'dark:{self.options.palette}'  # type: ignore[assignment]
+        if self._palette is None:
+            single_color = self.options.palette if isinstance(self.options.palette, str) else None
+            self._palette = default_palette(df[self.options.hue], single_color)
             self._color = None
         return df

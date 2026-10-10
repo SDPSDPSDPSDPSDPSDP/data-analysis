@@ -1,10 +1,9 @@
 from typing import Any, List
 
 import pandas as pd
-import seaborn as sns
 
 from ..core import renderer
-from ..core.base_plot import AbstractPlot
+from ..core.base_plot import AbstractPlot, default_colors
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.sorting import palette_colors
@@ -37,8 +36,7 @@ class PieChart(AbstractPlot):
         if isinstance(palette, dict):
             self._colors = palette_colors(palette, keys)
         else:
-            # No palette or a named seaborn palette: one distinct color per slice.
-            self._colors = sns.color_palette(palette, n_colors=len(keys)).as_hex()
+            self._colors = default_colors(len(keys))
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:

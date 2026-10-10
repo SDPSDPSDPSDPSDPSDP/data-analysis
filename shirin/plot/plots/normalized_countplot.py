@@ -21,7 +21,7 @@ class NormalizedCountPlot(AbstractPlot):
 
     def preprocess(self) -> pd.DataFrame:
         df = ensure_column_is_string(self.options.df, self.options.axis_column)
-        df = self._resolve_hue_palette(df, require_dict=True)
+        df = self._resolve_hue_palette(df)
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df

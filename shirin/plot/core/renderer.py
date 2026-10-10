@@ -1,12 +1,12 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.patches import Circle
 
-PaletteArg = Optional[Union[Dict[Any, str], str]]
+from ..common.sorting import palette_colors
 
 
 def create_figure(figsize: tuple[float, float]) -> Axes:
@@ -15,55 +15,75 @@ def create_figure(figsize: tuple[float, float]) -> Axes:
     return ax
 
 
+def _hue_levels(df: pd.DataFrame, hue: str) -> List[Any]:
+    """Hue values in data order; this is also the legend order."""
+    return list(df[hue].dropna().unique())
+
+
+def _draw_categorical_bars(
+    ax: Axes, table: pd.DataFrame, colors: List[Optional[str]], horizontal: bool, hue: Optional[str]
+) -> Axes:
+    """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
+    n_columns = len(table.columns)
+    width = 0.8 / n_columns
+    positions = np.arange(len(table))
+    draw = ax.barh if horizontal else ax.bar
+    for i, (level, color) in enumerate(zip(table.columns, colors)):
+        values = table[level]
+        drawn = values.notna().to_numpy()
+        offset = (i - (n_columns - 1) / 2) * width
+        draw(positions[drawn] + offset, values[drawn], width, color=color, edgecolor='none', label=level)
+
+    labels = [str(category) for category in table.index]
+    if horizontal:
+        ax.set_yticks(positions, labels)
+        ax.set_ylim(len(table) - 0.5, -0.5)  # first category on top
+    else:
+        ax.set_xticks(positions, labels)
+        ax.set_xlim(-0.5, len(table) - 0.5)
+    if hue is not None:
+        ax.legend(title=hue)
+    return ax
+
+
 def render_countplot(
     ax: Axes,
     df: pd.DataFrame,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    column: str,
+    horizontal: bool,
     hue: Optional[str] = None,
-    order: Optional[Any] = None,
+    order: Optional[List[Any]] = None,
     color: Optional[str] = None,
-    palette: PaletteArg = None,
+    palette: Optional[Dict[Any, str]] = None,
 ) -> Axes:
-    return sns.countplot(
-        data=df,
-        x=x,
-        y=y,
-        hue=hue,
-        order=order,
-        color=color,
-        palette=palette,
-        alpha=1,
-        edgecolor='none',
-        saturation=1,
-        ax=ax,
-    )
+    order = order if order is not None else list(df[column].dropna().unique())
+    if hue is None:
+        table = df[column].value_counts().reindex(order).to_frame()
+        return _draw_categorical_bars(ax, table, [color], horizontal, hue)
+    levels = _hue_levels(df, hue)
+    table = pd.crosstab(df[column], df[hue]).reindex(index=order, columns=levels)
+    return _draw_categorical_bars(ax, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
 def render_barplot(
     ax: Axes,
     df: pd.DataFrame,
-    x: Optional[str] = None,
-    y: Optional[str] = None,
+    column: str,
+    value: str,
+    horizontal: bool,
     hue: Optional[str] = None,
-    order: Optional[Any] = None,
+    order: Optional[List[Any]] = None,
     color: Optional[str] = None,
-    palette: PaletteArg = None,
+    palette: Optional[Dict[Any, str]] = None,
 ) -> Axes:
-    return sns.barplot(
-        data=df,
-        x=x,
-        y=y,
-        hue=hue,
-        order=order,
-        color=color,
-        palette=palette,
-        alpha=1,
-        edgecolor='none',
-        saturation=1,
-        errorbar=None,
-        ax=ax,
-    )
+    """Bar length is the mean of value per category (and hue)."""
+    order = order if order is not None else list(df[column].dropna().unique())
+    if hue is None:
+        table = df.groupby(column)[value].mean().reindex(order).to_frame()
+        return _draw_categorical_bars(ax, table, [color], horizontal, hue)
+    levels = _hue_levels(df, hue)
+    table = df.groupby([column, hue])[value].mean().unstack().reindex(index=order, columns=levels)
+    return _draw_categorical_bars(ax, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
 def render_histogram(
@@ -73,22 +93,25 @@ def render_histogram(
     bins: int,
     hue: Optional[str] = None,
     color: Optional[str] = None,
-    palette: PaletteArg = None,
+    palette: Optional[Dict[Any, str]] = None,
     stacked: Optional[bool] = None,
 ) -> Axes:
-    multiple = 'dodge' if hue is not None and stacked is False else 'stack'
-    return sns.histplot(
-        data=df,
-        x=x,
-        bins=bins,
-        hue=hue,
-        color=color,
-        palette=palette,
-        multiple=multiple,  # type: ignore
+    """With hue, groups stack unless stacked is False, then they are drawn side by side."""
+    edges = np.histogram_bin_edges(df[x], bins=bins)
+    if hue is None:
+        ax.hist(df[x], bins=edges, color=color, edgecolor='white')
+        return ax
+    levels = _hue_levels(df, hue)
+    ax.hist(
+        [df.loc[df[hue] == level, x] for level in levels],
+        bins=edges,
+        stacked=stacked is not False,
+        color=palette_colors(palette, levels),  # type: ignore[arg-type]
+        label=levels,
         edgecolor='white',
-        alpha=1,
-        ax=ax,
     )
+    ax.legend(title=hue)
+    return ax
 
 
 def render_lineplot(
@@ -98,20 +121,19 @@ def render_lineplot(
     y: str,
     hue: Optional[str] = None,
     color: Optional[str] = None,
-    palette: PaletteArg = None,
+    palette: Optional[Dict[Any, str]] = None,
 ) -> Axes:
-    return sns.lineplot(
-        data=df,
-        x=x,
-        y=y,
-        hue=hue,
-        color=color,
-        palette=palette,
-        marker='o',
-        markersize=4,
-        alpha=1,
-        ax=ax,
-    )
+    """One line per hue value; duplicate x values are averaged."""
+    if hue is None:
+        line = df.groupby(x)[y].mean()
+        ax.plot(line.index, line.values, color=color, marker='o', markersize=4)
+        return ax
+    levels = _hue_levels(df, hue)
+    for level, level_color in zip(levels, palette_colors(palette, levels)):  # type: ignore[arg-type]
+        line = df[df[hue] == level].groupby(x)[y].mean()
+        ax.plot(line.index, line.values, color=level_color, marker='o', markersize=4, label=level)
+    ax.legend(title=hue)
+    return ax
 
 
 def render_scatterplot(
@@ -122,20 +144,23 @@ def render_scatterplot(
     hue: Optional[str] = None,
     size: Optional[str] = None,
     color: Optional[str] = None,
-    palette: PaletteArg = None,
+    palette: Optional[Dict[Any, str]] = None,
 ) -> Axes:
-    return sns.scatterplot(
-        data=df,
-        x=x,
-        y=y,
-        hue=hue,
-        size=size,
-        color=color,
-        palette=palette,
-        alpha=0.8,
-        edgecolor='none',
-        ax=ax,
-    )
+    """size scales marker area linearly between 18 and 72 over the numeric size column."""
+    areas = pd.Series(36.0, index=df.index)
+    if size is not None:
+        values = df[size].astype(float)
+        areas = pd.Series(np.interp(values, (values.min(), values.max()), (18, 72)), index=df.index)
+
+    if hue is None:
+        ax.scatter(df[x], df[y], s=areas, color=color, alpha=0.8, edgecolors='none')
+        return ax
+    levels = _hue_levels(df, hue)
+    for level, level_color in zip(levels, palette_colors(palette, levels)):  # type: ignore[arg-type]
+        rows = df[hue] == level
+        ax.scatter(df.loc[rows, x], df.loc[rows, y], s=areas[rows], color=level_color, alpha=0.8, edgecolors='none', label=level)
+    ax.legend(title=hue)
+    return ax
 
 
 def render_stacked_barplot(ax: Axes, df: pd.DataFrame, kind: str, colors: list[str], width: float = 0.6) -> Axes:

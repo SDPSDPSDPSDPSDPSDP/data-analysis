@@ -93,13 +93,29 @@ def test_render_does_not_mutate_caller_options(df: pd.DataFrame) -> None:
     assert options.label_map is None
 
 
-@pytest.mark.filterwarnings("error::FutureWarning")
 @pytest.mark.parametrize("palette", [None, '#123456'])
-def test_hue_without_dict_palette_has_no_seaborn_warning(df: pd.DataFrame, palette) -> None:
+def test_hue_without_dict_palette_gets_one_color_per_hue_value(df: pd.DataFrame, palette) -> None:
     options = CountPlotOptions(df=df, axis_column='category', hue='group', palette=palette)
     rendered = CountPlot(options)
-    rendered.render()
+    ax = rendered.render()
     assert rendered._color is None
+    assert len(set(rendered._palette.values())) == 2
+    assert len({patch.get_facecolor() for patch in ax.patches}) == 2
+
+
+def test_countplot_counts_per_category_and_hue() -> None:
+    df = pd.DataFrame({'cat': ['A', 'A', 'A', 'B'], 'hue': ['x', 'x', 'y', 'y']})
+    ax = CountPlot(CountPlotOptions(df=df, axis_column='cat', hue='hue', palette={'x': '#111111', 'y': '#eeeeee'})).render()
+    heights = sorted(patch.get_height() for patch in ax.patches if patch.get_height() > 0)
+    assert heights == [1, 1, 2]
+    assert [tick.get_text() for tick in ax.get_xticklabels()] == ['A', 'B']
+
+
+def test_barplot_uses_mean_per_category() -> None:
+    df = pd.DataFrame({'cat': ['A', 'A', 'B'], 'v': [1.0, 3.0, 5.0]})
+    ax = BarPlot(BarPlotOptions(df=df, axis_column='cat', value='v', orientation='horizontal')).render()
+    assert sorted(patch.get_width() for patch in ax.patches) == [2.0, 5.0]
+    assert ax.get_ylim()[0] > ax.get_ylim()[1]  # first category on top
 
 
 def test_render_leaves_other_figures_open(df: pd.DataFrame) -> None:

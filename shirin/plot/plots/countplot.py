@@ -21,18 +21,18 @@ class CountPlot(StackableCategoricalPlot):
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         self._order = get_order(self.options.order_type, df, self.options.axis_column)
-        return self._resolve_hue_palette(df, require_dict=self.options.stacked)
+        return self._resolve_hue_palette(df)
 
     def _draw_unstacked(self, ax: Axes, data: pd.DataFrame) -> Any:
-        axis = 'x' if self.options.orientation == 'vertical' else 'y'
         return renderer.render_countplot(
             ax,
             df=data,
+            column=self.options.axis_column,
+            horizontal=self.options.orientation == 'horizontal',
             hue=self.options.hue,
             order=self._order,
             color=self._color,
             palette=self._palette,
-            **{axis: self.options.axis_column},
         )
 
     def _datalabel_formatting(self) -> str:

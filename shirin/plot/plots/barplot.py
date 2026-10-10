@@ -23,17 +23,15 @@ class BarPlot(StackableCategoricalPlot):
         self._order = get_order(
             self.options.order_type, df, self.options.axis_column, value_column=self.options.value
         )
-        return self._resolve_hue_palette(df, require_dict=self.options.stacked)
+        return self._resolve_hue_palette(df)
 
     def _draw_unstacked(self, ax: Axes, data: pd.DataFrame) -> Any:
-        x, y = self.options.axis_column, self.options.value
-        if self.options.orientation != 'vertical':
-            x, y = y, x
         return renderer.render_barplot(
             ax,
             df=data,
-            x=x,
-            y=y,
+            column=self.options.axis_column,
+            value=self.options.value,
+            horizontal=self.options.orientation == 'horizontal',
             hue=self.options.hue,
             order=self._order,
             color=self._color,

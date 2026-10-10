@@ -23,7 +23,7 @@ def get_order(
     column: str,
     value_column: Optional[str] = None,
 ) -> Optional[list]:
-    """Category order for seaborn: by total (value sum or count), alphabetical, or None (data order)."""
+    """Category order: by total (value sum or count), alphabetical, or None (data order)."""
     if order_type == 'frequency':
         totals = df.groupby(column)[value_column].sum() if value_column else df[column].value_counts()
         return list(totals.sort_values(ascending=False).index)
