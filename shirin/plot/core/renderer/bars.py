@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ...common.sorting import palette_colors
-from ...config import FigureSize, Marks, TextColors
+from ...config import FigureSize, Marks
 from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend
 
@@ -126,18 +126,19 @@ def render_histogram(
     groups = [df.loc[mask, x] for mask in masks]
 
     group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
+    inset = (edges[1] - edges[0]) * Marks.HISTOGRAM_GAP / 2
     if hue is not None and stacked is not False:
         # Each group is a pill from 0 to its cumulative count, drawn back to front, like the barplot remainder.
         for top, group_color in reversed(list(zip(np.cumsum(group_counts, axis=0), colors))):
             for left, right, count in zip(edges[:-1], edges[1:], top):
-                chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
+                chart.rects.append(Rect(left + inset, right - inset, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
         for left, right, count in zip(edges[:-1], edges[1:], counts):
             if hue is not None:
                 step = (right - left) / len(groups)
                 left, right = left + i * step, left + (i + 1) * step
-            chart.rects.append(Rect(left, right, 0, count, group_color, stroke=TextColors.WHITE, rounded=True))  # type: ignore[arg-type]
+            chart.rects.append(Rect(left + inset, right - inset, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
     return chart
 
 
