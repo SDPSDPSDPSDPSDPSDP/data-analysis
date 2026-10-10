@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "predev": "node scripts/build-wheel.mjs",
-    "dev": "next dev",
+    "dev": "next dev --port 6817",
     "prebuild": "node scripts/build-wheel.mjs",
     "build": "next build"
   },

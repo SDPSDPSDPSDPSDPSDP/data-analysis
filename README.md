@@ -13,5 +13,15 @@ The notebook ([`example_notebook.ipynb`](./example_notebook.ipynb)) is provided 
 - An overview of all the key functionalities across different modules.
 - **Practical examples.**
 
+### Website
+
+Write Python on the left and see the chart on the right. Python runs in the browser with Pyodide. To run it locally:
+
+```powershell
+cd web; npm run dev
+```
+
+Then open http://localhost:6817.
+
 ---
 WIP: This package is and always will be a work in progress.
