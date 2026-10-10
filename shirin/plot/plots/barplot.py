@@ -21,7 +21,7 @@ class BarPlot(StackableCategoricalPlot):
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         self._order = get_order(
-            self.options.order_type, df, self.options.axis_column, value_column=self.options.value
+            self.options.sort, df, self.options.axis_column, value_column=self.options.value
         )
         return self._resolve_hue_palette(df)
 
@@ -39,4 +39,4 @@ class BarPlot(StackableCategoricalPlot):
         )
 
     def _datalabel_formatting(self) -> str:
-        return 'percentage' if self.options.percentage_labels else 'totals'
+        return 'percentage' if self.options.normalized else 'totals'

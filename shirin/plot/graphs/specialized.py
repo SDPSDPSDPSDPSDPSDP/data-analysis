@@ -2,14 +2,13 @@ import pandas as pd
 from typing import Optional
 
 from ..config import TitleInput, TimeGroupByInput
-from ..config.colors import Colors
-from ..core import AccuracyPlotOptions, PiePlotOptions, TimePlotOptions
+from ..core import PiePlotOptions, TimePlotOptions
 from ..common.resolve_palette import resolve_palette
-from ..plots import AccuracyPlot, PieChart, TimePlot
+from ..plots import PieChart, TimePlot
 
 
 class SpecializedPlotsMixin:
-    """Plots with chart-specific layouts: pie, time series, accuracy."""
+    """Plots with chart-specific layouts: pie, time series."""
 
     def pie(
         self,
@@ -101,74 +100,3 @@ class SpecializedPlotsMixin:
             cumulative=cumulative,
         )
         self._render(TimePlot(options))
-
-    def accuracy(
-        self,
-        df: pd.DataFrame,
-        experiment: str,
-        accuracy: str,
-        title: Optional[TitleInput] = None,
-        experiment_label: Optional[str] = None,
-        accuracy_label: Optional[str] = None,
-        suffix: Optional[str] = None,
-        legend: bool = False,
-        orientation: str = 'vertical',
-        reverse_order: bool = False,
-        color_correct: str = Colors.GOOD_GREEN,
-        color_incorrect: str = Colors.BAD_RED,
-    ) -> None:
-        """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
-
-        Each bar is split into two segments: *Correct* (the accuracy fraction) at
-        the bottom and *Incorrect* (1 - accuracy) stacked on top.
-
-        Input:
-            df: DataFrame with one row per run / category.
-            experiment: Column name for the bar categories (e.g. `'run_name'`).
-            accuracy: Column name containing accuracy values as fractions in **[0, 1]**
-                (e.g. `0.78` for 78 %).
-
-        Text:
-            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
-                subtitle line. *Optional*.
-            experiment_label: Label for the category axis. *Optional*.
-            accuracy_label: Label for the value axis. *Optional*.
-            suffix: Text appended to stacked labels. When omitted, accuracy labels keep their
-                default `%` formatting. *Optional*.
-            legend: Whether to show the legend. *Default: `False`*.
-
-        Layout:
-            orientation: Direction of the bars. **Options:** `'vertical'` (bars grow upward),
-                `'horizontal'` (bars grow rightward). *Default: `'vertical'`*.
-            reverse_order: Put the lowest accuracy first (left, or top when horizontal) instead of
-                the highest. *Default: `False`*.
-            color_correct: Hex colour for the correct segment. *Default: `Colors.GOOD_GREEN`*.
-            color_incorrect: Hex colour for the incorrect segment. *Default: `Colors.BAD_RED`*.
-
-        Example:
-            >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
-            ...                    'accuracy':  [0.78,     0.78,   0.78]})
-            >>> plot.accuracy(
-            ...     df,
-            ...     experiment='run_name',
-            ...     accuracy='accuracy',
-            ...     experiment_label='Experiment Name',
-            ...     accuracy_label='Accuracy',
-            ...     orientation='horizontal',
-            ... )
-        """
-        options = AccuracyPlotOptions(
-            df=df,
-            axis_column=experiment,
-            value_column=accuracy,
-            palette={'Correct': color_correct, 'Incorrect': color_incorrect},
-            title=title,
-            x_axis_label=experiment_label,
-            y_axis_label=accuracy_label,
-            suffix=suffix,
-            legend=legend,
-            orientation=orientation,
-            reverse_order=reverse_order,
-        )
-
-        self._render(AccuracyPlot(options))

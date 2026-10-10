@@ -20,7 +20,7 @@ class CountPlot(StackableCategoricalPlot):
         return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        self._order = get_order(self.options.order_type, df, self.options.axis_column)
+        self._order = get_order(self.options.sort, df, self.options.axis_column)
         return self._resolve_hue_palette(df)
 
     def _draw_unstacked(self, chart: Chart, data: pd.DataFrame) -> Any:

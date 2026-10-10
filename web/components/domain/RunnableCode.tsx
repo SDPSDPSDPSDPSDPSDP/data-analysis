@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { hoverTooltip, keymap, Prec } from "@uiw/react-codemirror";
+import { useEffect, useRef, useState } from "react";
+import { hoverTooltip } from "@uiw/react-codemirror";
 import { load, run, type RunResult } from "@/lib/pyodide";
 import docstrings from "@/lib/docstrings.json";
 import CodeBlock from "@/components/ui/CodeBlock";
@@ -73,22 +73,21 @@ export default function RunnableCode({ initialCode, setup }: Props) {
     );
   }, []);
 
+  // Running a setup cell (like after picking a palette color) re-renders the chart.
+  const lastSetup = useRef(setup);
+  useEffect(() => {
+    if (lastSetup.current === setup) return;
+    lastSetup.current = setup;
+    execute(code);
+  }, [setup]);
+
   async function execute(source: string) {
     setResult(await run(`${setup}\n${source}`));
   }
 
-  const runKey = Prec.highest(
-    keymap.of([
-      {
-        key: "Mod-Enter",
-        run: (view) => (execute(view.state.doc.toString()), true),
-      },
-    ]),
-  );
-
   return (
     <div className="runnable">
-      <CodeBlock value={code} onChange={setCode} extensions={[runKey, docTooltip]} />
+      <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={[docTooltip]} />
       <section className="output">
         {result?.images.map((src, i) => (
           <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />

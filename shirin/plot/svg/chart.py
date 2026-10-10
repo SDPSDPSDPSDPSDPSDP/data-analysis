@@ -99,7 +99,7 @@ class Chart:
     dots: List[Dots] = field(default_factory=list)
     wedges: List[Wedge] = field(default_factory=list)
     texts: List[Text] = field(default_factory=list)
-    legend: List[Tuple[str, str]] = field(default_factory=list)  # (color, label)
+    legend: List[Tuple[str, str, str]] = field(default_factory=list)  # (color, label, value shown lighter after the label)
     title: str = ''
     subtitle: str = ''
 

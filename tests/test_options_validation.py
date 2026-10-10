@@ -5,16 +5,16 @@ from shirin.plot.core import BarPlotOptions, InvalidOptionError, LinePlotOptions
 
 
 @pytest.mark.parametrize(
-    "order_type, match",
+    "sort, match",
     [
-        ("alpabetical", "Invalid order_type"),  # typo
+        ("alpabetical", "Invalid sort"),  # typo
         ("random", "Valid options"),
         ("Alphabetical", "Valid options"),  # uppercase is not normalized
     ],
 )
-def test_order_type_invalid_raises(order_type: str, match: str) -> None:
+def test_sort_invalid_raises(sort: str, match: str) -> None:
     df = pd.DataFrame({"n_prediction": ["10", "2", "1"], "count": [1, 2, 3]})
-    options = BarPlotOptions(df=df, axis_column="n_prediction", value="count", order_type=order_type)
+    options = BarPlotOptions(df=df, axis_column="n_prediction", value="count", sort=sort)
 
     with pytest.raises(InvalidOptionError, match=match):
         options.validate()

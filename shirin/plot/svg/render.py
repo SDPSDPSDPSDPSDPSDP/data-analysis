@@ -51,17 +51,17 @@ def _scale(lo: float, hi: float, start: float, end: float) -> Scale:
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
 
-def _legend_rows(items: List[Tuple[str, str]], max_width: float) -> List[List[Tuple[str, str, float]]]:
+def _legend_rows(items: List[Tuple[str, str, str]], max_width: float) -> List[List[Tuple[str, str, str, float]]]:
     """One row of swatch + label items, wrapped when wider than the plot area."""
-    rows: List[List[Tuple[str, str, float]]] = [[]]
+    rows: List[List[Tuple[str, str, str, float]]] = [[]]
     used = 0.0
-    for color, label in items:
-        width = Layout.SWATCH + Layout.SWATCH_GAP + text_width(label, FontSizes.LEGEND)
+    for color, label, value in items:
+        width = Layout.SWATCH + Layout.SWATCH_GAP + text_width(f'{label} {value}'.strip(), FontSizes.LEGEND)
         if rows[-1] and used + Layout.LEGEND_ITEM_GAP + width > max_width:
             rows.append([])
             used = 0.0
         used += (Layout.LEGEND_ITEM_GAP if rows[-1] else 0) + width
-        rows[-1].append((color, label, width))
+        rows[-1].append((color, label, value, width))
     return [row for row in rows if row]
 
 
@@ -142,7 +142,10 @@ def _wedge(w: Wedge, sx: Scale, sy: Scale) -> str:
         return f'{cx + r * math.sin(angle):.2f} {cy - r * math.cos(angle):.2f}'
 
     large = 1 if w.end - w.start > 0.5 else 0
-    return f'<path d="M{cx:.2f} {cy:.2f} L{point(w.start)} A{r:.2f} {r:.2f} 0 {large} 1 {point(w.end)} Z" fill="{w.color}"/>'
+    return (
+        f'<path d="M{cx:.2f} {cy:.2f} L{point(w.start)} A{r:.2f} {r:.2f} 0 {large} 1 {point(w.end)} Z" fill="{w.color}" '
+        f'stroke="{w.color}" stroke-width="{Layout.WEDGE_SEAM}" stroke-linejoin="round"/>'
+    )
 
 
 def to_svg(chart: Chart, font: Optional[str] = None) -> str:
@@ -182,10 +185,14 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         row_top = header_row(Layout.SWATCH)
         x = 0.0
         items: List[str] = []
-        for color, label, item_width in row:
+        for color, label, value, item_width in row:
             items.append(f'<circle cx="{x + Layout.SWATCH / 2:.2f}" cy="{row_top + Layout.SWATCH / 2:.2f}" r="{Layout.SWATCH / 2}" fill="{color}"/>')
             baseline = row_top + Layout.SWATCH / 2 + cap_height(FontSizes.LEGEND) / 2
-            items.append(_text(x + Layout.SWATCH + Layout.SWATCH_GAP, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
+            label_x = x + Layout.SWATCH + Layout.SWATCH_GAP
+            items.append(_text(label_x, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
+            if value:
+                value_x = label_x + text_width(f'{label} ', FontSizes.LEGEND)
+                items.append(_text(value_x, baseline, value, FontSizes.LEGEND, TextColors.FAINT_GREY))
             x += item_width + Layout.LEGEND_ITEM_GAP
         header_rows.append((x - Layout.LEGEND_ITEM_GAP, items))
     plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if header_rows else top

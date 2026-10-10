@@ -68,7 +68,7 @@ class TestScatterPlotRender:
         plot = ScatterPlot(options)
         chart = plot.render()
 
-        assert [label for _, label in chart.legend] == ["A", "B"]
+        assert [label for _, label, _ in chart.legend] == ["A", "B"]
 
     def test_render_without_hue_hides_legend(self) -> None:
         df = pd.DataFrame({

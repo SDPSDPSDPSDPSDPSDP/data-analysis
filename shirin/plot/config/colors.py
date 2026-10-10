@@ -26,6 +26,7 @@ class Colors:
 class TextColors:
     DARK_GREY = '#444444'
     LIGHT_GREY = '#777777'
+    FAINT_GREY = '#aaaaaa'
     BLACK = '#000000'
     WHITE = '#FFFFFF'
 
@@ -37,3 +38,4 @@ DEFAULT_CYCLE = (
     '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
     '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
 )
+REMAINDER_TINT = 0.78  # share of the way from the filled color to white for a barplot remainder segment

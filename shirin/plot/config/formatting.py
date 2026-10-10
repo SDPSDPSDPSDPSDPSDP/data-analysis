@@ -12,7 +12,8 @@ class FigureSize:
     WIDTH = 8.4
     PLOT_HEIGHT = 3.2
     CATEGORY_SLOT = 0.75  # plot width per category for vertical bars; sets the figure width
-    BAR_ROW = 0.4  # plot height per category for horizontal bars
+    BAR_ROW = 0.6  # plot height per category for horizontal bars
+    HORIZONTAL_WIDTH = 5  # figure width for horizontal bars
     BAR_GROUP_WIDTH = 0.65  # share of a category slot covered by its bars (dodged bars split it)
     DODGE_GAP = 0.06  # share of a category slot left between dodged bars
     PIE = 3.2
@@ -32,4 +33,5 @@ class Layout:
     LEGEND_ITEM_GAP = 14
     LEGEND_GAP = 2  # extra space between title/subtitle and legend
     STACK_BLEND = 20  # gradient length across the boundary between stack segments
+    WEDGE_SEAM = 1  # stroke in the slice's own color: anti-aliased edges of touching slices leave a white seam
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room

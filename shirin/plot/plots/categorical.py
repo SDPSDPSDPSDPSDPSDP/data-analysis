@@ -23,7 +23,7 @@ def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tu
     if options.orientation == 'vertical':
         # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
         return (n_categories * FigureSize.CATEGORY_SLOT + 1, FigureSize.PLOT_HEIGHT)
-    return (FigureSize.WIDTH, n_categories * FigureSize.BAR_ROW)
+    return (FigureSize.HORIZONTAL_WIDTH, n_categories * FigureSize.BAR_ROW)
 
 
 def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
@@ -31,7 +31,7 @@ def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
 
 
 class StackableCategoricalPlot(AbstractPlot):
-    """Shared draw/format logic for count, bar and accuracy plots (plain or stacked by hue)."""
+    """Shared draw/format logic for count and bar plots (plain or stacked by hue)."""
 
     options: CategoricalPlotOptions
     _horizontal_width = 0.8
@@ -63,7 +63,7 @@ class StackableCategoricalPlot(AbstractPlot):
             data,
             self.options.hue,  # type: ignore[arg-type]
             self.options.axis_column,
-            self.options.order_type,
+            self.options.sort,
             value_col=self._value_column(),
             orientation=self.options.orientation,
         )

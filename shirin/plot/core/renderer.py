@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -21,7 +21,7 @@ def _hue_levels(df: pd.DataFrame, hue: str) -> List[Any]:
 
 
 def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
-    chart.legend = [(color, str(label)) for color, label in zip(colors, labels)]
+    chart.legend = [(color, str(label), '') for color, label in zip(colors, labels)]
 
 
 def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
@@ -50,11 +50,12 @@ def _draw_categorical_bars(
     chart: Chart, table: pd.DataFrame, colors: List[str], horizontal: bool, hue: Optional[str]
 ) -> Chart:
     """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
-    n_columns = len(table.columns)
-    width = FigureSize.BAR_GROUP_WIDTH / n_columns
-    bar_width = width - FigureSize.DODGE_GAP if n_columns > 1 else width
+    # hue equal to the category column fills one cell per row: draw full-width bars, no dodge.
+    n_slots = len(table.columns) if (table.notna().sum(axis=1) > 1).any() else 1
+    width = FigureSize.BAR_GROUP_WIDTH / n_slots
+    bar_width = width - FigureSize.DODGE_GAP if n_slots > 1 else width
     for i, (level, color) in enumerate(zip(table.columns, colors)):
-        offset = (i - (n_columns - 1) / 2) * width
+        offset = (i - (n_slots - 1) / 2) * width if n_slots > 1 else 0
         for position, value in enumerate(table[level]):
             if pd.notna(value):
                 _bar(chart, position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)
@@ -94,26 +95,47 @@ def render_barplot(
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
 ) -> Chart:
-    """Bar length is the mean of value per category (and hue)."""
+    """Bar length is the sum of value per category (and hue)."""
     order = order if order is not None else list(df[column].dropna().unique())
     if hue is None:
-        table = df.groupby(column)[value].mean().reindex(order).to_frame()
+        table = df.groupby(column)[value].sum().reindex(order).to_frame()
         return _draw_categorical_bars(chart, table, [color], horizontal, hue)  # type: ignore[list-item]
     levels = _hue_levels(df, hue)
-    table = df.groupby([column, hue])[value].mean().unstack().reindex(index=order, columns=levels)
+    table = df.groupby([column, hue])[value].sum().unstack().reindex(index=order, columns=levels)
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
-def render_stacked_barplot(chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6) -> Chart:
-    """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom."""
+def render_stacked_barplot(
+    chart: Chart,
+    df: pd.DataFrame,
+    horizontal: bool,
+    colors: List[str],
+    width: float = 0.6,
+    overlap: bool = False,
+    row_colors: Optional[List[Tuple[str, str]]] = None,
+) -> Chart:
+    """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
+
+    overlap (two columns only): the first column is its own pill in front of a full-length pill of the second.
+    row_colors (with overlap): (front, back) color per row instead of colors.
+    """
     values = df.to_numpy(dtype=float)
-    outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(values.sum(axis=1))]
-    base = np.zeros(len(df))
-    for column, color in enumerate(colors[:len(df.columns)]):
-        for position, (start, value) in enumerate(zip(base, values[:, column])):
-            fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
-            chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
-        base += values[:, column]
+    totals = values.sum(axis=1)
+    if overlap:
+        if len(df.columns) != 2:
+            raise ValueError(f"overlap needs exactly 2 columns, got {len(df.columns)}")
+        pairs = row_colors if row_colors is not None else [(colors[0], colors[1])] * len(df)
+        for position, (total, first, (front, back)) in enumerate(zip(totals, values[:, 0], pairs)):
+            _bar(chart, position, width, 0, total, back, horizontal, rounded=True)
+            _bar(chart, position, width, 0, first, front, horizontal, rounded=True)
+    else:
+        outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
+        base = np.zeros(len(df))
+        for column, color in enumerate(colors[:len(df.columns)]):
+            for position, (start, value) in enumerate(zip(base, values[:, column])):
+                fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
+                chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
+            base += values[:, column]
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     _set_legend(chart, colors, list(df.columns))
     return chart
@@ -140,15 +162,23 @@ def render_histogram(
         colors = palette_colors(palette, levels)  # type: ignore[arg-type]
         _set_legend(chart, colors, levels)  # type: ignore[arg-type]
 
+    group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
+    stack = hue is not None and stacked is not False
+    outlines = [
+        Rect(left, right, 0, total, '', rounded=True) for left, right, total in zip(edges[:-1], edges[1:], sum(group_counts))
+    ]
     base = np.zeros(len(edges) - 1)
-    for i, (values, group_color) in enumerate(zip(groups, colors)):
-        counts = np.histogram(values, bins=edges)[0].astype(float)
-        for left, right, start, count in zip(edges[:-1], edges[1:], base, counts):
-            if stacked is False and hue is not None:
-                step = (right - left) / len(groups)
-                left, right, start = left + i * step, left + (i + 1) * step, 0
-            chart.rects.append(Rect(left, right, start, start + count, group_color, stroke=TextColors.WHITE))  # type: ignore[arg-type]
-        if stacked is not False:
+    for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
+        for b, (left, right, start, count, outline) in enumerate(zip(edges[:-1], edges[1:], base, counts, outlines)):
+            if not stack:
+                if hue is not None:
+                    step = (right - left) / len(groups)
+                    left, right, start = left + i * step, left + (i + 1) * step, 0
+                chart.rects.append(Rect(left, right, start, start + count, group_color, stroke=TextColors.WHITE, rounded=True))  # type: ignore[arg-type]
+                continue
+            fade_to = next((colors[later] for later in range(i + 1, len(groups)) if group_counts[later][b]), None)
+            chart.rects.append(Rect(left, right, start, start + count, group_color, clip=outline, fade_to=fade_to))  # type: ignore[arg-type]
+        if stack:
             base += counts
     return chart
 

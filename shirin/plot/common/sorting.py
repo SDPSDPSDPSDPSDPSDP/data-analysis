@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Any, Dict, Iterable, Optional
 
-from ..config import OrderTypeInput
+from ..config import SortInput
 
 
 def _as_float(value: Any) -> float:
@@ -18,16 +18,16 @@ def sort_alphabetically(values: Any, ascending: bool = True) -> list:
 
 
 def get_order(
-    order_type: OrderTypeInput,
+    sort: SortInput,
     df: pd.DataFrame,
     column: str,
     value_column: Optional[str] = None,
 ) -> Optional[list]:
     """Category order: by total (value sum or count), alphabetical, or None (data order)."""
-    if order_type == 'frequency':
+    if sort == 'frequency':
         totals = df.groupby(column)[value_column].sum() if value_column else df[column].value_counts()
         return list(totals.sort_values(ascending=False).index)
-    if order_type == 'alphabetical':
+    if sort == 'alphabetical':
         return sort_alphabetically(df[column].unique())
     return None
 
@@ -43,10 +43,10 @@ def sort_by_frequency(df_pivot: pd.DataFrame, ascending: bool = False) -> pd.Dat
     return df_sorted.drop(columns=['_order'])
 
 
-def sort_pivot_table(df_pivot: pd.DataFrame, order_type: Optional[OrderTypeInput], ascending: bool = False) -> pd.DataFrame:
-    if order_type == 'frequency':
+def sort_pivot_table(df_pivot: pd.DataFrame, sort: Optional[SortInput], ascending: bool = False) -> pd.DataFrame:
+    if sort == 'frequency':
         return sort_by_frequency(df_pivot, ascending=ascending)
-    if order_type == 'alphabetical':
+    if sort == 'alphabetical':
         return _sort_dataframe_alphabetically(df_pivot, ascending=ascending)
     return df_pivot
 

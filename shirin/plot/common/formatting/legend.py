@@ -14,4 +14,4 @@ def format_optional_legend(
     if not legend:
         chart.legend = []
     elif label_map:
-        chart.legend = [(color, label_map.get(label, label)) for color, label in chart.legend]
+        chart.legend = [(color, label_map.get(label, label), value) for color, label, value in chart.legend]
