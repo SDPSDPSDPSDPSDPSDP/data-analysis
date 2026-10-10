@@ -5,6 +5,12 @@ import CodeMirror, { keymap, Prec } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { load, run, type RunResult } from "@/lib/pyodide";
 
+// Shown above the editor and prepended to every run.
+const SETUP = `from shirin.plot import PlotGraphs
+from shirin.assets.fake_data import df
+
+plot = PlotGraphs(font='satoshi')`;
+
 type Status = "loading" | "ready" | "running" | "failed";
 
 export default function Playground({ initialCode }: { initialCode: string }) {
@@ -24,31 +30,54 @@ export default function Playground({ initialCode }: { initialCode: string }) {
 
   async function execute(source: string) {
     setStatus("running");
-    setResult(await run(source));
+    setResult(await run(`${SETUP}\n${source}`));
     setStatus("ready");
   }
 
   const runKey = Prec.highest(
-    keymap.of([{ key: "Mod-Enter", run: (view) => (execute(view.state.doc.toString()), true) }]),
+    keymap.of([
+      {
+        key: "Mod-Enter",
+        run: (view) => (execute(view.state.doc.toString()), true),
+      },
+    ]),
   );
 
   return (
-    <main className="playground">
-      <section className="pane">
-        <div className="toolbar">
-          <button onClick={() => execute(code)} disabled={status !== "ready"}>
-            {status === "loading" ? "Loading Python…" : status === "running" ? "Running…" : "Run"}
-          </button>
-          <span className="hint">Ctrl+Enter</span>
-        </div>
-        <CodeMirror value={code} onChange={setCode} extensions={[python(), runKey]} height="100%" className="editor" />
-      </section>
-      <section className="pane output">
-        {result?.images.map((src, i) => <Chart key={i} base64={src} />)}
-        {result?.stdout && <pre>{result.stdout}</pre>}
-        {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && <p className="hint">Press Run to render the chart.</p>}
-      </section>
+    <main>
+      <header className="header">
+        <h1>Shirin</h1>
+        <pre className="setup">{SETUP}</pre>
+      </header>
+      <div className="playground">
+        <section className="pane">
+          <div className="toolbar">
+            <button onClick={() => execute(code)} disabled={status !== "ready"}>
+              {status === "loading"
+                ? "Loading Python…"
+                : status === "running"
+                  ? "Running…"
+                  : "Run"}
+            </button>
+            <span className="hint">Ctrl+Enter</span>
+          </div>
+          <CodeMirror
+            value={code}
+            onChange={setCode}
+            extensions={[python(), runKey]}
+            height="100%"
+            className="editor"
+          />
+        </section>
+        <section className="pane output">
+          {result?.images.map((src, i) => (
+            <Chart key={i} base64={src} />
+          ))}
+          {result?.stdout && <pre>{result.stdout}</pre>}
+          {result?.error && <pre className="error">{result.error}</pre>}
+          {!result && <p className="hint">Press Run to render the chart.</p>}
+        </section>
+      </div>
     </main>
   );
 }
