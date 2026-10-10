@@ -18,7 +18,8 @@ async function init() {
   py.setStderr({ batched: (line) => stdout.push(line) });
   await py.loadPackage(["micropip", "numpy", "pandas"]);
   // micropip reads name and version from the filename, so give it a valid wheel name.
-  const wheel = await fetch("/shirin.whl").then((r) => r.arrayBuffer());
+  // Revalidate so a rebuilt wheel is picked up without a hard reload.
+  const wheel = await fetch("/shirin.whl", { cache: "no-cache" }).then((r) => r.arrayBuffer());
   py.FS.writeFile("/tmp/shirin-0-py3-none-any.whl", new Uint8Array(wheel));
   await py.runPythonAsync(`import micropip; await micropip.install("emfs:/tmp/shirin-0-py3-none-any.whl")`);
   await py.runPythonAsync(SETUP);

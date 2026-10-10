@@ -100,7 +100,7 @@ body {
   align-items: center;
   gap: var(--space-3);
   height: var(--nav-height);
-  padding: 0 var(--space-2);
+  padding: 0 var(--space-1) 0 var(--space-2);
 }
 
 /* Glass on a pseudo-element: backdrop-filter on .nav itself would stop the dropdown's own blur from seeing the page. */

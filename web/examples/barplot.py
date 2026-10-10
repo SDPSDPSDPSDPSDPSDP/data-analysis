@@ -47,17 +47,6 @@ plot.barplot(
     title='Grouped by ripeness',
 )
 
-# %% Stacked by hue
-plot.barplot(
-    df,
-    y='fruit',
-    value='count',
-    hue='is_ripe',
-    stacked=True,
-    legend=True,
-    title='Stacked',
-)
-
 # %% 100% stacked by hue
 plot.barplot(
     df,
@@ -66,5 +55,5 @@ plot.barplot(
     hue='is_ripe',
     normalized=True,
     legend=True,
-    title=['Normalized', 'Share ripe per fruit'],
+    title='Normalized',
 )
