@@ -40,16 +40,16 @@ def test_histogram_suffix_on_tick_labels() -> None:
     assert chart.x.formatter(10) == '10 %'
 
 
-def test_histogram_bars_round_and_stacks_clip_to_total() -> None:
+def test_histogram_bars_round_and_stacks_overlap_as_pills() -> None:
     df = pd.DataFrame({'x': [1, 1, 2, 3], 'hue': ['a', 'b', 'a', 'b']})
     plain = Histogram(HistogramOptions(df=df, x='x', bins=3)).render()
     assert all(rect.rounded and rect.clip is None for rect in plain.rects)
     palette = {'a': '#111111', 'b': '#eeeeee'}
     stacked = Histogram(HistogramOptions(df=df, x='x', bins=3, hue='hue', palette=palette)).render()
-    assert all(not rect.rounded and rect.clip.rounded for rect in stacked.rects)
-    assert stacked.rects[0].clip.height == 2
-    assert stacked.rects[0].fade_to == '#eeeeee'
-    assert stacked.rects[1].fade_to is None
+    assert all(rect.rounded and rect.clip is None and rect.fade_to is None for rect in stacked.rects)
+    back, front = stacked.rects[:3], stacked.rects[3:]
+    assert [r.color for r in back + front] == ['#eeeeee'] * 3 + ['#111111'] * 3
+    assert [r.height for r in back] == [2, 1, 1] and [r.height for r in front] == [1, 1, 0]
 
 
 def test_stacked_barplot_sums_duplicate_rows() -> None:
