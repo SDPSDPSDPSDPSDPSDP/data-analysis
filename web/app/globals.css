@@ -126,6 +126,11 @@ body {
   font-size: var(--font-size-h3);
 }
 
+/* Sections sit in a category div, outside .page's flex gap. */
+.page > div > :is(h2, h3) + .setup-cell {
+  margin-top: var(--space-2);
+}
+
 .page h3 ~ h3 {
   margin-top: var(--space-6);
 }

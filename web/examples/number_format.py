@@ -1,4 +1,4 @@
-# %% [setup] Format numbers the Dutch way: '.' between thousands, ',' before decimals.
+# %% [setup]
 from shirin.number_format import format_compact, format_percentage, format_thousands
 
 # %% Thousands

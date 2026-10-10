@@ -111,7 +111,7 @@ export default function Playground({ setup, categories }: Props) {
         <h2>Setup</h2>
         {setup.map((cell, i) => (
           <section key={i} className="setup-cell">
-            <p>{cell.explanation}</p>
+            {cell.explanation && <p>{cell.explanation}</p>}
             <CodeBlock
               value={setupCodes[i]}
               onChange={(code) => setSetupCodes((codes) => codes.map((c, j) => (j === i ? code : c)))}

@@ -53,7 +53,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       <Heading id={sectionId(title)}>{title}</Heading>
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
-          <p>{cell.explanation}</p>
+          {cell.explanation && <p>{cell.explanation}</p>}
           <CodeBlock value={cell.code} />
         </section>
       ))}
