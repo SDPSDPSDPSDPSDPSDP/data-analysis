@@ -94,13 +94,13 @@ def render_barplot(
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
 ) -> Chart:
-    """Bar length is the mean of value per category (and hue)."""
+    """Bar length is the sum of value per category (and hue)."""
     order = order if order is not None else list(df[column].dropna().unique())
     if hue is None:
-        table = df.groupby(column)[value].mean().reindex(order).to_frame()
+        table = df.groupby(column)[value].sum().reindex(order).to_frame()
         return _draw_categorical_bars(chart, table, [color], horizontal, hue)  # type: ignore[list-item]
     levels = _hue_levels(df, hue)
-    table = df.groupby([column, hue])[value].mean().unstack().reindex(index=order, columns=levels)
+    table = df.groupby([column, hue])[value].sum().unstack().reindex(index=order, columns=levels)
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 

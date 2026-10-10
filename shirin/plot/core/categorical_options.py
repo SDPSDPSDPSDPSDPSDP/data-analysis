@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from typing import ClassVar, Optional
 
 from ..config.colors import Colors
-from ..config import OrderType, OrderTypeInput
+from ..config import Sort, SortInput
 from .base_options import (
-    VALID_ORDER_TYPES,
+    VALID_SORTS,
     VALID_ORIENTATIONS,
     BasePlotOptions,
     validate_str_or_enum_option,
@@ -18,7 +18,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     axis_column: str = ''
     orientation: str = 'vertical'
     stacked: bool = False
-    order_type: OrderTypeInput = 'frequency'
+    sort: SortInput = 'frequency'
     data_labels: bool = True
     suffix: Optional[str] = None
 
@@ -34,12 +34,11 @@ class CategoricalPlotOptions(BasePlotOptions):
         )
 
         validate_str_or_enum_option(
-            option_name='order_type',
-            value=self.order_type,
-            valid_options=VALID_ORDER_TYPES,
-            enum_type=OrderType,
+            option_name='sort',
+            value=self.sort,
+            valid_options=VALID_SORTS,
+            enum_type=Sort,
         )
-
 
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
@@ -58,7 +57,7 @@ class BarPlotOptions(CategoricalPlotOptions):
     column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column', 'value')
 
     value: str = ''
-    percentage_labels: bool = False
+    normalized: bool = False
 
     def validate(self) -> None:
         super().validate()
@@ -67,10 +66,16 @@ class BarPlotOptions(CategoricalPlotOptions):
 
 
 @dataclass
-class NormalizedCountPlotOptions(CategoricalPlotOptions):
-    """Always a 100%-stacked plot of hue shares; `stacked` is ignored."""
+class NormalizedPlotOptions(CategoricalPlotOptions):
+    """Always a 100%-stacked plot of hue shares; `stacked` is ignored.
+
+    Shares are of row counts, or of the summed `value` column when set.
+    """
+
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column', 'value')
 
     top_n: Optional[int] = None
+    value: Optional[str] = None
 
     def validate(self) -> None:
         super().validate()
@@ -82,7 +87,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
-    """`stacked`, `hue` and `order_type` are fixed for accuracy plots."""
+    """`stacked`, `hue` and `sort` are fixed for accuracy plots."""
 
     # hue is a synthetic column added in transform, so it is not checked against df.
     column_fields: ClassVar[tuple[str, ...]] = ('axis_column', 'value_column')

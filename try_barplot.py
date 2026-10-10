@@ -22,12 +22,12 @@ plot.barplot(totals, x='fruit', value='count', title=['Fruit counts', 'Pre-aggre
 plot.barplot(totals, y='fruit', value='count', title=['Fruit counts', 'Pre-aggregated'], x_axis_label='Count', y_axis_label='Fruit')
 
 # %% alphabetical, no labels
-plot.barplot(totals, x='fruit', value='count', order_type='alphabetical', data_labels=False, title='Alphabetical')
-plot.barplot(totals, y='fruit', value='count', order_type='alphabetical', data_labels=False, title='Alphabetical')
+plot.barplot(totals, x='fruit', value='count', sort='alphabetical', data_labels=False, title='Alphabetical')
+plot.barplot(totals, y='fruit', value='count', sort='alphabetical', data_labels=False, title='Alphabetical')
 
 # %% percentage labels
-plot.barplot(shares, x='fruit', value='share', percentage_labels=True, title='Share of total')
-plot.barplot(shares, y='fruit', value='share', percentage_labels=True, title='Share of total')
+plot.barplot(shares, x='fruit', value='share', normalized=True, title='Share of total')
+plot.barplot(shares, y='fruit', value='share', normalized=True, title='Share of total')
 
 # %% hue, grouped bars, legend
 plot.barplot(by_ripe, x='fruit', value='count', hue='is_ripe', legend=True, title='Grouped by ripeness')

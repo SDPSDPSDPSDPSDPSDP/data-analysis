@@ -54,7 +54,7 @@ class AccuracyPlot(StackableCategoricalPlot):
             data,
             self.options.hue,  # type: ignore[arg-type]
             self.options.axis_column,
-            order_type=None,
+            sort=None,
             value_col=_VALUE_COL,
             orientation=self.options.orientation,
         )[[_CORRECT_KEY, _INCORRECT_KEY]]

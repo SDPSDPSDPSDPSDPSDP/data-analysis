@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ..core import renderer
-from ..core.categorical_options import NormalizedCountPlotOptions
+from ..core.categorical_options import NormalizedPlotOptions
 from ..core.base_plot import AbstractPlot
 from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
@@ -12,10 +12,10 @@ from ..common.stacked_plots import sort_stacked_pivot
 from .categorical import create_sized_figure
 
 
-class NormalizedCountPlot(AbstractPlot):
-    options: NormalizedCountPlotOptions
+class NormalizedPlot(AbstractPlot):
+    options: NormalizedPlotOptions
 
-    def __init__(self, options: NormalizedCountPlotOptions):
+    def __init__(self, options: NormalizedPlotOptions):
         super().__init__(options)
         self._normalized_pivot: Optional[pd.DataFrame] = None
 
@@ -27,8 +27,12 @@ class NormalizedCountPlot(AbstractPlot):
         return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        shares = pd.crosstab(df[self.options.axis_column], df[self.options.hue], normalize='index')
-        self._normalized_pivot = sort_stacked_pivot(shares, self.options.order_type, self.options.orientation)
+        values = df[self.options.value] if self.options.value else None
+        shares = pd.crosstab(
+            df[self.options.axis_column], df[self.options.hue],
+            values=values, aggfunc='sum' if values is not None else None, normalize='index',
+        )
+        self._normalized_pivot = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:

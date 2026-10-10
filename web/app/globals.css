@@ -247,6 +247,10 @@ body {
   font-size: var(--font-size-h3);
 }
 
+.page h3 ~ h3 {
+  margin-top: var(--space-6);
+}
+
 .setup-cell {
   display: flex;
   flex-direction: column;

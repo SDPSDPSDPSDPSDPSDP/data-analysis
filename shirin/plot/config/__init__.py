@@ -2,10 +2,10 @@ from .colors import Colors, TextColors
 from .palettes import PaletteInput, LabelMappingInput
 from .formatting import FontSizes, FigureSize, Layout
 from .types import (
-    OrderType,
+    Sort,
     FillMissingValues,
     TimeGroupBy,
-    OrderTypeInput,
+    SortInput,
     FillMissingValuesInput,
     TimeGroupByInput,
     TitleInput,
@@ -19,10 +19,10 @@ __all__ = [
     'FontSizes',
     'FigureSize',
     'Layout',
-    'OrderType',
+    'Sort',
     'FillMissingValues',
     'TimeGroupBy',
-    'OrderTypeInput',
+    'SortInput',
     'FillMissingValuesInput',
     'TimeGroupByInput',
     'TitleInput',

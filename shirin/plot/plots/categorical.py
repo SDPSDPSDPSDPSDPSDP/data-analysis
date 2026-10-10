@@ -63,7 +63,7 @@ class StackableCategoricalPlot(AbstractPlot):
             data,
             self.options.hue,  # type: ignore[arg-type]
             self.options.axis_column,
-            self.options.order_type,
+            self.options.sort,
             value_col=self._value_column(),
             orientation=self.options.orientation,
         )

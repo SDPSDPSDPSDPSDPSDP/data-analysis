@@ -1,10 +1,10 @@
 import pandas as pd
 from typing import Optional
 
-from ..config import TitleInput, OrderTypeInput
-from ..core import CountPlotOptions, NormalizedCountPlotOptions
+from ..config import TitleInput, SortInput
+from ..core import CountPlotOptions, NormalizedPlotOptions
 from ..common.resolve_palette import resolve_palette
-from ..plots import CountPlot, NormalizedCountPlot
+from ..plots import CountPlot, NormalizedPlot
 
 
 class CountPlotsMixin:
@@ -20,7 +20,7 @@ class CountPlotsMixin:
         suffix: Optional[str] = None,
         legend: bool = False,
         data_labels: bool = True,
-        order_type: OrderTypeInput = 'frequency',
+        sort: SortInput = 'frequency',
         top_n: Optional[int] = None,
         stacked: bool = False,
         normalized: bool = False,
@@ -48,7 +48,7 @@ class CountPlotsMixin:
                 *Default: `True`*.
 
         Layout:
-            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+            sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
             top_n: Show only the top N most frequent categories. *Optional*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
@@ -74,10 +74,10 @@ class CountPlotsMixin:
             suffix=suffix,
             legend=legend,
             data_labels=data_labels,
-            order_type=order_type,
+            sort=sort,
             top_n=top_n,
         )
         if normalized and hue is not None:
-            self._render(NormalizedCountPlot(NormalizedCountPlotOptions(**common)))
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
             self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))

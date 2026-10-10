@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List, Optional, Union
 
 
-class OrderType(str, Enum):
+class Sort(str, Enum):
     FREQUENCY = 'frequency'
     ALPHABETICAL = 'alphabetical'
 
@@ -18,7 +18,7 @@ class TimeGroupBy(str, Enum):
     DAY = 'day'
 
 
-OrderTypeInput = Union[OrderType, str]
+SortInput = Union[Sort, str]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
 TimeGroupByInput = Union[TimeGroupBy, str]
 TitleInput = Union[str, List[str]]

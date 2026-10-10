@@ -3,12 +3,12 @@ from .countplot import CountPlot
 from .histogram import Histogram
 from .lineplot import LinePlot
 from .piechart import PieChart
-from .normalized_countplot import NormalizedCountPlot
+from .normalized_plot import NormalizedPlot
 from .timeplot import TimePlot
 from .accuracy import AccuracyPlot
 from .scatterplot import ScatterPlot
 
 __all__ = [
-    'CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot', 'TimePlot',
+    'CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedPlot', 'TimePlot',
     'AccuracyPlot', 'ScatterPlot',
 ]

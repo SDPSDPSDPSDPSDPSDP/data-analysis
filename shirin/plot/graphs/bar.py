@@ -1,10 +1,10 @@
 import pandas as pd
 from typing import Optional
 
-from ..config import TitleInput, OrderTypeInput
-from ..core import BarPlotOptions
+from ..config import TitleInput, SortInput
+from ..core import BarPlotOptions, NormalizedPlotOptions
 from ..common.resolve_palette import resolve_palette
-from ..plots import BarPlot
+from ..plots import BarPlot, NormalizedPlot
 
 
 class BarPlotsMixin:
@@ -18,16 +18,17 @@ class BarPlotsMixin:
         title: Optional[TitleInput] = None,
         x_axis_label: Optional[str] = None,
         y_axis_label: Optional[str] = None,
-        percentage_labels: bool = False,
         suffix: Optional[str] = None,
         legend: bool = False,
         data_labels: bool = True,
         stacked: bool = False,
-        order_type: OrderTypeInput = 'frequency',
+        normalized: bool = False,
+        sort: SortInput = 'frequency',
     ) -> None:
         """Create a **bar plot** with pre-aggregated data.
 
         _Unlike countplot, this requires a column with pre-calculated values._
+        Rows with the same category (and hue) are summed.
         Pass `x` for vertical bars or `y` for horizontal bars, not both.
 
         Input:
@@ -42,20 +43,21 @@ class BarPlotsMixin:
                 subtitle line. *Optional*.
             x_axis_label: Label for the x-axis. *Optional*.
             y_axis_label: Label for the y-axis. *Optional*.
-            percentage_labels: Whether to format data labels as percentages. *Default: `False`*.
             suffix: Text appended to each data label (e.g. `'%'` -> `'12 %'`). *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
             data_labels: Whether to show the value on each bar. *Default: `True`*.
 
         Layout:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
-            order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
+            normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
+                Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
         """
         if (x is None) == (y is None):
             raise ValueError('barplot needs exactly one of x or y.')
         vertical = x is not None
-        options = BarPlotOptions(
+        common = dict(
             df=df,
             axis_column=x if vertical else y,
             value=value,
@@ -65,12 +67,12 @@ class BarPlotsMixin:
             title=title,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
-            percentage_labels=percentage_labels,
             suffix=suffix,
             legend=legend,
             data_labels=data_labels,
-            stacked=stacked,
-            order_type=order_type,
+            sort=sort,
         )
-
-        self._render(BarPlot(options))
+        if normalized and hue is not None:
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
+        else:
+            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))

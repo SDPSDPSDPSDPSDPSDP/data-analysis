@@ -6,11 +6,11 @@ are applied correctly to bar colors and axis tick labels.
 """
 import pandas as pd
 
-from shirin.plot.plots import BarPlot, CountPlot, NormalizedCountPlot
+from shirin.plot.plots import BarPlot, CountPlot, NormalizedPlot
 from shirin.plot.core import (
     CountPlotOptions,
     BarPlotOptions,
-    NormalizedCountPlotOptions,
+    NormalizedPlotOptions,
 )
 
 from shirin.plot.config.colors import Colors
@@ -73,7 +73,7 @@ class TestStackedBarPlotTextColors:
         assert plot._palette is not None
 
 
-class TestNormalizedCountPlotPaletteKeys:
+class TestNormalizedPlotPaletteKeys:
     """Integration tests for normalized count plot palette key handling."""
 
     def test_normalized_countplot_boolean_palette_keys_do_not_raise(self):
@@ -85,7 +85,7 @@ class TestNormalizedCountPlotPaletteKeys:
 
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
 
-        options = NormalizedCountPlotOptions(
+        options = NormalizedPlotOptions(
             df=df,
             axis_column='category',
             orientation='vertical',
@@ -94,7 +94,7 @@ class TestNormalizedCountPlotPaletteKeys:
             data_labels=False,
         )
 
-        plot = NormalizedCountPlot(options)
+        plot = NormalizedPlot(options)
         plot.render()
 
         assert plot._normalized_pivot is not None
@@ -142,7 +142,7 @@ class TestAxisLabelMapping:
             orientation='horizontal',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
             legend=False,
-            percentage_labels=False,
+            normalized=False,
         )
 
         plot = BarPlot(options)
