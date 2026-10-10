@@ -4,22 +4,13 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 
-def _create_base_dataframe() -> DataFrame:
-    initial_labels = ["A", "B", "A", "C", "B", "B", "C", "A", "A", "C", "D", "E", "F", "A", "B", "C"]
-    initial_values = [5, 3, 8, 9, 4, 7, 6, 3, 2, 8, 1, 2, 3, 6, 5, 4]
-    
-    df = pd.DataFrame({
-        "label": initial_labels,
-        "values": initial_values,
+def _create_base_dataframe(rng: np.random.Generator, num_rows: int = 1000) -> DataFrame:
+    labels = ["Apple", "Banana", "Orange", "Grape", "Mango", "Kiwi"]
+    weights = [0.28, 0.22, 0.17, 0.14, 0.11, 0.08]
+    return pd.DataFrame({
+        "label": rng.choice(labels, size=num_rows, p=weights),
+        "values": rng.integers(1, 10, size=num_rows),
     })
-    
-    df["label"] = "Label " + df["label"]
-    
-    return df
-
-
-def _expand_dataframe(df: DataFrame, multiplier: int = 10000) -> DataFrame:
-    return pd.concat([df] * multiplier, ignore_index=True)
 
 
 def _generate_middle_weighted_values(
@@ -77,10 +68,9 @@ def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
     return pd.DataFrame(rows)
 
 
-def generate_fake_data(seed: int = 42) -> tuple[DataFrame, DataFrame]:
+def generate_demo_data(seed: int = 42) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
-    df = _create_base_dataframe()
-    df = _expand_dataframe(df)
+    df = _create_base_dataframe(rng)
     df["example_hue_3"] = _generate_middle_weighted_values(rng, len(df))
     df = _add_category_columns(rng, df)
 
@@ -140,7 +130,7 @@ def generate_time_series(
 
 @functools.lru_cache(maxsize=None)
 def _build_lazy_frames() -> dict:
-    df, df_documents_by_year = generate_fake_data()
+    df, df_documents_by_year = generate_demo_data()
     return {
         'df': df,
         'df_documents_by_year': df_documents_by_year,

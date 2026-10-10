@@ -2,7 +2,7 @@ import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 
 const SETUP = `from shirin.plot import PlotGraphs
-from shirin.assets.fake_data import df
+from shirin.assets.demo_data import df
 
 plot = PlotGraphs(font='satoshi')`;
 
