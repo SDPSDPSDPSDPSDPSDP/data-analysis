@@ -60,10 +60,21 @@ plot.barplot(
 
 # %% Share: fill each bar up to 100% with the remainder
 plot.barplot(
-    df[df['is_ripe']],
+    df,
     x='fruit',
     value='sold_share',
     remainder='Unsold',
     normalized=True,
-    title='Share of ripe fruit sold',
+    title='Share sold',
+)
+
+# %% Share, colored per fruit
+plot.barplot(
+    df,
+    y='fruit',
+    value='sold_share',
+    hue='fruit',
+    remainder='Unsold',
+    normalized=True,
+    title='Share sold per fruit',
 )

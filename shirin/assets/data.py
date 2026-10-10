@@ -17,11 +17,10 @@ def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> 
 
 
 def _count_fruit(df: DataFrame) -> DataFrame:
-    """Pre-aggregated fruit data: one row per fruit and ripeness, with count and share sold."""
-    ripe_sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Mango': .97, 'Fig': .6}
+    """Pre-aggregated fruit data: one row per fruit and ripeness, with count and the fruit's share sold."""
+    sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Mango': .97, 'Fig': .6}
     counts = df.groupby(['fruit', 'is_ripe']).size().reset_index(name='count')
-    # Unripe fruit sells at half the rate of ripe fruit.
-    counts['sold_share'] = counts['fruit'].map(ripe_sold_share) * counts['is_ripe'].map({True: 1, False: .5})
+    counts['sold_share'] = counts['fruit'].map(sold_share)
     return counts
 
 

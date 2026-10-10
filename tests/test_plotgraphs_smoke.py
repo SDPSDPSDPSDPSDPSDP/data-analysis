@@ -258,6 +258,39 @@ def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
     assert back.color == blend(front.color, '#FFFFFF', REMAINDER_TINT)
 
 
-def test_barplot_remainder_rejects_duplicate_categories(plot: PlotGraphs) -> None:
-    with pytest.raises(ValueError, match='one row per category'):
+def test_barplot_remainder_rejects_conflicting_fractions(plot: PlotGraphs) -> None:
+    with pytest.raises(ValueError, match='same on every row'):
         plot.barplot(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder='Incorrect')
+
+
+def test_fill_remainder_collapses_repeated_fraction() -> None:
+    df = pd.DataFrame({'run': ['a', 'a', 'b'], 'acc': [0.6, 0.6, 0.9]})
+    filled = fill_remainder(df, 'run', 'acc', 'Incorrect')
+    assert filled[REMAINDER_SHARE_COL].round(2).tolist() == [0.6, 0.9, 0.4, 0.1]
+
+
+def test_remainder_segment_has_no_data_label() -> None:
+    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
+    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect'))
+    chart = plot.draw(plot.transform(plot.preprocess()))
+    plot.format_plot(chart)
+    assert [text.text for text in chart.texts] == ['70%']
+
+
+def test_barplot_remainder_with_category_hue_colors_each_bar(plot: PlotGraphs) -> None:
+    df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
+    options = NormalizedPlotOptions(
+        df=fill_remainder(df, 'run', 'acc', 'Incorrect'), axis_column='run', hue='acc', value=REMAINDER_SHARE_COL,
+        remainder='Incorrect', category_palette={'a': '#ff0000', 'b': '#0000ff'},
+    )
+    nplot = NormalizedPlot(options)
+    chart = nplot.draw(nplot.transform(nplot.preprocess()))
+    fronts = [rect.color for rect in chart.rects[1::2]]
+    assert fronts == ['#0000ff', '#ff0000']
+    plot.barplot(df, y='run', value='acc', hue='run', remainder='Incorrect', normalized=True)
+
+
+def test_barplot_remainder_rejects_other_hue(plot: PlotGraphs) -> None:
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7], 'g': ['x']})
+    with pytest.raises(ValueError, match='hue must be the category column'):
+        plot.barplot(df, x='run', value='acc', hue='g', remainder='Incorrect', normalized=True)

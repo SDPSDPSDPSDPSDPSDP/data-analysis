@@ -3,6 +3,7 @@ from typing import Optional
 
 from ..config import TitleInput, SortInput
 from ..core import BarPlotOptions, NormalizedPlotOptions
+from ..core.base_plot import default_palette
 from ..common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
 from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot, NormalizedPlot
@@ -55,7 +56,8 @@ class BarPlotsMixin:
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
             remainder: Label for the gap up to 100% when `value` holds fractions in [0, 1]
                 (e.g. `value='accuracy', remainder='Incorrect'`). Needs `normalized=True` and no `hue`.
-                The filled segment is labelled with the `value` column name. *Optional*.
+                The filled segment is labelled with the `value` column name. Pass `hue` equal to `x`/`y`
+                to color each bar by its category instead. *Optional*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
         """
@@ -78,8 +80,15 @@ class BarPlotsMixin:
             sort=sort,
         )
         if remainder is not None:
-            if hue is not None or not normalized:
-                raise ValueError('remainder needs normalized=True and no hue.')
+            if not normalized:
+                raise ValueError('remainder needs normalized=True.')
+            if hue is not None and hue != common['axis_column']:
+                raise ValueError(f"With remainder, hue must be the category column {common['axis_column']!r} or None.")
+            if hue is not None:
+                category_palette = common['palette']
+                if not isinstance(category_palette, dict):
+                    category_palette = default_palette(df[hue], category_palette)
+                common['category_palette'] = category_palette
             common.update(
                 df=fill_remainder(df, common['axis_column'], value, remainder),
                 value=REMAINDER_SHARE_COL,
@@ -87,6 +96,8 @@ class BarPlotsMixin:
                 remainder=remainder,
                 **resolve_palette(self, value),
             )
+            if isinstance(common['palette'], str):
+                common['palette'] = {value: common['palette']}
         if normalized and common['hue'] is not None:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:

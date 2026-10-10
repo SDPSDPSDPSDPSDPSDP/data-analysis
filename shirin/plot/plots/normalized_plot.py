@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 import pandas as pd
 
@@ -7,7 +7,7 @@ from ..core.categorical_options import NormalizedPlotOptions
 from ..core.base_plot import AbstractPlot
 from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
-from ..common.sorting import create_colors_list
+from ..common.sorting import create_colors_list, palette_colors
 from ..common.stacked_plots import sort_stacked_pivot
 from ..common.colors import blend
 from ..config import TextColors
@@ -51,8 +51,16 @@ class NormalizedPlot(AbstractPlot):
             self._normalized_pivot = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
         return df
 
+    def _category_colors(self) -> Optional[List[str]]:
+        """Fill color per bar when bars are colored by category, else None."""
+        if self.options.category_palette is None:
+            return None
+        palette = {str(key): color for key, color in self.options.category_palette.items()}
+        return palette_colors(palette, self._normalized_pivot.index)  # type: ignore[union-attr]
+
     def draw(self, data: pd.DataFrame) -> Any:
         vertical = self.options.orientation == 'vertical'
+        category_colors = self._category_colors()
         return renderer.render_stacked_barplot(
             create_sized_figure(self, data),
             df=self._normalized_pivot,  # type: ignore[arg-type]
@@ -60,6 +68,9 @@ class NormalizedPlot(AbstractPlot):
             colors=create_colors_list(self._normalized_pivot, self._palette),  # type: ignore[arg-type]
             width=0.6 if vertical else 0.8,
             overlap=len(self._normalized_pivot.columns) == 2,  # type: ignore[union-attr]
+            row_colors=None if category_colors is None else [
+                (color, blend(color, TextColors.WHITE, REMAINDER_TINT)) for color in category_colors
+            ],
         )
 
     def format_plot(self, plot: Any) -> None:
@@ -71,10 +82,15 @@ class NormalizedPlot(AbstractPlot):
             format_ticks(plot, x_grid=True, percentage_x=True)
 
         if self.options.data_labels:
+            labelled = self._normalized_pivot
+            if self.options.remainder is not None:
+                # The remainder is stacked last, so dropping it leaves the other labels in place.
+                labelled = labelled.drop(columns=self.options.remainder)  # type: ignore[union-attr]
             format_datalabels_stacked_normalized(
                 plot,
-                self._normalized_pivot,  # type: ignore[arg-type]
+                labelled,  # type: ignore[arg-type]
                 self._palette,  # type: ignore[arg-type]
                 orientation=self.options.orientation,
                 suffix=self.options.suffix,
+                row_colors=self._category_colors(),
             )

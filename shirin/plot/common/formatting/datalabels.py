@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 import pandas as pd
 
 from ...config import FontSizes, Layout, TextColors
@@ -60,7 +60,9 @@ def _add_stacked_labels(
     orientation: str,
     suffix: Optional[str],
     threshold: float,
+    row_colors: Optional[List[str]] = None,
 ) -> None:
+    """row_colors: background per row, overriding the palette color of each column."""
     for index, (row_values, row_percentages) in enumerate(zip(pivot_data.values, percentages)):
         cumulative_sum = 0
         for category, value, value_percentage in zip(pivot_data.columns, row_values, row_percentages):
@@ -73,7 +75,7 @@ def _add_stacked_labels(
                 x,
                 y,
                 _format_stacked_percentage(value_percentage, suffix),
-                get_text_color_for_background(palette[str(category)]),
+                get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
                 FontSizes.DATALABELS,
             ))
 
@@ -97,5 +99,9 @@ def format_datalabels_stacked_normalized(
     palette: Dict,
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
+    row_colors: Optional[List[str]] = None,
 ) -> None:
-    _add_stacked_labels(chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=Layout.STACKED_LABEL_MIN_SHARE)
+    _add_stacked_labels(
+        chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix,
+        threshold=Layout.STACKED_LABEL_MIN_SHARE, row_colors=row_colors,
+    )

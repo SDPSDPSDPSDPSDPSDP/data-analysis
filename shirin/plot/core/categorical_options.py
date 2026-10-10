@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional
+from typing import ClassVar, Dict, Optional
 
 from ..config import Sort, SortInput
 from .base_options import (
@@ -76,6 +76,7 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     value: Optional[str] = None
     remainder: Optional[str] = None  # hue level drawn last, tinted from the other level unless the palette sets it
+    category_palette: Optional[Dict[str, str]] = None  # with remainder: one color per bar instead of per hue level
 
     def validate(self) -> None:
         super().validate()
@@ -83,3 +84,7 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
             raise ValueError("hue must be specified for normalized plots")
         if self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) for normalized plots")
+        if self.category_palette is not None and self.remainder is None:
+            raise ValueError("category_palette needs remainder")
+        if self.category_palette is not None and self.legend:
+            raise ValueError("legend is not supported when bars are colored by category")

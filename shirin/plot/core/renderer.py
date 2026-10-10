@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -105,20 +105,28 @@ def render_barplot(
 
 
 def render_stacked_barplot(
-    chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6, overlap: bool = False
+    chart: Chart,
+    df: pd.DataFrame,
+    horizontal: bool,
+    colors: List[str],
+    width: float = 0.6,
+    overlap: bool = False,
+    row_colors: Optional[List[Tuple[str, str]]] = None,
 ) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
 
     overlap (two columns only): the first column is its own pill in front of a full-length pill of the second.
+    row_colors (with overlap): (front, back) color per row instead of colors.
     """
     values = df.to_numpy(dtype=float)
     totals = values.sum(axis=1)
     if overlap:
         if len(df.columns) != 2:
             raise ValueError(f"overlap needs exactly 2 columns, got {len(df.columns)}")
-        for position, (total, first) in enumerate(zip(totals, values[:, 0])):
-            _bar(chart, position, width, 0, total, colors[1], horizontal, rounded=True)
-            _bar(chart, position, width, 0, first, colors[0], horizontal, rounded=True)
+        pairs = row_colors if row_colors is not None else [(colors[0], colors[1])] * len(df)
+        for position, (total, first, (front, back)) in enumerate(zip(totals, values[:, 0], pairs)):
+            _bar(chart, position, width, 0, total, back, horizontal, rounded=True)
+            _bar(chart, position, width, 0, first, front, horizontal, rounded=True)
     else:
         outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
         base = np.zeros(len(df))
