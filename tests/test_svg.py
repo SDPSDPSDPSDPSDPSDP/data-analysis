@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from shirin.plot.svg import Chart, Rect, Text, to_svg
+from shirin.plot.svg import Chart, Rect, Text, Wedge, to_svg
 from shirin.plot.svg.fonts import text_width
 from shirin.plot.svg.ticks import date_ticks, nice_ticks, to_days
 
@@ -93,3 +93,12 @@ def test_long_data_label_shrinks_plot_width() -> None:
 def test_axis_without_data_raises() -> None:
     with pytest.raises(ValueError, match="no data"):
         to_svg(Chart(width=6, plot_height=3))
+
+
+def test_wedge_stroked_in_own_color_hides_seams() -> None:
+    c = Chart(None, plot_height=2)
+    c.x.lim = c.y.lim = (-1, 1)
+    c.wedges = [Wedge(0, 0.3, '#ff0000'), Wedge(0.3, 1, '#00ff00')]
+    svg = to_svg(c)
+    assert 'fill="#ff0000" stroke="#ff0000"' in svg
+    assert 'fill="#00ff00" stroke="#00ff00"' in svg

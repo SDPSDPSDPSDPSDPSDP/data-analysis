@@ -142,7 +142,10 @@ def _wedge(w: Wedge, sx: Scale, sy: Scale) -> str:
         return f'{cx + r * math.sin(angle):.2f} {cy - r * math.cos(angle):.2f}'
 
     large = 1 if w.end - w.start > 0.5 else 0
-    return f'<path d="M{cx:.2f} {cy:.2f} L{point(w.start)} A{r:.2f} {r:.2f} 0 {large} 1 {point(w.end)} Z" fill="{w.color}"/>'
+    return (
+        f'<path d="M{cx:.2f} {cy:.2f} L{point(w.start)} A{r:.2f} {r:.2f} 0 {large} 1 {point(w.end)} Z" fill="{w.color}" '
+        f'stroke="{w.color}" stroke-width="{Layout.WEDGE_SEAM}" stroke-linejoin="round"/>'
+    )
 
 
 def to_svg(chart: Chart, font: Optional[str] = None) -> str:

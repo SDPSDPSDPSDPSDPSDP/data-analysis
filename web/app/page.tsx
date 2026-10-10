@@ -74,10 +74,28 @@ export default function Home() {
       ],
     }),
   ];
+  const pieCharts = [
+    section("Pie charts", "piechart.py", {
+      description: "One row per observation. The plot counts the rows per value and shows each count as a slice.",
+      columns: [
+        { name: "fruit", role: "col" },
+        { name: "is_ripe", role: "" },
+      ],
+      rows: [
+        ["Apple", "True"],
+        ["Apple", "False"],
+        ["Cherry", "True"],
+        ["Mango", "True"],
+      ],
+    }),
+  ];
   return (
     <Playground
       setup={parseExamples("setup.py").setup}
-      categories={[{ title: "Bar charts", sections: barCharts }]}
+      categories={[
+        { title: "Bar charts", sections: barCharts },
+        { title: "Pie charts", sections: pieCharts },
+      ]}
     />
   );
 }

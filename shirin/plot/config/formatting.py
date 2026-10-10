@@ -33,4 +33,5 @@ class Layout:
     LEGEND_ITEM_GAP = 14
     LEGEND_GAP = 2  # extra space between title/subtitle and legend
     STACK_BLEND = 20  # gradient length across the boundary between stack segments
+    WEDGE_SEAM = 1  # stroke in the slice's own color: anti-aliased edges of touching slices leave a white seam
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room

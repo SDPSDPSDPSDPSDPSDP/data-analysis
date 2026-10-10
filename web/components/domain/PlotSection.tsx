@@ -29,16 +29,19 @@ export function sectionId(title: string): string {
 type Props = PlotSectionData & {
   globalSetup: string;
   expandAll: boolean;
+  // Only section of its category: takes the category's heading level instead.
+  standalone: boolean;
 };
 
-export default function PlotSection({ title, dataFormat, setup, hiddenSetup, examples, globalSetup, expandAll }: Props) {
+export default function PlotSection({ title, dataFormat, setup, hiddenSetup, examples, globalSetup, expandAll, standalone }: Props) {
   const setupCode = [globalSetup, ...setup.map((cell) => cell.code), hiddenSetup].join("\n\n");
   const moreExamples = examples
     .slice(1)
     .map((code, i) => <RunnableCode key={i} initialCode={code} setup={setupCode} />);
+  const Heading = standalone ? "h2" : "h3";
   return (
     <>
-      <h3 id={sectionId(title)}>{title}</h3>
+      <Heading id={sectionId(title)}>{title}</Heading>
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           <p>{cell.explanation}</p>

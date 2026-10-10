@@ -7,6 +7,7 @@
   - scatterplot
   - timeplot
   - lineplot
+- custom scrollbar
 
 # later
 - portfolio

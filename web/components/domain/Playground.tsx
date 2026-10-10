@@ -5,6 +5,7 @@ import {
   ChartArea,
   ChartBarBig,
   ChartColumn,
+  ChartPie,
   ChevronsDownUp,
   ChevronsUpDown,
   Tally5,
@@ -19,6 +20,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   Countplots: Tally5,
   Barplots: ChartBarBig,
   Histograms: ChartArea,
+  "Pie charts": ChartPie,
 };
 
 type Category = {
@@ -59,22 +61,24 @@ export default function Playground({ setup, categories }: Props) {
                 <NavIcon title={category.title} />
                 {category.title}
               </a>
-              <div className="nav-dropdown">
-                {category.sections.map((section) => (
-                  <a
-                    key={section.title}
-                    href={`#${sectionId(section.title)}`}
-                    className="nav-link"
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      setDropdownClosed(true);
-                    }}
-                  >
-                    <NavIcon title={section.title} />
-                    {section.title}
-                  </a>
-                ))}
-              </div>
+              {category.sections.length > 1 && (
+                <div className="nav-dropdown">
+                  {category.sections.map((section) => (
+                    <a
+                      key={section.title}
+                      href={`#${sectionId(section.title)}`}
+                      className="nav-link"
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        setDropdownClosed(true);
+                      }}
+                    >
+                      <NavIcon title={section.title} />
+                      {section.title}
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -105,9 +109,15 @@ export default function Playground({ setup, categories }: Props) {
         ))}
         {categories.map((category) => (
           <div key={category.title}>
-            <h2 id={sectionId(category.title)}>{category.title}</h2>
+            {category.sections.length > 1 && <h2 id={sectionId(category.title)}>{category.title}</h2>}
             {category.sections.map((section) => (
-              <PlotSection key={section.title} {...section} globalSetup={setupCode} expandAll={expandAll} />
+              <PlotSection
+                key={section.title}
+                {...section}
+                globalSetup={setupCode}
+                expandAll={expandAll}
+                standalone={category.sections.length === 1}
+              />
             ))}
           </div>
         ))}
