@@ -6,9 +6,10 @@ import pandas as pd
 import pytest
 
 from shirin.plot import PlotGraphs
-from shirin.plot.common.data_conversion import fill_missing_values_in_data
+from shirin.plot.common.colors import blend
+from shirin.plot.config.colors import REMAINDER_TINT
+from shirin.plot.common.data_conversion import REMAINDER_SHARE_COL, fill_missing_values_in_data, fill_remainder
 from shirin.plot.core import (
-    AccuracyPlotOptions,
     BarPlotOptions,
     CountPlotOptions,
     HistogramOptions,
@@ -50,8 +51,7 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot.pie(df, col='category')
     plot.timeplot(df, x='date', group_by='month')
     plot.timeplot(df, x='date', group_by='day', plot_type='line', rotation=45)
-    plot.accuracy(pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]}), experiment='run', accuracy='acc', reverse_order=True)
-    assert len(shown) == 12
+    assert len(shown) == 11
     assert all(svg.startswith('<svg') for svg in shown)
 
 
@@ -183,12 +183,6 @@ def test_missing_palette_key_raises_key_error(df: pd.DataFrame) -> None:
         PieChart(PiePlotOptions(df=counts, col='count', palette={'A': '#111111'})).render()
 
 
-def test_accuracy_outside_unit_interval_raises() -> None:
-    options = AccuracyPlotOptions(df=pd.DataFrame({'run': ['a'], 'acc': [78]}), axis_column='run', value_column='acc')
-    with pytest.raises(ValueError, match=r"fractions in \[0, 1\]"):
-        options.validate()
-
-
 def test_pie_on_column_named_count(plot: PlotGraphs) -> None:
     plot.pie(pd.DataFrame({'count': ['a', 'b', 'b']}), col='count')
 
@@ -230,3 +224,35 @@ def test_normalized_barplot_shares_summed_value_per_hue() -> None:
     plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='cat', hue='hue', value='v'))
     plot.render()
     assert plot._normalized_pivot.loc['A'].tolist() == [0.75, 0.25]
+
+
+def test_normalized_barplot_accepts_duplicate_index() -> None:
+    df = pd.DataFrame({'cat': ['A', 'A'], 'hue': ['x', 'y'], 'v': [3, 1]}, index=[0, 0])
+    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='cat', hue='hue', value='v'))
+    plot.render()
+    assert plot._normalized_pivot.loc['A'].tolist() == [0.75, 0.25]
+
+
+def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> None:
+    df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
+    plot.barplot(df, x='run', value='acc', normalized=True, remainder='Incorrect')
+    shares = fill_remainder(df, 'run', 'acc', 'Incorrect')
+    plot_obj = NormalizedPlot(NormalizedPlotOptions(df=shares, axis_column='run', hue='acc', value=REMAINDER_SHARE_COL, remainder='Incorrect'))
+    plot_obj.render()
+    assert plot_obj._normalized_pivot.columns.tolist() == ['acc', 'Incorrect']
+    assert plot_obj._normalized_pivot.index.tolist() == ['b', 'a']
+
+
+def test_barplot_remainder_rejects_non_fractions(plot: PlotGraphs) -> None:
+    with pytest.raises(ValueError, match=r"fractions in \[0, 1\]"):
+        plot.barplot(pd.DataFrame({'run': ['a'], 'acc': [78]}), x='run', value='acc', normalized=True, remainder='Incorrect')
+
+
+def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
+    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
+    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect'))
+    chart = plot.draw(plot.transform(plot.preprocess()))
+    back, front = chart.rects
+    assert (back.y0, back.y1, front.y0, front.y1) == (0, 1, 0, 0.7)
+    assert back.rounded and front.rounded and back.fade_to is None
+    assert back.color == blend(front.color, '#FFFFFF', REMAINDER_TINT)

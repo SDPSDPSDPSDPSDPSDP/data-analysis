@@ -5,10 +5,9 @@ from .lineplot import LinePlot
 from .piechart import PieChart
 from .normalized_plot import NormalizedPlot
 from .timeplot import TimePlot
-from .accuracy import AccuracyPlot
 from .scatterplot import ScatterPlot
 
 __all__ = [
     'CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedPlot', 'TimePlot',
-    'AccuracyPlot', 'ScatterPlot',
+    'ScatterPlot',
 ]

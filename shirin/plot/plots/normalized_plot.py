@@ -9,6 +9,9 @@ from ..common.formatting import format_ticks, format_datalabels_stacked_normaliz
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
 from ..common.sorting import create_colors_list
 from ..common.stacked_plots import sort_stacked_pivot
+from ..common.colors import blend
+from ..config import TextColors
+from ..config.colors import REMAINDER_TINT
 from .categorical import create_sized_figure
 
 
@@ -20,8 +23,13 @@ class NormalizedPlot(AbstractPlot):
         self._normalized_pivot: Optional[pd.DataFrame] = None
 
     def preprocess(self) -> pd.DataFrame:
-        df = ensure_column_is_string(self.options.df, self.options.axis_column)
+        # crosstab aligns columns on the index, which fails on duplicate labels (e.g. after pd.concat).
+        df = ensure_column_is_string(self.options.df, self.options.axis_column).reset_index(drop=True)
         df = self._resolve_hue_palette(df)
+        remainder = self.options.remainder
+        if remainder is not None and not (isinstance(self.options.palette, dict) and remainder in self.options.palette):
+            filled = next(level for level in df[self.options.hue].unique() if level != remainder)
+            self._palette = {**self._palette, remainder: blend(self._palette[filled], TextColors.WHITE, REMAINDER_TINT)}  # type: ignore[dict-item]
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df
@@ -32,7 +40,15 @@ class NormalizedPlot(AbstractPlot):
             df[self.options.axis_column], df[self.options.hue],
             values=values, aggfunc='sum' if values is not None else None, normalize='index',
         )
-        self._normalized_pivot = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
+        if self.options.remainder is not None:
+            shares = shares[[level for level in shares.columns if level != self.options.remainder] + [self.options.remainder]]
+        if self.options.sort == 'frequency':
+            # Every row sums to 1, so rank by the first segment's share instead.
+            self._normalized_pivot = shares.sort_values(
+                shares.columns[0], ascending=self.options.orientation == 'horizontal',
+            )
+        else:
+            self._normalized_pivot = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
@@ -43,6 +59,7 @@ class NormalizedPlot(AbstractPlot):
             horizontal=not vertical,
             colors=create_colors_list(self._normalized_pivot, self._palette),  # type: ignore[arg-type]
             width=0.6 if vertical else 0.8,
+            overlap=len(self._normalized_pivot.columns) == 2,  # type: ignore[union-attr]
         )
 
     def format_plot(self, plot: Any) -> None:

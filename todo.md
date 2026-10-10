@@ -1,9 +1,6 @@
-- no matplotlib
-- website
+- consolidate bar and count into one, if theres no value given, its countplot
 - dark mode
 - finetune plots (countplot done):
-  - accuracy
-  - pie
   - scatterplot
   - timeplot
   - lineplot

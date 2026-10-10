@@ -3,6 +3,7 @@ from typing import Optional
 
 from ..config import TitleInput, SortInput
 from ..core import BarPlotOptions, NormalizedPlotOptions
+from ..common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
 from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot, NormalizedPlot
 
@@ -24,6 +25,7 @@ class BarPlotsMixin:
         stacked: bool = False,
         normalized: bool = False,
         sort: SortInput = 'frequency',
+        remainder: Optional[str] = None,
     ) -> None:
         """Create a **bar plot** with pre-aggregated data.
 
@@ -51,6 +53,9 @@ class BarPlotsMixin:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            remainder: Label for the gap up to 100% when `value` holds fractions in [0, 1]
+                (e.g. `value='accuracy', remainder='Incorrect'`). Needs `normalized=True` and no `hue`.
+                The filled segment is labelled with the `value` column name. *Optional*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
         """
@@ -72,7 +77,17 @@ class BarPlotsMixin:
             data_labels=data_labels,
             sort=sort,
         )
-        if normalized and hue is not None:
+        if remainder is not None:
+            if hue is not None or not normalized:
+                raise ValueError('remainder needs normalized=True and no hue.')
+            common.update(
+                df=fill_remainder(df, common['axis_column'], value, remainder),
+                value=REMAINDER_SHARE_COL,
+                hue=value,
+                remainder=remainder,
+                **resolve_palette(self, value),
+            )
+        if normalized and common['hue'] is not None:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
             self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))

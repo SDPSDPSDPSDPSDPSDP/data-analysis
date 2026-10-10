@@ -47,13 +47,25 @@ plot.barplot(
     title='Grouped by ripeness',
 )
 
-# %% 100% stacked by hue
+# %% Stacked by hue
 plot.barplot(
     df,
     y='fruit',
     value='count',
     hue='is_ripe',
-    normalized=True,
     legend=True,
-    title='Normalized',
+    stacked=True,
+    title='Stacked',
+)
+
+# %% Accuracy: fill each run up to 100% with the remainder
+from shirin.assets.data import df_accuracy
+
+plot.barplot(
+    df_accuracy,
+    x='run_name',
+    value='accuracy',
+    remainder='Incorrect',
+    normalized=True,
+    title='Accuracy per run',
 )

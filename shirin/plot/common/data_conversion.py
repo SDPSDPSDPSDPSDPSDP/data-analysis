@@ -1,6 +1,8 @@
 import pandas as pd
 from typing import Optional
 
+REMAINDER_SHARE_COL = '__share__'
+
 
 def convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
     if isinstance(d, dict):
@@ -36,3 +38,17 @@ def fill_missing_values_in_data(
     if fill is not None:
         df[y] = df.groupby(hue)[y].transform(fill) if hue is not None else fill(df[y])
     return df
+
+
+def fill_remainder(df: pd.DataFrame, category_col: str, value_col: str, remainder: str) -> pd.DataFrame:
+    """Long format: per category one `value_col` row (the fraction) and one `remainder` row (1 - fraction).
+
+    The segment labels go in a column named `value_col`, the shares in REMAINDER_SHARE_COL.
+    """
+    fractions = df[value_col].astype(float)
+    if not fractions.between(0, 1).all():
+        raise ValueError(f"{value_col!r} must hold fractions in [0, 1] when remainder is set")
+    return pd.concat([
+        pd.DataFrame({category_col: df[category_col], value_col: value_col, REMAINDER_SHARE_COL: fractions}),
+        pd.DataFrame({category_col: df[category_col], value_col: remainder, REMAINDER_SHARE_COL: 1 - fractions}),
+    ], ignore_index=True)

@@ -104,16 +104,29 @@ def render_barplot(
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
-def render_stacked_barplot(chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6) -> Chart:
-    """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom."""
+def render_stacked_barplot(
+    chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6, overlap: bool = False
+) -> Chart:
+    """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
+
+    overlap (two columns only): the first column is its own pill in front of a full-length pill of the second.
+    """
     values = df.to_numpy(dtype=float)
-    outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(values.sum(axis=1))]
-    base = np.zeros(len(df))
-    for column, color in enumerate(colors[:len(df.columns)]):
-        for position, (start, value) in enumerate(zip(base, values[:, column])):
-            fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
-            chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
-        base += values[:, column]
+    totals = values.sum(axis=1)
+    if overlap:
+        if len(df.columns) != 2:
+            raise ValueError(f"overlap needs exactly 2 columns, got {len(df.columns)}")
+        for position, (total, first) in enumerate(zip(totals, values[:, 0])):
+            _bar(chart, position, width, 0, total, colors[1], horizontal, rounded=True)
+            _bar(chart, position, width, 0, first, colors[0], horizontal, rounded=True)
+    else:
+        outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
+        base = np.zeros(len(df))
+        for column, color in enumerate(colors[:len(df.columns)]):
+            for position, (start, value) in enumerate(zip(base, values[:, column])):
+                fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
+                chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
+            base += values[:, column]
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     _set_legend(chart, colors, list(df.columns))
     return chart

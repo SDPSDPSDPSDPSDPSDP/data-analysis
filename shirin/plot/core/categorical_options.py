@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import ClassVar, Optional
 
-from ..config.colors import Colors
 from ..config import Sort, SortInput
 from .base_options import (
     VALID_SORTS,
@@ -76,6 +75,7 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
 
     top_n: Optional[int] = None
     value: Optional[str] = None
+    remainder: Optional[str] = None  # hue level drawn last, tinted from the other level unless the palette sets it
 
     def validate(self) -> None:
         super().validate()
@@ -83,28 +83,3 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
             raise ValueError("hue must be specified for normalized plots")
         if self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) for normalized plots")
-
-
-@dataclass
-class AccuracyPlotOptions(CategoricalPlotOptions):
-    """`stacked`, `hue` and `sort` are fixed for accuracy plots."""
-
-    # hue is a synthetic column added in transform, so it is not checked against df.
-    column_fields: ClassVar[tuple[str, ...]] = ('axis_column', 'value_column')
-
-    value_column: str = ''
-    reverse_order: bool = False
-
-    def __post_init__(self) -> None:
-        self.stacked = True
-        self.hue = '__is_correct__'
-        if not isinstance(self.palette, dict):
-            self.palette = {'Correct': Colors.GOOD_GREEN, 'Incorrect': Colors.BAD_RED}
-
-    def validate(self) -> None:
-        if not self.value_column:
-            raise ValueError("value_column must be specified")
-        super().validate()
-        accuracy = self.df[self.value_column].astype(float)
-        if not accuracy.between(0, 1).all():
-            raise ValueError(f"{self.value_column!r} must hold fractions in [0, 1]")

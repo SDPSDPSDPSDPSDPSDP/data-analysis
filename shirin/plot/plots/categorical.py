@@ -31,7 +31,7 @@ def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
 
 
 class StackableCategoricalPlot(AbstractPlot):
-    """Shared draw/format logic for count, bar and accuracy plots (plain or stacked by hue)."""
+    """Shared draw/format logic for count and bar plots (plain or stacked by hue)."""
 
     options: CategoricalPlotOptions
     _horizontal_width = 0.8
