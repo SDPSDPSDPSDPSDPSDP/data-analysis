@@ -73,10 +73,27 @@
   --tooltip-max-width: 560px;
   --tooltip-max-height: 400px;
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --color-scrollbar: rgba(0, 0, 0, 0.25);
+  --scrollbar-width: 6px;
+  --scrollbar-inset: 2px;
+  --z-scrollbar: 1200;
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+.overlay-scrollbar {
+  position: fixed;
+  z-index: var(--z-scrollbar);
+  width: var(--scrollbar-width);
+  margin-left: calc(-1 * (var(--scrollbar-width) + var(--scrollbar-inset)));
+  border-radius: var(--radius-pill);
+  background: var(--color-scrollbar);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition);
 }
 
 body {
