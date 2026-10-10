@@ -3,7 +3,7 @@ import pandas as pd
 
 from ...config import FontSizes, Layout, TextColors
 from ...svg import Chart, Rect, Text
-from ....number_format import format_percentage, format_thousands
+from ....number_format import format_compact, format_percentage, format_thousands
 from .text_contrast import get_text_color_for_background
 
 
@@ -11,10 +11,10 @@ def _length(rect: Rect, orientation: str) -> float:
     return rect.height if orientation == 'vertical' else rect.width
 
 
-def _add_text(chart: Chart, rect: Rect, text: str, orientation: str) -> None:
+def _add_text(chart: Chart, rect: Rect, text: str, orientation: str, short_text: Optional[str] = None) -> None:
     gap = Layout.DATALABEL_GAP
     if orientation == 'vertical':
-        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap)
+        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap, short_text=short_text)
     else:
         label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
     chart.texts.append(label)
@@ -34,10 +34,9 @@ def format_datalabels(
         if length <= 0:
             continue
         if formatting == 'percentage':
-            text = _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix)
+            _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
         else:
-            text = _with_suffix(format_thousands(length), suffix)
-        _add_text(chart, rect, text, orientation)
+            _add_text(chart, rect, _with_suffix(format_thousands(length), suffix), orientation, _with_suffix(format_compact(length), suffix))
 
 
 def _with_suffix(text: str, suffix: Optional[str]) -> str:

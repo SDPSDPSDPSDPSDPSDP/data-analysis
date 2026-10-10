@@ -51,6 +51,14 @@ def _scale(lo: float, hi: float, start: float, end: float) -> Scale:
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
 
+def _shorten_crowded_labels(chart: Chart, sx: Scale, sy: Scale) -> None:
+    labels = [t for t in chart.texts if t.short_text]
+    spans = sorted(marks.place(t, sx, sy)[2:4] for t in labels)
+    if any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
+        for t in labels:
+            t.text = t.short_text  # type: ignore[assignment]
+
+
 def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     x_lim, y_lim = _limits(chart.x, chart.data_values('x')), _limits(chart.y, chart.data_values('y'))
     x_ticks, y_ticks = _ticks(chart.x, *x_lim), _ticks(chart.y, *y_lim)
@@ -68,6 +76,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
+    _shorten_crowded_labels(chart, sx, sy)
     boxes = [marks.place(t, sx, sy)[2:] for t in chart.texts if t.text]
     if x_ticks and not chart.x.rotation:
         position, label = x_ticks[-1]

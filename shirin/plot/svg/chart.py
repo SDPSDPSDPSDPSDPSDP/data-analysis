@@ -43,6 +43,7 @@ class Text:
     va: str = 'center'  # bottom | center | top
     dx: float = 0
     dy: float = 0
+    short_text: Optional[str] = None  # shown instead when side-by-side labels leave too little room
 
 
 @dataclass

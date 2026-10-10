@@ -118,3 +118,15 @@ def test_categorical_tick_label_map_requires_tick_labels() -> None:
 
     with pytest.raises(ValueError, match="no tick labels"):
         format_categorical_tick_labels(Chart(width=1, plot_height=1), {'a': 'A'}, axis='x')
+
+
+def test_crowded_data_labels_get_shortened() -> None:
+    def chart(gap: float) -> Chart:
+        c = Chart(width=3, plot_height=3)
+        c.x.lim = (0, 10)
+        for i in range(2):
+            c.rects.append(Rect(i * gap, i * gap + 0.1, 0, 5, '#123456'))
+            c.texts.append(Text(i * gap + 0.05, 5, '10.915', '#000000', 8, 'center', 'bottom', short_text='11k'))
+        return c
+    assert '>11k<' in to_svg(chart(0.5))
+    assert '>10.915<' in to_svg(chart(5))
