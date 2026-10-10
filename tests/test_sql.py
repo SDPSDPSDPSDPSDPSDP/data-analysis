@@ -21,7 +21,7 @@ def sqlite_engine(monkeypatch):
     with sqlite.begin() as conn:
         conn.execute(text('CREATE TABLE t (id INTEGER, year INTEGER, note TEXT)'))
         conn.execute(text("INSERT INTO t VALUES (1, 2023, NULL), (2, 2024, NULL), (3, 2024, 'late')"))
-    monkeypatch.setattr(engine, 'get_engine', lambda *args: sqlite)
+    monkeypatch.setattr(engine, 'get_engine', lambda **credentials: sqlite)
     return sqlite
 
 
@@ -112,3 +112,26 @@ def test_db2_integration(tmp_path) -> None:
     out = tmp_path / 'db2.parquet'
     db.sql(query, params={'n': 7}, output_path=out)
     assert pq.read_table(out).num_rows == 1
+
+
+def test_credentials_from_dotenv(monkeypatch, tmp_path) -> None:
+    captured = {}
+    monkeypatch.setattr(engine, 'get_engine', lambda **credentials: captured.update(credentials))
+    for name in CREDENTIALS:
+        monkeypatch.delenv(f'DB2_{name.upper()}', raising=False)
+    (tmp_path / '.env').write_text('\n'.join(f'DB2_{k.upper()}={v}' for k, v in CREDENTIALS.items()))
+    monkeypatch.chdir(tmp_path)
+
+    Database(user='override')
+
+    assert captured == {**CREDENTIALS, 'user': 'override'}
+    for name in CREDENTIALS:
+        monkeypatch.delenv(f'DB2_{name.upper()}', raising=False)
+
+
+def test_missing_credentials(monkeypatch, tmp_path) -> None:
+    for name in CREDENTIALS:
+        monkeypatch.delenv(f'DB2_{name.upper()}', raising=False)
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match='DB2_SCHEMA'):
+        Database(**{k: v for k, v in CREDENTIALS.items() if k != 'schema'})

@@ -121,12 +121,13 @@ format_compact(1500000)                    # '1,5M' (also 'k')
 from pathlib import Path
 from shirin.sql import Database
 
-db = Database(user='u', password='p', host='h', port=50000, db_name='d', schema='S1')  # create once, reuse
+db = Database()  # credentials from .env, create once, reuse
+db = Database(user='u', password='p', host='h', port=50000, db_name='d', schema='S1')  # or explicit
 df = db.sql("SELECT * FROM t WHERE year = :year", params={'year': 2024})
 db.sql(Path('query.sql'), output_path=Path('out.parquet'))  # streams to Parquet, returns None
 ```
 
-All six `Database` arguments required. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
+`.env` (working dir or parent) keys: `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA`. Explicit arguments override `.env`. Missing value raises `ValueError`. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
 
 ## Tips
 
