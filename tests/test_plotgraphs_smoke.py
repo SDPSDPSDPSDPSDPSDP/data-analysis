@@ -42,8 +42,8 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot.countplot(df, x='category')
     plot.countplot(df, y='category', hue='group', stacked=True)
     plot.countplot(df, x='category', hue='group', normalized=True)
-    plot.barplot_x(df, x='category', value='value')
-    plot.barplot_y(df, y='category', value='value', hue='group', stacked=True)
+    plot.barplot(df, x='category', value='value')
+    plot.barplot(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
     plot.lineplot(df, x='date', y='value', hue='group')
     plot.scatterplot(df, x='value', y='value')
@@ -198,3 +198,10 @@ def test_countplot_direction_from_x_or_y(df: pd.DataFrame, shown: List[str]) -> 
         PlotGraphs().countplot(df, x='category', y='category')
     with pytest.raises(ValueError, match='exactly one of x or y'):
         PlotGraphs().countplot(df)
+
+
+def test_barplot_needs_exactly_one_of_x_or_y(df: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match='exactly one of x or y'):
+        PlotGraphs().barplot(df, x='category', y='category', value='value')
+    with pytest.raises(ValueError, match='exactly one of x or y'):
+        PlotGraphs().barplot(df, value='value')

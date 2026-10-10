@@ -2,8 +2,7 @@
 - website
 - dark mode
 - finetune plots (countplot done):
-  - barplot_x
-  - barplot_y
+  - barplot
   - histogram
   - lineplot
   - scatterplot
