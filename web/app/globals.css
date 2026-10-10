@@ -280,6 +280,10 @@ body {
   grid-template-columns: 1fr;
 }
 
+.data-format .runnable > .output {
+  order: -1;
+}
+
 .data-format .data-table {
   margin-top: var(--space-2);
 }
