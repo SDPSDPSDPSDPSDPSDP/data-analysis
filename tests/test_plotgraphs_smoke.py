@@ -59,8 +59,8 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     assert all(svg.startswith('<svg') for svg in shown)
 
 
-def test_countplot_show_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
-    rendered = CountPlot(CountPlotOptions(df=df, axis_column='category', show_labels=False))
+def test_countplot_data_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
+    rendered = CountPlot(CountPlotOptions(df=df, axis_column='category', data_labels=False))
     chart = rendered.render()
     assert len(chart.texts) == 0
 

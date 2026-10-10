@@ -80,7 +80,7 @@ class Axis:
     show_tick_labels: bool = True
     visible: bool = True
     rotation: float = 0
-    label: str = ''
+    label: Optional[str] = None
     sub_labels: List[Tuple[float, str]] = field(default_factory=list)  # a second tick row, e.g. years
 
 

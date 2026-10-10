@@ -13,13 +13,14 @@
   --text-on-dark: rgba(255, 255, 255, 0.93);
   --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
 
-  --font-body: system-ui, sans-serif;
+  --font-body: var(--font-satoshi), sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
-  --font-doc: var(--font-satoshi), sans-serif;
   --font-size-small: 13px;
   --font-size-code: 14px;
   --font-size-doc: 15px;
+  --font-size-doc-heading: 19px;
   --font-weight-heading: 500;
+  --font-weight-doc-heading: 700;
   --letter-spacing-heading: 0.015em;
 
   --space-0-5: 4px;
@@ -203,8 +204,17 @@ pre {
   max-height: var(--tooltip-max-height);
   overflow: auto;
   white-space: pre-wrap;
-  font-family: var(--font-doc);
+  font-family: var(--font-body);
   font-size: var(--font-size-doc);
+}
+
+.doc-heading {
+  font-size: var(--font-size-doc-heading);
+  font-weight: var(--font-weight-doc-heading);
+}
+
+.doc-meta {
+  color: var(--text-secondary);
 }
 
 .doc-tooltip code {

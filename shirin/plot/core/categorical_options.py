@@ -19,7 +19,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     orientation: str = 'vertical'
     stacked: bool = False
     order_type: OrderTypeInput = 'frequency'
-    show_labels: bool = True
+    data_labels: bool = True
     suffix: Optional[str] = None
 
     def validate(self) -> None:
@@ -71,7 +71,6 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
     """Always a 100%-stacked plot of hue shares; `stacked` is ignored."""
 
     top_n: Optional[int] = None
-    y_axis_label: str = 'Percentage'
 
     def validate(self) -> None:
         super().validate()

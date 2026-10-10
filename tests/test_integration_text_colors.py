@@ -91,7 +91,7 @@ class TestNormalizedCountPlotPaletteKeys:
             orientation='vertical',
             hue='status',
             palette=palette,
-            show_labels=False,
+            data_labels=False,
         )
 
         plot = NormalizedCountPlot(options)
@@ -116,7 +116,7 @@ class TestAxisLabelMapping:
             orientation='vertical',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
             legend=False,
-            show_labels=False,
+            data_labels=False,
         )
 
         plot = CountPlot(options)

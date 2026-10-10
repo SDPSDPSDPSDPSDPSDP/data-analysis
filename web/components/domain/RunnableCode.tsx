@@ -22,6 +22,16 @@ function inlineMarkdown(text: string): string {
     .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[Number(i)]}</code>`);
 }
 
+// Unindented "Input:" lines are section headings; "    name:" lines start an argument.
+// Docstring wraps (8-space continuation lines) are joined so Options/Default/Optional each get a line of their own.
+function formatDoc(doc: string): string {
+  return inlineMarkdown(doc.replace(/\n {8}(?=\S)/g, " "))
+    .replace(/^([A-Z]\w*):$/gm, '<span class="doc-heading">$1</span>')
+    .replace(/^( {4})(\w+):/gm, "$1<strong>$2</strong>:")
+    .replace(/ (<em>(?:Optional|Default:.*?)<\/em>\.?)/g, '\n        <span class="doc-meta">$1</span>')
+    .replace(/ (<strong>Options:<\/strong>.*)$/gm, '\n        <span class="doc-meta">$1</span>');
+}
+
 const DOCS: Record<string, string> = docstrings;
 
 // Docstring of the dotted name under the cursor, looked up by its last part.
@@ -40,7 +50,7 @@ const docTooltip = hoverTooltip((view, pos) => {
     create: () => {
       const dom = document.createElement("pre");
       dom.className = "doc-tooltip";
-      dom.innerHTML = inlineMarkdown(doc);
+      dom.innerHTML = formatDoc(doc);
       return { dom };
     },
   };

@@ -49,7 +49,7 @@ class NormalizedCountPlot(AbstractPlot):
         else:
             format_ticks(plot, x_grid=True, percentage_x=True)
 
-        if self.options.show_labels:
+        if self.options.data_labels:
             format_datalabels_stacked_normalized(
                 plot,
                 self._normalized_pivot,  # type: ignore[arg-type]

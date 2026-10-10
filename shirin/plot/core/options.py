@@ -92,7 +92,6 @@ class TimePlotOptions(BasePlotOptions):
     group_by: TimeGroupByInput = 'day'
     plot_type: str = 'bar'
     display_month: bool = True
-    y_axis_label: str = 'Total'
     cumulative: bool = False
     rotation: int = 0
 

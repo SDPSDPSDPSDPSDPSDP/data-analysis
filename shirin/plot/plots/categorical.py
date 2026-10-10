@@ -92,7 +92,7 @@ class StackableCategoricalPlot(AbstractPlot):
             format_ticks(plot, x_grid=True, numeric_x=True)
             format_categorical_tick_labels(plot, tick_label_map, axis='y')
 
-        if self.options.show_labels:
+        if self.options.data_labels:
             self._format_data_labels(plot)
 
     def _format_data_labels(self, plot: Any) -> None:

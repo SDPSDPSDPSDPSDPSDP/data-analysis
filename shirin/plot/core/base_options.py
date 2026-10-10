@@ -68,8 +68,8 @@ class BasePlotOptions:
     df: pd.DataFrame
     palette: Optional[Union[Dict[Any, str], str]] = None
     label_map: Optional[Dict[Any, str]] = None
-    x_axis_label: str = ''
-    y_axis_label: str = ''
+    x_axis_label: Optional[str] = None
+    y_axis_label: Optional[str] = None
     legend: bool = False
     hue: Optional[str] = None
     title: Optional[TitleInput] = None
