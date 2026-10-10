@@ -36,8 +36,22 @@ export function run(code: string): Promise<RunResult> {
   });
 }
 
+// Lookups queue behind chart renders in the worker, so repeat hovers must not hit it again.
+const docs = new Map<string, Promise<string>>();
+
 /** Docstring of a dotted name in the session's globals. Empty if undefined or undocumented. */
-export async function docOf(name: string): Promise<string> {
+export function docOf(name: string): Promise<string> {
+  let doc = docs.get(name);
+  if (!doc) {
+    doc = fetchDoc(name);
+    docs.set(name, doc);
+    // Undefined names may be defined by a later run, so only keep hits.
+    doc.then((d) => d || docs.delete(name), () => docs.delete(name));
+  }
+  return doc;
+}
+
+async function fetchDoc(name: string): Promise<string> {
   const result = await run(`import inspect
 try:
     print(inspect.getdoc(eval(${JSON.stringify(name)})) or "")

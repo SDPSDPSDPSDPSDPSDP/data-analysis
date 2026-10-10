@@ -41,7 +41,7 @@ const docTooltip = hoverTooltip(async (view, pos) => {
       return { dom };
     },
   };
-});
+}, { hoverTime: 100 });
 
 type Props = {
   initialCode: string;

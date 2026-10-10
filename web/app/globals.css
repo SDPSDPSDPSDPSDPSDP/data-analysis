@@ -15,6 +15,7 @@
 
   --font-body: system-ui, sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
+  --font-doc: var(--font-satoshi), sans-serif;
   --font-size-small: 13px;
   --font-size-code: 14px;
   --font-weight-heading: 500;
@@ -190,6 +191,7 @@ pre {
   max-height: var(--tooltip-max-height);
   overflow: auto;
   white-space: pre-wrap;
+  font-family: var(--font-doc);
   font-size: var(--font-size-small);
 }
 
