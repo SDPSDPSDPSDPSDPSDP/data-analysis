@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ChartColumn } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
@@ -16,19 +19,32 @@ type Props = {
 export default function Playground({ title, setup, examples }: Props) {
   const setupCode = setup.map((cell) => cell.code).join("\n\n");
   const titleId = title.toLowerCase().replace(/\s+/g, "-");
+  // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
+  const [dropdownClosed, setDropdownClosed] = useState(false);
   return (
     <>
       <nav className="nav">
         <a href="#" className="nav-brand">
           shirin
         </a>
-        <div className="nav-menu">
+        <div
+          className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
+          onMouseLeave={() => setDropdownClosed(false)}
+        >
           <a href="#bar-charts" className="nav-link">
             <ChartColumn size="1em" aria-hidden />
             Bar charts
           </a>
           <div className="nav-dropdown">
-            <a href={`#${titleId}`}>{title}</a>
+            <a
+              href={`#${titleId}`}
+              onClick={(e) => {
+                e.currentTarget.blur();
+                setDropdownClosed(true);
+              }}
+            >
+              {title}
+            </a>
           </div>
         </div>
       </nav>
