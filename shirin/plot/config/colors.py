@@ -26,6 +26,7 @@ class Colors:
 class TextColors:
     DARK_GREY = '#444444'
     LIGHT_GREY = '#777777'
+    FAINT_GREY = '#aaaaaa'
     BLACK = '#000000'
     WHITE = '#FFFFFF'
 

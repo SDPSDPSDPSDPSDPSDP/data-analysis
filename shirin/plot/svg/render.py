@@ -192,7 +192,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
             items.append(_text(label_x, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
             if value:
                 value_x = label_x + text_width(f'{label} ', FontSizes.LEGEND)
-                items.append(_text(value_x, baseline, value, FontSizes.LEGEND, TextColors.LIGHT_GREY))
+                items.append(_text(value_x, baseline, value, FontSizes.LEGEND, TextColors.FAINT_GREY))
             x += item_width + Layout.LEGEND_ITEM_GAP
         header_rows.append((x - Layout.LEGEND_ITEM_GAP, items))
     plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if header_rows else top

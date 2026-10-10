@@ -110,4 +110,4 @@ def test_legend_value_drawn_lighter_after_label() -> None:
     c.legend = [('#ff0000', 'Apple', '9.027')]
     svg = to_svg(c)
     assert 'fill="#444444">Apple<' in svg
-    assert 'fill="#777777">9.027<' in svg
+    assert 'fill="#aaaaaa">9.027<' in svg

@@ -58,6 +58,7 @@
   --radius: 6px;
   --border-width: 1px;
   --radius-pill: 999px;
+  --radius-swatch: 2px;
   --switch-width: 38px;
   --switch-height: 22px;
   --switch-padding: 2px;
@@ -568,4 +569,32 @@ pre {
   border-radius: var(--radius);
   background: var(--color-surface);
   font-size: var(--font-size-small);
+}
+
+/* Native color picker shown as a small swatch in front of "#rrggbb" in editable code. */
+.color-swatch {
+  width: 1em;
+  height: 1em;
+  margin-right: var(--space-0-5);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-swatch);
+  background: none;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.color-swatch::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+/* Separate rules: a selector list with an unknown vendor pseudo-element is dropped entirely. */
+.color-swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--radius-swatch);
+}
+
+.color-swatch::-moz-color-swatch {
+  border: none;
+  border-radius: var(--radius-swatch);
 }

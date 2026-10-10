@@ -40,7 +40,9 @@ function NavIcon({ title }: { title: string }) {
 }
 
 export default function Playground({ setup, categories }: Props) {
-  const setupCode = setup.map((cell) => cell.code).join("\n\n");
+  const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
+  // Edits apply to the examples only once a setup cell is run.
+  const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
   const [expandAll, setExpandAll] = useState(false);
@@ -104,7 +106,11 @@ export default function Playground({ setup, categories }: Props) {
         {setup.map((cell, i) => (
           <section key={i} className="setup-cell">
             <p>{cell.explanation}</p>
-            <CodeBlock value={cell.code} />
+            <CodeBlock
+              value={setupCodes[i]}
+              onChange={(code) => setSetupCodes((codes) => codes.map((c, j) => (j === i ? code : c)))}
+              onRun={(code) => setSetupCode(setupCodes.map((c, j) => (j === i ? code : c)).join("\n\n"))}
+            />
           </section>
         ))}
         {categories.map((category) => (
