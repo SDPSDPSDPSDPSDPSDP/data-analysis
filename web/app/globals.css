@@ -71,6 +71,7 @@
   --transition-spring: 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --runnable-height: 75vh;
+  --data-format-chart-height: 50vh;
   --chart-aspect-ratio: 4 / 3;
   --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;

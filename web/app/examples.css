@@ -31,6 +31,11 @@ section.setup-cell + section.setup-cell {
   grid-template-columns: 1fr;
 }
 
+/* Chart sits under the code here, so it gets less height to keep the whole explainer on screen. */
+.data-format .chart img {
+  max-height: var(--data-format-chart-height);
+}
+
 /* Text output reads best under its code. */
 .tool-examples {
   display: flex;
