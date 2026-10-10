@@ -59,6 +59,19 @@ export default function Home() {
         ["Banana", "True", "4"],
       ],
     }),
+    section("Histograms", "histogram.py", {
+      description: "One row per observation with a numeric value. The plot counts the rows per bin.",
+      columns: [
+        { name: "weight", role: "x" },
+        { name: "is_ripe", role: "hue" },
+      ],
+      rows: [
+        ["182", "True"],
+        ["7", "False"],
+        ["295", "True"],
+        ["49", "False"],
+      ],
+    }),
   ];
   return <Playground setup={parseExamples("setup.py").setup} sections={sections} />;
 }
