@@ -19,7 +19,9 @@ async function init() {
   await py.loadPackage(["micropip", "numpy", "pandas"]);
   // micropip reads name and version from the filename, so give it a valid wheel name.
   // Revalidate so a rebuilt wheel is picked up without a hard reload.
-  const wheel = await fetch("/shirin.whl", { cache: "no-cache" }).then((r) => r.arrayBuffer());
+  const response = await fetch("/shirin.whl", { cache: "no-cache" });
+  if (!response.ok) throw new Error(`Fetching /shirin.whl failed: ${response.status} ${response.statusText}`);
+  const wheel = await response.arrayBuffer();
   py.FS.writeFile("/tmp/shirin-0-py3-none-any.whl", new Uint8Array(wheel));
   await py.runPythonAsync(`import micropip; await micropip.install("emfs:/tmp/shirin-0-py3-none-any.whl")`);
   await py.runPythonAsync(SETUP);
@@ -54,7 +56,9 @@ async function execute({ id, code }) {
   } catch (err) {
     error = err instanceof Error ? err.message : String(err);
   }
-  const images = py.runPython("_out[:]").toJs();
-  py.runPython("_out.clear()");
+  const out = py.globals.get("_out");
+  const images = out.toJs();
+  out.clear();
+  out.destroy();
   postMessage({ type: "result", id, images, stdout: stdout.join("\n"), error });
 }

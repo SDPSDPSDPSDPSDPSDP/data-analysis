@@ -3,6 +3,7 @@ from typing import List
 
 from ...config import FontSizes, Marks, TextColors
 from ...svg import Chart, Text, Wedge
+from ....number_format import format_percentage
 
 
 def render_piechart(
@@ -28,7 +29,7 @@ def render_piechart(
         texts.append(Text(
             pctdistance * math.sin(angle),
             pctdistance * math.cos(angle),
-            f'{percentage:.{n_after_comma}f}%' if percentage >= value_datalabel else '',
+            format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else '',
             TextColors.BLACK,
             FontSizes.TEXT,
         ))

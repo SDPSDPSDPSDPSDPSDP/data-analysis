@@ -5,7 +5,6 @@ from ..config import TitleInput, SortInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
 from ..core.base_plot import default_palette
 from ..common.data_conversion import REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder
-from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot, CountPlot, NormalizedPlot
 
 
@@ -73,7 +72,7 @@ class BarPlotsMixin:
             axis_column=x if vertical else y,
             orientation='vertical' if vertical else 'horizontal',
             hue=hue,
-            **resolve_palette(self, hue),
+            **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
@@ -113,7 +112,7 @@ class BarPlotsMixin:
                 value=REMAINDER_SHARE_COL,
                 hue=value,
                 remainder=REMAINDER_LABEL,
-                **resolve_palette(self, value),
+                **self._column_config(value),
             )
             if isinstance(common['palette'], str):
                 common['palette'] = {value: common['palette']}

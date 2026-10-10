@@ -95,9 +95,18 @@ def test_remainder_not_in_legend() -> None:
     assert [label for _, label, _ in plot.chart.legend] == ['acc']
 
 
+def test_remainder_legend_keeps_level_labelled_like_remainder() -> None:
+    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
+    plot = NormalizedPlot(NormalizedPlotOptions(
+        df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect', legend=True, label_map={'acc': 'Incorrect'},
+    ))
+    plot.render()
+    assert [label for _, label, _ in plot.chart.legend] == ['Incorrect']
+
+
 def test_normalized_barplot_hue_equal_to_axis_draws_full_width_share_bars() -> None:
     df = pd.DataFrame({'fruit': ['a', 'b'], 'count': [3, 1]})
     plot = BarPlot(BarPlotOptions(df=df, axis_column='fruit', value='count', hue='fruit', normalized=True))
     plot.render()
     assert {round(rect.x1 - rect.x0, 3) for rect in plot.chart.rects} == {FigureSize.BAR_GROUP_WIDTH}
-    assert sorted(text.text for text in plot.chart.texts) == ['25.0%', '75.0%']
+    assert sorted(text.text for text in plot.chart.texts) == ['25,0%', '75,0%']

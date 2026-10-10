@@ -21,6 +21,7 @@ class NormalizedPlot(AbstractPlot):
     def __init__(self, options: NormalizedPlotOptions):
         super().__init__(options)
         self._normalized_pivot: Optional[pd.DataFrame] = None
+        self._row_colors: Optional[List[str]] = None
 
     def preprocess(self) -> pd.DataFrame:
         # crosstab aligns columns on the index, which fails on duplicate labels (e.g. after pd.concat).
@@ -60,7 +61,7 @@ class NormalizedPlot(AbstractPlot):
 
     def draw(self, data: pd.DataFrame) -> Any:
         vertical = self.options.orientation == 'vertical'
-        category_colors = self._category_colors()
+        category_colors = self._row_colors = self._category_colors()
         return renderer.render_stacked_barplot(
             create_sized_figure(self, data),
             df=self._normalized_pivot,  # type: ignore[arg-type]
@@ -74,10 +75,13 @@ class NormalizedPlot(AbstractPlot):
         )
 
     def format_plot(self, plot: Any) -> None:
-        self._format_labels_and_legend(plot)
         if self.options.remainder is not None:
-            shown_name = (self._label_map_legend or {}).get(self.options.remainder, self.options.remainder)
-            plot.legend = [item for item in plot.legend if item[1] != shown_name]
+            # Legend entries follow the pivot columns; match on level, not on the shown text.
+            plot.legend = [
+                item for item, level in zip(plot.legend, self._normalized_pivot.columns)  # type: ignore[union-attr]
+                if level != self.options.remainder
+            ]
+        self._format_labels_and_legend(plot)
 
         if self.options.orientation == 'vertical':
             format_ticks(plot, y_grid=True, percentage_y=True)
@@ -95,5 +99,5 @@ class NormalizedPlot(AbstractPlot):
                 self._palette,  # type: ignore[arg-type]
                 orientation=self.options.orientation,
                 suffix=self.options.suffix,
-                row_colors=self._category_colors(),
+                row_colors=self._row_colors,
             )

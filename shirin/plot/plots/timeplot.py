@@ -38,27 +38,27 @@ class TimePlot(AbstractPlot):
         date_col = self.options.x
 
         period = {'year': 'Y', 'month': 'M', 'day': 'D'}[group_by]
-        df['_time_group'] = df[date_col].dt.to_period(period).dt.to_timestamp()
+        df['__time_group__'] = df[date_col].dt.to_period(period).dt.to_timestamp()
 
         self._aggregated_df = (
-            df.groupby('_time_group')
+            df.groupby('__time_group__')
             .size()
             .reset_index(name='count')
-            .sort_values('_time_group')
+            .sort_values('__time_group__')
         )
 
         # Include empty periods with zero counts so the x-axis stays continuous.
         if not self._aggregated_df.empty:
-            groups = self._aggregated_df['_time_group']
+            groups = self._aggregated_df['__time_group__']
             full_range = pd.date_range(
                 start=groups.min(),
                 end=groups.max(),
                 freq={'year': 'YS', 'month': 'MS', 'day': 'D'}[group_by],
             )
 
-            full_df = pd.DataFrame({'_time_group': full_range})
+            full_df = pd.DataFrame({'__time_group__': full_range})
             self._aggregated_df = (
-                full_df.merge(self._aggregated_df, on='_time_group', how='left')
+                full_df.merge(self._aggregated_df, on='__time_group__', how='left')
                 .fillna({'count': 0})
             )
             self._aggregated_df['count'] = self._aggregated_df['count'].astype(int)
@@ -70,7 +70,7 @@ class TimePlot(AbstractPlot):
 
     def draw(self, data: pd.DataFrame) -> Any:
         chart = self._standard_chart()
-        days = to_days(data['_time_group'])
+        days = to_days(data['__time_group__'])
         if self.options.plot_type == 'bar':
             return renderer.render_time_bars(chart, days, data['count'], color=self._color, width=Marks.TIME_BAR_DAYS[self.options.group_by])  # type: ignore[arg-type]
         return renderer.render_time_line(
@@ -88,7 +88,7 @@ class TimePlot(AbstractPlot):
 
     def _format_date_axis(self, chart: Chart) -> None:
         """Year ticks, month ticks with a year row below, or automatic day ticks."""
-        groups = self._aggregated_df['_time_group']
+        groups = self._aggregated_df['__time_group__']
         if self.options.group_by == 'day':
             chart.x.dates, chart.x.date_format = True, '%Y-%m-%d'
             chart.x.rotation = self.options.rotation

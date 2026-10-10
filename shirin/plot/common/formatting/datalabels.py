@@ -3,7 +3,7 @@ import pandas as pd
 
 from ...config import FontSizes, Layout, TextColors
 from ...svg import Chart, Rect, Text
-from ....number_format import format_thousands
+from ....number_format import format_percentage, format_thousands
 from .text_contrast import get_text_color_for_background
 
 
@@ -29,27 +29,26 @@ def format_datalabels(
     rects = chart.rects
     lengths = [_length(r, orientation) for r in rects]
     total = sum(lengths)
-    suffix = suffix.strip() if suffix else ''
 
     for rect, length in zip(rects, lengths):
         if length <= 0:
             continue
         if formatting == 'percentage':
-            percentage = length / total * 100 if total > 0 else 0
-            text = f'{percentage:,.1f}%'.replace(',', '.')
+            text = _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix)
         else:
-            text = format_thousands(length)
-        if suffix:
-            text = f"{text} {suffix}"
+            text = _with_suffix(format_thousands(length), suffix)
         _add_text(chart, rect, text, orientation)
 
 
-def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -> str:
+def _with_suffix(text: str, suffix: Optional[str]) -> str:
+    return f'{text} {suffix.strip()}' if suffix and suffix.strip() else text
+
+
+def _percentage_label(percentage: float, decimals: int, suffix: Optional[str]) -> str:
+    """A suffix replaces the '%' sign; an empty suffix drops it."""
     if suffix is None:
-        return f'{value_percentage:.0f}%'
-    if suffix.strip() == '':
-        return f'{value_percentage:.0f}'
-    return f'{value_percentage:.0f} {suffix.strip()}'
+        return format_percentage(percentage, decimals)
+    return _with_suffix(format_thousands(percentage, decimals), suffix)
 
 
 def _add_stacked_labels(
@@ -74,7 +73,7 @@ def _add_stacked_labels(
             chart.texts.append(Text(
                 x,
                 y,
-                _format_stacked_percentage(value_percentage, suffix),
+                _percentage_label(value_percentage, 0, suffix),
                 get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
                 FontSizes.DATALABELS,
             ))

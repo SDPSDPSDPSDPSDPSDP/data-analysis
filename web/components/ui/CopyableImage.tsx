@@ -23,21 +23,29 @@ async function toPng(src: string): Promise<Blob> {
 
 export default function CopyableImage({ src, alt }: { src: string; alt: string }) {
   const [png, setPng] = useState<{ blob: Blob; url: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let url: string | null = null;
     let cancelled = false;
-    toPng(src).then((blob) => {
-      if (cancelled) return;
-      url = URL.createObjectURL(blob);
-      setPng({ blob, url });
-    });
+    setError(null);
+    toPng(src).then(
+      (blob) => {
+        if (cancelled) return;
+        url = URL.createObjectURL(blob);
+        setPng({ blob, url });
+      },
+      (err) => {
+        if (!cancelled) setError(`Rendering chart failed: ${err}`);
+      },
+    );
     return () => {
       cancelled = true;
       if (url) URL.revokeObjectURL(url);
     };
   }, [src]);
 
+  if (error) return <pre className="error">{error}</pre>;
   if (!png) return <div className="skeleton" role="status" aria-label="Rendering chart" />;
 
   return (

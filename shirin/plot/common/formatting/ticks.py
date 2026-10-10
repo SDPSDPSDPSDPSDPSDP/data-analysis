@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
 from ...svg import Axis, Chart
-from ....number_format import format_thousands
+from ....number_format import format_percentage, format_thousands
 
 
 def _set_axis_formatter(axis: Axis, numeric: bool, percentage: bool) -> None:
@@ -10,7 +10,7 @@ def _set_axis_formatter(axis: Axis, numeric: bool, percentage: bool) -> None:
     if numeric:
         axis.formatter = format_thousands
     elif percentage:
-        axis.formatter = lambda val: f"{val * 100:.0f}%"
+        axis.formatter = lambda val: format_percentage(val * 100)
 
 
 def format_categorical_tick_labels(

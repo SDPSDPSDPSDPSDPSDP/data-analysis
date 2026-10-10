@@ -3,7 +3,7 @@ from typing import Any, List
 import pandas as pd
 
 from ..core import renderer
-from ..core.base_plot import AbstractPlot, default_colors
+from ..core.base_plot import AbstractPlot, default_colors, default_palette
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.sorting import palette_colors
@@ -34,10 +34,9 @@ class PieChart(AbstractPlot):
         self._labels = [label_map.get(key, key) for key in keys]
 
         palette = self.options.palette
-        if isinstance(palette, dict):
-            self._colors = palette_colors(palette, keys)
-        else:
-            self._colors = default_colors(len(keys))
+        if isinstance(palette, str):
+            palette = default_palette(pd.Series(keys), palette)
+        self._colors = default_colors(len(keys)) if palette is None else palette_colors(palette, keys)
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:

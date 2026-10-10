@@ -17,3 +17,8 @@ def format_thousands(value: Number, decimals: Optional[int] = None) -> str:
         else:
             return f"{value:.2f}".rstrip('0').rstrip('.').translate(_DUTCH_SEPARATORS)
     return f"{value:,.{decimals}f}".translate(_DUTCH_SEPARATORS)
+
+
+def format_percentage(value: Number, decimals: int = 0) -> str:
+    """Percentage with Dutch separators, e.g. 12.5 -> "12,5%"."""
+    return f"{format_thousands(value, decimals)}%"

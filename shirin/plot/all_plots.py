@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from .core import AbstractPlot
 from .config.palettes import (
@@ -55,6 +55,12 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         self._font = font
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
         self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
+
+    def _column_config(self, column: Optional[str]) -> Dict[str, Any]:
+        """palette and label_map configured for a hue (or pie col) column."""
+        if column is None:
+            return {'palette': None, 'label_map': None}
+        return {'palette': self._palette.get(column), 'label_map': self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:
         show(to_svg(plot.render(), font=self._font))
