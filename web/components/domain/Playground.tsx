@@ -1,16 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { ChartColumn, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
+import { ChartArea, ChartColumn, ChevronsDownUp, ChevronsUpDown, type LucideIcon } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
 
-type Props = {
-  setup: SetupCell[];
+// Keyed by title: icon components can't be passed from the server page.
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  "Bar charts": ChartColumn,
+  Distributions: ChartArea,
+};
+
+type Category = {
+  title: string;
   sections: PlotSectionData[];
 };
 
-export default function Playground({ setup, sections }: Props) {
+type Props = {
+  setup: SetupCell[];
+  categories: Category[];
+};
+
+function categoryIcon(title: string): LucideIcon {
+  const icon = CATEGORY_ICONS[title];
+  if (!icon) throw new Error(`No icon for category "${title}"`);
+  return icon;
+}
+
+export default function Playground({ setup, categories }: Props) {
   const setupCode = setup.map((cell) => cell.code).join("\n\n");
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
@@ -21,28 +38,36 @@ export default function Playground({ setup, sections }: Props) {
         <a href="#" className="nav-brand">
           shirin
         </a>
-        <div
-          className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
-          onMouseLeave={() => setDropdownClosed(false)}
-        >
-          <a href="#bar-charts" className="nav-link">
-            <ChartColumn size="1em" aria-hidden />
-            Bar charts
-          </a>
-          <div className="nav-dropdown">
-            {sections.map((section) => (
-              <a
-                key={section.title}
-                href={`#${sectionId(section.title)}`}
-                onClick={(e) => {
-                  e.currentTarget.blur();
-                  setDropdownClosed(true);
-                }}
+        <div className="nav-menus">
+          {categories.map((category) => {
+            const Icon = categoryIcon(category.title);
+            return (
+              <div
+                key={category.title}
+                className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
+                onMouseLeave={() => setDropdownClosed(false)}
               >
-                {section.title}
-              </a>
-            ))}
-          </div>
+                <a href={`#${sectionId(category.title)}`} className="nav-link">
+                  <Icon size="1em" aria-hidden />
+                  {category.title}
+                </a>
+                <div className="nav-dropdown">
+                  {category.sections.map((section) => (
+                    <a
+                      key={section.title}
+                      href={`#${sectionId(section.title)}`}
+                      onClick={(e) => {
+                        e.currentTarget.blur();
+                        setDropdownClosed(true);
+                      }}
+                    >
+                      {section.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
         <label className="switch" title={expandAll ? "Collapse examples" : "Expand all examples"}>
           <input
@@ -69,9 +94,13 @@ export default function Playground({ setup, sections }: Props) {
             <CodeBlock value={cell.code} />
           </section>
         ))}
-        <h2 id="bar-charts">Bar charts</h2>
-        {sections.map((section) => (
-          <PlotSection key={section.title} {...section} globalSetup={setupCode} expandAll={expandAll} />
+        {categories.map((category) => (
+          <div key={category.title}>
+            <h2 id={sectionId(category.title)}>{category.title}</h2>
+            {category.sections.map((section) => (
+              <PlotSection key={section.title} {...section} globalSetup={setupCode} expandAll={expandAll} />
+            ))}
+          </div>
         ))}
       </main>
     </>

@@ -125,10 +125,17 @@ body {
   letter-spacing: var(--letter-spacing-heading);
 }
 
-.nav-menu {
+.nav-menus {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+.nav-menu {
+  position: relative;
   display: flex;
   align-items: center;
   height: 100%;

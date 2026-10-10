@@ -1,15 +1,15 @@
 # %% Plain
 plot.histogram(
     df,
-    x='weight',
+    x='sweetness',
 )
 
 # %% Title, axis labels, fewer bins
 plot.histogram(
     df,
-    x='weight',
-    title=['Fruit weight', '20 bins'],
-    x_axis_label='Weight (g)',
+    x='sweetness',
+    title=['Fruit sweetness', '20 bins'],
+    x_axis_label='Sugar (%)',
     y_axis_label='Fruits',
     bins=20,
 )
@@ -17,15 +17,15 @@ plot.histogram(
 # %% Upper limit
 plot.histogram(
     df,
-    x='weight',
-    xlimit=100,
-    title=['Light fruit', 'Weight up to 100 g'],
+    x='sweetness',
+    xlimit=10,
+    title=['Sour fruit', 'Sugar up to 10%'],
 )
 
 # %% Stacked by hue
 plot.histogram(
     df,
-    x='weight',
+    x='sweetness',
     hue='is_ripe',
     bins=30,
     legend=True,
@@ -35,7 +35,7 @@ plot.histogram(
 # %% Dodged by hue
 plot.histogram(
     df,
-    x='weight',
+    x='sweetness',
     hue='is_ripe',
     bins=30,
     stacked=False,

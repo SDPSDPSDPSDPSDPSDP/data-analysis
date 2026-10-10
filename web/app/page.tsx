@@ -31,7 +31,7 @@ function section(title: string, file: string, dataFormat: DataFormat): PlotSecti
 }
 
 export default function Home() {
-  const sections = [
+  const barCharts = [
     section("Countplots", "countplot.py", {
       description: "One row per observation. The plot counts the rows per value.",
       columns: [
@@ -59,19 +59,30 @@ export default function Home() {
         ["Banana", "True", "4"],
       ],
     }),
+  ];
+  const distributions = [
     section("Histograms", "histogram.py", {
       description: "One row per observation with a numeric value. The plot counts the rows per bin.",
       columns: [
-        { name: "weight", role: "x" },
+        { name: "fruit", role: "" },
+        { name: "sweetness", role: "x" },
         { name: "is_ripe", role: "hue" },
       ],
       rows: [
-        ["182", "True"],
-        ["7", "False"],
-        ["295", "True"],
-        ["49", "False"],
+        ["Apple", "15.2", "True"],
+        ["Apple", "8.7", "False"],
+        ["Apple", "13.9", "True"],
+        ["Mango", "10.4", "False"],
       ],
     }),
   ];
-  return <Playground setup={parseExamples("setup.py").setup} sections={sections} />;
+  return (
+    <Playground
+      setup={parseExamples("setup.py").setup}
+      categories={[
+        { title: "Bar charts", sections: barCharts },
+        { title: "Distributions", sections: distributions },
+      ]}
+    />
+  );
 }

@@ -4,17 +4,15 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 
-def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 300) -> DataFrame:
+def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> DataFrame:
     fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Mango': .25, 'Fig': .17}
     ripe_share = {'Apple': .8, 'Banana': .25, 'Cherry': .6, 'Date': .4, 'Mango': .9, 'Fig': .15}
-    mean_weight = {'Apple': 180, 'Banana': 120, 'Cherry': 8, 'Date': 7, 'Mango': 300, 'Fig': 50}
     fruit = rng.choice(list(fruit_share), num_rows, p=list(fruit_share.values()))
     is_ripe = rng.random(num_rows) < pd.Series(fruit).map(ripe_share).to_numpy()
-    mean = pd.Series(fruit).map(mean_weight).to_numpy()
     return pd.DataFrame({
         'fruit': fruit,
         'is_ripe': is_ripe,
-        'weight': np.round(rng.normal(mean, mean * 0.15)).clip(1),
+        'sweetness': np.round(rng.normal(np.where(is_ripe, 14, 11), 2.5), 2),
     })
 
 
