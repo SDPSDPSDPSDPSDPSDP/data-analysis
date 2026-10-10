@@ -9,8 +9,9 @@ plot.histogram(
     df,
     x='sweetness',
     title=['Fruit sweetness', '20 bins'],
-    x_axis_label='Sugar (%)',
-    y_axis_label='Fruits',
+    x_axis_label='Sugar',
+    suffix='%',
+    y_axis_label='Number of fruits',
     bins=20,
 )
 

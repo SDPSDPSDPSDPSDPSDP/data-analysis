@@ -74,6 +74,12 @@ def test_histogram_keeps_fractional_values() -> None:
     assert sum(rect.height for rect in chart.rects) == 4
 
 
+def test_histogram_suffix_on_tick_labels() -> None:
+    df = pd.DataFrame({'x': [0.5, 1.5, 2.5]})
+    chart = Histogram(HistogramOptions(df=df, x='x', bins=3, suffix='%')).render()
+    assert chart.x.formatter(10) == '10 %'
+
+
 def test_histogram_bars_round_and_stacks_clip_to_total() -> None:
     df = pd.DataFrame({'x': [1, 1, 2, 3], 'hue': ['a', 'b', 'a', 'b']})
     plain = Histogram(HistogramOptions(df=df, x='x', bins=3)).render()

@@ -20,6 +20,7 @@ class NumericPlotsMixin:
         bins: int = 100,
         xlimit: Optional[Union[float, int]] = None,
         stacked: Optional[bool] = None,
+        suffix: Optional[str] = None,
     ) -> None:
         """Create a **histogram** of a numeric column.
 
@@ -34,6 +35,7 @@ class NumericPlotsMixin:
             x_axis_label: Label for the x-axis. *Optional*.
             y_axis_label: Label for the y-axis. *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
+            suffix: Text appended to each x tick label (e.g. `'%'` -> `'12 %'`). *Optional*.
 
         Layout:
             bins: Maximum number of bins; whole-number data gets at most one bin per value.
@@ -53,6 +55,7 @@ class NumericPlotsMixin:
             bins=bins,
             xlimit=xlimit,
             stacked=stacked,
+            suffix=suffix,
         )
         self._render(Histogram(options))
 

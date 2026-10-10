@@ -59,3 +59,6 @@ class Histogram(AbstractPlot):
             numeric_x=not self._is_year_column(),
             numeric_y=True
         )
+        if self.options.suffix:
+            plain = plot.x.formatter
+            plot.x.formatter = lambda val: f"{plain(val)} {self.options.suffix.strip()}"

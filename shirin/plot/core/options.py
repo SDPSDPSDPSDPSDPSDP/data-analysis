@@ -19,6 +19,7 @@ class HistogramOptions(BasePlotOptions):
     xlimit: Optional[Union[float, int]] = None
     bins: int = 100
     stacked: Optional[bool] = None
+    suffix: Optional[str] = None
 
     def validate(self) -> None:
         super().validate()
