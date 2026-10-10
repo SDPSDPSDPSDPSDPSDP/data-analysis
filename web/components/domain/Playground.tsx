@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChartColumn } from "lucide-react";
+import { ChartColumn, ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 
@@ -58,9 +58,50 @@ export default function Playground({ title, setup, examples }: Props) {
         ))}
         <h2 id="bar-charts">Bar charts</h2>
         <h3 id={titleId}>{title}</h3>
-        {examples.map((code, i) => (
-          <RunnableCode key={i} initialCode={code} setup={setupCode} />
-        ))}
+        <section className="data-format">
+          <div className="setup-cell">
+            <h4>Data format</h4>
+            <p>One row per observation. The plot counts the rows per value.</p>
+          </div>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>fruit</th>
+                <th>ripe</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Apple</td>
+                <td>True</td>
+              </tr>
+              <tr>
+                <td>Apple</td>
+                <td>False</td>
+              </tr>
+              <tr>
+                <td>Apple</td>
+                <td>False</td>
+              </tr>
+              <tr>
+                <td>Mango</td>
+                <td>True</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <RunnableCode initialCode={examples[0]} setup={setupCode} />
+        <details className="more-examples">
+          <summary>
+            <span className="more-examples-button">
+              {examples.length - 1} more examples
+              <ChevronDown size="1em" aria-hidden />
+            </span>
+          </summary>
+          {examples.slice(1).map((code, i) => (
+            <RunnableCode key={i} initialCode={code} setup={setupCode} />
+          ))}
+        </details>
       </main>
     </>
   );
