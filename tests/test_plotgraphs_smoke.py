@@ -256,3 +256,8 @@ def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
     assert (back.y0, back.y1, front.y0, front.y1) == (0, 1, 0, 0.7)
     assert back.rounded and front.rounded and back.fade_to is None
     assert back.color == blend(front.color, '#FFFFFF', REMAINDER_TINT)
+
+
+def test_barplot_remainder_rejects_duplicate_categories(plot: PlotGraphs) -> None:
+    with pytest.raises(ValueError, match='one row per category'):
+        plot.barplot(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder='Incorrect')

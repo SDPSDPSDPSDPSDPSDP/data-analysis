@@ -45,6 +45,8 @@ def fill_remainder(df: pd.DataFrame, category_col: str, value_col: str, remainde
 
     The segment labels go in a column named `value_col`, the shares in REMAINDER_SHARE_COL.
     """
+    if df[category_col].duplicated().any():
+        raise ValueError(f"{category_col!r} must have one row per category when remainder is set")
     fractions = df[value_col].astype(float)
     if not fractions.between(0, 1).all():
         raise ValueError(f"{value_col!r} must hold fractions in [0, 1] when remainder is set")

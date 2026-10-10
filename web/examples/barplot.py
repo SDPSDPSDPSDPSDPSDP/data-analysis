@@ -58,14 +58,12 @@ plot.barplot(
     title='Stacked',
 )
 
-# %% Accuracy: fill each run up to 100% with the remainder
-from shirin.assets.data import df_accuracy
-
+# %% Share: fill each bar up to 100% with the remainder
 plot.barplot(
-    df_accuracy,
-    x='run_name',
-    value='accuracy',
-    remainder='Incorrect',
+    df[df['is_ripe']],
+    x='fruit',
+    value='sold_share',
+    remainder='Unsold',
     normalized=True,
-    title='Accuracy per run',
+    title='Share of ripe fruit sold',
 )

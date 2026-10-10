@@ -17,8 +17,12 @@ def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> 
 
 
 def _count_fruit(df: DataFrame) -> DataFrame:
-    """Pre-aggregated fruit data: one row per fruit and ripeness, with count."""
-    return df.groupby(['fruit', 'is_ripe']).size().reset_index(name='count')
+    """Pre-aggregated fruit data: one row per fruit and ripeness, with count and share sold."""
+    ripe_sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Mango': .97, 'Fig': .6}
+    counts = df.groupby(['fruit', 'is_ripe']).size().reset_index(name='count')
+    # Unripe fruit sells at half the rate of ripe fruit.
+    counts['sold_share'] = counts['fruit'].map(ripe_sold_share) * counts['is_ripe'].map({True: 1, False: .5})
+    return counts
 
 
 def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
@@ -126,16 +130,12 @@ def _build_lazy_frames() -> dict:
         'df_fruit_counts': _count_fruit(df),
         # Larger yearly_growth produces more extreme increasing totals.
         'df_time': generate_time_series(yearly_growth=0.5),
-        'df_accuracy': pd.DataFrame({
-            'run_name': ['medium', 'nano', 'small'],
-            'accuracy': [0.99, 0.71, 0.85],
-        }),
     }
 
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    frames = _build_lazy_frames() if name in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time', 'df_accuracy') else {}
+    frames = _build_lazy_frames() if name in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time') else {}
     if name in frames:
         return frames[name].copy()
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
