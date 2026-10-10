@@ -53,10 +53,6 @@ section.setup-cell + section.setup-cell {
   height: var(--space-6);
 }
 
-.data-format .runnable > .output {
-  order: -1;
-}
-
 .data-format .data-table {
   margin-top: var(--space-2);
 }
