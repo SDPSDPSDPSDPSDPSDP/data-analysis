@@ -8,12 +8,12 @@ plot = PlotGraphs(
     palette={
         'is_ripe': {True: "#e9d0ff", False: "#6f2525"},
         'fruit': {
-            'Apple': "#8db600",
-            'Banana': "#ffe135",
-            'Cherry': "#9b111e",
-            'Date': "#8b5a2b",
-            'Fig': "#6c3461",
-            'Mango': "#ffa62b",
+            'Apple': "#c7ff0f",
+            'Banana': "#e7ffb3",
+            'Cherry': "#73304c",
+            'Date': "#8b6f75",
+            'Fig': "#9f5090",
+            'Mango': "#ffb752",
         },
     },
     label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},

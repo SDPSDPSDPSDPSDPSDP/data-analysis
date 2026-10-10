@@ -24,7 +24,12 @@ class ColorWidget extends WidgetType {
     input.value = this.color.toLowerCase();
     // "change", not "input": rewriting the text while dragging rebuilds this widget and closes the picker.
     input.addEventListener("change", () => {
-      const from = view.posAtDOM(input);
+      // posAtDOM can land a character off next to a widget: take the nearest occurrence of this color on its line.
+      const pos = view.posAtDOM(input);
+      const line = view.state.doc.lineAt(pos);
+      const start = line.text.indexOf(this.color, Math.max(0, pos - line.from - this.color.length));
+      if (start < 0) throw new Error(`Color ${this.color} not found on line ${line.number}`);
+      const from = line.from + start;
       view.dispatch({ changes: { from, to: from + this.color.length, insert: input.value } });
     });
     return input;
