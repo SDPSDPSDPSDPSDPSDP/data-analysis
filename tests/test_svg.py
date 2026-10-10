@@ -29,6 +29,13 @@ def test_text_width_grows_with_text() -> None:
     assert 0 < text_width('1', 10) < text_width('1000', 10) < text_width('1000', 20)
 
 
+def test_subtitle_is_tracked_tighter_than_small_text() -> None:
+    assert text_width('Share', 10) / 10 < text_width('Share', 8) / 8
+    c = Chart(width=6, plot_height=3, subtitle='Share')
+    c.rects.append(Rect(0, 1, 0, 5, '#123456'))
+    assert 'class="l">Share<' in to_svg(c)
+
+
 def test_title_adds_height_instead_of_squeezing_plot() -> None:
     def chart(title: str) -> Chart:
         c = Chart(width=6, plot_height=3, title=title)

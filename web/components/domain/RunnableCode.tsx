@@ -95,7 +95,7 @@ export default function RunnableCode({ initialCode, setup }: Props) {
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && <p className="hint">Rendering chart…</p>}
+        {!result && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>
   );

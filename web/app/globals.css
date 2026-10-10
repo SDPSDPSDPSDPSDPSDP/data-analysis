@@ -1,7 +1,7 @@
 :root {
   --color-bg: #fff;
   --color-surface: rgba(0, 0, 0, 0.04);
-  --color-border: rgba(0, 0, 0, 0.1);
+  --color-shimmer: rgba(0, 0, 0, 0.08);
   --color-error: #b00020;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
@@ -29,12 +29,13 @@
   --space-2: 16px;
   --space-3: 24px;
 
-  --border-width: 1px;
   --radius: 6px;
   --button-height: 28px;
   --transition: 120ms ease;
 
   --runnable-height: 75vh;
+  --chart-aspect-ratio: 4 / 3;
+  --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;
   --tooltip-max-height: 400px;
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -58,11 +59,30 @@ body {
   padding: var(--space-3) var(--space-2);
 }
 
+.page h1,
+.page h2 {
+  text-align: center;
+}
+
 .page h1 {
   margin: 0;
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
+}
+
+.page h2 {
+  margin: var(--space-3) 0 0;
+}
+
+.setup-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.setup-cell p {
+  margin: 0;
 }
 
 .code-block {
@@ -81,6 +101,10 @@ body {
 .code-block .cm-editor .cm-gutters {
   background: var(--color-code-bg);
   border: none;
+}
+
+.code-block .cm-scroller {
+  padding: var(--space-1) 0;
 }
 
 .code-block .cm-editor .cm-activeLine,
@@ -125,7 +149,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
-  height: var(--runnable-height);
+  align-items: start;
 }
 
 .runnable > * {
@@ -146,10 +170,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  overflow: auto;
-  padding: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
 }
 
 .chart {
@@ -160,6 +180,8 @@ body {
 .chart img {
   width: 100%;
   height: auto;
+  max-height: var(--runnable-height);
+  object-fit: contain;
   display: block;
 }
 
@@ -173,17 +195,35 @@ pre {
   color: var(--color-error);
 }
 
-.hint {
-  color: var(--text-secondary);
-  font-size: var(--font-size-small);
+.skeleton {
+  width: 100%;
+  aspect-ratio: var(--chart-aspect-ratio);
+  max-height: var(--runnable-height);
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-shimmer) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer var(--shimmer-duration) linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
 }
 
 /* Custom properties are not allowed in media queries. */
 @media (max-width: 800px) {
   .runnable {
     grid-template-columns: 1fr;
-    grid-template-rows: 50vh auto;
-    height: auto;
   }
 }
 

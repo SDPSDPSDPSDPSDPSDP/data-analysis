@@ -38,7 +38,7 @@ export default function CopyableImage({ src, alt }: { src: string; alt: string }
     };
   }, [src]);
 
-  if (!png) return null;
+  if (!png) return <div className="skeleton" role="status" aria-label="Rendering chart" />;
 
   return (
     <figure className="chart copyable">

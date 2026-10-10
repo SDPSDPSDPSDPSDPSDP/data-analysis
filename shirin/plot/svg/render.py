@@ -7,7 +7,7 @@ from xml.sax.saxutils import escape
 from ..config import FontSizes, Layout, TextColors
 from ..config.colors import GRID_COLOR
 from .chart import Axis, Chart, Dots, Line, Rect, Text, Wedge
-from .fonts import cap_height, font_css, text_width
+from .fonts import cap_height, font_css, is_large, text_width
 from .ticks import date_ticks, nice_ticks
 
 PT_PER_INCH = 72
@@ -71,6 +71,8 @@ def _text(x: float, y: float, s: str, size: float, color: str, anchor: str = 'st
         attrs += f' text-anchor="{anchor}"'
     if bold:
         attrs += ' class="b"'
+    elif is_large(size):
+        attrs += ' class="l"'
     if rotate:
         attrs += f' transform="rotate({-rotate} {x:.2f} {y - cap_height(size) / 2:.2f})"'
     return f'<text {attrs}>{escape(s)}</text>'
