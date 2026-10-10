@@ -19,7 +19,7 @@ dependencies = [
 sql = [
     "ibm-db-sa",
     "sqlalchemy",
-    "pyarrow",
+    "pyarrow>=14",
 ]
 
 [dependency-groups]

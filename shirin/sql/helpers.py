@@ -1,12 +1,18 @@
 """Helper functions for SQL query execution."""
 
+import functools
 import json
 import re
 from pathlib import Path
-from typing import Dict, Union
+from typing import Any, Dict, Iterator, Optional, Union
 import pandas as pd
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import URL
+import pyarrow as pa
+import pyarrow.parquet as pq
+from sqlalchemy import create_engine, event, text
+from sqlalchemy.engine import URL, Engine
+
+REQUIRED_CONFIG_KEYS = ('user', 'password', 'host', 'port', 'db_name', 'schema')
+PARQUET_CHUNK_ROWS = 100_000
 
 
 def load_sql_query(sql_query: Union[str, Path]) -> str:
@@ -73,55 +79,45 @@ def load_db_config(
 
 
 def convert_extension_types(df: pd.DataFrame) -> pd.DataFrame:
-    """Convert pandas extension types to standard types for PyArrow compatibility.
-    
-    This prevents ArrowKeyError when saving to parquet format.
-    
-    Args:
-        df: DataFrame with potential extension types.
-        
-    Returns:
-        DataFrame with standard types.
+    """Convert pandas extension-dtype columns to plain object columns for PyArrow.
+
+    This prevents ArrowKeyError when saving to parquet format. Returns ``df``
+    unchanged (no copy) when it has no extension columns.
     """
-    df_converted = pd.DataFrame()
-    
-    for col in df.columns:
-        dtype = df[col].dtype
-        
-        if pd.api.types.is_extension_array_dtype(dtype):
-            df_converted[col] = pd.Series(df[col].to_numpy(), index=df.index)
-        else:
-            df_converted[col] = df[col]
-    
-    return df_converted
+    ext_cols = [col for col in df.columns if pd.api.types.is_extension_array_dtype(df[col].dtype)]
+    if not ext_cols:
+        return df
+    return df.astype({col: object for col in ext_cols})
 
 
-def execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
-    """Execute SQL query against IBM DB2 database.
-    
-    Args:
-        sql_query: SQL query string.
-        db_config: Database configuration dict with required keys:
-                   user, password, host, port, db_name, schema.
-                   
-    Returns:
-        DataFrame with query results.
-        
-    Raises:
-        KeyError: If required database config keys are missing.
-    """
-    required_keys = ['user', 'password', 'host', 'port', 'db_name', 'schema']
-    missing_keys = [key for key in required_keys if key not in db_config]
+def _validate_db_config(db_config: Dict[str, Any]) -> None:
+    missing_keys = [key for key in REQUIRED_CONFIG_KEYS if key not in db_config]
     if missing_keys:
-        raise KeyError(
-            f"Missing required database config keys: {missing_keys}"
-        )
-
-    schema = db_config['schema']
+        raise KeyError(f"Missing required database config keys: {missing_keys}")
     # SET SCHEMA can't take a bind parameter, so only allow plain identifiers.
-    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_$#@]*', schema):
-        raise ValueError(f"Invalid schema name: {schema!r}")
+    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_$#@]*', str(db_config['schema'])):
+        raise ValueError(f"Invalid schema name: {db_config['schema']!r}")
 
+
+# ponytail: one pooled engine per (connection, schema) for the process lifetime; unbounded,
+# fine for a handful of configs. Add eviction/dispose if configs are generated dynamically.
+@functools.lru_cache(maxsize=None)
+def _get_engine(url: URL, schema: str) -> Engine:
+    engine = create_engine(url, pool_pre_ping=True)
+
+    @event.listens_for(engine, "connect")
+    def _set_schema(dbapi_connection, _connection_record) -> None:
+        # Once per physical connection instead of a round trip per query.
+        cursor = dbapi_connection.cursor()
+        cursor.execute(f"SET SCHEMA {schema}")
+        cursor.close()
+
+    return engine
+
+
+def get_engine(db_config: Dict[str, Any]) -> Engine:
+    """Return the cached DB2 engine for this config (schema set on every new connection)."""
+    _validate_db_config(db_config)
     url = URL.create(
         "ibm_db_sa",
         username=db_config['user'],
@@ -130,10 +126,57 @@ def execute_query(sql_query: str, db_config: Dict[str, str]) -> pd.DataFrame:
         port=int(db_config['port']),
         database=db_config['db_name'],
     )
-    engine = create_engine(url)
-    try:
-        with engine.connect() as connection:
-            connection.execute(text(f"SET SCHEMA {schema}"))
-            return pd.read_sql(sql_query, con=connection)
-    finally:
-        engine.dispose()
+    return _get_engine(url, str(db_config['schema']))
+
+
+def _read_sql(sql_query: str, connection: Any, params: Optional[Dict[str, Any]], **kwargs: Any) -> Any:
+    # Bind parameters use SQLAlchemy's :name style; plain strings go through untouched.
+    query = text(sql_query) if params else sql_query
+    return pd.read_sql(query, con=connection, params=params, **kwargs)
+
+
+def execute_query(
+    sql_query: str,
+    db_config: Dict[str, Any],
+    params: Optional[Dict[str, Any]] = None,
+) -> pd.DataFrame:
+    """Execute SQL query against IBM DB2 database.
+
+    Args:
+        sql_query: SQL query string. Use ``:name`` placeholders with ``params``.
+        db_config: Database configuration dict with required keys:
+                   user, password, host, port, db_name, schema.
+        params: Optional bind parameters, e.g. ``{"year": 2024}``.
+
+    Returns:
+        DataFrame with query results.
+
+    Raises:
+        KeyError: If required database config keys are missing.
+        ValueError: If the schema name is not a plain identifier.
+    """
+    with get_engine(db_config).connect() as connection:
+        return _read_sql(sql_query, connection, params)
+
+
+def query_to_parquet(
+    sql_query: str,
+    db_config: Dict[str, Any],
+    output_path: Path,
+    params: Optional[Dict[str, Any]] = None,
+    chunk_rows: int = PARQUET_CHUNK_ROWS,
+) -> None:
+    """Fetch in chunks and write one parquet file, without holding the whole result in pandas.
+
+    Chunks are kept as Arrow tables (compact) and their schemas unified, so a column
+    that is all-NULL or integer in an early chunk still gets its real type from later ones.
+    """
+    with get_engine(db_config).connect() as connection:
+        chunks: Iterator[pd.DataFrame] = _read_sql(sql_query, connection, params, chunksize=chunk_rows)
+        tables = [
+            pa.Table.from_pandas(convert_extension_types(chunk), preserve_index=False)
+            for chunk in chunks
+        ]
+    # ponytail: Arrow tables for the whole result stay in memory until the single write;
+    # switch to a ParquetWriter with a fixed schema if results outgrow RAM.
+    pq.write_table(pa.concat_tables(tables, promote_options='permissive'), output_path)

@@ -2730,7 +2730,7 @@ requires-dist = [
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pyarrow", marker = "extra == 'sql'" },
+    { name = "pyarrow", marker = "extra == 'sql'", specifier = ">=14" },
     { name = "seaborn" },
     { name = "sqlalchemy", marker = "extra == 'sql'" },
 ]
