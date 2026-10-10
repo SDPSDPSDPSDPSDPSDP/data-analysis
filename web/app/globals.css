@@ -1,30 +1,55 @@
+:root {
+  --color-bg: #fff;
+  --color-surface: rgba(0, 0, 0, 0.04);
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-error: #b00020;
+
+  --text-primary: rgba(0, 0, 0, 0.93);
+  --text-secondary: rgba(0, 0, 0, 0.53);
+
+  --font-body: system-ui, sans-serif;
+  --font-heading: var(--font-futura), "Futura", sans-serif;
+  --font-size-small: 13px;
+  --font-size-code: 14px;
+  --font-weight-heading: 500;
+  --letter-spacing-heading: 0.015em;
+
+  --space-1: 8px;
+  --space-1-5: 12px;
+  --space-2: 16px;
+  --space-3: 24px;
+
+  --border-width: 1px;
+  --radius: 6px;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #fff;
-  color: #111;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--text-primary);
 }
 
 .header {
-  padding: 24px 16px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  padding: var(--space-3) var(--space-2) var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .header h1 {
-  margin: 0 0 12px;
-  font-family: var(--font-futura), "Futura", sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.015em;
+  margin: 0 0 var(--space-1-5);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--letter-spacing-heading);
 }
 
 .setup {
-  padding: 12px;
-  background: #f5f5f5;
-  border-radius: 6px;
+  padding: var(--space-1-5);
+  background: var(--color-surface);
+  border-radius: var(--radius);
 }
 
 .playground {
@@ -38,27 +63,27 @@ body {
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  border-right: 1px solid #e5e5e5;
+  border-right: var(--border-width) solid var(--color-border);
 }
 
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e5e5e5;
+  gap: var(--space-1-5);
+  padding: var(--space-1) var(--space-1-5);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .editor {
   flex: 1;
   min-height: 0;
-  font-size: 14px;
+  font-size: var(--font-size-code);
 }
 
 .output {
   overflow: auto;
-  padding: 16px;
-  gap: 16px;
+  padding: var(--space-2);
+  gap: var(--space-2);
 }
 
 .chart {
@@ -74,25 +99,26 @@ body {
 
 .chart button {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: var(--space-1);
+  right: var(--space-1);
 }
 
 pre {
   margin: 0;
   white-space: pre-wrap;
-  font-size: 13px;
+  font-size: var(--font-size-small);
 }
 
 .error {
-  color: #b00020;
+  color: var(--color-error);
 }
 
 .hint {
-  color: #777;
-  font-size: 13px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
 }
 
+/* Custom properties are not allowed in media queries. */
 @media (max-width: 800px) {
   .playground {
     grid-template-columns: 1fr;

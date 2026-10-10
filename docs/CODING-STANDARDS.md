@@ -11,7 +11,7 @@ Code structure, design tokens and conventions for the `shirin` Python package an
 * **Matplotlib state:** Each plot draws on its own figure. Styling goes through `plt.rc_context`; never mutate global `rcParams`.
 * **Python version:** Code must run on Python 3.9 (CI matrix 3.9-3.13). No `X | Y` unions at runtime, no `match` statements.
 * **Number formatting:** Use `shirin/number_format.py` for Dutch formatting. Do not reformat numbers ad hoc.
-* **Tests:** One `tests/test_<module>.py` per area. Run with `uv run pytest`.
+* **Tests:** One `tests/test_<module>.py` per area. Run with `uv run python -m pytest`.
 
 ---
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import CodeMirror, { keymap, Prec } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { load, run, type RunResult } from "@/lib/pyodide";
+import CopyableImage from "@/components/ui/CopyableImage";
 
 // Shown above the editor and prepended to every run.
 const SETUP = `from shirin.plot import PlotGraphs
@@ -20,7 +21,7 @@ export default function Playground({ initialCode }: { initialCode: string }) {
 
   useEffect(() => {
     load().then(
-      () => setStatus("ready"),
+      () => execute(initialCode),
       (err) => {
         setStatus("failed");
         setResult({ images: [], stdout: "", error: String(err) });
@@ -71,32 +72,13 @@ export default function Playground({ initialCode }: { initialCode: string }) {
         </section>
         <section className="pane output">
           {result?.images.map((src, i) => (
-            <Chart key={i} base64={src} />
+            <CopyableImage key={i} src={`data:image/png;base64,${src}`} alt="Rendered chart" />
           ))}
           {result?.stdout && <pre>{result.stdout}</pre>}
           {result?.error && <pre className="error">{result.error}</pre>}
-          {!result && <p className="hint">Press Run to render the chart.</p>}
+          {!result && <p className="hint">Rendering chart…</p>}
         </section>
       </div>
     </main>
-  );
-}
-
-function Chart({ base64 }: { base64: string }) {
-  const src = `data:image/png;base64,${base64}`;
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    const blob = await fetch(src).then((r) => r.blob());
-    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <figure className="chart">
-      <img src={src} alt="Rendered chart" />
-      <button onClick={copy}>{copied ? "Copied" : "Copy"}</button>
-    </figure>
   );
 }

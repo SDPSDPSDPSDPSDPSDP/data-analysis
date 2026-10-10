@@ -36,7 +36,7 @@ class Palette:
 class LabelMapping:
     """Base class for per-column label mappings.
 
-    Same structure as :class:`Palette` — each attribute name is a column name.
+    Same structure as :class:`Palette` - each attribute name is a column name.
 
     Example::
 
