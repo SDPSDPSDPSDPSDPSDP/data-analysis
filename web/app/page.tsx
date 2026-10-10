@@ -43,7 +43,7 @@ export default function Home() {
         ["Apple", "True"],
         ["Apple", "False"],
         ["Apple", "False"],
-        ["Mango", "True"],
+        ["Orange", "True"],
       ],
     }, {
       description: "With value: one row per category and hue, with the value already calculated. The plot sums the values per category.",
@@ -70,7 +70,7 @@ export default function Home() {
         ["Apple", "15.2", "True"],
         ["Apple", "8.7", "False"],
         ["Apple", "13.9", "True"],
-        ["Mango", "10.4", "False"],
+        ["Orange", "10.4", "False"],
       ],
     }),
   ];
@@ -85,7 +85,7 @@ export default function Home() {
         ["Apple", "True"],
         ["Apple", "False"],
         ["Cherry", "True"],
-        ["Mango", "True"],
+        ["Orange", "True"],
       ],
     }),
   ];
