@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, Optional, Union
 import pandas as pd
 
 from ..common.data_conversion import convert_dict_keys_to_string
-from ..config import FigureSizeMode, FillMissingValues, OrderType, StackedLabelType, TimeGroupBy
+from ..config import FillMissingValues, OrderType, StackedLabelType, TimeGroupBy
 
 
 class InvalidOptionError(ValueError):
@@ -30,7 +30,6 @@ class InvalidOptionError(ValueError):
 
 VALID_ORDER_TYPES = tuple(order_type.value for order_type in OrderType)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
-VALID_FIGURE_SIZES = tuple(size.value for size in FigureSizeMode)
 VALID_STACKED_LABEL_TYPES = tuple(stacked_label.value for stacked_label in StackedLabelType)
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
 VALID_TIME_PLOT_TYPES = ('bar', 'line')

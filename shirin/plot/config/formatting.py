@@ -11,8 +11,8 @@ class FigureSize:
     """Inches. Figure height is the plot area plus whatever rows (title, legend, labels) are present."""
     WIDTH = 8.4
     PLOT_HEIGHT = 3.2
-    CATEGORY_SLOT = 0.8  # plot width per category for vertical 'dynamic' bars
-    BAR_ROW = 0.4  # plot height per category for horizontal 'dynamic' bars
+    CATEGORY_SLOT = 0.8  # plot width per category for vertical bars
+    BAR_ROW = 0.4  # plot height per category for horizontal bars
     PIE = 3.2
 
 

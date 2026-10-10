@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Any, Dict, Optional, Union
 
-from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
+from ..config import OrderTypeInput, StackedLabelTypeInput
 from ..core import CountPlotOptions, NormalizedCountPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import CountPlot, NormalizedCountPlot
@@ -35,7 +35,6 @@ class CountPlotsMixin:
         title: str = '',
         subtitle: str = '',
         top_n: Optional[int] = None,
-        figsize_width: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
@@ -58,8 +57,6 @@ class CountPlotsMixin:
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
-            figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
-                *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
                 or `None`. *Default: `None`*.
@@ -87,7 +84,6 @@ class CountPlotsMixin:
             title=title,
             subtitle=subtitle,
             top_n=top_n,
-            figsize=figsize_width,
             order_type=order_type,
             show_labels=show_labels,
             suffix=suffix,
@@ -105,7 +101,6 @@ class CountPlotsMixin:
         title: str = '',
         subtitle: str = '',
         top_n: Optional[int] = None,
-        figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
@@ -128,8 +123,6 @@ class CountPlotsMixin:
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
-            figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
-                *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
                 or `None`. *Default: `None`*.
@@ -157,7 +150,6 @@ class CountPlotsMixin:
             title=title,
             subtitle=subtitle,
             top_n=top_n,
-            figsize=figsize_height,
             order_type=order_type,
             show_labels=show_labels,
             suffix=suffix,

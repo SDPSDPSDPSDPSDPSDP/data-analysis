@@ -12,11 +12,6 @@ class StackedLabelType(str, Enum):
     PERCENTAGE = 'percentage'
 
 
-class FigureSizeMode(str, Enum):
-    DYNAMIC = 'dynamic'
-    STANDARD = 'standard'
-
-
 class FillMissingValues(str, Enum):
     SHIFT = 'shift'
     ZERO = 'zero'
@@ -30,6 +25,5 @@ class TimeGroupBy(str, Enum):
 
 OrderTypeInput = Union[OrderType, str]
 StackedLabelTypeInput = Optional[Union[StackedLabelType, str]]
-FigureSizeInput = Union[FigureSizeMode, str, float]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
 TimeGroupByInput = Union[TimeGroupBy, str]

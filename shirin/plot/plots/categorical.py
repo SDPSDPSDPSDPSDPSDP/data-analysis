@@ -18,22 +18,12 @@ from ..svg import Chart
 
 
 def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tuple[float, float]:
-    """(figure width, plot height) in inches.
-
-    'dynamic' grows with the category count (default width as minimum), 'standard' is fixed,
-    a number sets the figure width (vertical) or plot height (horizontal).
-    """
-    vertical = options.orientation == 'vertical'
-    if options.figsize == 'dynamic':
-        n_categories = data[options.axis_column].nunique()
-        if vertical:
-            # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
-            return (max(FigureSize.WIDTH, n_categories * FigureSize.CATEGORY_SLOT + 1), FigureSize.PLOT_HEIGHT)
-        return (FigureSize.WIDTH, n_categories * FigureSize.BAR_ROW)
-    if options.figsize == 'standard':
-        return (FigureSize.WIDTH, FigureSize.PLOT_HEIGHT)
-    size = float(options.figsize)
-    return (size, FigureSize.PLOT_HEIGHT) if vertical else (FigureSize.WIDTH, size)
+    """(figure width, plot height) in inches; grows with the category count, default width as minimum."""
+    n_categories = data[options.axis_column].nunique()
+    if options.orientation == 'vertical':
+        # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
+        return (max(FigureSize.WIDTH, n_categories * FigureSize.CATEGORY_SLOT + 1), FigureSize.PLOT_HEIGHT)
+    return (FigureSize.WIDTH, n_categories * FigureSize.BAR_ROW)
 
 
 def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:

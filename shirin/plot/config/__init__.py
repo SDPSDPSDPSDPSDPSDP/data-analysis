@@ -3,13 +3,11 @@ from .palettes import Palette, LabelMapping
 from .formatting import FontSizes, FigureSize, Layout
 from .types import (
     OrderType,
-    FigureSizeMode,
     StackedLabelType,
     FillMissingValues,
     TimeGroupBy,
     OrderTypeInput,
     StackedLabelTypeInput,
-    FigureSizeInput,
     FillMissingValuesInput,
     TimeGroupByInput,
 )
@@ -23,13 +21,11 @@ __all__ = [
     'FigureSize',
     'Layout',
     'OrderType',
-    'FigureSizeMode',
     'StackedLabelType',
     'FillMissingValues',
     'TimeGroupBy',
     'OrderTypeInput',
     'StackedLabelTypeInput',
-    'FigureSizeInput',
     'FillMissingValuesInput',
     'TimeGroupByInput',
 ]

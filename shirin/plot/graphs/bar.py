@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Any, Dict, Optional, Union
 
-from ..config import OrderTypeInput, StackedLabelTypeInput, FigureSizeInput
+from ..config import OrderTypeInput, StackedLabelTypeInput
 from ..core import BarPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import BarPlot
@@ -20,7 +20,6 @@ class BarPlotsMixin:
         legend: bool = False,
         title: str = '',
         subtitle: str = '',
-        figsize_width: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
@@ -44,8 +43,6 @@ class BarPlotsMixin:
             legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
-            figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
-                *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
                 or `None`. *Default: `None`*.
@@ -68,7 +65,6 @@ class BarPlotsMixin:
             legend=legend,
             title=title,
             subtitle=subtitle,
-            figsize=figsize_width,
             stacked=stacked,
             stacked_labels=stacked_labels,
             order_type=order_type,
@@ -90,7 +86,6 @@ class BarPlotsMixin:
         legend: bool = False,
         title: str = '',
         subtitle: str = '',
-        figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
         order_type: OrderTypeInput = 'frequency',
@@ -114,8 +109,6 @@ class BarPlotsMixin:
             legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
-            figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
-                *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             stacked_labels: Type of labels for stacked bars. **Options:** `'standard'`, `'percentage'`,
                 or `None`. *Default: `None`*.
@@ -138,7 +131,6 @@ class BarPlotsMixin:
             legend=legend,
             title=title,
             subtitle=subtitle,
-            figsize=figsize_height,
             stacked=stacked,
             stacked_labels=stacked_labels,
             order_type=order_type,
