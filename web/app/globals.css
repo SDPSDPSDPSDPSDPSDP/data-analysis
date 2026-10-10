@@ -18,6 +18,7 @@
   --font-doc: var(--font-satoshi), sans-serif;
   --font-size-small: 13px;
   --font-size-code: 14px;
+  --font-size-doc: 15px;
   --font-weight-heading: 500;
   --letter-spacing-heading: 0.015em;
 
@@ -34,7 +35,8 @@
 
   --runnable-height: 75vh;
   --tooltip-max-width: 560px;
-  --tooltip-max-height: 320px;
+  --tooltip-max-height: 400px;
+  --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -184,19 +186,30 @@ pre {
   }
 }
 
+.code-block .cm-editor .cm-tooltip:has(.doc-tooltip) {
+  background: var(--color-bg);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-tooltip);
+}
+
 .doc-tooltip {
   margin: 0;
-  padding: var(--space-1) var(--space-1-5);
+  padding: var(--space-1-5) var(--space-2);
+  color: var(--text-primary);
+  background: var(--color-bg);
+  line-height: 1.5;
   max-width: var(--tooltip-max-width);
   max-height: var(--tooltip-max-height);
   overflow: auto;
   white-space: pre-wrap;
   font-family: var(--font-doc);
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-doc);
 }
 
 .doc-tooltip code {
   padding: 0 var(--space-0-5);
   border-radius: var(--radius);
-  background: var(--color-button);
+  background: var(--color-surface);
+  font-size: var(--font-size-small);
 }
