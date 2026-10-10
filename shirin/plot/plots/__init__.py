@@ -8,4 +8,7 @@ from .timeplot import TimePlot
 from .accuracy import AccuracyPlot
 from .scatterplot import ScatterPlot
 
-__all__ = ['CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot', 'TimePlot', 'AccuracyPlot', 'ScatterPlot']
+__all__ = [
+    'CountPlot', 'BarPlot', 'Histogram', 'LinePlot', 'PieChart', 'NormalizedCountPlot', 'TimePlot',
+    'AccuracyPlot', 'ScatterPlot',
+]

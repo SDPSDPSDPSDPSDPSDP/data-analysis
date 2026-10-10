@@ -3,7 +3,7 @@ As well as repetitive data cleaning tasks.
 
 ### Documentation
 
-Comprehensive documentation is available in the [`docs/`](./docs/) folder, including a detailed developer guide explaining the package architecture and usage.
+Comprehensive documentation is available in the [`docs/`](./docs/) folder, including a developer guide with setup steps and an overview of the package layout.
 
 ### Example Usage
 

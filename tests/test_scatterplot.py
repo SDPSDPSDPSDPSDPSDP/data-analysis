@@ -1,15 +1,8 @@
 import pandas as pd
 import pytest
-import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, ScatterPlotOptions
-
-
-@pytest.fixture(autouse=True)
-def close_plots():
-    """Close all matplotlib figures after each test."""
-    yield
-    plt.close('all')
+from shirin.plot.core import ScatterPlotOptions
+from shirin.plot.plots import ScatterPlot
 
 
 class TestScatterPlotOptionsValidation:
@@ -50,7 +43,7 @@ class TestScatterPlotRender:
             ylabel="Weight",
         )
 
-        plot = create_plot('scatter', options)
+        plot = ScatterPlot(options)
         ax = plot.render()
 
         assert ax.get_xlabel() == "Height"
@@ -72,7 +65,7 @@ class TestScatterPlotRender:
             plot_legend=True,
         )
 
-        plot = create_plot('scatter', options)
+        plot = ScatterPlot(options)
         ax = plot.render()
 
         assert ax.get_legend() is not None
@@ -89,7 +82,7 @@ class TestScatterPlotRender:
             y="weight",
         )
 
-        plot = create_plot('scatter', options)
+        plot = ScatterPlot(options)
         ax = plot.render()
 
         assert ax.get_legend() is None

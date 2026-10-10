@@ -1,15 +1,7 @@
 import pandas as pd
-import pytest
-import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, PiePlotOptions
-
-
-@pytest.fixture(autouse=True)
-def close_plots():
-    """Close all matplotlib figures after each test."""
-    yield
-    plt.close('all')
+from shirin.plot.core import PiePlotOptions
+from shirin.plot.plots import PieChart
 
 
 class TestPieChartRender:
@@ -21,7 +13,7 @@ class TestPieChartRender:
             palette={"A": "#111111", "B": "#222222", "C": "#333333"},
         )
 
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         ax = plot.render()
 
         assert len(ax.patches) == 3
@@ -35,7 +27,7 @@ class TestPieChartRender:
             donut=True,
         )
 
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         ax = plot.render()
 
         assert len(ax.patches) >= 2
@@ -54,7 +46,7 @@ class TestPieChartRender:
             value_datalabel=0,
         )
 
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         plot.format_plot(plot.plot_object)
 
@@ -73,7 +65,7 @@ class TestPieChartRender:
             value_datalabel=101,
         )
 
-        plot = create_plot('pie', options)
+        plot = PieChart(options)
         plot.render()
         plot.format_plot(plot.plot_object)
 

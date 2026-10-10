@@ -1,5 +1,5 @@
 """Unit tests for palette conversion with non-string keys (boolean, integer)."""
-from shirin.plot.common.data_conversion import convert_palette_to_strings
+from shirin.plot.common.data_conversion import convert_dict_keys_to_string as convert_palette_to_strings
 from shirin.plot.common.formatting.text_contrast import get_text_color_for_background
 from shirin.plot.config.colors import Colors, TextColors
 
@@ -22,18 +22,14 @@ class TestPaletteLookupWithBooleanKeys:
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
         palette_str = convert_palette_to_strings(palette)
         
-        # Simulate what happens in stacked plots - lookup by string key
         bg_color_true = palette_str.get('True', '#000000')
         bg_color_false = palette_str.get('False', '#000000')
         
-        # BAD_RED is dark -> white text
         assert get_text_color_for_background(bg_color_true) == TextColors.WHITE
-        # GOOD_GREEN is light -> black text
         assert get_text_color_for_background(bg_color_false) == TextColors.BLACK
     
     def test_direct_color_list_lookup(self):
         """Test that using pre-computed colors list works correctly (pie chart fix)."""
-        # Simulate pie chart scenario where _colors is already computed
         colors = [Colors.BAD_RED, Colors.GOOD_GREEN]
         
         text_colors = [get_text_color_for_background(c) for c in colors]
@@ -45,10 +41,9 @@ class TestPaletteLookupWithBooleanKeys:
         """Test that failed palette lookup defaults to black (white text)."""
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
         
-        # This simulates the bug - looking up string key in boolean-keyed dict
-        bg_color = palette.get('True', '#000000')  # Will return default black
+        # Regression: a str key never matches a bool-keyed dict, so the fallback black wins.
+        bg_color = palette.get('True', '#000000')
         
-        # This is why we needed the fix - wrong lookup gives black background
         assert bg_color == '#000000'
         assert get_text_color_for_background(bg_color) == TextColors.WHITE
 
