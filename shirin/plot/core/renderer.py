@@ -27,7 +27,7 @@ def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
 def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
     lo, hi = center - width / 2, center + width / 2
     if horizontal:
-        return Rect(base, base + value, lo, hi, color, **kwargs)
+        return Rect(base, base + value, lo, hi, color, horizontal=True, **kwargs)
     return Rect(lo, hi, base, base + value, color, **kwargs)
 
 
@@ -106,14 +106,14 @@ def render_barplot(
 
 def render_stacked_barplot(chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom."""
-    totals = df.to_numpy(dtype=float).sum(axis=1)
-    outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
+    values = df.to_numpy(dtype=float)
+    outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(values.sum(axis=1))]
     base = np.zeros(len(df))
-    for column, color in zip(df.columns, colors):
-        values = df[column].to_numpy(dtype=float)
-        for position, (start, value) in enumerate(zip(base, values)):
-            chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position]))
-        base += values
+    for column, color in enumerate(colors[:len(df.columns)]):
+        for position, (start, value) in enumerate(zip(base, values[:, column])):
+            fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
+            chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
+        base += values[:, column]
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     _set_legend(chart, colors, list(df.columns))
     return chart

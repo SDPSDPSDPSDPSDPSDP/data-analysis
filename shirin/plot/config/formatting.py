@@ -21,6 +21,7 @@ class FigureSize:
 class Layout:
     """Points, measured from the figure edges."""
     PAD = 12
+    CORNER_RADIUS = 6
     ROW_GAP = 6
     PLOT_GAP = 12
     TICK_GAP = 6
@@ -30,4 +31,5 @@ class Layout:
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
     LEGEND_GAP = 2  # extra space between title/subtitle and legend
+    STACK_BLEND = 20  # gradient length across the boundary between stack segments
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room

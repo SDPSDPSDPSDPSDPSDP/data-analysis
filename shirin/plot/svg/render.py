@@ -93,6 +93,20 @@ def _rect(r: Rect, sx: Scale, sy: Scale) -> str:
     return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{xb - xa:.2f}" height="{yb - ya:.2f}"{radius} fill="{r.color}"{stroke}/>'
 
 
+def _fade(r: Rect, sx: Scale, sy: Scale, gradient_id: str) -> str:
+    """Gradient band centered on the rect's end edge, so the next stack segment blends in."""
+    half = Layout.STACK_BLEND / 2
+    if r.horizontal:
+        ya, yb = sorted((sy(r.y0), sy(r.y1)))
+        x, y, w, h, direction = sx(r.x1) - half, ya, 2 * half, yb - ya, 'x2="1" y2="0"'
+    else:
+        xa, xb = sorted((sx(r.x0), sx(r.x1)))
+        x, y, w, h, direction = xa, sy(r.y1) - half, xb - xa, 2 * half, 'x1="0" y1="1" x2="0" y2="0"'
+    return (f'<linearGradient id="{gradient_id}" {direction}><stop offset="0" stop-color="{r.color}"/>'
+            f'<stop offset="1" stop-color="{r.fade_to}"/></linearGradient>'
+            f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="url(#{gradient_id})"/>')
+
+
 def _line(line: Line, sx: Scale, sy: Scale) -> str:
     segments: List[List[Tuple[float, float]]] = [[]]
     for x, y in zip(line.xs, line.ys):
@@ -201,17 +215,22 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
     body += [_wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
     clip_ids: Dict[int, str] = {}
+    fades: List[str] = []  # drawn after every segment, else the next segment covers them
     for r in chart.rects:
         if not (r.width and r.height):
             continue
         rect = _rect(r, sx, sy)
+        # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
+        fade = _fade(r, sx, sy, f'fade{next(_CLIP_IDS)}') if r.fade_to is not None else ''
         if r.clip is not None:
             if id(r.clip) not in clip_ids:
-                # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
                 clip_ids[id(r.clip)] = f'clip{next(_CLIP_IDS)}'
                 body.append(f'<clipPath id="{clip_ids[id(r.clip)]}">{_rect(r.clip, sx, sy)}</clipPath>')
-            rect = rect.replace('<rect ', f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" ', 1)
+            clip = f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" '
+            rect, fade = rect.replace('<rect ', clip, 1), fade.replace('<rect ', clip, 1)
         body.append(rect)
+        fades.append(fade)
+    body += fades
     body += [_line(line, sx, sy) for line in chart.lines]
     body += [_dots(dots, sx, sy) for dots in chart.dots]
     for t in chart.texts:
@@ -256,7 +275,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width * PX_PER_PT:.0f}" height="{height * PX_PER_PT:.0f}" '
         f'viewBox="0 0 {width:.2f} {height:.2f}">',
         f'<style>{font_css(font, bool(chart.title))}</style>',
-        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        f'<rect width="100%" height="100%" rx="{Layout.CORNER_RADIUS}" fill="#ffffff"/>',
         *header,
         *body,
         '</svg>',

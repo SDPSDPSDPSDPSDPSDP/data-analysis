@@ -4,30 +4,14 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 
 
-def _create_base_dataframe(rng: np.random.Generator, num_rows: int = 10000) -> DataFrame:
-    labels = ["Apple", "Banana", "Orange", "Grape", "Mango", "Kiwi"]
-    weights = [0.28, 0.22, 0.17, 0.14, 0.11, 0.08]
+def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 300) -> DataFrame:
+    fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Mango': .25, 'Fig': .17}
+    ripe_share = {'Apple': .8, 'Banana': .25, 'Cherry': .6, 'Date': .4, 'Mango': .9, 'Fig': .15}
+    fruit = rng.choice(list(fruit_share), num_rows, p=list(fruit_share.values()))
     return pd.DataFrame({
-        "label": rng.choice(labels, size=num_rows, p=weights),
-        "values": rng.integers(1, 10, size=num_rows),
+        'fruit': fruit,
+        'ripe': rng.random(num_rows) < pd.Series(fruit).map(ripe_share).to_numpy(),
     })
-
-
-def _generate_middle_weighted_values(
-    rng: np.random.Generator, num_rows: int, value_range: tuple[int, int] = (1, 101)
-) -> np.ndarray:
-    min_val, max_val = value_range
-    midpoint = (min_val + max_val) // 2
-
-    values = np.arange(min_val, max_val)
-    weights = 100 - np.abs(midpoint - values)
-    return rng.choice(values, size=num_rows, p=weights / weights.sum())
-
-
-def _add_category_columns(rng: np.random.Generator, df: DataFrame) -> DataFrame:
-    df["example_hue_1"] = rng.choice(["category_1", "category_2"], size=len(df))
-    df['example_hue_2'] = df['example_hue_1'] == 'category_1'
-    return df
 
 
 def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
@@ -68,11 +52,9 @@ def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
     return pd.DataFrame(rows)
 
 
-def generate_demo_data(seed: int = 42) -> tuple[DataFrame, DataFrame]:
+def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
-    df = _create_base_dataframe(rng)
-    df["example_hue_3"] = _generate_middle_weighted_values(rng, len(df))
-    df = _add_category_columns(rng, df)
+    df = _create_fruit_dataframe(rng)
 
     df_documents_by_year = _create_documents_by_year_dataframe(rng)
     

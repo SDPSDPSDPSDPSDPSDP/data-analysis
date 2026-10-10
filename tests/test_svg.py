@@ -63,6 +63,15 @@ def test_stacked_segments_share_one_clip_path() -> None:
     assert svg.count('<clipPath') == 1 and svg.count('clip-path="url(#') == 2
 
 
+def test_stacked_segment_fades_into_next_inside_clip() -> None:
+    c = Chart(width=6, plot_height=3)
+    outline = Rect(0, 1, 0, 5, '', rounded=True)
+    c.rects += [Rect(0, 1, 0, 2, '#111111', clip=outline, fade_to='#222222'), Rect(0, 1, 2, 5, '#222222', clip=outline)]
+    svg = to_svg(c)
+    assert svg.count('<linearGradient') == 1 and 'stop-color="#222222"' in svg
+    assert svg.count('clip-path="url(#') == 3
+
+
 def test_long_data_label_shrinks_plot_width() -> None:
     def bar_width(label: str) -> float:
         c = Chart(width=6, plot_height=1)

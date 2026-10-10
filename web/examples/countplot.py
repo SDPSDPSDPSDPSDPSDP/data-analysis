@@ -1,4 +1,4 @@
 plot.countplot_x(
   df,
-  x='label',
+  x='fruit',
 )
