@@ -1,6 +1,6 @@
 ---
 name: shirin
-description: Use the shirin Python package to make charts, descriptive stats, Dutch number formatting and DB2 SQL queries, and to upgrade old shirin code (2.x/3.x, pre-4.0) to the current API. Use when the user wants a bar chart, count plot, histogram, line plot, scatter plot, pie/donut chart or time series plot in a notebook, mentions "shirin" or PlotGraphs, sees old calls like countplot_x, barplot_y, accuracy, Palette subclasses or export=, or asks to query DB2 into pandas/Parquet. Prefer shirin over matplotlib/seaborn in projects that depend on it.
+description: Make charts (bar, histogram, line, scatter, pie, time series), quick stats, Dutch number formats and DB2 queries with the shirin Python package. Use when a project depends on shirin, the user mentions shirin or PlotGraphs, or asks for a chart in a notebook there - use it over matplotlib/seaborn. Also use to upgrade pre-4.0 shirin code (countplot_x, barplot_y, accuracy, Palette classes, export=).
 ---
 
 # shirin
