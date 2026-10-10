@@ -39,39 +39,42 @@ export default function PlotSection({ title, dataFormat, setup, hiddenSetup, exa
   return (
     <>
       <h3 id={sectionId(title)}>{title}</h3>
-      <section className="data-format">
-        <div className="setup-cell">
-          <h4>Data format</h4>
-          <p>{dataFormat.description}</p>
-        </div>
-        <table className="data-table">
-          <thead>
-            <tr>
-              {dataFormat.columns.map((col) => (
-                <th key={col.name}>
-                  {col.name} <span className="data-table-role">{col.role}</span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {dataFormat.rows.map((row, i) => (
-              <tr key={i}>
-                {row.map((cell, j) => (
-                  <td key={j}>{cell}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           <p>{cell.explanation}</p>
           <CodeBlock value={cell.code} />
         </section>
       ))}
-      <RunnableCode initialCode={examples[0]} setup={setupCode} />
+      <section className="data-format">
+        <div className="setup-cell">
+          <h4>Data format</h4>
+          <p>{dataFormat.description}</p>
+          <table className="data-table">
+            <thead>
+              <tr>
+                {dataFormat.columns.map((col) => (
+                  <th key={col.name}>
+                    {col.name} <span className="data-table-role">{col.role}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {dataFormat.rows.map((row, i) => (
+                <tr key={i}>
+                  {row.map((cell, j) => (
+                    <td key={j}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="setup-cell">
+          <h4>Example</h4>
+          <RunnableCode initialCode={examples[0]} setup={setupCode} />
+        </div>
+      </section>
       {expandAll ? (
         moreExamples
       ) : (

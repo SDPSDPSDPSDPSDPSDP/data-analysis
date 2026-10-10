@@ -275,6 +275,15 @@ body {
   margin: var(--space-3) 0 var(--space-6);
 }
 
+/* First example shares the row with the data format, so code and chart stack. */
+.data-format .runnable {
+  grid-template-columns: 1fr;
+}
+
+.data-format .data-table {
+  margin-top: var(--space-2);
+}
+
 /* separate, not collapse: border-radius is ignored on collapsed tables. */
 .data-table {
   width: 100%;
