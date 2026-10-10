@@ -41,11 +41,11 @@ GROUP_LABELS = {'group': {'x': 'Ex'}}
 
 def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot = PlotGraphs(palette=GROUP_PALETTE)
-    plot.countplot(df, x='category')
-    plot.countplot(df, y='category', hue='group', stacked=True)
-    plot.countplot(df, x='category', hue='group', normalized=True)
-    plot.barplot(df, x='category', value='value')
-    plot.barplot(df, y='category', value='value', hue='group', stacked=True)
+    plot.bar(df, x='category')
+    plot.bar(df, y='category', hue='group', stacked=True)
+    plot.bar(df, x='category', hue='group', normalized=True)
+    plot.bar(df, x='category', value='value')
+    plot.bar(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
     plot.lineplot(df, x='date', y='value', hue='group')
     plot.scatterplot(df, x='value', y='value')
@@ -143,7 +143,7 @@ def test_barplot_sums_per_category() -> None:
 
 
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).countplot(
+    PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).bar(
         df, x='category', hue='group', title='Totals', legend=True
     )
     assert '>Totals</text>' in shown[0]
@@ -152,7 +152,7 @@ def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> N
 
 
 def test_hidden_legend(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot(df, x='category', hue='group')
+    PlotGraphs().bar(df, x='category', hue='group')
     assert '>x</text>' not in shown[0]
 
 
@@ -195,29 +195,36 @@ def test_shift_fill_interpolates_in_x_order() -> None:
 
 
 def test_title_list_adds_subtitle(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot(df, x='category', title=['Totals', 'Per category'])
+    PlotGraphs().bar(df, x='category', title=['Totals', 'Per category'])
     assert '>Totals</text>' in shown[0]
     assert '>Per category</text>' in shown[0]
     with pytest.raises(ValueError, match='title must be'):
-        PlotGraphs().countplot(df, x='category', title=['a', 'b', 'c'])
+        PlotGraphs().bar(df, x='category', title=['a', 'b', 'c'])
 
 
 def test_countplot_direction_from_x_or_y(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot(df, y='category')
-    PlotGraphs().countplot(df, y='category', x_axis_label='')
+    PlotGraphs().bar(df, y='category')
+    PlotGraphs().bar(df, y='category', x_axis_label='')
     assert '>Count</text>' in shown[0]
     assert '>Count</text>' not in shown[1]
     with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().countplot(df, x='category', y='category')
+        PlotGraphs().bar(df, x='category', y='category')
     with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().countplot(df)
+        PlotGraphs().bar(df)
 
 
 def test_barplot_needs_exactly_one_of_x_or_y(df: pd.DataFrame) -> None:
     with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().barplot(df, x='category', y='category', value='value')
+        PlotGraphs().bar(df, x='category', y='category', value='value')
     with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().barplot(df, value='value')
+        PlotGraphs().bar(df, value='value')
+
+
+def test_bar_rejects_options_of_the_other_mode(df: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match='remainder needs value'):
+        PlotGraphs().bar(df, x='category', normalized=True, remainder=True)
+    with pytest.raises(ValueError, match='top_n only works without value'):
+        PlotGraphs().bar(df, x='category', value='value', top_n=2)
 
 
 def test_normalized_barplot_shares_summed_value_per_hue() -> None:
@@ -236,7 +243,7 @@ def test_normalized_barplot_accepts_duplicate_index() -> None:
 
 def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
-    plot.barplot(df, x='run', value='acc', normalized=True, remainder=True)
+    plot.bar(df, x='run', value='acc', normalized=True, remainder=True)
     shares = fill_remainder(df, 'run', 'acc', 'Incorrect')
     plot_obj = NormalizedPlot(NormalizedPlotOptions(df=shares, axis_column='run', hue='acc', value=REMAINDER_SHARE_COL, remainder='Incorrect'))
     plot_obj.render()
@@ -246,7 +253,7 @@ def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> 
 
 def test_barplot_remainder_rejects_non_fractions(plot: PlotGraphs) -> None:
     with pytest.raises(ValueError, match=r"fractions in \[0, 1\]"):
-        plot.barplot(pd.DataFrame({'run': ['a'], 'acc': [78]}), x='run', value='acc', normalized=True, remainder=True)
+        plot.bar(pd.DataFrame({'run': ['a'], 'acc': [78]}), x='run', value='acc', normalized=True, remainder=True)
 
 
 def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
@@ -261,7 +268,7 @@ def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
 
 def test_barplot_remainder_rejects_conflicting_fractions(plot: PlotGraphs) -> None:
     with pytest.raises(ValueError, match='same on every row'):
-        plot.barplot(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder=True)
+        plot.bar(pd.DataFrame({'run': ['a', 'a'], 'acc': [0.5, 0.6]}), x='run', value='acc', normalized=True, remainder=True)
 
 
 def test_fill_remainder_collapses_repeated_fraction() -> None:
@@ -288,13 +295,13 @@ def test_barplot_remainder_with_category_hue_colors_each_bar(plot: PlotGraphs) -
     chart = nplot.draw(nplot.transform(nplot.preprocess()))
     fronts = [rect.color for rect in chart.rects[1::2]]
     assert fronts == ['#0000ff', '#ff0000']
-    plot.barplot(df, y='run', value='acc', hue='run', remainder=True, normalized=True)
+    plot.bar(df, y='run', value='acc', hue='run', remainder=True, normalized=True)
 
 
 def test_barplot_remainder_rejects_other_hue(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a'], 'acc': [0.7], 'g': ['x']})
     with pytest.raises(ValueError, match='hue must be the category column'):
-        plot.barplot(df, x='run', value='acc', hue='g', remainder=True, normalized=True)
+        plot.bar(df, x='run', value='acc', hue='g', remainder=True, normalized=True)
 
 
 def test_remainder_not_in_legend() -> None:

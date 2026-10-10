@@ -26,14 +26,14 @@ function parseExamples(file: string) {
   return { setup, hiddenSetup, examples };
 }
 
-function section(title: string, file: string, dataFormat: DataFormat): PlotSectionData {
-  return { title, dataFormat, ...parseExamples(file) };
+function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {
+  return { title, dataFormats, ...parseExamples(file) };
 }
 
 export default function Home() {
   const barCharts = [
-    section("Countplots", "countplot.py", {
-      description: "One row per observation. The plot counts the rows per value.",
+    section("Barplots", "bar.py", {
+      description: "Without value (df): one row per observation. The plot counts the rows per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },
@@ -44,9 +44,8 @@ export default function Home() {
         ["Apple", "False"],
         ["Mango", "True"],
       ],
-    }),
-    section("Barplots", "barplot.py", {
-      description: "One row per category and hue, with the value already calculated. Without hue, the values per category are summed.",
+    }, {
+      description: "With value (df_fruit_counts): one row per category and hue, with the value already calculated. The plot sums the values per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },
