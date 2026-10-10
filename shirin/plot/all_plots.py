@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from .core import AbstractPlot
 from .config.palettes import (
@@ -9,7 +9,6 @@ from .config.palettes import (
     merge_column_config,
 )
 from .graphs.bar import BarPlotsMixin
-from .graphs.count import CountPlotsMixin
 from .graphs.numeric import NumericPlotsMixin
 from .graphs.specialized import SpecializedPlotsMixin
 from .svg import to_svg
@@ -22,10 +21,10 @@ def show(svg: str) -> None:
     display(SVG(svg))
 
 
-class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
+class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
     """A comprehensive plotting interface for creating data visualizations in a notebook.
 
-    This class provides methods for creating various types of plots including **count plots**,
+    This class provides methods for creating various types of plots including
     **bar plots**, **histograms**, **line plots**, and **pie charts**. Each plot is shown
     inline as an SVG.
 
@@ -42,7 +41,7 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
         ...     palette={'is_ripe': {True: '#e9d0ff', False: '#6f2525'}},
         ...     label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},
         ... )
-        >>> plot.countplot(df, x='fruit', hue='is_ripe')
+        >>> plot.bar(df, x='fruit', hue='is_ripe')
     """
 
     def __init__(
@@ -56,6 +55,12 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
         self._font = font
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
         self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
+
+    def _column_config(self, column: Optional[str]) -> Dict[str, Any]:
+        """palette and label_map configured for a hue (or pie col) column."""
+        if column is None:
+            return {'palette': None, 'label_map': None}
+        return {'palette': self._palette.get(column), 'label_map': self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:
         show(to_svg(plot.render(), font=self._font))

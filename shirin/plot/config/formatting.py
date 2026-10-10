@@ -28,6 +28,7 @@ class Layout:
     TICK_GAP = 6
     LABEL_GAP = 14
     DATALABEL_GAP = 6
+    DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
@@ -35,3 +36,24 @@ class Layout:
     STACK_BLEND = 20  # gradient length across the boundary between stack segments
     WEDGE_SEAM = 1  # stroke in the slice's own color: anti-aliased edges of touching slices leave a white seam
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
+    HAIRLINE = 0.5  # stroke width of grid lines and rect outlines
+    AXIS_MARGIN = 0.05  # share of the data range padded on each side of an auto-scaled axis
+
+
+class Marks:
+    """Data-mark sizes. Bar widths are shares of a category slot, pie radii shares of the pie radius."""
+    BAR_WIDTH = 0.6
+    HORIZONTAL_BAR_WIDTH = 0.8
+    TIME_BAR_DAYS = {'year': 300, 'month': 25, 'day': 0.8}  # bar width in days per time grouping
+    PIE_LABEL_RADIUS = 0.6
+    DONUT_LABEL_RADIUS = 0.8
+    DONUT_HOLE_RADIUS = 0.6
+    LINE_WIDTH = 1.5
+    TIME_LINE_WIDTH = 2
+    LINE_MARKER_RADIUS = 2
+    TIME_LINE_MARKER_RADIUS = 1.5
+    TIME_LINE_ALPHA = 0.9
+    TIME_LINE_MAX_MARKED_DAYS = 25  # longer daily lines drop markers
+    DOT_AREA = 36.0  # square points
+    DOT_AREA_RANGE = (18, 72)  # square points, when sized by a column
+    DOT_ALPHA = 0.8

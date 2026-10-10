@@ -17,3 +17,17 @@ def format_thousands(value: Number, decimals: Optional[int] = None) -> str:
         else:
             return f"{value:.2f}".rstrip('0').rstrip('.').translate(_DUTCH_SEPARATORS)
     return f"{value:,.{decimals}f}".translate(_DUTCH_SEPARATORS)
+
+
+def format_percentage(value: Number, decimals: int = 0) -> str:
+    """Percentage with Dutch separators, e.g. 12.5 -> "12,5%"."""
+    return f"{format_thousands(value, decimals)}%"
+
+
+def format_compact(value: Number) -> str:
+    """Short form for tight labels, e.g. 10915 -> "11k", 1517 -> "1,5k"."""
+    for divisor, unit in ((1e6, 'M'), (1e3, 'k')):
+        if abs(value) >= divisor:
+            scaled = value / divisor
+            return f"{format_thousands(round(scaled, 0 if abs(scaled) >= 10 else 1))}{unit}"
+    return format_thousands(value)

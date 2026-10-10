@@ -34,8 +34,8 @@ class TestPaletteLookupWithBooleanKeys:
         
         text_colors = [get_text_color_for_background(c) for c in colors]
         
-        assert text_colors[0] == TextColors.WHITE  # BAD_RED -> white text
-        assert text_colors[1] == TextColors.BLACK  # GOOD_GREEN -> black text
+        assert text_colors[0] == TextColors.WHITE
+        assert text_colors[1] == TextColors.BLACK
     
     def test_failed_lookup_returns_black_background(self):
         """Test that failed palette lookup defaults to black (white text)."""

@@ -1,27 +1,13 @@
-import math
+"""Bar marks: categorical, stacked, histogram and time bars."""
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
-from ..common.sorting import palette_colors
-from ..config import FigureSize, FontSizes, TextColors
-from ..svg import Chart, Dots, Line, Rect, Text, Wedge
-from ..svg.ticks import to_days
-
-
-def create_figure(width: Optional[float], plot_height: float) -> Chart:
-    """New empty chart; every render function draws on the chart it is given."""
-    return Chart(width=width, plot_height=plot_height)
-
-
-def _hue_levels(df: pd.DataFrame, hue: str) -> List[Any]:
-    """Hue values in data order; this is also the legend order."""
-    return list(df[hue].dropna().unique())
-
-
-def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
-    chart.legend = [(color, str(label), '') for color, label in zip(colors, labels)]
+from ...common.sorting import palette_colors
+from ...config import FigureSize, Marks, TextColors
+from ...svg import Chart, Rect
+from .hue import hue_groups, hue_levels, set_legend
 
 
 def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
@@ -61,47 +47,29 @@ def _draw_categorical_bars(
                 _bar(chart, position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)
     _category_axis(chart, [str(category) for category in table.index], horizontal, top_down=True)
     if hue is not None:
-        _set_legend(chart, colors, list(table.columns))
+        set_legend(chart, colors, list(table.columns))
     return chart
-
-
-def render_countplot(
-    chart: Chart,
-    df: pd.DataFrame,
-    column: str,
-    horizontal: bool,
-    hue: Optional[str] = None,
-    order: Optional[List[Any]] = None,
-    color: Optional[str] = None,
-    palette: Optional[Dict[Any, str]] = None,
-) -> Chart:
-    order = order if order is not None else list(df[column].dropna().unique())
-    if hue is None:
-        table = df[column].value_counts().reindex(order).to_frame()
-        return _draw_categorical_bars(chart, table, [color], horizontal, hue)  # type: ignore[list-item]
-    levels = _hue_levels(df, hue)
-    table = pd.crosstab(df[column], df[hue]).reindex(index=order, columns=levels)
-    return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
 def render_barplot(
     chart: Chart,
     df: pd.DataFrame,
     column: str,
-    value: str,
+    value: Optional[str],
     horizontal: bool,
     hue: Optional[str] = None,
     order: Optional[List[Any]] = None,
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
 ) -> Chart:
-    """Bar length is the sum of value per category (and hue)."""
+    """Bar length is the sum of value per category (and hue), or the row count when value is None."""
     order = order if order is not None else list(df[column].dropna().unique())
     if hue is None:
-        table = df.groupby(column)[value].sum().reindex(order).to_frame()
-        return _draw_categorical_bars(chart, table, [color], horizontal, hue)  # type: ignore[list-item]
-    levels = _hue_levels(df, hue)
-    table = df.groupby([column, hue])[value].sum().unstack().reindex(index=order, columns=levels)
+        totals = df.groupby(column)[value].sum() if value else df[column].value_counts()
+        return _draw_categorical_bars(chart, totals.reindex(order).to_frame(), [color], horizontal, hue)  # type: ignore[list-item]
+    levels = hue_levels(df, hue)
+    table = df.groupby([column, hue])[value].sum().unstack() if value else pd.crosstab(df[column], df[hue])
+    table = table.reindex(index=order, columns=levels)
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
@@ -110,7 +78,7 @@ def render_stacked_barplot(
     df: pd.DataFrame,
     horizontal: bool,
     colors: List[str],
-    width: float = 0.6,
+    width: float = Marks.BAR_WIDTH,
     overlap: bool = False,
     row_colors: Optional[List[Tuple[str, str]]] = None,
 ) -> Chart:
@@ -137,7 +105,7 @@ def render_stacked_barplot(
                 chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
             base += values[:, column]
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
-    _set_legend(chart, colors, list(df.columns))
+    set_legend(chart, colors, list(df.columns))
     return chart
 
 
@@ -154,13 +122,8 @@ def render_histogram(
     """With hue, groups stack unless stacked is False, then they are drawn side by side."""
     edges = np.histogram_bin_edges(df[x], bins=bins)
     chart.y.sticky = (0,)
-    if hue is None:
-        groups, colors = [df[x]], [color]
-    else:
-        levels = _hue_levels(df, hue)
-        groups = [df.loc[df[hue] == level, x] for level in levels]
-        colors = palette_colors(palette, levels)  # type: ignore[arg-type]
-        _set_legend(chart, colors, levels)  # type: ignore[arg-type]
+    masks, colors = hue_groups(chart, df, hue, color, palette)
+    groups = [df.loc[mask, x] for mask in masks]
 
     group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
     stack = hue is not None and stacked is not False
@@ -183,113 +146,8 @@ def render_histogram(
     return chart
 
 
-def _numeric_x(chart: Chart, values: pd.Series) -> pd.Series:
-    """Positions on the x axis: numbers as is, dates as days, anything else as categories."""
-    if pd.api.types.is_datetime64_any_dtype(values):
-        chart.x.dates = True
-        return to_days(values)
-    if pd.api.types.is_numeric_dtype(values):
-        return values.astype(float)
-    categories = sorted(values.dropna().unique(), key=str)
-    chart.x.ticks, chart.x.tick_labels = list(range(len(categories))), [str(c) for c in categories]
-    return values.map({category: i for i, category in enumerate(categories)}).astype(float)
-
-
-def render_lineplot(
-    chart: Chart,
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: Optional[str] = None,
-    color: Optional[str] = None,
-    palette: Optional[Dict[Any, str]] = None,
-) -> Chart:
-    """One line per hue value; duplicate x values are averaged."""
-    df = df.assign(**{x: _numeric_x(chart, df[x])})
-    if hue is None:
-        groups, colors = [df], [color]
-    else:
-        levels = _hue_levels(df, hue)
-        groups = [df[df[hue] == level] for level in levels]
-        colors = palette_colors(palette, levels)  # type: ignore[arg-type]
-        _set_legend(chart, colors, levels)  # type: ignore[arg-type]
-    for group, group_color in zip(groups, colors):
-        line = group.groupby(x)[y].mean()
-        chart.lines.append(Line(list(line.index), list(line.values), group_color, marker_radius=2))  # type: ignore[arg-type]
-    return chart
-
-
-def render_scatterplot(
-    chart: Chart,
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: Optional[str] = None,
-    size: Optional[str] = None,
-    color: Optional[str] = None,
-    palette: Optional[Dict[Any, str]] = None,
-) -> Chart:
-    """size scales marker area linearly between 18 and 72 square points over the numeric size column."""
-    areas = pd.Series(36.0, index=df.index)
-    if size is not None:
-        values = df[size].astype(float)
-        areas = pd.Series(np.interp(values, (values.min(), values.max()), (18, 72)), index=df.index)
-    radii = np.sqrt(areas) / 2
-    xs = _numeric_x(chart, df[x])
-
-    if hue is None:
-        chart.dots.append(Dots(list(xs), list(df[y]), list(radii), color, alpha=0.8))  # type: ignore[arg-type]
-        return chart
-    levels = _hue_levels(df, hue)
-    colors = palette_colors(palette, levels)  # type: ignore[arg-type]
-    for level, level_color in zip(levels, colors):
-        rows = df[hue] == level
-        chart.dots.append(Dots(list(xs[rows]), list(df.loc[rows, y]), list(radii[rows]), level_color, alpha=0.8))
-    _set_legend(chart, colors, levels)
-    return chart
-
-
 def render_time_bars(chart: Chart, days: pd.Series, counts: pd.Series, color: str, width: float) -> Chart:
     chart.y.sticky = (0,)
     for day, count in zip(days, counts):
         _bar(chart, day, width, 0, float(count), color, horizontal=False)
     return chart
-
-
-def render_time_line(chart: Chart, days: pd.Series, counts: pd.Series, color: str, show_markers: bool) -> Chart:
-    chart.lines.append(Line(list(days), list(counts), color, width=2, marker_radius=1.5 if show_markers else 0, alpha=0.9))
-    return chart
-
-
-def render_piechart(
-    chart: Chart,
-    values: List[float],
-    colors: List[str],
-    donut: bool,
-    n_after_comma: int,
-    value_datalabel: int,
-    pctdistance: float,
-) -> List[Text]:
-    """Draw the pie clockwise from 12 o'clock; returns one percentage text per slice ('' below value_datalabel)."""
-    chart.x.lim = chart.y.lim = (-1, 1)
-    chart.x.visible = chart.y.visible = False
-    total = sum(values)
-    texts: List[Text] = []
-    start = 0.0
-    for value, color in zip(values, colors):
-        end = start + value / total
-        chart.wedges.append(Wedge(start, end, color))
-        percentage = value / total * 100
-        angle = math.pi * (start + end)
-        texts.append(Text(
-            pctdistance * math.sin(angle),
-            pctdistance * math.cos(angle),
-            f'{percentage:.{n_after_comma}f}%' if percentage >= value_datalabel else '',
-            TextColors.BLACK,
-            FontSizes.TEXT,
-        ))
-        start = end
-    if donut:
-        chart.wedges.append(Wedge(0, 1, TextColors.WHITE, radius=0.6))
-    chart.texts += texts
-    return texts

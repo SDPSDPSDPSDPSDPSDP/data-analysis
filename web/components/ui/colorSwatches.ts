@@ -46,7 +46,6 @@ const matcher = new MatchDecorator({
   decorate: (add, from, _to, match) => add(from, from, Decoration.widget({ widget: new ColorWidget(match[0]), side: -1 })),
 });
 
-// Clickable color picker in front of every "#rrggbb" in the editor, like VS Code shows for CSS.
 export const colorSwatches = ViewPlugin.fromClass(
   class {
     decorations: DecorationSet;

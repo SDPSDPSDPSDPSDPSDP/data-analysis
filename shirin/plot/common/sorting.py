@@ -32,22 +32,15 @@ def get_order(
     return None
 
 
-def _sort_dataframe_alphabetically(df_pivot: pd.DataFrame, ascending: bool = True) -> pd.DataFrame:
-    sorted_index = sort_alphabetically(df_pivot.index, ascending=ascending)
-    return df_pivot.loc[sorted_index]
-
-
 def sort_by_frequency(df_pivot: pd.DataFrame, ascending: bool = False) -> pd.DataFrame:
-    df_pivot['_order'] = df_pivot.sum(axis=1)
-    df_sorted = df_pivot.sort_values(by='_order', ascending=ascending)
-    return df_sorted.drop(columns=['_order'])
+    return df_pivot.loc[df_pivot.sum(axis=1).sort_values(ascending=ascending).index]
 
 
 def sort_pivot_table(df_pivot: pd.DataFrame, sort: Optional[SortInput], ascending: bool = False) -> pd.DataFrame:
     if sort == 'frequency':
         return sort_by_frequency(df_pivot, ascending=ascending)
     if sort == 'alphabetical':
-        return _sort_dataframe_alphabetically(df_pivot, ascending=ascending)
+        return df_pivot.loc[sort_alphabetically(df_pivot.index, ascending=ascending)]
     return df_pivot
 
 
@@ -59,10 +52,3 @@ def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> list[str]:
         raise KeyError(f"Palette missing keys: {missing}. Available keys: {list(palette.keys())}")
     return [palette[key] for key in keys]
 
-
-def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
-    return palette_colors(palette, df.columns)
-
-
-def create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return {str(key): str(key) for key in df[hue].unique()}

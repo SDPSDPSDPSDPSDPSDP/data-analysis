@@ -1,6 +1,5 @@
 name: CI
 
-# Run on push to master and on pull requests
 on:
   push:
     branches: [master]
@@ -11,31 +10,57 @@ jobs:
   test:
     name: Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-    
+
     steps:
-      # 1. Checkout code
       - uses: actions/checkout@v4
-      
-      # 2. Install uv (your package manager)
+
+      # python-version makes every uv command use this interpreter, not the project default.
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
           version: "latest"
-      
-      # 3. Set up Python
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-      
-      # 4. Install dependencies
+          python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          uv sync
-          uv pip install pytest
-      
-      # 5. Run tests
+        run: uv sync
+
+      - name: Check interpreter
+        run: uv run python -c "import sys; assert sys.version.startswith('${{ matrix.python-version }}.'), sys.version"
+
       - name: Run tests
-        run: uv run pytest tests/ -v
+        run: uv run python -m pytest tests/ -v
+
+  web:
+    name: Web build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # prebuild builds the wheel and docstrings.json, which the typecheck imports.
+      - name: Build
+        run: npm run build
+
+      - name: Typecheck
+        run: npx tsc --noEmit

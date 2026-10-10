@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import "./globals.css";
+import "./nav.css";
+import "./code.css";
+import "./examples.css";
 
 const futura = localFont({
   src: "../public/fonts/FuturaND-Medium.woff2",
@@ -23,7 +27,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${futura.variable} ${satoshi.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <OverlayScrollbar />
+      </body>
     </html>
   );
 }

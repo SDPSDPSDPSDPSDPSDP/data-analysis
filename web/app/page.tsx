@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import Playground from "@/components/domain/Playground";
-import type { DataFormat, PlotSectionData } from "@/components/domain/PlotSection";
+import type { DataFormat, Example, PlotSectionData } from "@/components/domain/PlotSection";
 
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
-// "# %% [hidden]" cells run before every example but are not shown.
+// "# %% [hidden]" cells run before every example below them but are not shown.
 // Other "# %% label" cells are runnable examples; their labels are not shown.
 function parseExamples(file: string) {
   const source = readFileSync(join(process.cwd(), "examples", file), "utf8");
@@ -18,22 +18,23 @@ function parseExamples(file: string) {
   const setup = cells
     .filter((cell) => cell.label.startsWith("[setup]"))
     .map((cell) => ({ explanation: cell.label.replace("[setup]", "").trim(), code: cell.code }));
-  const hiddenSetup = cells
-    .filter((cell) => cell.label.startsWith("[hidden]"))
-    .map((cell) => cell.code)
-    .join("\n\n");
-  const examples = cells.filter((cell) => !cell.label.startsWith("[")).map((cell) => cell.code);
-  return { setup, hiddenSetup, examples };
+  const hidden: string[] = [];
+  const examples: Example[] = [];
+  for (const cell of cells) {
+    if (cell.label.startsWith("[hidden]")) hidden.push(cell.code);
+    else if (!cell.label.startsWith("[")) examples.push({ code: cell.code, hiddenSetup: hidden.join("\n\n") });
+  }
+  return { setup, examples };
 }
 
-function section(title: string, file: string, dataFormat: DataFormat): PlotSectionData {
-  return { title, dataFormat, ...parseExamples(file) };
+function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {
+  return { title, dataFormats, ...parseExamples(file) };
 }
 
 export default function Home() {
   const barCharts = [
-    section("Countplots", "countplot.py", {
-      description: "One row per observation. The plot counts the rows per value.",
+    section("Barplots", "bar.py", {
+      description: "Without value: one row per observation. The plot counts the rows per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },
@@ -42,11 +43,10 @@ export default function Home() {
         ["Apple", "True"],
         ["Apple", "False"],
         ["Apple", "False"],
-        ["Mango", "True"],
+        ["Orange", "True"],
       ],
-    }),
-    section("Barplots", "barplot.py", {
-      description: "One row per category and hue, with the value already calculated. Without hue, the values per category are summed.",
+    }, {
+      description: "With value: one row per category and hue, with the value already calculated. The plot sums the values per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },
@@ -70,7 +70,7 @@ export default function Home() {
         ["Apple", "15.2", "True"],
         ["Apple", "8.7", "False"],
         ["Apple", "13.9", "True"],
-        ["Mango", "10.4", "False"],
+        ["Orange", "10.4", "False"],
       ],
     }),
   ];
@@ -85,7 +85,7 @@ export default function Home() {
         ["Apple", "True"],
         ["Apple", "False"],
         ["Cherry", "True"],
-        ["Mango", "True"],
+        ["Orange", "True"],
       ],
     }),
   ];

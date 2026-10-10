@@ -13,13 +13,18 @@ export type DataFormat = {
   rows: string[][];
 };
 
+export type Example = {
+  code: string;
+  // Runs after the section setup, not shown.
+  hiddenSetup: string;
+};
+
 export type PlotSectionData = {
   title: string;
-  dataFormat: DataFormat;
+  dataFormats: DataFormat[];
   // Shown in the section and run before each of its examples, after the global setup.
   setup: SetupCell[];
-  hiddenSetup: string;
-  examples: string[];
+  examples: Example[];
 };
 
 export function sectionId(title: string): string {
@@ -33,11 +38,15 @@ type Props = PlotSectionData & {
   standalone: boolean;
 };
 
-export default function PlotSection({ title, dataFormat, setup, hiddenSetup, examples, globalSetup, expandAll, standalone }: Props) {
-  const setupCode = [globalSetup, ...setup.map((cell) => cell.code), hiddenSetup].join("\n\n");
-  const moreExamples = examples
-    .slice(1)
-    .map((code, i) => <RunnableCode key={i} initialCode={code} setup={setupCode} />);
+export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, expandAll, standalone }: Props) {
+  const runnable = (example: Example, key?: number) => (
+    <RunnableCode
+      key={key}
+      initialCode={example.code}
+      setup={[globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n")}
+    />
+  );
+  const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));
   const Heading = standalone ? "h2" : "h3";
   return (
     <>
@@ -50,32 +59,36 @@ export default function PlotSection({ title, dataFormat, setup, hiddenSetup, exa
       ))}
       <section className="data-format">
         <div className="setup-cell">
-          <h4>Data format</h4>
-          <p>{dataFormat.description}</p>
-          <table className="data-table">
-            <thead>
-              <tr>
-                {dataFormat.columns.map((col) => (
-                  <th key={col.name}>
-                    {col.name} <span className="data-table-role">{col.role}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {dataFormat.rows.map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td key={j}>{cell}</td>
+          <h4>{dataFormats.length > 1 ? "Data formats" : "Data format"}</h4>
+          {dataFormats.map((dataFormat, k) => (
+            <div key={k} className="setup-cell">
+              <p>{dataFormat.description}</p>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    {dataFormat.columns.map((col) => (
+                      <th key={col.name}>
+                        {col.name} <span className="data-table-role">{col.role}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataFormat.rows.map((row, i) => (
+                    <tr key={i}>
+                      {row.map((cell, j) => (
+                        <td key={j}>{cell}</td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          ))}
         </div>
         <div className="setup-cell">
           <h4>Example</h4>
-          <RunnableCode initialCode={examples[0]} setup={setupCode} />
+          {runnable(examples[0])}
         </div>
       </section>
       {expandAll ? (

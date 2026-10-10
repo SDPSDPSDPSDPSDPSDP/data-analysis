@@ -7,6 +7,9 @@ import docstrings from "@/lib/docstrings.json";
 import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
 
+// Start a run slightly before the example scrolls into view.
+const RUN_AHEAD_MARGIN = "200px";
+
 const DOTTED_NAME = /^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$/;
 
 // Inline markdown only: docstrings are Google-style, so a block parser would turn indented Args into code blocks.
@@ -34,7 +37,6 @@ function formatDoc(doc: string): string {
 
 const DOCS: Record<string, string> = docstrings;
 
-// Docstring of the dotted name under the cursor, looked up by its last part.
 const docTooltip = hoverTooltip((view, pos) => {
   const line = view.state.doc.lineAt(pos);
   const offset = pos - line.from;
@@ -65,28 +67,37 @@ type Props = {
 export default function RunnableCode({ initialCode, setup }: Props) {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<RunResult | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
+  // Python loads right away; the example only runs once visible. Content of a closed
+  // <details> never intersects, so collapsed examples run when opened.
   useEffect(() => {
-    load().then(
-      () => execute(initialCode),
-      (err) => setResult({ images: [], stdout: "", error: String(err) }),
+    load().catch((err) => setResult({ images: [], stdout: "", error: String(err) }));
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin: RUN_AHEAD_MARGIN },
     );
+    observer.observe(root.current!);
+    return () => observer.disconnect();
   }, []);
 
   // Running a setup cell (like after picking a palette color) re-renders the chart.
-  const lastSetup = useRef(setup);
+  // An example that has not run yet picks up the new setup when it becomes visible.
   useEffect(() => {
-    if (lastSetup.current === setup) return;
-    lastSetup.current = setup;
-    execute(code);
-  }, [setup]);
+    if (visible) execute(code);
+  }, [visible, setup]);
 
   async function execute(source: string) {
     setResult(await run(`${setup}\n${source}`));
   }
 
   return (
-    <div className="runnable">
+    <div className="runnable" ref={root}>
       <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={[docTooltip]} />
       <section className="output">
         {result?.images.map((src, i) => (

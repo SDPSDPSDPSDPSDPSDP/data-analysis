@@ -4,12 +4,9 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 import pandas as pd
 
-from .helpers import (
-    load_sql_query,
-    load_db_config,
-    execute_query,
-    query_to_parquet,
-)
+from .engine import load_db_config
+from .helpers import execute_query, load_sql_query
+from .parquet import query_to_parquet
 
 
 def run_sql_query(

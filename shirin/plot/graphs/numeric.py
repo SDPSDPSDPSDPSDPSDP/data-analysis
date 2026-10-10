@@ -3,7 +3,6 @@ from typing import Optional, Union
 
 from ..config import TitleInput, FillMissingValuesInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
-from ..common.resolve_palette import resolve_palette
 from ..plots import Histogram, LinePlot, ScatterPlot
 
 
@@ -47,7 +46,7 @@ class NumericPlotsMixin:
             df=df,
             x=x,
             hue=hue,
-            **resolve_palette(self, hue),
+            **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
@@ -97,7 +96,7 @@ class NumericPlotsMixin:
             x=x,
             y=y,
             hue=hue,
-            **resolve_palette(self, hue),
+            **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
@@ -141,7 +140,7 @@ class NumericPlotsMixin:
             y=y,
             hue=hue,
             size=size,
-            **resolve_palette(self, hue),
+            **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,

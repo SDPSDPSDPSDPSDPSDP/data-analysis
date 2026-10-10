@@ -5,8 +5,8 @@ from pandas.core.frame import DataFrame
 
 
 def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> DataFrame:
-    fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Mango': .25, 'Fig': .17}
-    ripe_share = {'Apple': .8, 'Banana': .25, 'Cherry': .6, 'Date': .4, 'Mango': .9, 'Fig': .15}
+    fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Orange': .25, 'Fig': .17}
+    ripe_share = {'Apple': .8, 'Banana': .25, 'Cherry': .6, 'Date': .4, 'Orange': .9, 'Fig': .15}
     fruit = rng.choice(list(fruit_share), num_rows, p=list(fruit_share.values()))
     is_ripe = rng.random(num_rows) < pd.Series(fruit).map(ripe_share).to_numpy()
     return pd.DataFrame({
@@ -18,57 +18,27 @@ def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> 
 
 def _count_fruit(df: DataFrame) -> DataFrame:
     """Pre-aggregated fruit data: one row per fruit and ripeness, with count and the fruit's share sold."""
-    sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Mango': .97, 'Fig': .6}
+    sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Orange': .97, 'Fig': .6}
     counts = df.groupby(['fruit', 'is_ripe']).size().reset_index(name='count')
     counts['sold_share'] = counts['fruit'].map(sold_share)
     return counts
 
 
 def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
-    """Creates dataframe with 2 rows per year (one for each type: True/False)."""
-    
-    start_year = 2000
-    end_year = 2023
-    years = range(start_year, end_year)
-    
-    cutoff_year = 2010
-    
+    """Two rows per year 2000-2022 (example_hue_3 True/False) with cumulative document counts."""
     rows = []
-    cumul_true = 0
-    cumul_false = 0
-    
-    for year in years:
-        hue_value = year < cutoff_year
-        
-        count_true = int(rng.integers(80, 150))
-        count_false = int(rng.integers(20, 60))
-        
-        cumul_true += count_true
-        cumul_false += count_false
-        
-        rows.append({
-            'year': year,
-            'cumul_total_docs': cumul_true,
-            'example_hue_4': hue_value,
-            'example_hue_3': True
-        })
-        rows.append({
-            'year': year,
-            'cumul_total_docs': cumul_false,
-            'example_hue_4': hue_value,
-            'example_hue_3': False
-        })
-    
+    cumul = {True: 0, False: 0}
+    for year in range(2000, 2023):
+        cumul[True] += int(rng.integers(80, 150))
+        cumul[False] += int(rng.integers(20, 60))
+        for flag in (True, False):
+            rows.append({'year': year, 'cumul_total_docs': cumul[flag], 'example_hue_4': year < 2010, 'example_hue_3': flag})
     return pd.DataFrame(rows)
 
 
 def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
-    df = _create_fruit_dataframe(rng)
-
-    df_documents_by_year = _create_documents_by_year_dataframe(rng)
-    
-    return df, df_documents_by_year
+    return _create_fruit_dataframe(rng), _create_documents_by_year_dataframe(rng)
 
 
 def generate_time_series(
@@ -127,14 +97,12 @@ def _build_lazy_frames() -> dict:
         'df': df,
         'df_documents_by_year': df_documents_by_year,
         'df_fruit_counts': _count_fruit(df),
-        # Larger yearly_growth produces more extreme increasing totals.
-        'df_time': generate_time_series(yearly_growth=0.5),
+        'df_time': generate_time_series(),
     }
 
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    frames = _build_lazy_frames() if name in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time') else {}
-    if name in frames:
-        return frames[name].copy()
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    if name not in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time'):
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return _build_lazy_frames()[name].copy()

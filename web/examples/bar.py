@@ -1,25 +1,33 @@
-# %% [hidden]
-from shirin.assets.data import df_fruit_counts as df
-
-# %% Plain
-plot.barplot(
+# %% Count rows per category
+plot.bar(
     df,
     x='fruit',
-    value='count',
 )
 
-# %% Title, axis labels, suffix
-plot.barplot(
+# %% Title, axis label, top n, suffix
+plot.bar(
     df,
     y='fruit',
-    value='count',
-    title=['Fruit counts', 'Pre-aggregated'],
+    title=['Fruit counts', 'Top 4 only'],
     y_axis_label='Fruit',
+    top_n=4,
     suffix='pcs',
 )
 
+# %% Counts grouped by hue
+plot.bar(
+    df,
+    x='fruit',
+    hue='is_ripe',
+    legend=True,
+    title='Grouped by ripeness',
+)
+
+# %% [hidden]
+from shirin.assets.data import df_fruit_counts as df
+
 # %% Alphabetical, no data labels
-plot.barplot(
+plot.bar(
     df,
     x='fruit',
     value='count',
@@ -30,7 +38,7 @@ plot.barplot(
 )
 
 # %% Percentage labels
-plot.barplot(
+plot.bar(
     df,
     y='fruit',
     value='count',
@@ -38,18 +46,8 @@ plot.barplot(
     title='Share of total',
 )
 
-# %% Grouped by hue
-plot.barplot(
-    df,
-    x='fruit',
-    value='count',
-    hue='is_ripe',
-    legend=True,
-    title='Grouped by ripeness',
-)
-
 # %% Stacked by hue
-plot.barplot(
+plot.bar(
     df,
     y='fruit',
     value='count',
@@ -60,7 +58,7 @@ plot.barplot(
 )
 
 # %% Share: fill each bar up to 100% with the remainder
-plot.barplot(
+plot.bar(
     df,
     x='fruit',
     value='sold_share',
@@ -71,7 +69,7 @@ plot.barplot(
 )
 
 # %% Share, colored per fruit
-plot.barplot(
+plot.bar(
     df,
     y='fruit',
     value='sold_share',

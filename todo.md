@@ -1,5 +1,4 @@
-- consolidate bar and count into one, if theres no value given, its countplot
-- custom scrollbar
+- skill
 
 # later
 - dark mode

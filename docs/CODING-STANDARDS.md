@@ -8,7 +8,7 @@ Code structure, design tokens and conventions for the `shirin` Python package an
 
 * **Layout:** Follow the layers in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md#architecture). New chart = public method in `plot/graphs/`, Options dataclass in `plot/core/`, plot class in `plot/plots/`. Shared helpers go in `plot/common/`, constants and palettes in `plot/config/`.
 * **Options validation:** Validate user input in the Options dataclasses, not inside drawing code.
-* **Rendering:** Plots fill a `Chart` (`plot/svg/chart.py`) in data coordinates; only `plot/svg/render.py` deals in points and SVG.
+* **Rendering:** Plots fill a `Chart` (`plot/svg/chart.py`) in data coordinates; only `plot/svg/` (`render.py` layout, `header.py`, `marks.py`) deals in points and SVG.
 * **Python version:** Code must run on Python 3.9 (CI matrix 3.9-3.13). No `X | Y` unions at runtime, no `match` statements.
 * **Number formatting:** Use `shirin/number_format.py` for Dutch formatting. Do not reformat numbers ad hoc.
 * **Tests:** One `tests/test_<module>.py` per area. Run with `uv run python -m pytest`.
@@ -34,10 +34,11 @@ Code structure, design tokens and conventions for the `shirin` Python package an
 
 ## 3. CSS Design Tokens & Typography
 
+* **Stylesheets:** Global CSS in `web/app/`: `globals.css` (tokens, base), `nav.css`, `code.css`, `examples.css`, imported in that order by `layout.tsx`. No CSS modules yet.
 * **Central Tokens:** Define all visual values as custom properties in `:root` of `web/app/globals.css`. Fonts load via `next/font/local` in `web/app/layout.tsx` (exposed as `--font-futura`).
 * **Zero Hardcoded Values:** Never use raw hex colors, pixel sizes, margins, or padding outside the token definitions. Reference tokens via `var(--token-name)`.
 * **Text Opacity Rule:** Never use solid hex greys for text. Use alpha transparent black/white (e.g. `rgba(0, 0, 0, 0.87)`, `rgba(0, 0, 0, 0.5)`).
-* **Role-Based Typography:** Name utility classes after UI roles (e.g. `.shirin-pane-title`, `.shirin-hint`), not abstract scales. Compose them in CSS modules (`composes: shirin-hint from global;`).
+* **Role-Based Typography:** Name utility classes after UI roles (e.g. `.shirin-pane-title`, `.shirin-hint`), not abstract scales.
 
 ---
 

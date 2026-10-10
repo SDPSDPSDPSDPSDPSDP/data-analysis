@@ -35,9 +35,8 @@ def fill_missing_values_in_data(
     }
     # 'shift' interpolates between neighbours along x, so rows must be in x order.
     df = df.sort_values(x)
-    fill = fills.get(fill_method)
-    if fill is not None:
-        df[y] = df.groupby(hue)[y].transform(fill) if hue is not None else fill(df[y])
+    fill = fills[fill_method]
+    df[y] = df.groupby(hue)[y].transform(fill) if hue is not None else fill(df[y])
     return df
 
 

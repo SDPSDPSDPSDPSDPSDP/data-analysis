@@ -3,7 +3,6 @@ from typing import Optional
 
 from ..config import TitleInput, TimeGroupByInput
 from ..core import PiePlotOptions, TimePlotOptions
-from ..common.resolve_palette import resolve_palette
 from ..plots import PieChart, TimePlot
 
 
@@ -38,7 +37,7 @@ class SpecializedPlotsMixin:
         options = PiePlotOptions(
             df=df[col].value_counts().rename('__count__').to_frame(),
             col='__count__',
-            **resolve_palette(self, col),
+            **self._column_config(col),
             title=title,
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,

@@ -44,7 +44,6 @@ class TestPieChartRender:
 
         plot = PieChart(options)
         plot.render()
-        plot.format_plot(plot.plot_object)
 
         assert len(plot._autotexts) == 2
         for autotext in plot._autotexts:
@@ -62,6 +61,5 @@ class TestPieChartRender:
 
         plot = PieChart(options)
         plot.render()
-        plot.format_plot(plot.plot_object)
 
         assert len(plot._autotexts) == 3
