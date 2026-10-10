@@ -5,7 +5,7 @@ from typing import List
 import pandas as pd
 import pytest
 
-from shirin.plot import LabelMapping, Palette, PlotGraphs
+from shirin.plot import PlotGraphs
 from shirin.plot.common.data_conversion import fill_missing_values_in_data
 from shirin.plot.core import (
     AccuracyPlotOptions,
@@ -33,16 +33,12 @@ def plot() -> PlotGraphs:
     return PlotGraphs()
 
 
-class GroupPalette(Palette):
-    group = {'x': '#111111', 'y': '#eeeeee'}
-
-
-class GroupLabels(LabelMapping):
-    group = {'x': 'Ex'}
+GROUP_PALETTE = {'group': {'x': '#111111', 'y': '#eeeeee'}}
+GROUP_LABELS = {'group': {'x': 'Ex'}}
 
 
 def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
-    plot = PlotGraphs(palette=GroupPalette)
+    plot = PlotGraphs(palette=GROUP_PALETTE)
     plot.countplot_x(df, x='category')
     plot.countplot_y(df, y='category', hue='group', stacked=True)
     plot.countplot_x(df, x='category', hue='group', normalized=True)
@@ -128,7 +124,7 @@ def test_barplot_uses_mean_per_category() -> None:
 
 
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs(font='satoshi', label_mapping=GroupLabels).countplot_x(
+    PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).countplot_x(
         df, x='category', hue='group', title='Totals', legend=True
     )
     assert '>Totals</text>' in shown[0]
@@ -139,6 +135,13 @@ def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> N
 def test_hidden_legend(df: pd.DataFrame, shown: List[str]) -> None:
     PlotGraphs().countplot_x(df, x='category', hue='group')
     assert '>x</text>' not in shown[0]
+
+
+def test_bad_palette_config_raises() -> None:
+    with pytest.raises(TypeError, match="palette must be a dict"):
+        PlotGraphs(palette=['#111111'])
+    with pytest.raises(TypeError, match=r"label_mapping\['group'\] must be a dict"):
+        PlotGraphs(label_mapping={'group': 'Ex'})
 
 
 def test_unknown_font_raises() -> None:

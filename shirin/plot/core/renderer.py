@@ -24,14 +24,17 @@ def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
     chart.legend = [(color, str(label)) for color, label in zip(colors, labels)]
 
 
+def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
+    lo, hi = center - width / 2, center + width / 2
+    if horizontal:
+        return Rect(base, base + value, lo, hi, color, **kwargs)
+    return Rect(lo, hi, base, base + value, color, **kwargs)
+
+
 def _bar(
     chart: Chart, center: float, width: float, base: float, value: float, color: str, horizontal: bool, rounded: bool = False
 ) -> None:
-    lo, hi = center - width / 2, center + width / 2
-    if horizontal:
-        chart.rects.append(Rect(base, base + value, lo, hi, color, rounded=rounded))
-    else:
-        chart.rects.append(Rect(lo, hi, base, base + value, color, rounded=rounded))
+    chart.rects.append(_bar_rect(center, width, base, value, color, horizontal, rounded=rounded))
 
 
 def _category_axis(chart: Chart, labels: List[str], horizontal: bool, top_down: bool) -> None:
@@ -49,11 +52,12 @@ def _draw_categorical_bars(
     """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
     n_columns = len(table.columns)
     width = FigureSize.BAR_GROUP_WIDTH / n_columns
+    bar_width = width - FigureSize.DODGE_GAP if n_columns > 1 else width
     for i, (level, color) in enumerate(zip(table.columns, colors)):
         offset = (i - (n_columns - 1) / 2) * width
         for position, value in enumerate(table[level]):
             if pd.notna(value):
-                _bar(chart, position + offset, width, 0, float(value), color, horizontal, rounded=True)
+                _bar(chart, position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)
     _category_axis(chart, [str(category) for category in table.index], horizontal, top_down=True)
     if hue is not None:
         _set_legend(chart, colors, list(table.columns))
@@ -102,11 +106,13 @@ def render_barplot(
 
 def render_stacked_barplot(chart: Chart, df: pd.DataFrame, horizontal: bool, colors: List[str], width: float = 0.6) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom."""
+    totals = df.to_numpy(dtype=float).sum(axis=1)
+    outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
     base = np.zeros(len(df))
     for column, color in zip(df.columns, colors):
         values = df[column].to_numpy(dtype=float)
         for position, (start, value) in enumerate(zip(base, values)):
-            _bar(chart, position, width, start, value, color, horizontal)
+            chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position]))
         base += values
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     _set_legend(chart, colors, list(df.columns))

@@ -87,7 +87,7 @@ def format_datalabels_stacked(
 ) -> None:
     values = pivot_data.values
     percentages = values / values.sum(axis=1, keepdims=True) * 100
-    threshold = 0.04 * pivot_data.sum(axis=1).max()
+    threshold = Layout.STACKED_LABEL_MIN_SHARE * pivot_data.sum(axis=1).max()
     _add_stacked_labels(chart, pivot_data, percentages, palette, orientation, suffix, threshold)
 
 
@@ -98,4 +98,4 @@ def format_datalabels_stacked_normalized(
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    _add_stacked_labels(chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)
+    _add_stacked_labels(chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=Layout.STACKED_LABEL_MIN_SHARE)

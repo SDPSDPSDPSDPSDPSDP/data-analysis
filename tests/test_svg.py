@@ -55,6 +55,14 @@ def test_rounded_rect_is_pill_shaped() -> None:
     assert _attr(rect, 'rx') == pytest.approx(min(_attr(rect, 'width'), _attr(rect, 'height')) / 2)
 
 
+def test_stacked_segments_share_one_clip_path() -> None:
+    c = Chart(width=6, plot_height=3)
+    outline = Rect(0, 1, 0, 5, '', rounded=True)
+    c.rects += [Rect(0, 1, 0, 2, '#111111', clip=outline), Rect(0, 1, 2, 5, '#222222', clip=outline)]
+    svg = to_svg(c)
+    assert svg.count('<clipPath') == 1 and svg.count('clip-path="url(#') == 2
+
+
 def test_long_data_label_shrinks_plot_width() -> None:
     def bar_width(label: str) -> float:
         c = Chart(width=6, plot_height=1)

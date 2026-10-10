@@ -1,6 +1,7 @@
 """Lays out a Chart (see PLAN.md for the layout spec) and writes it as an SVG string."""
+import itertools
 import math
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 from xml.sax.saxutils import escape
 
 from ..config import FontSizes, Layout, TextColors
@@ -12,6 +13,7 @@ from .ticks import date_ticks, nice_ticks
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
 MARGIN = 0.05
+_CLIP_IDS = itertools.count()
 _ANCHOR = {'left': 'start', 'center': 'middle', 'right': 'end'}
 
 Scale = Callable[[float], float]
@@ -165,7 +167,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         x = 0.0
         items: List[str] = []
         for color, label, item_width in row:
-            items.append(f'<rect x="{x:.2f}" y="{row_top:.2f}" width="{Layout.SWATCH}" height="{Layout.SWATCH}" fill="{color}"/>')
+            items.append(f'<circle cx="{x + Layout.SWATCH / 2:.2f}" cy="{row_top + Layout.SWATCH / 2:.2f}" r="{Layout.SWATCH / 2}" fill="{color}"/>')
             baseline = row_top + Layout.SWATCH / 2 + cap_height(FontSizes.LEGEND) / 2
             items.append(_text(x + Layout.SWATCH + Layout.SWATCH_GAP, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
             x += item_width + Layout.LEGEND_ITEM_GAP
@@ -198,7 +200,18 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     if chart.x.grid:
         body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
     body += [_wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
-    body += [_rect(r, sx, sy) for r in chart.rects if r.width and r.height]
+    clip_ids: Dict[int, str] = {}
+    for r in chart.rects:
+        if not (r.width and r.height):
+            continue
+        rect = _rect(r, sx, sy)
+        if r.clip is not None:
+            if id(r.clip) not in clip_ids:
+                # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
+                clip_ids[id(r.clip)] = f'clip{next(_CLIP_IDS)}'
+                body.append(f'<clipPath id="{clip_ids[id(r.clip)]}">{_rect(r.clip, sx, sy)}</clipPath>')
+            rect = rect.replace('<rect ', f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" ', 1)
+        body.append(rect)
     body += [_line(line, sx, sy) for line in chart.lines]
     body += [_dots(dots, sx, sy) for dots in chart.dots]
     for t in chart.texts:

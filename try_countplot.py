@@ -2,24 +2,22 @@
 import numpy as np
 import pandas as pd
 
-from shirin.plot import LabelMapping, Palette, PlotGraphs
+from shirin.plot import PlotGraphs
 
 rng = np.random.default_rng(0)
+fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Mango': .25, 'Fig': .17}
+ripe_share = {'Apple': .8, 'Banana': .25, 'Cherry': .6, 'Date': .4, 'Mango': .9, 'Fig': .15}
+fruit = rng.choice(list(fruit_share), 300, p=list(fruit_share.values()))
 df = pd.DataFrame({
-    'fruit': rng.choice(['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig'], 300, p=[.3, .25, .2, .12, .08, .05]),
-    'ripe': rng.choice([True, False], 300),
+    'fruit': fruit,
+    'ripe': rng.random(300) < pd.Series(fruit).map(ripe_share).to_numpy(),
 })
 
 
-class MyPalette(Palette):
-    ripe = {True: '#57ccff', False: '#e3c2ff'}
-
-
-class MyLabels(LabelMapping):
-    ripe = {True: 'Ripe', False: 'Unripe'}
-
-
-plot = PlotGraphs(palette=MyPalette, label_mapping=MyLabels)
+plot = PlotGraphs(
+    palette={'ripe': {True: "#e9d0ff", False: "#6f2525"}},
+    label_mapping={'ripe': {True: 'Ripe', False: 'Unripe'}},
+)
 
 # %% plain
 plot.countplot_x(df, x='fruit')

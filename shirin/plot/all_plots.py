@@ -1,7 +1,13 @@
 from typing import Optional
 
 from .core import AbstractPlot
-from .config.palettes import Palette, LabelMapping
+from .config.palettes import (
+    DEFAULT_LABEL_MAPPING,
+    DEFAULT_PALETTE,
+    LabelMappingInput,
+    PaletteInput,
+    merge_column_config,
+)
 from .graphs.bar import BarPlotsMixin
 from .graphs.count import CountPlotsMixin
 from .graphs.numeric import NumericPlotsMixin
@@ -26,26 +32,30 @@ class PlotGraphs(CountPlotsMixin, BarPlotsMixin, NumericPlotsMixin, SpecializedP
     Args:
         font: Font to use for all text. **Options:** `'satoshi'` (embedded in the SVG),
             `None` (the viewer's sans-serif). *Default: `'satoshi'`*.
-        palette: A :class:`Palette` subclass with column-name attributes. When a plot uses
-            `hue=col`, the matching palette is resolved automatically.
-        label_mapping: A :class:`LabelMapping` subclass. Same resolution logic as `palette`.
+        palette: Dict of `{column: {value: color}}` (or `{column: color}`). When a plot uses
+            `hue=col`, the matching palette is resolved automatically. Built-in entries
+            (`is_correct`) apply unless overridden.
+        label_mapping: Dict of `{column: {value: label}}`. Same resolution logic as `palette`.
 
     Example:
-        >>> plot = PlotGraphs()
-        >>> plot.countplot_x(df, x='category')
+        >>> plot = PlotGraphs(
+        ...     palette={'ripe': {True: '#e9d0ff', False: '#6f2525'}},
+        ...     label_mapping={'ripe': {True: 'Ripe', False: 'Unripe'}},
+        ... )
+        >>> plot.countplot_x(df, x='fruit', hue='ripe')
     """
 
     def __init__(
         self,
         font: Optional[str] = 'satoshi',
-        palette: Optional[type[Palette]] = None,
-        label_mapping: Optional[type[LabelMapping]] = None,
+        palette: Optional[PaletteInput] = None,
+        label_mapping: Optional[LabelMappingInput] = None,
     ) -> None:
         if font is not None and font.lower() != 'satoshi':
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         self._font = font
-        self._palette = palette
-        self._label_mapping = label_mapping
+        self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
+        self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
 
     def _render(self, plot: AbstractPlot) -> None:
         show(to_svg(plot.render(), font=self._font))

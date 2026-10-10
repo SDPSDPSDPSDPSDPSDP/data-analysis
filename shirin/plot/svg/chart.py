@@ -16,6 +16,7 @@ class Rect:
     color: str
     stroke: Optional[str] = None
     rounded: bool = False  # pill shape; off for stacked/adjacent rects where round ends leave gaps
+    clip: Optional['Rect'] = None  # shared outline, e.g. a rounded stack that its segments are cut to
 
     @property
     def width(self) -> float:

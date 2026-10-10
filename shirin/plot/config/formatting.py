@@ -14,6 +14,7 @@ class FigureSize:
     CATEGORY_SLOT = 0.75  # plot width per category for vertical bars; sets the figure width
     BAR_ROW = 0.4  # plot height per category for horizontal bars
     BAR_GROUP_WIDTH = 0.65  # share of a category slot covered by its bars (dodged bars split it)
+    DODGE_GAP = 0.06  # share of a category slot left between dodged bars
     PIE = 3.2
 
 
@@ -28,4 +29,5 @@ class Layout:
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
-    LEGEND_GAP = 6  # extra space between title/subtitle and legend
+    LEGEND_GAP = 2  # extra space between title/subtitle and legend
+    STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
