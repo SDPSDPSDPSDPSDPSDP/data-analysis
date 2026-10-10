@@ -44,6 +44,7 @@ class Marks:
     """Data-mark sizes. Bar widths are shares of a category slot, pie radii shares of the pie radius."""
     BAR_WIDTH = 0.6
     HORIZONTAL_BAR_WIDTH = 0.8
+    HISTOGRAM_GAP = 0.15  # share of a bin left empty between neighbouring histogram bars
     TIME_BAR_DAYS = {'year': 300, 'month': 25, 'day': 0.8}  # bar width in days per time grouping
     PIE_LABEL_RADIUS = 0.6
     DONUT_LABEL_RADIUS = 0.8

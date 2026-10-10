@@ -89,12 +89,18 @@ export default function Home() {
       ],
     }),
   ];
+  const tools = [
+    section("Number formatting", "number_format.py"),
+    section("Statistics", "stats.py"),
+    section("DB2 queries", "sql.py"),
+  ];
   return (
     <Playground
       setup={parseExamples("setup.py").setup}
       categories={[
         { title: "Bar charts", sections: barCharts },
         { title: "Pie charts", sections: pieCharts },
+        { title: "Tools", sections: tools },
       ]}
     />
   );

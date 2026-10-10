@@ -13,6 +13,15 @@ The notebook ([`example_notebook.ipynb`](./example_notebook.ipynb)) is provided 
 - An overview of all the key functionalities across different modules.
 - **Practical examples.**
 
+### Claude Code skill
+
+A skill that teaches Claude how to use this package ships as a plugin in [`shirin-charts/`](./shirin-charts/). Install it with:
+
+```
+/plugin marketplace add SDPSDPSDPSDPSDPSDP/data-analysis
+/plugin install shirin-charts@shirin-charts
+```
+
 ### Website
 
 Write Python on the left and see the chart on the right. Python runs in the browser with Pyodide. To run it locally:

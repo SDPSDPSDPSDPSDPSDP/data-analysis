@@ -1,5 +1,3 @@
-- skill
-
 # later
 - dark mode
 - portfolio
@@ -7,3 +5,4 @@
   - scatterplot
   - timeplot
   - lineplot
+- more fun, less basic website

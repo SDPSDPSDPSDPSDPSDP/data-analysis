@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
+import SectionIcon from "@/components/domain/SectionIcon";
 
 export type SetupCell = {
   explanation: string;
@@ -48,15 +49,29 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
   );
   const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));
   const Heading = standalone ? "h2" : "h3";
-  return (
+  const heading = (
     <>
       <Heading id={sectionId(title)}>{title}</Heading>
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
-          <p>{cell.explanation}</p>
+          {cell.explanation && <p>{cell.explanation}</p>}
           <CodeBlock value={cell.code} />
         </section>
       ))}
+    </>
+  );
+  // Tools: no data format, every example shown.
+  if (dataFormats.length === 0) {
+    return (
+      <>
+        {heading}
+        <div className="tool-examples">{examples.map((example, i) => runnable(example, i))}</div>
+      </>
+    );
+  }
+  return (
+    <>
+      {heading}
       <section className="data-format">
         <div className="setup-cell">
           <h4>{dataFormats.length > 1 ? "Data formats" : "Data format"}</h4>
@@ -97,8 +112,10 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
         <details className="more-examples">
           <summary>
             <span className="more-examples-button">
-              {examples.length - 1} more examples
-              <ChevronDown size="1em" aria-hidden />
+              <SectionIcon title={title} />
+              <span className="more-examples-closed">{examples.length - 1} more examples</span>
+              <span className="more-examples-open">Hide examples</span>
+              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
             </span>
           </summary>
           {moreExamples}

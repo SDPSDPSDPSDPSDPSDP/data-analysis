@@ -85,6 +85,7 @@
 .switch {
   display: inline-flex;
   margin-left: auto;
+  margin-right: var(--space-2);
   cursor: pointer;
 }
 
@@ -102,9 +103,15 @@
   place-items: center;
   width: var(--switch-width);
   height: var(--switch-height);
+  padding: var(--switch-padding);
   border-radius: var(--radius-pill);
-  background: var(--color-shimmer);
+  background: var(--color-surface);
   color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.switch:hover .switch-track {
+  color: var(--text-muted);
 }
 
 .switch input:focus-visible + .switch-track {
@@ -118,13 +125,13 @@
   left: var(--switch-padding);
   display: grid;
   place-items: center;
-  width: calc(var(--switch-height) - 2 * var(--switch-padding));
-  height: calc(var(--switch-height) - 2 * var(--switch-padding));
+  width: calc((100% - 2 * var(--switch-padding)) / 2);
+  height: calc(100% - 2 * var(--switch-padding));
   border-radius: var(--radius-pill);
-  background: var(--color-bg);
+  background: var(--color-switch-knob);
   color: var(--text-primary);
-  box-shadow: var(--shadow-tooltip);
-  transition: transform var(--transition);
+  box-shadow: var(--shadow-switch-knob);
+  transition: transform var(--transition-spring);
 }
 
 .switch-track svg {
@@ -133,7 +140,7 @@
 }
 
 .switch input:checked + .switch-track .switch-knob {
-  transform: translateX(calc(var(--switch-width) - var(--switch-height)));
+  transform: translateX(100%);
 }
 
 .nav .nav-link {

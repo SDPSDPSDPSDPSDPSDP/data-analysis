@@ -1,0 +1,7 @@
+{
+  "name": "shirin-charts",
+  "displayName": "Shirin Charts",
+  "version": "1.2.1",
+  "description": "Skill for using the shirin Python package: SVG charts (bar, histogram, line, scatter, pie, time), Series stats, Dutch number formatting, DB2 SQL helpers.",
+  "author": { "name": "SDPSDPSDPSDPSDPSDP" }
+}
