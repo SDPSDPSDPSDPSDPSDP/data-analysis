@@ -1,6 +1,6 @@
 "use client";
 
-import CodeMirror, { keymap, Prec, type Extension } from "@uiw/react-codemirror";
+import CodeMirror, { EditorSelection, keymap, Prec, type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { oneDarkTheme } from "@codemirror/theme-one-dark";
@@ -26,6 +26,26 @@ const highlightStyle = HighlightStyle.define([
 
 const theme = [oneDarkTheme, syntaxHighlighting(highlightStyle)];
 
+// Python's smart indent re-aligns inside parens; users expect Enter to copy the line's own indent.
+const keepIndentOnEnter = Prec.high(
+  keymap.of([
+    {
+      key: "Enter",
+      run: ({ state, dispatch }) => {
+        const changes = state.changeByRange((range) => {
+          const insert = "\n" + /^\s*/.exec(state.doc.lineAt(range.from).text)![0];
+          return {
+            changes: { from: range.from, to: range.to, insert },
+            range: EditorSelection.cursor(range.from + insert.length),
+          };
+        });
+        dispatch(state.update(changes, { scrollIntoView: true, userEvent: "input" }));
+        return true;
+      },
+    },
+  ]),
+);
+
 type Props = {
   value: string;
   onChange?: (value: string) => void;
@@ -47,7 +67,7 @@ export default function CodeBlock({ value, onChange, onRun, extensions = [] }: P
         editable={Boolean(onChange)}
         readOnly={!onChange}
         theme={theme}
-        extensions={[python(), ...(onChange ? [colorSwatches] : []), ...runKey, ...extensions]}
+        extensions={[python(), ...(onChange ? [colorSwatches, keepIndentOnEnter] : []), ...runKey, ...extensions]}
         height="100%"
       />
       <CopyButton copy={() => navigator.clipboard.writeText(value)} />
