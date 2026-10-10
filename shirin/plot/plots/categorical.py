@@ -23,7 +23,7 @@ def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tu
     if options.orientation == 'vertical':
         # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
         return (n_categories * FigureSize.CATEGORY_SLOT + 1, FigureSize.PLOT_HEIGHT)
-    return (FigureSize.WIDTH, n_categories * FigureSize.BAR_ROW)
+    return (FigureSize.HORIZONTAL_WIDTH, n_categories * FigureSize.BAR_ROW)
 
 
 def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
