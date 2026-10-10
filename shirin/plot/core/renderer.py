@@ -147,14 +147,15 @@ def render_histogram(
     ]
     base = np.zeros(len(edges) - 1)
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
-        for left, right, start, count, outline in zip(edges[:-1], edges[1:], base, counts, outlines):
-            if hue is not None and not stack:
-                step = (right - left) / len(groups)
-                left, right, start = left + i * step, left + (i + 1) * step, 0
-            chart.rects.append(Rect(
-                left, right, start, start + count, group_color,  # type: ignore[arg-type]
-                stroke=TextColors.WHITE, rounded=not stack, clip=outline if stack else None,
-            ))
+        for b, (left, right, start, count, outline) in enumerate(zip(edges[:-1], edges[1:], base, counts, outlines)):
+            if not stack:
+                if hue is not None:
+                    step = (right - left) / len(groups)
+                    left, right, start = left + i * step, left + (i + 1) * step, 0
+                chart.rects.append(Rect(left, right, start, start + count, group_color, stroke=TextColors.WHITE, rounded=True))  # type: ignore[arg-type]
+                continue
+            fade_to = next((colors[later] for later in range(i + 1, len(groups)) if group_counts[later][b]), None)
+            chart.rects.append(Rect(left, right, start, start + count, group_color, clip=outline, fade_to=fade_to))  # type: ignore[arg-type]
         if stack:
             base += counts
     return chart

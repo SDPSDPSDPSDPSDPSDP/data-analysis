@@ -82,6 +82,8 @@ def test_histogram_bars_round_and_stacks_clip_to_total() -> None:
     stacked = Histogram(HistogramOptions(df=df, x='x', bins=3, hue='hue', palette=palette)).render()
     assert all(not rect.rounded and rect.clip.rounded for rect in stacked.rects)
     assert stacked.rects[0].clip.height == 2
+    assert stacked.rects[0].fade_to == '#eeeeee'
+    assert stacked.rects[1].fade_to is None
 
 
 def test_stacked_barplot_sums_duplicate_rows() -> None:
