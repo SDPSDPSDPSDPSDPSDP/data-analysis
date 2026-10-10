@@ -1,4 +1,3 @@
-- custom scrollbar
 - skill
 
 # later
