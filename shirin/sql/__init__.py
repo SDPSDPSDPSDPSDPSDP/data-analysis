@@ -27,7 +27,10 @@ def run_sql_query(
         output_path: Optional Path to save results as Parquet file (fetched in chunks).
                      If None, returns DataFrame.
         params: Optional bind parameters for ``:name`` placeholders in the query,
-                e.g. ``{"year": 2024}``. Prefer this over formatting values into SQL.
+                e.g. ``{"year": 2024}``. Prefer this over formatting values into SQL:
+                DB2 reuses one cached plan instead of compiling every literal value.
+                With params the query is parsed by SQLAlchemy, so a literal colon
+                followed by a word (e.g. ``'12:00'``) must be escaped as ``'12\\:00'``.
 
     Returns:
         DataFrame with query results if output_path is None,

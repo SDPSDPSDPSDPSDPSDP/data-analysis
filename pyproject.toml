@@ -18,7 +18,7 @@ dependencies = [
 [project.optional-dependencies]
 sql = [
     "ibm-db-sa",
-    "sqlalchemy",
+    "sqlalchemy>=2.0",
     "pyarrow>=14",
 ]
 

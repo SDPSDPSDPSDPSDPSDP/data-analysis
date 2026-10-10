@@ -5,12 +5,12 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from sqlalchemy import create_engine, event, text
-from sqlalchemy.engine import URL, Engine
+from sqlalchemy.engine import URL, Connection, CursorResult, Engine
 
 REQUIRED_CONFIG_KEYS = ('user', 'password', 'host', 'port', 'db_name', 'schema')
 PARQUET_CHUNK_ROWS = 100_000
@@ -79,18 +79,6 @@ def load_db_config(
     )
 
 
-def convert_extension_types(df: pd.DataFrame) -> pd.DataFrame:
-    """Convert pandas extension-dtype columns to plain object columns for PyArrow.
-
-    This prevents ArrowKeyError when saving to parquet format. Returns ``df``
-    unchanged (no copy) when it has no extension columns.
-    """
-    ext_cols = [col for col in df.columns if pd.api.types.is_extension_array_dtype(df[col].dtype)]
-    if not ext_cols:
-        return df
-    return df.astype({col: object for col in ext_cols})
-
-
 def _validate_db_config(db_config: Dict[str, Any]) -> None:
     missing_keys = [key for key in REQUIRED_CONFIG_KEYS if key not in db_config]
     if missing_keys:
@@ -113,7 +101,10 @@ def _add_db2_dll_directory() -> None:
 @functools.lru_cache(maxsize=None)
 def _get_engine(url: URL, schema: str) -> Engine:
     _add_db2_dll_directory()
-    engine = create_engine(url, pool_pre_ping=True)
+    # pool_recycle replaces a pre-ping round trip per query: connections older than 15 min
+    # are reopened, which stays under typical DB2/firewall idle timeouts. One connection is
+    # kept idle; up to 4 extra for concurrent callers are closed when returned.
+    engine = create_engine(url, pool_recycle=900, pool_size=1, max_overflow=4)
 
     @event.listens_for(engine, "connect")
     def _set_schema(dbapi_connection, _connection_record) -> None:
@@ -139,10 +130,36 @@ def get_engine(db_config: Dict[str, Any]) -> Engine:
     return _get_engine(url, str(db_config['schema']))
 
 
-def _read_sql(sql_query: str, connection: Any, params: Optional[Dict[str, Any]], **kwargs: Any) -> Any:
+def _read_sql(sql_query: str, connection: Any, params: Optional[Dict[str, Any]]) -> pd.DataFrame:
     # Bind parameters use SQLAlchemy's :name style; plain strings go through untouched.
     query = text(sql_query) if params else sql_query
-    return pd.read_sql(query, con=connection, params=params, **kwargs)
+    return pd.read_sql(query, con=connection, params=params)
+
+
+def _execute_streaming(
+    connection: Connection, sql_query: str, params: Optional[Dict[str, Any]], chunk_rows: int
+) -> CursorResult:
+    """Same parsing rules as _read_sql, but rows are fetched chunk_rows at a time."""
+    streaming = connection.execution_options(yield_per=chunk_rows)
+    if params:
+        return streaming.execute(text(sql_query), params)
+    return streaming.exec_driver_sql(sql_query)
+
+
+def _rows_to_table(columns: List[str], rows: List[Any]) -> pa.Table:
+    return pa.Table.from_arrays([pa.array(list(values)) for values in zip(*rows)], names=columns)
+
+
+def _unify(tables: List[pa.Table]) -> pa.Schema:
+    return pa.unify_schemas([table.schema for table in tables], promote_options='permissive')
+
+
+def _widen(schema: pa.Schema) -> pa.Schema:
+    """Arrow infers decimal precision per chunk; widen to the max so later chunks still fit."""
+    return pa.schema([
+        field.with_type(pa.decimal128(38, field.type.scale)) if pa.types.is_decimal(field.type) else field
+        for field in schema
+    ])
 
 
 def execute_query(
@@ -159,7 +176,8 @@ def execute_query(
         params: Optional bind parameters, e.g. ``{"year": 2024}``.
 
     Returns:
-        DataFrame with query results.
+        DataFrame with query results. The whole result is loaded into memory;
+        for large results use ``query_to_parquet`` (``output_path`` in ``run_sql_query``).
 
     Raises:
         KeyError: If required database config keys are missing.
@@ -176,17 +194,40 @@ def query_to_parquet(
     params: Optional[Dict[str, Any]] = None,
     chunk_rows: int = PARQUET_CHUNK_ROWS,
 ) -> None:
-    """Fetch in chunks and write one parquet file, without holding the whole result in pandas.
+    """Stream the result into one parquet file, chunk_rows rows at a time, without pandas.
 
-    Chunks are kept as Arrow tables (compact) and their schemas unified, so a column
-    that is all-NULL or integer in an early chunk still gets its real type from later ones.
+    The parquet schema is fixed once every column has a real type: chunks are buffered
+    while a column is still all-NULL, then written, and every later chunk is cast to it.
     """
     with get_engine(db_config).connect() as connection:
-        chunks: Iterator[pd.DataFrame] = _read_sql(sql_query, connection, params, chunksize=chunk_rows)
-        tables = [
-            pa.Table.from_pandas(convert_extension_types(chunk), preserve_index=False)
-            for chunk in chunks
-        ]
-    # ponytail: Arrow tables for the whole result stay in memory until the single write;
-    # switch to a ParquetWriter with a fixed schema if results outgrow RAM.
-    pq.write_table(pa.concat_tables(tables, promote_options='permissive'), output_path)
+        result = _execute_streaming(connection, sql_query, params, chunk_rows)
+        columns = list(result.keys())
+        # ponytail: a column that stays NULL for many rows keeps them all buffered in memory;
+        # read types from cursor.description if that ever matters.
+        pending: List[pa.Table] = []
+        writer: Optional[pq.ParquetWriter] = None
+        try:
+            for rows in result.partitions():
+                table = _rows_to_table(columns, rows)
+                if writer is not None:
+                    writer.write_table(table.cast(writer.schema))
+                    continue
+                pending.append(table)
+                schema = _unify(pending)
+                if any(pa.types.is_null(field.type) for field in schema):
+                    continue
+                writer = pq.ParquetWriter(output_path, _widen(schema))
+                for buffered in pending:
+                    writer.write_table(buffered.cast(writer.schema))
+                pending = []
+        finally:
+            if writer is not None:
+                writer.close()
+
+    if writer is None:
+        # Result ended while some column was still all-NULL (or the result was empty).
+        if pending:
+            table = pa.concat_tables(pending, promote_options='permissive')
+        else:
+            table = pa.schema([(column, pa.null()) for column in columns]).empty_table()
+        pq.write_table(table, output_path)

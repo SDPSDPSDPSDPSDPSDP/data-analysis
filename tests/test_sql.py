@@ -1,7 +1,10 @@
 """SQL helpers, run against an in-memory SQLite engine in place of DB2."""
 import json
+import os
+from decimal import Decimal
+from pathlib import Path
 
-import pandas as pd
+import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from sqlalchemy import create_engine, text
@@ -34,6 +37,29 @@ def test_parquet_chunks_unify_schema(sqlite_engine, tmp_path) -> None:
     table = pq.read_table(out)
     assert table.num_rows == 3
     assert table.column('note').to_pylist() == [None, None, 'late']
+
+
+def test_parquet_streams_one_row_group_per_chunk(sqlite_engine, tmp_path) -> None:
+    out = tmp_path / 'typed.parquet'
+    helpers.query_to_parquet('SELECT id, year FROM t ORDER BY id', CONFIG, out, chunk_rows=1)
+    parquet = pq.ParquetFile(out)
+    assert parquet.metadata.num_row_groups == 3
+    assert parquet.read().column('year').to_pylist() == [2023, 2024, 2024]
+
+
+def test_parquet_all_null_column(sqlite_engine, tmp_path) -> None:
+    out = tmp_path / 'nulls.parquet'
+    helpers.query_to_parquet('SELECT id, note FROM t WHERE note IS NULL', CONFIG, out, chunk_rows=1)
+    assert pq.read_table(out).column('note').to_pylist() == [None, None]
+
+
+def test_parquet_widens_decimals_across_chunks(sqlite_engine, tmp_path, monkeypatch) -> None:
+    # SQLite has no DECIMAL type; turn its text into Decimals the way ibm_db returns them.
+    monkeypatch.setattr(helpers, '_rows_to_table', lambda columns, rows: pa.Table.from_arrays(
+        [pa.array([Decimal(value) for (value,) in rows])], names=columns))
+    out = tmp_path / 'decimal.parquet'
+    helpers.query_to_parquet("SELECT '1.50' AS v UNION ALL SELECT '12345.75'", CONFIG, out, chunk_rows=1)
+    assert pq.read_table(out).column('v').to_pylist() == [Decimal('1.50'), Decimal('12345.75')]
 
 
 def test_parquet_empty_result(sqlite_engine, tmp_path) -> None:
@@ -76,9 +102,14 @@ def test_config_and_query_from_files(sqlite_engine, tmp_path) -> None:
     assert run_sql_query(sql_path, config_path)['n'].tolist() == [3]
 
 
-def test_convert_extension_types() -> None:
-    plain = pd.DataFrame({'a': [1, 2]})
-    assert helpers.convert_extension_types(plain) is plain
-    converted = helpers.convert_extension_types(pd.DataFrame({'a': pd.array([1, None], dtype='Int64'), 'b': [1.0, 2.0]}))
-    assert converted['a'].dtype == object
-    assert converted['b'].dtype == float
+@pytest.mark.skipif('DB2_TEST_CONFIG' not in os.environ, reason='set DB2_TEST_CONFIG to a DB2 config JSON path')
+def test_db2_integration(tmp_path) -> None:
+    """Live DB2: SET SCHEMA hook, ibm_db_sa streaming and bind params."""
+    config = Path(os.environ['DB2_TEST_CONFIG'])
+    query = 'SELECT CURRENT SCHEMA AS s, CAST(:n AS INTEGER) AS n FROM SYSIBM.SYSDUMMY1'
+    df = run_sql_query(query, config, params={'n': 7})
+    assert df['n'].tolist() == [7]
+    assert df['s'].str.strip().str.upper().tolist() == [helpers.load_db_config(config)['schema'].upper()]
+    out = tmp_path / 'db2.parquet'
+    run_sql_query(query, config, output_path=out, params={'n': 7})
+    assert pq.read_table(out).num_rows == 1

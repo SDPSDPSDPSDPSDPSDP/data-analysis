@@ -2732,7 +2732,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.0" },
     { name = "pyarrow", marker = "extra == 'sql'", specifier = ">=14" },
     { name = "seaborn", specifier = ">=0.13" },
-    { name = "sqlalchemy", marker = "extra == 'sql'" },
+    { name = "sqlalchemy", marker = "extra == 'sql'", specifier = ">=2.0" },
 ]
 provides-extras = ["sql"]
 
