@@ -44,8 +44,14 @@ ready.then(
   (err) => postMessage({ type: "ready", error: String(err) }),
 );
 
-self.onmessage = async (e) => {
-  const { id, code } = e.data;
+// Runs share stdout and _out, so overlapping runs (StrictMode double effect, hover
+// docstring lookups) would steal each other's output. Serialize them.
+let queue = Promise.resolve();
+self.onmessage = (e) => {
+  queue = queue.then(() => execute(e.data));
+};
+
+async function execute({ id, code }) {
   stdout = [];
   let py;
   try {
@@ -63,4 +69,4 @@ self.onmessage = async (e) => {
   const images = py.runPython("_out[:]").toJs();
   py.runPython("_out.clear(); plt.close('all')");
   postMessage({ type: "result", id, images, stdout: stdout.join("\n"), error });
-};
+}

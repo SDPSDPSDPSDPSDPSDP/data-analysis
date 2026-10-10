@@ -8,6 +8,19 @@ import CopyableImage from "@/components/ui/CopyableImage";
 
 const DOTTED_NAME = /^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$/;
 
+// Inline markdown only: docstrings are Google-style, so a block parser would turn indented Args into code blocks.
+function inlineMarkdown(text: string): string {
+  const codes: string[] = [];
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/`([^`\n]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`)
+    .replace(/\*\*(\S(?:[\s\S]*?\S)?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|\W)([*_])(\S(?:[\s\S]*?\S)?)\2(?=\W|$)/g, "$1<em>$3</em>")
+    .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[Number(i)]}</code>`);
+}
+
 // Docstring of the dotted name under the cursor, cut off after the hovered word.
 const docTooltip = hoverTooltip(async (view, pos) => {
   const line = view.state.doc.lineAt(pos);
@@ -24,7 +37,7 @@ const docTooltip = hoverTooltip(async (view, pos) => {
     create: () => {
       const dom = document.createElement("pre");
       dom.className = "doc-tooltip";
-      dom.textContent = doc;
+      dom.innerHTML = inlineMarkdown(doc);
       return { dom };
     },
   };

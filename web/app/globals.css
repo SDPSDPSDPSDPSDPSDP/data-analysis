@@ -20,6 +20,7 @@
   --font-weight-heading: 500;
   --letter-spacing-heading: 0.015em;
 
+  --space-0-5: 4px;
   --space-1: 8px;
   --space-1-5: 12px;
   --space-2: 16px;
@@ -190,4 +191,10 @@ pre {
   overflow: auto;
   white-space: pre-wrap;
   font-size: var(--font-size-small);
+}
+
+.doc-tooltip code {
+  padding: 0 var(--space-0-5);
+  border-radius: var(--radius);
+  background: var(--color-button);
 }
