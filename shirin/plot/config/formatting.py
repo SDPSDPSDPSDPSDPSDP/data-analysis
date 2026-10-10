@@ -27,3 +27,4 @@ class Layout:
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
+    LEGEND_GAP = 6  # extra space between title/subtitle and legend

@@ -156,7 +156,10 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         if text:
             row_top = header_row(size)
             header_rows.append((text_width(text, size, bold), [_text(0, row_top + cap_height(size), text, size, color, bold=bold)]))
-    for row in _legend_rows(chart.legend, plot_w):
+    legend_rows = _legend_rows(chart.legend, plot_w)
+    if legend_rows and header_rows:
+        top += Layout.LEGEND_GAP
+    for row in legend_rows:
         row_top = header_row(Layout.SWATCH)
         x = 0.0
         items: List[str] = []
