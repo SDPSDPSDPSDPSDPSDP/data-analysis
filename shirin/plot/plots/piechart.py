@@ -55,7 +55,7 @@ class PieChart(AbstractPlot):
 
     def format_plot(self, plot: Any) -> None:
         plot.legend = [
-            (color, f'{label}: {format_thousands(val)}')
+            (color, label, format_thousands(val))
             for color, label, val in zip(self._colors, self._labels, self._values)
         ]
         for bg_color, autotext in zip(self._colors, self._autotexts):

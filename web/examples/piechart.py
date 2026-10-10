@@ -4,13 +4,6 @@ plot.pie(
     col='fruit',
 )
 
-# %% Title and subtitle
-plot.pie(
-    df,
-    col='fruit',
-    title=['Fruit basket', 'Share per fruit'],
-)
-
 # %% Donut
 plot.pie(
     df,
@@ -18,7 +11,7 @@ plot.pie(
     donut=True,
     n_after_comma=1,
     value_datalabel=10,
-    title=['Donut', 'One decimal, labels from 10%'],
+    title=['Fruit basket', 'Share per fruit'],
 )
 
 # %% Palette and label mapping

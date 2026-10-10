@@ -102,3 +102,12 @@ def test_wedge_stroked_in_own_color_hides_seams() -> None:
     svg = to_svg(c)
     assert 'fill="#ff0000" stroke="#ff0000"' in svg
     assert 'fill="#00ff00" stroke="#00ff00"' in svg
+
+
+def test_legend_value_drawn_lighter_after_label() -> None:
+    c = Chart(None, plot_height=2)
+    c.x.lim = c.y.lim = (-1, 1)
+    c.legend = [('#ff0000', 'Apple', '9.027')]
+    svg = to_svg(c)
+    assert 'fill="#444444">Apple<' in svg
+    assert 'fill="#777777">9.027<' in svg

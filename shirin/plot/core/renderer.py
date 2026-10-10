@@ -21,7 +21,7 @@ def _hue_levels(df: pd.DataFrame, hue: str) -> List[Any]:
 
 
 def _set_legend(chart: Chart, colors: List[str], labels: List[Any]) -> None:
-    chart.legend = [(color, str(label)) for color, label in zip(colors, labels)]
+    chart.legend = [(color, str(label), '') for color, label in zip(colors, labels)]
 
 
 def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
