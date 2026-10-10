@@ -44,8 +44,8 @@ ready.then(
   (err) => postMessage({ type: "ready", error: String(err) }),
 );
 
-// Runs share stdout and _out, so overlapping runs (StrictMode double effect, hover
-// docstring lookups) would steal each other's output. Serialize them.
+// Runs share stdout and _out, so overlapping runs (StrictMode double effect) would
+// steal each other's output. Serialize them.
 let queue = Promise.resolve();
 self.onmessage = (e) => {
   queue = queue.then(() => execute(e.data));

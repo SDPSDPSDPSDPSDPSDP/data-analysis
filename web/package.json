@@ -2,9 +2,9 @@
   "name": "shirin-web",
   "private": true,
   "scripts": {
-    "predev": "node scripts/build-wheel.mjs",
+    "predev": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json",
     "dev": "next dev --port 6817",
-    "prebuild": "node scripts/build-wheel.mjs",
+    "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json",
     "build": "next build"
   },
   "dependencies": {

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { hoverTooltip, keymap, Prec } from "@uiw/react-codemirror";
-import { docOf, load, run, type RunResult } from "@/lib/pyodide";
+import { load, run, type RunResult } from "@/lib/pyodide";
+import docstrings from "@/lib/docstrings.json";
 import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
 
@@ -21,15 +22,17 @@ function inlineMarkdown(text: string): string {
     .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[Number(i)]}</code>`);
 }
 
-// Docstring of the dotted name under the cursor, cut off after the hovered word.
-const docTooltip = hoverTooltip(async (view, pos) => {
+const DOCS: Record<string, string> = docstrings;
+
+// Docstring of the dotted name under the cursor, looked up by its last part.
+const docTooltip = hoverTooltip((view, pos) => {
   const line = view.state.doc.lineAt(pos);
   const offset = pos - line.from;
   const start = offset - line.text.slice(0, offset).match(/[\w.]*$/)![0].length;
   const end = offset + line.text.slice(offset).match(/^\w*/)![0].length;
   const name = line.text.slice(start, end);
   if (!DOTTED_NAME.test(name)) return null;
-  const doc = await docOf(name);
+  const doc = DOCS[name.split(".").pop()!];
   if (!doc) return null;
   return {
     pos: line.from + start,
@@ -41,7 +44,7 @@ const docTooltip = hoverTooltip(async (view, pos) => {
       return { dom };
     },
   };
-}, { hoverTime: 100 });
+});
 
 type Props = {
   initialCode: string;
