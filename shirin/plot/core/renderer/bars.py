@@ -134,11 +134,11 @@ def render_histogram(
                 chart.rects.append(Rect(left + inset, right - inset, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
-        for left, right, count in zip(edges[:-1], edges[1:], counts):
+        for left, right, count in zip(edges[:-1] + inset, edges[1:] - inset, counts):
             if hue is not None:
                 step = (right - left) / len(groups)
                 left, right = left + i * step, left + (i + 1) * step
-            chart.rects.append(Rect(left + inset, right - inset, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
+            chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
     return chart
 
 
