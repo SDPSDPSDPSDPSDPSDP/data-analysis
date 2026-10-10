@@ -59,8 +59,6 @@ export default function Home() {
         ["Banana", "True", "4"],
       ],
     }),
-  ];
-  const distributions = [
     section("Histograms", "histogram.py", {
       description: "One row per observation with a numeric value. The plot counts the rows per bin.",
       columns: [
@@ -79,10 +77,7 @@ export default function Home() {
   return (
     <Playground
       setup={parseExamples("setup.py").setup}
-      categories={[
-        { title: "Bar charts", sections: barCharts },
-        { title: "Distributions", sections: distributions },
-      ]}
+      categories={[{ title: "Bar charts", sections: barCharts }]}
     />
   );
 }

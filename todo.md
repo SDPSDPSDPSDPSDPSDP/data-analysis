@@ -2,12 +2,11 @@
 - website
 - dark mode
 - finetune plots (countplot done):
-  - histogram
-  - lineplot
-  - scatterplot
-  - pie
-  - timeplot
   - accuracy
+  - pie
+  - scatterplot
+  - timeplot
+  - lineplot
 
 # later
 - portfolio

@@ -140,15 +140,22 @@ def render_histogram(
         colors = palette_colors(palette, levels)  # type: ignore[arg-type]
         _set_legend(chart, colors, levels)  # type: ignore[arg-type]
 
+    group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
+    stack = hue is not None and stacked is not False
+    outlines = [
+        Rect(left, right, 0, total, '', rounded=True) for left, right, total in zip(edges[:-1], edges[1:], sum(group_counts))
+    ]
     base = np.zeros(len(edges) - 1)
-    for i, (values, group_color) in enumerate(zip(groups, colors)):
-        counts = np.histogram(values, bins=edges)[0].astype(float)
-        for left, right, start, count in zip(edges[:-1], edges[1:], base, counts):
-            if stacked is False and hue is not None:
+    for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
+        for left, right, start, count, outline in zip(edges[:-1], edges[1:], base, counts, outlines):
+            if hue is not None and not stack:
                 step = (right - left) / len(groups)
                 left, right, start = left + i * step, left + (i + 1) * step, 0
-            chart.rects.append(Rect(left, right, start, start + count, group_color, stroke=TextColors.WHITE))  # type: ignore[arg-type]
-        if stacked is not False:
+            chart.rects.append(Rect(
+                left, right, start, start + count, group_color,  # type: ignore[arg-type]
+                stroke=TextColors.WHITE, rounded=not stack, clip=outline if stack else None,
+            ))
+        if stack:
             base += counts
     return chart
 

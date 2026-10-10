@@ -74,6 +74,16 @@ def test_histogram_keeps_fractional_values() -> None:
     assert sum(rect.height for rect in chart.rects) == 4
 
 
+def test_histogram_bars_round_and_stacks_clip_to_total() -> None:
+    df = pd.DataFrame({'x': [1, 1, 2, 3], 'hue': ['a', 'b', 'a', 'b']})
+    plain = Histogram(HistogramOptions(df=df, x='x', bins=3)).render()
+    assert all(rect.rounded and rect.clip is None for rect in plain.rects)
+    palette = {'a': '#111111', 'b': '#eeeeee'}
+    stacked = Histogram(HistogramOptions(df=df, x='x', bins=3, hue='hue', palette=palette)).render()
+    assert all(not rect.rounded and rect.clip.rounded for rect in stacked.rects)
+    assert stacked.rects[0].clip.height == 2
+
+
 def test_stacked_barplot_sums_duplicate_rows() -> None:
     df = pd.DataFrame({'cat': ['A', 'A', 'B'], 'hue': ['x', 'x', 'y'], 'v': [1, 2, 3]})
     options = BarPlotOptions(
