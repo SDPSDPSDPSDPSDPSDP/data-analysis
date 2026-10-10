@@ -2,25 +2,12 @@
 // Turbopack turns bundled workers into classic workers, which Pyodide refuses.
 import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs";
 
-// Replaces plt.show so every call saves the current figure as a PNG, then
-// renders one throwaway figure so matplotlib's font cache is built before the first run.
+// Replaces shirin's notebook display so every chart call appends its SVG to _out.
 const SETUP = `
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt, io, base64
-from shirin.plot.config.matplotlib import build_rc
+import shirin.plot.all_plots as _all_plots
 
 _out = []
-
-def _show(*args, **kwargs):
-    buf = io.BytesIO()
-    plt.gcf().savefig(buf, format="png", dpi=200, bbox_inches="tight")
-    _out.append(base64.b64encode(buf.getvalue()).decode())
-
-plt.show = _show
-build_rc(font="satoshi")
-plt.figure().savefig(io.BytesIO())
-plt.close("all")
+_all_plots.show = _out.append
 `;
 
 let stdout = [];
@@ -29,7 +16,7 @@ async function init() {
   const py = await loadPyodide();
   py.setStdout({ batched: (line) => stdout.push(line) });
   py.setStderr({ batched: (line) => stdout.push(line) });
-  await py.loadPackage(["micropip", "matplotlib", "numpy", "pandas"]);
+  await py.loadPackage(["micropip", "numpy", "pandas"]);
   // micropip reads name and version from the filename, so give it a valid wheel name.
   const wheel = await fetch("/shirin.whl").then((r) => r.arrayBuffer());
   py.FS.writeFile("/tmp/shirin-0-py3-none-any.whl", new Uint8Array(wheel));
@@ -67,6 +54,6 @@ async function execute({ id, code }) {
     error = err instanceof Error ? err.message : String(err);
   }
   const images = py.runPython("_out[:]").toJs();
-  py.runPython("_out.clear(); plt.close('all')");
+  py.runPython("_out.clear()");
   postMessage({ type: "result", id, images, stdout: stdout.join("\n"), error });
 }

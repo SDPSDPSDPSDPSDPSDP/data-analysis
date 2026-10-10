@@ -19,6 +19,8 @@ class SpecializedPlotsMixin:
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
+        title: str = '',
+        subtitle: str = '',
         # injected by @resolve_palette
         palette: Optional[Dict[Any, str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -31,7 +33,9 @@ class SpecializedPlotsMixin:
             label_map=label_map,
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
-            donut=donut
+            donut=donut,
+            title=title,
+            subtitle=subtitle,
         )
         self._render(PieChart(options))
 
@@ -47,6 +51,8 @@ class SpecializedPlotsMixin:
         display_month: bool = True,
         cumulative: bool = False,
         rotation: int = 0,
+        title: str = '',
+        subtitle: str = '',
     ) -> None:
         """Create a **time series count plot** showing event frequencies over time.
 
@@ -66,6 +72,8 @@ class SpecializedPlotsMixin:
                 `False` shows only years. *Default: `True`*.
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
 
         Example:
             >>> plot = PlotGraphs()
@@ -82,6 +90,8 @@ class SpecializedPlotsMixin:
             display_month=display_month,
             cumulative=cumulative,
             rotation=rotation,
+            title=title,
+            subtitle=subtitle,
         )
         self._render(TimePlot(options))
 
@@ -98,6 +108,8 @@ class SpecializedPlotsMixin:
         reverse_order: bool = False,
         plot_legend: bool = False,
         suffix: Optional[str] = None,
+        title: str = '',
+        subtitle: str = '',
     ) -> None:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
@@ -122,6 +134,8 @@ class SpecializedPlotsMixin:
             plot_legend: Whether to show the legend. *Default: ``False``*.
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
+            title: Chart title above the plot. *Default: ``''``*.
+            subtitle: Grey line under the title. *Default: ``''``*.
 
         Example:
             >>> df = pd.DataFrame({'run_name': ['medium', 'nano', 'small'],
@@ -146,6 +160,8 @@ class SpecializedPlotsMixin:
             reverse_order=reverse_order,
             plot_legend=plot_legend,
             suffix=suffix,
+            title=title,
+            subtitle=subtitle,
         )
 
         self._render(AccuracyPlot(options))

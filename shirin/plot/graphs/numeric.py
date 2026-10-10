@@ -20,8 +20,8 @@ class NumericPlotsMixin:
         bins: int = 100,
         stacked: Optional[bool] = None,
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -39,8 +39,8 @@ class NumericPlotsMixin:
                 *Default: `100`*.
             stacked: With `hue`, `False` dodges the groups, otherwise they stack. *Optional*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
         """
         options = HistogramOptions(
             df=df,
@@ -54,8 +54,8 @@ class NumericPlotsMixin:
             hue=hue,
             stacked=stacked,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol
+            title=title,
+            subtitle=subtitle,
         )
         self._render(Histogram(options))
 
@@ -69,8 +69,8 @@ class NumericPlotsMixin:
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         rotation: int = 0,
         fill_missing_values: FillMissingValuesInput = None,
         # injected by @resolve_palette
@@ -87,8 +87,8 @@ class NumericPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
             rotation=rotation,
             fill_missing_values=fill_missing_values
         )
@@ -105,8 +105,8 @@ class NumericPlotsMixin:
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         # injected by @resolve_palette
         palette: Optional[Union[Dict[Any, str], str]] = None,
         label_map: Optional[Dict[Any, str]] = None,
@@ -122,8 +122,8 @@ class NumericPlotsMixin:
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
         """
         options = ScatterPlotOptions(
             df=df,
@@ -136,7 +136,7 @@ class NumericPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
         )
         self._render(ScatterPlot(options))

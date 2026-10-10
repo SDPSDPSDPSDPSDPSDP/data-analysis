@@ -18,8 +18,8 @@ class BarPlotsMixin:
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         figsize_width: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
@@ -42,8 +42,8 @@ class BarPlotsMixin:
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
             figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
                 *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
@@ -66,8 +66,8 @@ class BarPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
             figsize=figsize_width,
             stacked=stacked,
             stacked_labels=stacked_labels,
@@ -88,8 +88,8 @@ class BarPlotsMixin:
         xlabel: str = '',
         ylabel: str = '',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
         stacked_labels: StackedLabelTypeInput = None,
@@ -112,8 +112,8 @@ class BarPlotsMixin:
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
             figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
                 *Default: `'dynamic'`*.
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
@@ -136,8 +136,8 @@ class BarPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
             figsize=figsize_height,
             stacked=stacked,
             stacked_labels=stacked_labels,

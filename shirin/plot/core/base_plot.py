@@ -2,18 +2,18 @@ import dataclasses
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.axes import Axes
-from matplotlib.colors import LinearSegmentedColormap, to_hex
 
 from .base_options import BasePlotOptions
 from . import renderer
+from ..common.colors import blend
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend, format_xy_labels
 from ..common.sorting import create_default_label_map
 from ..config import Colors, FigureSize
+from ..config.colors import DEFAULT_CYCLE
+from ..svg import Chart
 
 PaletteInput = Optional[Union[Dict[Any, str], str]]
 
@@ -28,9 +28,8 @@ def split_palette(palette: PaletteInput) -> Tuple[Optional[str], Optional[Dict[A
 
 
 def default_colors(n: int) -> List[str]:
-    """First n colors of matplotlib's color cycle, repeating when n is larger."""
-    cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
-    return [cycle[i % len(cycle)] for i in range(n)]
+    """First n colors of the default color cycle, repeating when n is larger."""
+    return [DEFAULT_CYCLE[i % len(DEFAULT_CYCLE)] for i in range(n)]
 
 
 def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:
@@ -38,14 +37,13 @@ def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str,
     keys = sorted(values.astype(str).unique())
     if color is None:
         return dict(zip(keys, default_colors(len(keys))))
-    shades = LinearSegmentedColormap.from_list('', ['#333333', color])(np.linspace(1, 0.3, len(keys)))
-    return dict(zip(keys, map(to_hex, shades)))
+    return {key: blend('#333333', color, t) for key, t in zip(keys, np.linspace(1, 0.3, len(keys)))}
 
 
 class AbstractPlot(ABC):
     def __init__(self, options: BasePlotOptions):
         self.options = options
-        self.ax: Optional[Axes] = None
+        self.chart: Optional[Chart] = None
         self.plot_object: Optional[Any] = None
         self._preprocessed_df: Optional[pd.DataFrame] = None
         self._color: Optional[str] = None
@@ -80,12 +78,14 @@ class AbstractPlot(ABC):
     def format_plot(self, plot: Any) -> None:
         pass
 
-    def _new_axes(self, figsize: Tuple[float, float]) -> Axes:
-        self.ax = renderer.create_figure(figsize)
-        return self.ax
+    def _new_chart(self, width: Optional[float], plot_height: float) -> Chart:
+        """width None makes the plot area square (pie)."""
+        self.chart = renderer.create_figure(width, plot_height)
+        self.chart.title, self.chart.subtitle = self.options.title, self.options.subtitle
+        return self.chart
 
-    def _standard_axes(self) -> Axes:
-        return self._new_axes((FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT))
+    def _standard_chart(self) -> Chart:
+        return self._new_chart(FigureSize.WIDTH, FigureSize.PLOT_HEIGHT)
 
     def _format_labels_and_legend(self, plot: Any) -> None:
         """Axis labels plus hue legend; builds a default label_map from the data when missing."""
@@ -96,14 +96,7 @@ class AbstractPlot(ABC):
         self._label_map_legend = label_map or None
 
         format_xy_labels(plot, xlabel=options.xlabel, ylabel=options.ylabel)
-        format_optional_legend(
-            plot,
-            options.hue,
-            options.plot_legend,
-            self._label_map_legend,
-            options.ncol,
-            options.legend_offset,
-        )
+        format_optional_legend(plot, options.hue, options.plot_legend, self._label_map_legend)
 
     def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:
         """Set _color/_palette and stringify hue so it matches the (stringified) palette keys.

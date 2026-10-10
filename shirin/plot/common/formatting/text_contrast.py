@@ -1,14 +1,9 @@
-import re
-
-from matplotlib.colors import to_rgb
-
 from ...config import TextColors
+from ..colors import to_rgb
 
 
 def get_luminance(color: str) -> float:
-    """WCAG relative luminance of any matplotlib color (hex with or without '#', named)."""
-    if re.fullmatch(r'[0-9a-fA-F]{6}', color):
-        color = f'#{color}'
+    """WCAG relative luminance of a hex color (with or without '#')."""
     r, g, b = to_rgb(color)
 
     def adjust(c):

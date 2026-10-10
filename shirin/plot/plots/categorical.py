@@ -1,7 +1,6 @@
 from typing import Any, Optional
 
 import pandas as pd
-from matplotlib.axes import Axes
 
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
@@ -15,22 +14,30 @@ from ..common.formatting import (
 )
 from ..common.sorting import create_colors_list
 from ..common.stacked_plots import prepare_stacked_data
+from ..svg import Chart
 
 
 def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tuple[float, float]:
-    """'dynamic' grows with the category count, 'standard' is fixed, a number sets the length axis."""
+    """(figure width, plot height) in inches.
+
+    'dynamic' grows with the category count (default width as minimum), 'standard' is fixed,
+    a number sets the figure width (vertical) or plot height (horizontal).
+    """
     vertical = options.orientation == 'vertical'
     if options.figsize == 'dynamic':
         n_categories = data[options.axis_column].nunique()
-        return (n_categories + 1, FigureSize.STANDARD_HEIGHT) if vertical else (FigureSize.WIDTH, n_categories / 2 + 1)
+        if vertical:
+            # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
+            return (max(FigureSize.WIDTH, n_categories * FigureSize.CATEGORY_SLOT + 1), FigureSize.PLOT_HEIGHT)
+        return (FigureSize.WIDTH, n_categories * FigureSize.BAR_ROW)
     if options.figsize == 'standard':
-        return (FigureSize.WIDTH, FigureSize.STANDARD_HEIGHT if vertical else FigureSize.HEIGHT)
+        return (FigureSize.WIDTH, FigureSize.PLOT_HEIGHT)
     size = float(options.figsize)
-    return (size, FigureSize.STANDARD_HEIGHT) if vertical else (FigureSize.WIDTH, size)
+    return (size, FigureSize.PLOT_HEIGHT) if vertical else (FigureSize.WIDTH, size)
 
 
-def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Axes:
-    return plot._new_axes(calculate_figsize(plot.options, data))  # type: ignore[arg-type]
+def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
+    return plot._new_chart(*calculate_figsize(plot.options, data))  # type: ignore[arg-type]
 
 
 class StackableCategoricalPlot(AbstractPlot):
@@ -44,7 +51,7 @@ class StackableCategoricalPlot(AbstractPlot):
         self._order: Optional[list] = None
         self._df_unlabeled: Optional[pd.DataFrame] = None
 
-    def _draw_unstacked(self, ax: Axes, data: pd.DataFrame) -> Any:
+    def _draw_unstacked(self, chart: Chart, data: pd.DataFrame) -> Any:
         raise NotImplementedError
 
     def _datalabel_formatting(self) -> str:
@@ -55,10 +62,10 @@ class StackableCategoricalPlot(AbstractPlot):
         return None
 
     def draw(self, data: pd.DataFrame) -> Any:
-        ax = create_sized_figure(self, data)
+        chart = create_sized_figure(self, data)
         if self.options.stacked:
-            return self._draw_stacked(ax, data)
-        return self._draw_unstacked(ax, data)
+            return self._draw_stacked(chart, data)
+        return self._draw_unstacked(chart, data)
 
     def _prepare_stacked(self, data: pd.DataFrame) -> pd.DataFrame:
         """Pivot to one column per hue value and one row per category, in drawing order."""
@@ -71,13 +78,13 @@ class StackableCategoricalPlot(AbstractPlot):
             orientation=self.options.orientation,
         )
 
-    def _draw_stacked(self, ax: Axes, data: pd.DataFrame) -> Any:
+    def _draw_stacked(self, chart: Chart, data: pd.DataFrame) -> Any:
         horizontal = self.options.orientation == 'horizontal'
         df_prepared = self._prepare_stacked(data)
         plot = renderer.render_stacked_barplot(
-            ax,
+            chart,
             df=df_prepared,
-            kind='barh' if horizontal else 'bar',
+            horizontal=horizontal,
             colors=create_colors_list(df_prepared, self._palette),  # type: ignore[arg-type]
             width=self._horizontal_width if horizontal else 0.6,
         )
@@ -111,7 +118,6 @@ class StackableCategoricalPlot(AbstractPlot):
             return
         format_datalabels(
             plot,
-            label_offset=0.007,
             formatting=self._datalabel_formatting(),
             orientation=self.options.orientation,
             suffix=self.options.suffix,

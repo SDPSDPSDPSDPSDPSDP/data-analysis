@@ -29,7 +29,7 @@ class TestScatterPlotOptionsValidation:
 
 
 class TestScatterPlotRender:
-    def test_render_returns_axes_with_expected_labels(self) -> None:
+    def test_render_returns_chart_with_expected_labels(self) -> None:
         df = pd.DataFrame({
             "height": [150, 160, 170, 180],
             "weight": [50, 60, 70, 80],
@@ -44,11 +44,11 @@ class TestScatterPlotRender:
         )
 
         plot = ScatterPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        assert ax.get_xlabel() == "Height"
-        assert ax.get_ylabel() == "Weight"
-        assert len(ax.collections) > 0
+        assert chart.x.label == "Height"
+        assert chart.y.label == "Weight"
+        assert len(chart.dots) > 0
 
     def test_render_with_hue_creates_legend(self) -> None:
         df = pd.DataFrame({
@@ -66,9 +66,9 @@ class TestScatterPlotRender:
         )
 
         plot = ScatterPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        assert ax.get_legend() is not None
+        assert [label for _, label in chart.legend] == ["A", "B"]
 
     def test_render_without_hue_hides_legend(self) -> None:
         df = pd.DataFrame({
@@ -83,6 +83,6 @@ class TestScatterPlotRender:
         )
 
         plot = ScatterPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        assert ax.get_legend() is None
+        assert chart.legend == []

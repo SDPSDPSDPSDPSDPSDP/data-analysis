@@ -1,7 +1,7 @@
 """Smoke tests: every public PlotGraphs method renders without raising, plus regressions."""
 import dataclasses
+from typing import List
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
 
@@ -33,7 +33,7 @@ def plot() -> PlotGraphs:
     return PlotGraphs()
 
 
-def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame) -> None:
+def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame, shown: List[str]) -> None:
     palette = {'x': '#111111', 'y': '#eeeeee'}
     plot.countplot_x(df, x='category')
     plot.countplot_y(df, y='category', hue='group', palette=palette, stacked=True, stacked_labels='standard')
@@ -47,26 +47,27 @@ def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame) -> None:
     plot.timeplot(df, x='date', group_by='month')
     plot.timeplot(df, x='date', group_by='day', plot_type='line', rotation=45)
     plot.accuracy(pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]}), experiment='run', accuracy='acc', reverse_order=True)
-    assert plt.get_fignums() == []  # _render closes every figure
+    assert len(shown) == 12
+    assert all(svg.startswith('<svg') for svg in shown)
 
 
 def test_countplot_show_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
     rendered = CountPlot(CountPlotOptions(df=df, axis_column='category', show_labels=False))
-    ax = rendered.render()
-    assert len(ax.texts) == 0
+    chart = rendered.render()
+    assert len(chart.texts) == 0
 
 
 def test_pie_without_palette_uses_distinct_colors(df: pd.DataFrame) -> None:
     counts = df['category'].value_counts().to_frame()
-    ax = PieChart(PiePlotOptions(df=counts, col='count')).render()
-    assert len({wedge.get_facecolor() for wedge in ax.patches}) == 3
+    chart = PieChart(PiePlotOptions(df=counts, col='count')).render()
+    assert len({wedge.color for wedge in chart.wedges}) == 3
 
 
 def test_histogram_keeps_fractional_values() -> None:
     df = pd.DataFrame({'x': [0.1, 0.2, 0.5, 0.9, None]})
-    ax = Histogram(HistogramOptions(df=df, x='x', bins=10)).render()
-    assert len(ax.patches) == 10
-    assert sum(patch.get_height() for patch in ax.patches) == 4
+    chart = Histogram(HistogramOptions(df=df, x='x', bins=10)).render()
+    assert len(chart.rects) == 10
+    assert sum(rect.height for rect in chart.rects) == 4
 
 
 def test_stacked_barplot_sums_duplicate_rows() -> None:
@@ -75,8 +76,8 @@ def test_stacked_barplot_sums_duplicate_rows() -> None:
         df=df, axis_column='cat', value='v', hue='hue', stacked=True,
         palette={'x': '#111111', 'y': '#eeeeee'},
     )
-    ax = BarPlot(options).render()
-    assert max(patch.get_height() for patch in ax.patches) == 3
+    chart = BarPlot(options).render()
+    assert max(rect.height for rect in chart.rects) == 3
 
 
 def test_stacked_without_dict_palette_raises(df: pd.DataFrame) -> None:
@@ -97,37 +98,42 @@ def test_render_does_not_mutate_caller_options(df: pd.DataFrame) -> None:
 def test_hue_without_dict_palette_gets_one_color_per_hue_value(df: pd.DataFrame, palette) -> None:
     options = CountPlotOptions(df=df, axis_column='category', hue='group', palette=palette)
     rendered = CountPlot(options)
-    ax = rendered.render()
+    chart = rendered.render()
     assert rendered._color is None
     assert len(set(rendered._palette.values())) == 2
-    assert len({patch.get_facecolor() for patch in ax.patches}) == 2
+    assert len({rect.color for rect in chart.rects}) == 2
 
 
 def test_countplot_counts_per_category_and_hue() -> None:
     df = pd.DataFrame({'cat': ['A', 'A', 'A', 'B'], 'hue': ['x', 'x', 'y', 'y']})
-    ax = CountPlot(CountPlotOptions(df=df, axis_column='cat', hue='hue', palette={'x': '#111111', 'y': '#eeeeee'})).render()
-    heights = sorted(patch.get_height() for patch in ax.patches if patch.get_height() > 0)
+    chart = CountPlot(CountPlotOptions(df=df, axis_column='cat', hue='hue', palette={'x': '#111111', 'y': '#eeeeee'})).render()
+    heights = sorted(rect.height for rect in chart.rects if rect.height > 0)
     assert heights == [1, 1, 2]
-    assert [tick.get_text() for tick in ax.get_xticklabels()] == ['A', 'B']
+    assert chart.x.tick_labels == ['A', 'B']
 
 
 def test_barplot_uses_mean_per_category() -> None:
     df = pd.DataFrame({'cat': ['A', 'A', 'B'], 'v': [1.0, 3.0, 5.0]})
-    ax = BarPlot(BarPlotOptions(df=df, axis_column='cat', value='v', orientation='horizontal')).render()
-    assert sorted(patch.get_width() for patch in ax.patches) == [2.0, 5.0]
-    assert ax.get_ylim()[0] > ax.get_ylim()[1]  # first category on top
+    chart = BarPlot(BarPlotOptions(df=df, axis_column='cat', value='v', orientation='horizontal')).render()
+    assert sorted(rect.width for rect in chart.rects) == [2.0, 5.0]
+    assert chart.y.lim[0] > chart.y.lim[1]  # first category on top
 
 
-def test_render_leaves_other_figures_open(df: pd.DataFrame) -> None:
-    user_figure = plt.figure()
-    PlotGraphs().countplot_x(df, x='category')
-    assert plt.get_fignums() == [user_figure.number]
+def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
+    PlotGraphs(font='satoshi').countplot_x(df, x='category', hue='group', title='Totals', label_map={'x': 'Ex'})
+    assert '>Totals</text>' in shown[0]
+    assert '>Ex</text>' in shown[0]
+    assert '@font-face' in shown[0]
 
 
-def test_styling_does_not_change_global_rcparams(df: pd.DataFrame) -> None:
-    before = dict(plt.rcParams)
-    PlotGraphs().countplot_x(df, x='category')
-    assert dict(plt.rcParams) == before
+def test_hidden_legend(df: pd.DataFrame, shown: List[str]) -> None:
+    PlotGraphs().countplot_x(df, x='category', hue='group', plot_legend=False)
+    assert '>x</text>' not in shown[0]
+
+
+def test_unknown_font_raises() -> None:
+    with pytest.raises(ValueError, match="Unknown font"):
+        PlotGraphs(font='comic sans')
 
 
 def test_unknown_column_raises_clear_error(df: pd.DataFrame) -> None:

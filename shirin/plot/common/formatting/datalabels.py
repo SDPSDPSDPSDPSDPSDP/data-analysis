@@ -1,39 +1,37 @@
-from matplotlib.axes import Axes
-from matplotlib.patches import Patch
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 import pandas as pd
 
-from ...config import FontSizes, TextColors
+from ...config import FontSizes, Layout, TextColors
+from ...svg import Chart, Rect, Text
 from ....number_format import format_thousands
 from .text_contrast import get_text_color_for_background
 
 
-def _length(patch: Patch, orientation: str) -> float:
-    return patch.get_height() if orientation == 'vertical' else patch.get_width()
+def _length(rect: Rect, orientation: str) -> float:
+    return rect.height if orientation == 'vertical' else rect.width
 
 
-def _add_text(plot: Axes, patch: Patch, position: float, text: str, orientation: str) -> None:
+def _add_text(chart: Chart, rect: Rect, text: str, orientation: str) -> None:
+    gap = Layout.DATALABEL_GAP
     if orientation == 'vertical':
-        x, y, ha, va = patch.get_x() + patch.get_width() / 2.0, position, 'center', 'bottom'
+        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap)
     else:
-        x, y, ha, va = position, patch.get_y() + patch.get_height() / 2.0, 'left', 'center'
-    plot.text(x, y, text, ha=ha, va=va, fontsize=FontSizes.DATALABELS, color=TextColors.LIGHT_GREY)
+        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
+    chart.texts.append(label)
 
 
 def format_datalabels(
-    plot: Axes,
-    label_offset: float = 0.01,
+    chart: Chart,
     formatting: str = 'totals',
     orientation: str = 'vertical',
     suffix: Optional[str] = None,
 ) -> None:
-    patches: List[Patch] = plot.patches
-    lengths = [_length(p, orientation) for p in patches]
-    offset = max(lengths) * label_offset
+    rects = chart.rects
+    lengths = [_length(r, orientation) for r in rects]
     total = sum(lengths)
     suffix = suffix.strip() if suffix else ''
 
-    for patch, length in zip(patches, lengths):
+    for rect, length in zip(rects, lengths):
         if length <= 0:
             continue
         if formatting == 'percentage':
@@ -43,7 +41,7 @@ def format_datalabels(
             text = format_thousands(length)
         if suffix:
             text = f"{text} {suffix}"
-        _add_text(plot, patch, length + offset, text, orientation)
+        _add_text(chart, rect, text, orientation)
 
 
 def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -> str:
@@ -55,7 +53,7 @@ def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -
 
 
 def _add_stacked_labels(
-    plot: Axes,
+    chart: Chart,
     pivot_data: pd.DataFrame,
     percentages,
     palette: Dict,
@@ -71,19 +69,17 @@ def _add_stacked_labels(
                 continue
             center = cumulative_sum - value / 2
             x, y = (center, index) if orientation == 'horizontal' else (index, center)
-            plot.text(
+            chart.texts.append(Text(
                 x,
                 y,
                 _format_stacked_percentage(value_percentage, suffix),
-                ha='center',
-                va='center',
-                color=get_text_color_for_background(palette[str(category)]),
-                fontsize=FontSizes.DATALABELS,
-            )
+                get_text_color_for_background(palette[str(category)]),
+                FontSizes.DATALABELS,
+            ))
 
 
 def format_datalabels_stacked(
-    plot: Axes,
+    chart: Chart,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
@@ -92,14 +88,14 @@ def format_datalabels_stacked(
     values = pivot_data.values
     percentages = values / values.sum(axis=1, keepdims=True) * 100
     threshold = 0.04 * pivot_data.sum(axis=1).max()
-    _add_stacked_labels(plot, pivot_data, percentages, palette, orientation, suffix, threshold)
+    _add_stacked_labels(chart, pivot_data, percentages, palette, orientation, suffix, threshold)
 
 
 def format_datalabels_stacked_normalized(
-    plot: Axes,
+    chart: Chart,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    _add_stacked_labels(plot, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)
+    _add_stacked_labels(chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix, threshold=0.04)

@@ -34,7 +34,7 @@ class TestPieChartTextColors:
         
         for bg_color, autotext in zip(plot._colors, plot._autotexts):
             expected_text_color = get_text_color_for_background(bg_color)
-            actual_text_color = autotext.get_color()
+            actual_text_color = autotext.color
             assert actual_text_color == expected_text_color, \
                 f"Text color {actual_text_color} doesn't match expected {expected_text_color} for background {bg_color}"
     
@@ -57,7 +57,7 @@ class TestPieChartTextColors:
         
         for bg_color, autotext in zip(plot._colors, plot._autotexts):
             expected_text_color = get_text_color_for_background(bg_color)
-            actual_text_color = autotext.get_color()
+            actual_text_color = autotext.color
             assert actual_text_color == expected_text_color
     
     def test_pie_chart_dark_background_gets_white_text(self):
@@ -78,7 +78,7 @@ class TestPieChartTextColors:
         plot = PieChart(options)
         plot.render()
         
-        assert plot._autotexts[0].get_color() == TextColors.WHITE
+        assert plot._autotexts[0].color == TextColors.WHITE
     
     def test_pie_chart_light_background_gets_black_text(self):
         """Test that light pie slices get black text."""
@@ -98,7 +98,7 @@ class TestPieChartTextColors:
         plot = PieChart(options)
         plot.render()
         
-        assert plot._autotexts[0].get_color() == TextColors.BLACK
+        assert plot._autotexts[0].color == TextColors.BLACK
 
 
 class TestIntegerPaletteKeys:
@@ -125,5 +125,5 @@ class TestIntegerPaletteKeys:
         
         for bg_color, autotext in zip(plot._colors, plot._autotexts):
             expected_text_color = get_text_color_for_background(bg_color)
-            actual_text_color = autotext.get_color()
+            actual_text_color = autotext.color
             assert actual_text_color == expected_text_color

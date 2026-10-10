@@ -1,9 +1,9 @@
 from typing import Any, Optional
 
 import pandas as pd
-from matplotlib.axes import Axes
 
 from ..core import renderer
+from ..svg import Chart
 from ..core.categorical_options import BarPlotOptions
 from ..common.data_conversion import ensure_column_is_string
 from ..common.sorting import get_order
@@ -25,9 +25,9 @@ class BarPlot(StackableCategoricalPlot):
         )
         return self._resolve_hue_palette(df)
 
-    def _draw_unstacked(self, ax: Axes, data: pd.DataFrame) -> Any:
+    def _draw_unstacked(self, chart: Chart, data: pd.DataFrame) -> Any:
         return renderer.render_barplot(
-            ax,
+            chart,
             df=data,
             column=self.options.axis_column,
             value=self.options.value,

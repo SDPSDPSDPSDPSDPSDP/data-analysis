@@ -32,8 +32,8 @@ class CountPlotsMixin:
         xlabel: str = '',
         ylabel: str = 'Count',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         top_n: Optional[int] = None,
         figsize_width: FigureSizeInput = 'dynamic',
         stacked: bool = False,
@@ -55,8 +55,8 @@ class CountPlotsMixin:
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `'Count'`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
             figsize_width: Figure width. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
                 *Default: `'dynamic'`*.
@@ -84,8 +84,8 @@ class CountPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
             top_n=top_n,
             figsize=figsize_width,
             order_type=order_type,
@@ -102,8 +102,8 @@ class CountPlotsMixin:
         xlabel: str = 'Count',
         ylabel: str = '',
         plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: str = '',
+        subtitle: str = '',
         top_n: Optional[int] = None,
         figsize_height: FigureSizeInput = 'dynamic',
         stacked: bool = False,
@@ -125,8 +125,8 @@ class CountPlotsMixin:
             xlabel: Label for the x-axis. *Default: `'Count'`*.
             ylabel: Label for the y-axis. *Default: `''`*.
             plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+            title: Chart title above the plot. *Default: `''`*.
+            subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
             figsize_height: Figure height. **Options:** `'dynamic'`, `'standard'`, or a numeric value.
                 *Default: `'dynamic'`*.
@@ -154,8 +154,8 @@ class CountPlotsMixin:
             xlabel=xlabel,
             ylabel=ylabel,
             plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            title=title,
+            subtitle=subtitle,
             top_n=top_n,
             figsize=figsize_height,
             order_type=order_type,

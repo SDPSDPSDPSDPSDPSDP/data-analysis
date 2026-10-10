@@ -6,7 +6,6 @@ from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import HistogramOptions
 from ..common.formatting import format_ticks
-from ..config import FigureSize
 
 
 def _is_whole_numbers(values: pd.Series) -> bool:
@@ -42,7 +41,7 @@ class Histogram(AbstractPlot):
 
     def draw(self, data: pd.DataFrame) -> Any:
         return renderer.render_histogram(
-            self._new_axes((FigureSize.WIDTH, FigureSize.HEIGHT * 0.7)),
+            self._standard_chart(),
             df=data,
             x=self.options.x,
             bins=self._bins,

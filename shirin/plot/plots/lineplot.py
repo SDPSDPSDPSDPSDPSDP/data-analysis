@@ -7,6 +7,7 @@ from ..core.base_plot import AbstractPlot
 from ..core.options import LinePlotOptions
 from ..common.formatting import format_ticks
 from ..common.data_conversion import fill_missing_values_in_data
+from ..config import Colors
 
 
 class LinePlot(AbstractPlot):
@@ -24,11 +25,11 @@ class LinePlot(AbstractPlot):
         )
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self._resolve_hue_palette(df, no_hue_color='black')
+        return self._resolve_hue_palette(df, no_hue_color=Colors.BLACK)
 
     def draw(self, data: pd.DataFrame) -> Any:
         return renderer.render_lineplot(
-            self._standard_axes(),
+            self._standard_chart(),
             df=data,
             x=self.options.x,
             y=self.options.y,

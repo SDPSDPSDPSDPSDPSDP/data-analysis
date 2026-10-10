@@ -122,9 +122,9 @@ class TestAxisLabelMapping:
         )
 
         plot = CountPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        xtick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
+        xtick_labels = chart.x.tick_labels
         assert 'Non-Contentious' in xtick_labels
         assert 'Contentious' in xtick_labels
         assert '0' not in xtick_labels
@@ -148,9 +148,9 @@ class TestAxisLabelMapping:
         )
 
         plot = BarPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        ytick_labels = [tick.get_text() for tick in ax.get_yticklabels()]
+        ytick_labels = chart.y.tick_labels
         assert 'Non-Contentious' in ytick_labels
         assert 'Contentious' in ytick_labels
         assert '0' not in ytick_labels

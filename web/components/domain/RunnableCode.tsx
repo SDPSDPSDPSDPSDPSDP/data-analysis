@@ -81,7 +81,7 @@ export default function RunnableCode({ initialCode, setup }: Props) {
       <CodeBlock value={code} onChange={setCode} extensions={[runKey, docTooltip]} />
       <section className="output">
         {result?.images.map((src, i) => (
-          <CopyableImage key={i} src={`data:image/png;base64,${src}`} alt="Rendered chart" />
+          <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}

@@ -1,6 +1,6 @@
 from .colors import Colors, TextColors
 from .palettes import Palette, LabelMapping
-from .formatting import FontSizes, FigureSize
+from .formatting import FontSizes, FigureSize, Layout
 from .types import (
     OrderType,
     FigureSizeMode,
@@ -21,6 +21,7 @@ __all__ = [
     'LabelMapping',
     'FontSizes',
     'FigureSize',
+    'Layout',
     'OrderType',
     'FigureSizeMode',
     'StackedLabelType',

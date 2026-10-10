@@ -8,7 +8,22 @@ class FontSizes:
 
 
 class FigureSize:
-    HEIGHT = 8 * 1.5
-    WIDTH = 12 * 1.5 * 0.7
-    STANDARD_HEIGHT = 4
-    PIE = 4 * 1.2
+    """Inches. Figure height is the plot area plus whatever rows (title, legend, labels) are present."""
+    WIDTH = 8.4
+    PLOT_HEIGHT = 3.2
+    CATEGORY_SLOT = 0.8  # plot width per category for vertical 'dynamic' bars
+    BAR_ROW = 0.4  # plot height per category for horizontal 'dynamic' bars
+    PIE = 3.2
+
+
+class Layout:
+    """Points, measured from the figure edges."""
+    PAD = 12
+    ROW_GAP = 6
+    PLOT_GAP = 12
+    TICK_GAP = 6
+    LABEL_GAP = 8
+    DATALABEL_GAP = 3
+    SWATCH = 8
+    SWATCH_GAP = 4
+    LEGEND_ITEM_GAP = 14

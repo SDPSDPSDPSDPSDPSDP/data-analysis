@@ -73,9 +73,9 @@ class BasePlotOptions:
     xlabel: str = ''
     ylabel: str = ''
     plot_legend: bool = True
-    legend_offset: float = 1.13
-    ncol: int = 2
     hue: Optional[str] = None
+    title: str = ''
+    subtitle: str = ''
 
     def validate(self) -> None:
         if self.df is None or self.df.empty:

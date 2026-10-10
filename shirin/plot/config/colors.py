@@ -28,3 +28,12 @@ class TextColors:
     LIGHT_GREY = '#777777'
     BLACK = '#000000'
     WHITE = '#FFFFFF'
+
+
+GRID_COLOR = '#d3d3d3'
+
+# Colors for hue values without a palette (the tab10 cycle).
+DEFAULT_CYCLE = (
+    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+)

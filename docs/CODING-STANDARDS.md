@@ -8,7 +8,7 @@ Code structure, design tokens and conventions for the `shirin` Python package an
 
 * **Layout:** Follow the layers in [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md#architecture). New chart = public method in `plot/graphs/`, Options dataclass in `plot/core/`, plot class in `plot/plots/`. Shared helpers go in `plot/common/`, constants and palettes in `plot/config/`.
 * **Options validation:** Validate user input in the Options dataclasses, not inside drawing code.
-* **Matplotlib state:** Each plot draws on its own figure. Styling goes through `plt.rc_context`; never mutate global `rcParams`.
+* **Rendering:** Plots fill a `Chart` (`plot/svg/chart.py`) in data coordinates; only `plot/svg/render.py` deals in points and SVG.
 * **Python version:** Code must run on Python 3.9 (CI matrix 3.9-3.13). No `X | Y` unions at runtime, no `match` statements.
 * **Number formatting:** Use `shirin/number_format.py` for Dutch formatting. Do not reformat numbers ad hoc.
 * **Tests:** One `tests/test_<module>.py` per area. Run with `uv run python -m pytest`.
