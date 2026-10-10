@@ -8,67 +8,16 @@ from ....stats.number_format import format_thousands
 from .text_contrast import get_text_color_for_background
 
 
-def _calculate_label_offset(
-    patches: List[Patch], label_offset: float, orientation: str
-) -> float:
-    dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
-    max_dimension = max(getattr(p, dimension_getter[orientation])() for p in patches)
-    return max_dimension * label_offset
+def _length(patch: Patch, orientation: str) -> float:
+    return patch.get_height() if orientation == 'vertical' else patch.get_width()
 
 
-def _format_labels(
-    plot: Axes,
-    patches: List[Patch],
-    label_offset: float,
-    formatting: str,
-    orientation: str,
-    suffix: Optional[str] = None,
-) -> None:
-    if formatting == 'percentage':
-        dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
-        total_dimension = sum(getattr(p, dimension_getter[orientation])() for p in patches)
-
-    for patch in patches:
-        dimension = patch.get_height() if orientation == 'vertical' else patch.get_width()
-        if dimension > 0:
-            if formatting == 'totals':
-                text: str = format_thousands(dimension)
-
-            elif formatting == 'percentage':
-                percentage = (dimension / total_dimension * 100) if total_dimension > 0 else 0
-                text = f'{percentage:,.1f}%'.replace(',', '.')
-            if suffix is not None and suffix.strip() != '':
-                text = f"{text} {suffix.strip()}"
-            _add_text(plot, patch, dimension + label_offset, text, orientation)
-
-
-def _add_text(
-    plot: Axes,
-    patch: Patch,
-    position: float,
-    text: str,
-    orientation: str,
-) -> None:
+def _add_text(plot: Axes, patch: Patch, position: float, text: str, orientation: str) -> None:
     if orientation == 'vertical':
-        plot.text(
-            patch.get_x() + patch.get_width() / 2.0,
-            position,
-            text,
-            ha='center',
-            va='bottom',
-            fontsize=FontSizes.DATALABELS,
-            color=TextColors.LIGHT_GREY,
-        )
-    elif orientation == 'horizontal':
-        plot.text(
-            position,
-            patch.get_y() + patch.get_height() / 2.0,
-            text,
-            ha='left',
-            va='center',
-            fontsize=FontSizes.DATALABELS,
-            color=TextColors.LIGHT_GREY,
-        )
+        x, y, ha, va = patch.get_x() + patch.get_width() / 2.0, position, 'center', 'bottom'
+    else:
+        x, y, ha, va = position, patch.get_y() + patch.get_height() / 2.0, 'left', 'center'
+    plot.text(x, y, text, ha=ha, va=va, fontsize=FontSizes.DATALABELS, color=TextColors.LIGHT_GREY)
 
 
 def format_datalabels(
@@ -79,8 +28,22 @@ def format_datalabels(
     suffix: Optional[str] = None,
 ) -> None:
     patches: List[Patch] = plot.patches
-    label_offset = _calculate_label_offset(patches, label_offset, orientation)
-    _format_labels(plot, patches, label_offset, formatting, orientation, suffix=suffix)
+    lengths = [_length(p, orientation) for p in patches]
+    offset = max(lengths) * label_offset
+    total = sum(lengths)
+    suffix = suffix.strip() if suffix else ''
+
+    for patch, length in zip(patches, lengths):
+        if length <= 0:
+            continue
+        if formatting == 'percentage':
+            percentage = length / total * 100 if total > 0 else 0
+            text = f'{percentage:,.1f}%'.replace(',', '.')
+        else:
+            text = format_thousands(length)
+        if suffix:
+            text = f"{text} {suffix}"
+        _add_text(plot, patch, length + offset, text, orientation)
 
 
 def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -> str:

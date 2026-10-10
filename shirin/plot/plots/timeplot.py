@@ -37,10 +37,8 @@ class TimePlot(AbstractPlot):
         group_by = self.options.group_by
         date_col = self.options.x
 
-        datetime_series = pd.to_datetime(df[date_col])
-
         period = {'year': 'Y', 'month': 'M'}.get(group_by, 'D')
-        df['_time_group'] = datetime_series.dt.to_period(period).dt.to_timestamp()
+        df['_time_group'] = df[date_col].dt.to_period(period).dt.to_timestamp()
 
         self._aggregated_df = (
             df.groupby('_time_group')
@@ -49,7 +47,7 @@ class TimePlot(AbstractPlot):
             .sort_values('_time_group')
         )
 
-        # Ensure continuity on the x-axis by including empty periods with zero counts
+        # Include empty periods with zero counts so the x-axis stays continuous.
         if not self._aggregated_df.empty:
             groups = self._aggregated_df['_time_group']
             full_range = pd.date_range(
@@ -86,13 +84,7 @@ class TimePlot(AbstractPlot):
 
     def _get_bar_width(self) -> float:
         """Bar width in days for the grouping."""
-        group_by = self.options.group_by
-        if group_by == 'year':
-            return 300
-        elif group_by == 'month':
-            return 25
-        else:  # day
-            return 0.8
+        return {'year': 300, 'month': 25}.get(self.options.group_by, 0.8)
 
     def format_plot(self, plot: Any) -> None:
         format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)

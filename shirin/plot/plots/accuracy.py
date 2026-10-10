@@ -69,9 +69,7 @@ class AccuracyPlot(AbstractPlot):
         # vertical plots and top-to-bottom for horizontal plots. reverse_order
         # flips that behavior.
         df_prepared = df_prepared[[_CORRECT_KEY, _INCORRECT_KEY]]
-        ascending = orientation == 'horizontal'
-        if self.options.reverse_order:
-            ascending = not ascending
+        ascending = (orientation == 'horizontal') != self.options.reverse_order
         df_prepared = df_prepared.sort_values(_CORRECT_KEY, ascending=ascending)
 
         palette = self.options.palette  # type: ignore[assignment]

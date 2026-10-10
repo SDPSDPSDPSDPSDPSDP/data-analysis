@@ -1,16 +1,7 @@
 import pandas as pd
-import pytest
-import matplotlib.pyplot as plt
 
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import create_plot
-
-
-@pytest.fixture(autouse=True)
-def close_plots():
-    """Close all matplotlib figures after each test."""
-    yield
-    plt.close('all')
 
 
 class TestPieChartRender:

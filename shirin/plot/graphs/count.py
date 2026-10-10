@@ -23,7 +23,6 @@ class CountPlotsMixin:
             )
             self._render('count', options, output_name)
 
-
     @resolve_palette
     def countplot_x(
         self,
@@ -96,7 +95,6 @@ class CountPlotsMixin:
             show_labels=show_labels,
             suffix=suffix,
         )
-
 
     @resolve_palette
     def countplot_y(

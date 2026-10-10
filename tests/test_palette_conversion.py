@@ -41,10 +41,9 @@ class TestPaletteLookupWithBooleanKeys:
         """Test that failed palette lookup defaults to black (white text)."""
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
         
-        # This simulates the bug - looking up string key in boolean-keyed dict
-        bg_color = palette.get('True', '#000000')  # Will return default black
+        # Regression: a str key never matches a bool-keyed dict, so the fallback black wins.
+        bg_color = palette.get('True', '#000000')
         
-        # This is why we needed the fix - wrong lookup gives black background
         assert bg_color == '#000000'
         assert get_text_color_for_background(bg_color) == TextColors.WHITE
 

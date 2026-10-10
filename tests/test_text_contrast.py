@@ -51,10 +51,8 @@ class TestGetTextColorForBackground:
         assert result == TextColors.BLACK
     
     def test_mid_grey_threshold(self):
-        # Test around the WCAG threshold (0.179 luminance)
-        # A grey with ~46% brightness is around the threshold
-        dark_grey = '#555555'  # Below threshold
-        light_grey = '#777777'  # Above threshold
+        dark_grey = '#555555'
+        light_grey = '#777777'
         
         assert get_text_color_for_background(dark_grey) == TextColors.WHITE
         assert get_text_color_for_background(light_grey) == TextColors.BLACK

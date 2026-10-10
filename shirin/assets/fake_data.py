@@ -28,9 +28,7 @@ def _generate_middle_weighted_values(num_rows: int, value_range: tuple[int, int]
     midpoint = (min_val + max_val) // 2
     
     weights = [100 - abs(midpoint - x) for x in range(min_val, max_val)]
-    values = [random.choices(range(min_val, max_val), weights=weights)[0] for _ in range(num_rows)]
-    
-    return values
+    return random.choices(range(min_val, max_val), weights=weights, k=num_rows)
 
 
 def _add_category_columns(df: DataFrame) -> DataFrame:

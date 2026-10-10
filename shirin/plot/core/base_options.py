@@ -78,7 +78,5 @@ class BasePlotOptions:
         if self.df is None or self.df.empty:
             raise ValueError("DataFrame cannot be None or empty")
 
-        if isinstance(self.palette, dict):
-            self.palette = convert_dict_keys_to_string(self.palette)
-        if isinstance(self.label_map, dict):
-            self.label_map = convert_dict_keys_to_string(self.label_map)
+        self.palette = convert_dict_keys_to_string(self.palette)
+        self.label_map = convert_dict_keys_to_string(self.label_map)
