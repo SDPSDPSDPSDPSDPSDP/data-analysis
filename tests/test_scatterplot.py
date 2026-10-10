@@ -1,15 +1,8 @@
 import pandas as pd
 import pytest
-import matplotlib.pyplot as plt
 
-from shirin.plot.core import create_plot, ScatterPlotOptions
-
-
-@pytest.fixture(autouse=True)
-def close_plots():
-    """Close all matplotlib figures after each test."""
-    yield
-    plt.close('all')
+from shirin.plot.core import ScatterPlotOptions
+from shirin.plot.plots import ScatterPlot
 
 
 class TestScatterPlotOptionsValidation:
@@ -35,61 +28,27 @@ class TestScatterPlotOptionsValidation:
             options.validate()
 
 
+def _render(group=None, **options):
+    data = {"height": [150, 160, 170, 180], "weight": [50, 60, 70, 80]}
+    if group is not None:
+        data["group"] = group
+    return ScatterPlot(ScatterPlotOptions(df=pd.DataFrame(data), x="height", y="weight", **options)).render()
+
+
 class TestScatterPlotRender:
-    def test_render_returns_axes_with_expected_labels(self) -> None:
-        df = pd.DataFrame({
-            "height": [150, 160, 170, 180],
-            "weight": [50, 60, 70, 80],
-        })
+    def test_render_returns_chart_with_expected_labels(self) -> None:
+        chart = _render(x_axis_label="Height", y_axis_label="Weight")
 
-        options = ScatterPlotOptions(
-            df=df,
-            x="height",
-            y="weight",
-            xlabel="Height",
-            ylabel="Weight",
-        )
-
-        plot = create_plot('scatter', options)
-        ax = plot.render()
-
-        assert ax.get_xlabel() == "Height"
-        assert ax.get_ylabel() == "Weight"
-        assert len(ax.collections) > 0
+        assert chart.x.label == "Height"
+        assert chart.y.label == "Weight"
+        assert len(chart.dots) > 0
 
     def test_render_with_hue_creates_legend(self) -> None:
-        df = pd.DataFrame({
-            "height": [150, 160, 170, 180],
-            "weight": [50, 60, 70, 80],
-            "group": ["A", "A", "B", "B"],
-        })
+        chart = _render(group=["A", "A", "B", "B"], hue="group", legend=True)
 
-        options = ScatterPlotOptions(
-            df=df,
-            x="height",
-            y="weight",
-            hue="group",
-            plot_legend=True,
-        )
-
-        plot = create_plot('scatter', options)
-        ax = plot.render()
-
-        assert ax.get_legend() is not None
+        assert [label for _, label, _ in chart.legend] == ["A", "B"]
 
     def test_render_without_hue_hides_legend(self) -> None:
-        df = pd.DataFrame({
-            "height": [150, 160, 170, 180],
-            "weight": [50, 60, 70, 80],
-        })
+        chart = _render()
 
-        options = ScatterPlotOptions(
-            df=df,
-            x="height",
-            y="weight",
-        )
-
-        plot = create_plot('scatter', options)
-        ax = plot.render()
-
-        assert ax.get_legend() is None
+        assert chart.legend == []

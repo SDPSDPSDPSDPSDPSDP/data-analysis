@@ -1,0 +1,194 @@
+.setup-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+section.setup-cell + section.setup-cell {
+  margin-top: var(--space-3);
+}
+
+.setup-cell p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.setup-cell h4 {
+  margin: 0;
+  font-size: var(--font-size-doc-heading);
+}
+
+.data-format {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  column-gap: var(--space-6);
+  align-items: start;
+  margin: var(--space-3) 0 var(--space-6);
+}
+
+/* First example shares the row with the data format, so code and chart stack. */
+.data-format .runnable {
+  grid-template-columns: 1fr;
+}
+
+/* Chart sits under the code here, so it gets less height to keep the whole explainer on screen. */
+.data-format .chart img {
+  max-height: var(--data-format-chart-height);
+}
+
+/* Text output reads best under its code. */
+.tool-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.tool-examples .runnable {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+}
+
+.tool-examples .runnable + .runnable {
+  margin-top: 0;
+}
+
+.tool-examples .skeleton {
+  aspect-ratio: auto;
+  height: var(--space-6);
+}
+
+.data-format .data-table {
+  margin-top: var(--space-2);
+}
+
+/* separate, not collapse: border-radius is ignored on collapsed tables. */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: var(--border-width) solid var(--color-shimmer);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: var(--font-size-code);
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+}
+
+.data-table td {
+  border-top: var(--border-width) solid var(--color-shimmer);
+}
+
+.data-table th {
+  background: var(--color-surface);
+  font-weight: var(--font-weight-doc-heading);
+}
+
+.data-table-role {
+  margin-left: var(--space-0-5);
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+.runnable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.runnable + .runnable,
+.more-examples > .runnable {
+  margin-top: var(--space-6);
+}
+
+/* Divider line through the middle, button sits on top of it. */
+.more-examples > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+  cursor: pointer;
+}
+
+.more-examples > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-examples > summary::before,
+.more-examples > summary::after {
+  content: "";
+  flex: 1;
+  border-top: var(--border-width) solid var(--color-shimmer);
+}
+
+.more-examples-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-shimmer);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+  transition: background var(--transition);
+}
+
+.more-examples > summary:hover .more-examples-button {
+  background: var(--color-surface);
+}
+
+.more-examples-chevron {
+  transition: transform var(--transition);
+}
+
+.more-examples[open] .more-examples-chevron {
+  transform: rotate(180deg);
+}
+
+.more-examples:not([open]) .more-examples-open,
+.more-examples[open] .more-examples-closed {
+  display: none;
+}
+
+.runnable > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Bounded height lets .cm-scroller scroll long code instead of clipping. */
+.runnable > .code-block .cm-editor {
+  max-height: var(--runnable-height);
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.chart {
+  margin: 0;
+  position: relative;
+}
+
+.chart img {
+  width: 100%;
+  height: auto;
+  max-height: var(--runnable-height);
+  object-fit: contain;
+  display: block;
+}
+
+/* Custom properties are not allowed in media queries. */
+@media (max-width: 800px) {
+  .runnable,
+  .data-format {
+    grid-template-columns: 1fr;
+  }
+}

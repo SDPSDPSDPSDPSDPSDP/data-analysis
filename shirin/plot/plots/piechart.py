@@ -1,99 +1,61 @@
-from typing import Any, Optional, List, cast
+from typing import Any, List
 
 import pandas as pd
-import matplotlib.pyplot as plt
 
-from ..core.base_plot import AbstractPlot
+from ..core import renderer
+from ..core.base_plot import AbstractPlot, default_colors, default_palette
 from ..core.options import PiePlotOptions
-from ..common.label_mapping import create_label_map
 from ..common.formatting.text_contrast import get_text_color_for_background
-from ..common.data_conversion import convert_dict_keys_to_string
-from ...stats.number_format import format_thousands
-
+from ..common.sorting import palette_colors
+from ..config import FigureSize, Marks
+from ..svg import Text
+from ...number_format import format_thousands
 
 
 class PieChart(AbstractPlot):
-    def __init__(self, options: PiePlotOptions, renderer=None):
-        super().__init__(options, renderer)
-        self.options: PiePlotOptions = options
-        self._labels: Optional[List] = None
-        self._colors: Optional[List] = None
-        self._original_labels: Optional[List] = None
-        self._values: Optional[List] = None
-    
+    options: PiePlotOptions
+
+    def __init__(self, options: PiePlotOptions):
+        super().__init__(options)
+        self._labels: List[str] = []
+        self._colors: List[str] = []
+        self._values: List[float] = []
+        self._autotexts: List[Text] = []
+
     def preprocess(self) -> pd.DataFrame:
         return self.options.df.copy()
-    
+
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = df.copy()
         df[self.options.col] = df[self.options.col].fillna(0).astype(float)
         self._values = df[self.options.col].tolist()
-        self._original_labels = df.index.tolist()
-        
-        label_map_to_use = self.options.label_map
-        # Keep original types for label_map keys
-        # if label_map_to_use:
-        #     label_map_to_use = convert_dict_keys_to_string(label_map_to_use)
-        
-        label_map = create_label_map(
-            label_map_to_use,
-            self._original_labels
-        )
-        
-        original_labels = cast(list, self._original_labels)
-        self._labels = [label_map.get(str(val), str(val)) for val in original_labels]
-        
-        palette_dict = cast(dict, self.options.palette)
-        if palette_dict:
-            self._colors = [palette_dict.get(str(val), '#000000') for val in original_labels]
-        else:
-            self._colors = ['#000000'] * len(original_labels)
-        
+        keys = [str(val) for val in df.index]
+
+        label_map = self.options.label_map or {}
+        self._labels = [label_map.get(key, key) for key in keys]
+
+        palette = self.options.palette
+        if isinstance(palette, str):
+            palette = default_palette(pd.Series(keys), palette)
+        self._colors = default_colors(len(keys)) if palette is None else palette_colors(palette, keys)
         return df
-    
+
     def draw(self, data: pd.DataFrame) -> Any:
-        from ..config import FigureSize
-        self.renderer.create_figure((FigureSize.PIE, FigureSize.PIE))
-        
-        result = self.renderer.render_piechart(
-            values=self._values,  # type: ignore
-            colors=self._colors,  # type: ignore
+        chart = self._new_chart(None, FigureSize.PIE)
+        self._autotexts = renderer.render_piechart(
+            chart,
+            values=self._values,
+            colors=self._colors,
             donut=self.options.donut,
             n_after_comma=self.options.n_after_comma,
             value_datalabel=self.options.value_datalabel,
-            pctdistance=0.775 if self.options.donut else 0.6
+            pctdistance=Marks.DONUT_LABEL_RADIUS if self.options.donut else Marks.PIE_LABEL_RADIUS
         )
-        
-        try:
-            self._autotexts = result[2]
-        except IndexError:
-            self._autotexts = []
-        
-        ax = plt.gca()
-        return ax
-    
-    def format_plot(self, plot: Any) -> None:
-        from ..config import FontSizes, TextColors
-        
-        # Create legend labels
-        legend_labels = [
-            f'{label}: {format_thousands(val)}'
-            for label, val in zip(self._labels, self._values)  # type: ignore
-        ]
+        return chart
 
-        
-        legend = plt.legend(
-            legend_labels,
-            loc="lower center",
-            bbox_to_anchor=(0.5, 0.98),
-            fontsize=FontSizes.LEGEND,
-            framealpha=0.0,
-            ncol=1,
-        )
-        for text in legend.get_texts():
-            text.set_color(TextColors.DARK_GREY)
-        
-        # Apply automatic text colors based on slice background
-        for bg_color, autotext in zip(self._colors, self._autotexts):  # type: ignore
-            text_color = get_text_color_for_background(bg_color)
-            autotext.set_color(text_color)
+    def format_plot(self, plot: Any) -> None:
+        plot.legend = [
+            (color, label, format_thousands(val))
+            for color, label, val in zip(self._colors, self._labels, self._values)
+        ]
+        for bg_color, autotext in zip(self._colors, self._autotexts):
+            autotext.color = get_text_color_for_background(bg_color)

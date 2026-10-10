@@ -1,47 +1,30 @@
 from .base_plot import AbstractPlot
-from .exporter import PlotExporter
-from .factory import PlotFactory, PlotRegistry, create_plot, register_plot
-from .options import (
-    BasePlotOptions,
-    BarPlotOptions,
+from .base_options import BasePlotOptions, InvalidOptionError
+from .categorical_options import (
+    CategoricalPlotOptions,
     CountPlotOptions,
+    BarPlotOptions,
+    NormalizedPlotOptions,
+)
+from .options import (
     HistogramOptions,
     LinePlotOptions,
     PiePlotOptions,
-    NormalizedCountPlotOptions,
     TimePlotOptions,
-    AccuracyPlotOptions,
     ScatterPlotOptions,
 )
-from .renderer import PlotRenderer, SeabornRenderer
-from .strategies import (
-    get_figure_size_strategy,
-    get_ordering_strategy,
-    get_palette_strategy,
-)
-
-from . import registration
 
 __all__ = [
     'AbstractPlot',
-    'PlotExporter',
-    'PlotRenderer',
-    'SeabornRenderer',
-    'PlotFactory',
-    'PlotRegistry',
-    'create_plot',
-    'register_plot',
     'BasePlotOptions',
+    'InvalidOptionError',
+    'CategoricalPlotOptions',
     'CountPlotOptions',
     'BarPlotOptions',
+    'NormalizedPlotOptions',
     'HistogramOptions',
     'LinePlotOptions',
     'PiePlotOptions',
-    'NormalizedCountPlotOptions',
     'TimePlotOptions',
-    'AccuracyPlotOptions',
     'ScatterPlotOptions',
-    'get_ordering_strategy',
-    'get_figure_size_strategy',
-    'get_palette_strategy',
 ]

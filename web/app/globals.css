@@ -1,0 +1,176 @@
+:root {
+  --color-bg: #fff;
+  --color-surface: rgba(0, 0, 0, 0.04);
+  --color-shimmer: rgba(0, 0, 0, 0.08);
+  --color-error: #b00020;
+  --color-glass: rgba(242, 242, 244, 0.7);
+  --glass-blur: 16px;
+  --glass-saturate: 180%;
+  /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
+  --z-nav: 1000;
+  --z-tooltip: 1100;
+  --color-code-bg: #1e1e1e;
+  --color-code-highlight: rgba(255, 255, 255, 0.05);
+  /* Syntax colors, applied by CodeBlock's highlight style. */
+  --code-text: #d3d8e1;
+  --code-keyword: #ffffff;
+  --code-name: #f5c0ff;
+  --code-function: #d23cff;
+  --code-constant: #75bb75;
+  --code-class: #66ff00;
+  --code-operator: #feffff;
+  --code-string: #d6ffb9;
+  --code-comment: #7d8799;
+  --color-button: rgba(255, 255, 255, 0.08);
+  --color-button-hover: rgba(255, 255, 255, 0.16);
+  --color-overlay-button: rgba(0, 0, 0, 0.5);
+  --color-overlay-button-hover: rgba(0, 0, 0, 0.7);
+
+  --text-primary: rgba(0, 0, 0, 0.93);
+  --text-muted: rgba(0, 0, 0, 0.7);
+  --text-secondary: rgba(0, 0, 0, 0.53);
+  --text-on-dark: rgba(255, 255, 255, 0.93);
+  --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
+  --text-on-dark-pure: rgba(255, 255, 255, 1);
+
+  --font-body: var(--font-satoshi), sans-serif;
+  --font-heading: var(--font-futura), "Futura", sans-serif;
+  --font-size-brand: 28px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
+  --font-size-small: 13px;
+  --font-size-code: 14px;
+  --font-size-doc: 15px;
+  --font-size-doc-heading: 19px;
+  --font-weight-heading: 500;
+  --font-weight-nav: 500;
+  --font-weight-doc-heading: 700;
+  --letter-spacing-heading: 0.015em;
+
+  --space-0-5: 4px;
+  --space-1: 8px;
+  --space-1-5: 12px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-6: 48px;
+  --nav-height: 56px;
+
+  --radius: 6px;
+  --border-width: 1px;
+  --radius-pill: 999px;
+  --radius-swatch: 2px;
+  --switch-width: 56px;
+  --switch-height: 28px;
+  --switch-padding: 3px;
+  --focus-ring-width: 2px;
+  --switch-icon-size: 14px;
+  --color-switch-knob: rgba(255, 255, 255, 0.9);
+  --shadow-switch-knob: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.08);
+  --button-height: 28px;
+  --transition: 120ms ease;
+  --transition-spring: 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --runnable-height: 75vh;
+  --data-format-chart-height: 50vh;
+  --chart-aspect-ratio: 4 / 3;
+  --shimmer-duration: 1.4s;
+  --tooltip-max-width: 560px;
+  --tooltip-max-height: 400px;
+  --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --color-scrollbar: rgba(0, 0, 0, 0.25);
+  --scrollbar-width: 6px;
+  --scrollbar-inset: 2px;
+  --z-scrollbar: 1200;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+.overlay-scrollbar {
+  position: fixed;
+  z-index: var(--z-scrollbar);
+  width: var(--scrollbar-width);
+  margin-left: calc(-1 * (var(--scrollbar-width) + var(--scrollbar-inset)));
+  border-radius: var(--radius-pill);
+  background: var(--color-scrollbar);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--text-primary);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+}
+
+.page h2,
+.page h3 {
+  text-align: center;
+  scroll-margin-top: var(--nav-height);
+}
+
+.page h2 {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-h2);
+}
+
+.page h3 {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+
+/* Sections sit in a category div, outside .page's flex gap. */
+.page > div > :is(h2, h3) + .setup-cell {
+  margin-top: var(--space-2);
+}
+
+.page h3 ~ h3 {
+  margin-top: var(--space-6);
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-small);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.skeleton {
+  width: 100%;
+  aspect-ratio: var(--chart-aspect-ratio);
+  max-height: var(--runnable-height);
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-shimmer) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer var(--shimmer-duration) linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

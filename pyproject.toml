@@ -4,29 +4,37 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shirin"
-version = "3.0.0"
+version = "4.0.0"
 description = "A data analysis toolkit for statistical computing, visualization, and SQL operations"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "matplotlib",
-    "seaborn",
     "numpy",
-    "pandas",
-    "ipykernel",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+sql = [
     "ibm-db-sa",
-    "sqlalchemy",
-    "pyarrow",
+    "sqlalchemy>=2.0",
+    "pyarrow>=14",
+    "python-dotenv>=1.2.1",
 ]
 
 [dependency-groups]
 dev = [
+    "shirin[sql]",
+    "ipykernel",
     "jupyter",
     "pytest>=8.4.2",
+    "fonttools",
 ]
 
 [tool.setuptools]
 include-package-data = false
+
+[tool.setuptools.package-data]
+shirin = ["assets/fonts/*.woff2", "assets/fonts/*.json"]
 
 [tool.setuptools.packages.find]
 include = ["shirin*"]
@@ -34,5 +42,4 @@ exclude = ["tests*", "docs*", "scripts*"]
 
 [tool.setuptools.exclude-package-data]
 "*" = ["*.ipynb"]
-
 

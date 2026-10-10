@@ -1,183 +1,105 @@
-import matplotlib.pyplot as plt
-from matplotlib.container import BarContainer
-from matplotlib.patches import Patch
 from typing import Dict, List, Optional
 import pandas as pd
 
-from ...config import FontSizes, TextColors
-from ....stats.number_format import format_thousands
+from ...config import FontSizes, Layout, TextColors
+from ...svg import Chart, Rect, Text
+from ....number_format import format_compact, format_percentage, format_thousands
 from .text_contrast import get_text_color_for_background
 
 
-
-def _calculate_label_offset(
-    patches: List[Patch], label_offset: float, orientation: str
-) -> float:
-    dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
-    max_dimension = max(getattr(p, dimension_getter[orientation])() for p in patches)
-    return max_dimension * label_offset
+def _length(rect: Rect, orientation: str) -> float:
+    return rect.height if orientation == 'vertical' else rect.width
 
 
-def _format_labels(
-    patches: List[Patch],
-    label_offset: float,
-    formatting: str,
-    orientation: str,
-    suffix: Optional[str] = None,
-) -> None:
-    if formatting == 'percentage':
-        dimension_getter = {'vertical': 'get_height', 'horizontal': 'get_width'}
-        total_dimension = sum(getattr(p, dimension_getter[orientation])() for p in patches)
-
-    for patch in patches:
-        dimension = patch.get_height() if orientation == 'vertical' else patch.get_width()
-        if dimension > 0:
-            if formatting == 'totals':
-                text: str = format_thousands(dimension)
-
-            elif formatting == 'percentage':
-                percentage = (dimension / total_dimension * 100) if total_dimension > 0 else 0
-                text = f'{percentage:,.1f}%'.replace(',', '.')
-            if suffix is not None and suffix.strip() != '':
-                text = f"{text} {suffix.strip()}"
-            _add_text(patch, dimension + label_offset, text, orientation)
-
-
-def _add_text(
-    patch: Patch,
-    position: float,
-    text: str,
-    orientation: str,
-) -> None:
+def _add_text(chart: Chart, rect: Rect, text: str, orientation: str, short_text: Optional[str] = None) -> None:
+    gap = Layout.DATALABEL_GAP
     if orientation == 'vertical':
-        plt.text(
-            patch.get_x() + patch.get_width() / 2.0,
-            position,
-            text,
-            ha='center',
-            va='bottom',
-            fontsize=FontSizes.DATALABELS,
-            color=TextColors.LIGHT_GREY,
-        )
-    elif orientation == 'horizontal':
-        plt.text(
-            position,
-            patch.get_y() + patch.get_height() / 2.0,
-            text,
-            ha='left',
-            va='center',
-            fontsize=FontSizes.DATALABELS,
-            color=TextColors.LIGHT_GREY,
-        )
+        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap, short_text=short_text)
+    else:
+        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
+    chart.texts.append(label)
 
 
 def format_datalabels(
-    plot: BarContainer,
-    label_offset: float = 0.01,
+    chart: Chart,
     formatting: str = 'totals',
     orientation: str = 'vertical',
     suffix: Optional[str] = None,
 ) -> None:
-    patches: List[Patch] = plot.patches
-    label_offset = _calculate_label_offset(patches, label_offset, orientation)
-    _format_labels(patches, label_offset, formatting, orientation, suffix=suffix)
+    rects = chart.rects
+    lengths = [_length(r, orientation) for r in rects]
+    total = sum(lengths)
+
+    for rect, length in zip(rects, lengths):
+        if length <= 0:
+            continue
+        if formatting == 'percentage':
+            _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
+        else:
+            _add_text(chart, rect, _with_suffix(format_thousands(length), suffix), orientation, _with_suffix(format_compact(length), suffix))
 
 
-def _format_stacked_percentage(value_percentage: float, suffix: Optional[str]) -> str:
+def _with_suffix(text: str, suffix: Optional[str]) -> str:
+    return f'{text} {suffix.strip()}' if suffix and suffix.strip() else text
+
+
+def _percentage_label(percentage: float, decimals: int, suffix: Optional[str]) -> str:
+    """A suffix replaces the '%' sign; an empty suffix drops it."""
     if suffix is None:
-        return f'{value_percentage:.0f}%'
-    if suffix.strip() == '':
-        return f'{value_percentage:.0f}'
-    return f'{value_percentage:.0f} {suffix.strip()}'
+        return format_percentage(percentage, decimals)
+    return _with_suffix(format_thousands(percentage, decimals), suffix)
+
+
+def _add_stacked_labels(
+    chart: Chart,
+    pivot_data: pd.DataFrame,
+    percentages,
+    palette: Dict,
+    orientation: str,
+    suffix: Optional[str],
+    threshold: float,
+    row_colors: Optional[List[str]] = None,
+) -> None:
+    """row_colors: background per row, overriding the palette color of each column."""
+    for index, (row_values, row_percentages) in enumerate(zip(pivot_data.values, percentages)):
+        cumulative_sum = 0
+        for category, value, value_percentage in zip(pivot_data.columns, row_values, row_percentages):
+            cumulative_sum += value
+            if value < threshold:
+                continue
+            center = cumulative_sum - value / 2
+            x, y = (center, index) if orientation == 'horizontal' else (index, center)
+            chart.texts.append(Text(
+                x,
+                y,
+                _percentage_label(value_percentage, 0, suffix),
+                get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
+                FontSizes.DATALABELS,
+            ))
 
 
 def format_datalabels_stacked(
-    plot: BarContainer,
+    chart: Chart,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
 ) -> None:
-    max_count = pivot_data.sum(axis=1).max()
-    threshold = 0.04 * max_count
-    ax = plt.gca()
-
-    for index, row_values in enumerate(pivot_data.values):
-        total = row_values.sum()
-        cumulative_sum = 0
-
-        for col_index, value in enumerate(row_values):
-            category = pivot_data.columns[col_index]
-            bg_color = palette.get(category, '#000000')
-            text_color = get_text_color_for_background(bg_color)
-
-            value_percentage = (value / total) * 100
-            cumulative_sum += value
-
-            if value >= threshold:
-                text = _format_stacked_percentage(value_percentage, suffix)
-                if orientation == 'horizontal':
-                    ax.text(
-                        cumulative_sum - value / 2,
-                        index,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
-                else:
-                    ax.text(
-                        index,
-                        cumulative_sum - value / 2,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
+    values = pivot_data.values
+    percentages = values / values.sum(axis=1, keepdims=True) * 100
+    threshold = Layout.STACKED_LABEL_MIN_SHARE * pivot_data.sum(axis=1).max()
+    _add_stacked_labels(chart, pivot_data, percentages, palette, orientation, suffix, threshold)
 
 
 def format_datalabels_stacked_normalized(
-    plot: BarContainer,
+    chart: Chart,
     pivot_data: pd.DataFrame,
     palette: Dict,
     orientation: str = 'horizontal',
     suffix: Optional[str] = None,
+    row_colors: Optional[List[str]] = None,
 ) -> None:
-    threshold = 0.04
-    ax = plt.gca()
-
-    for index, row_values in enumerate(pivot_data.values):
-        cumulative_sum = 0
-
-        for col_index, value in enumerate(row_values):
-            category = pivot_data.columns[col_index]
-            bg_color = palette.get(category, '#000000')
-            text_color = get_text_color_for_background(bg_color)
-
-            value_percentage = value * 100
-            cumulative_sum += value
-
-            if value >= threshold:
-                text = _format_stacked_percentage(value_percentage, suffix)
-                if orientation == 'horizontal':
-                    ax.text(
-                        cumulative_sum - value / 2,
-                        index,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
-                else:
-                    ax.text(
-                        index,
-                        cumulative_sum - value / 2,
-                        text,
-                        ha='center',
-                        va='center',
-                        color=text_color,
-                        fontsize=FontSizes.DATALABELS,
-                    )
+    _add_stacked_labels(
+        chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix,
+        threshold=Layout.STACKED_LABEL_MIN_SHARE, row_colors=row_colors,
+    )

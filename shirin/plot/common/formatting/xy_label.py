@@ -1,29 +1,8 @@
-import matplotlib.pyplot as plt
-from ...config import TextColors, FontSizes
-from matplotlib.axes import Axes
+from typing import Optional
 
-plt.rcParams['axes.labelsize'] = FontSizes.XYLABEL
+from ...svg import Chart
 
-def format_xy_labels(
-    plot: Axes, 
-    xlabel: str = 'Count', 
-    x_labelpad: int = 10, 
-    ylabel: str = 'Count', 
-    y_offset: float = 0.5, 
-    y_labelpad: int = 20
-) -> None:
-    plt.xlabel(
-        xlabel, 
-        ha='center', 
-        x=0.5, 
-        labelpad=x_labelpad, 
-        fontsize=FontSizes.XYLABEL, 
-        color=TextColors.BLACK
-    )
-    plt.ylabel(
-        ylabel, 
-        y=y_offset, 
-        labelpad=y_labelpad, 
-        fontsize=FontSizes.XYLABEL, 
-        color=TextColors.BLACK
-    )
+
+def format_xy_labels(chart: Chart, x_axis_label: Optional[str], y_axis_label: Optional[str]) -> None:
+    chart.x.label = x_axis_label
+    chart.y.label = y_axis_label

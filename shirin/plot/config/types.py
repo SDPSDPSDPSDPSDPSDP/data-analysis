@@ -1,20 +1,10 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 
-class OrderType(str, Enum):
+class Sort(str, Enum):
     FREQUENCY = 'frequency'
     ALPHABETICAL = 'alphabetical'
-
-
-class StackedLabelType(str, Enum):
-    STANDARD = 'standard'
-    PERCENTAGE = 'percentage'
-
-
-class FigureSize(str, Enum):
-    DYNAMIC = 'dynamic'
-    STANDARD = 'standard'
 
 
 class FillMissingValues(str, Enum):
@@ -28,8 +18,7 @@ class TimeGroupBy(str, Enum):
     DAY = 'day'
 
 
-OrderTypeInput = Union[OrderType, str]
-StackedLabelTypeInput = Optional[Union[StackedLabelType, str]]
-FigureSizeInput = Union[FigureSize, str, float]
+SortInput = Union[Sort, str]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
 TimeGroupByInput = Union[TimeGroupBy, str]
+TitleInput = Union[str, List[str]]

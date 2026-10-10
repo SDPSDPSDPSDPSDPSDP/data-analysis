@@ -1,55 +1,28 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 from .colors import Colors
 
+PaletteInput = Dict[str, Union[Dict[Any, str], str]]
+LabelMappingInput = Dict[str, Dict[Any, str]]
 
-class Palette:
-    """Base class for defining per-column palettes.
+# Plain dicts instead of user subclasses: class-level dicts trip linters (Ruff RUF012) in user code.
+DEFAULT_PALETTE: PaletteInput = {
+    'is_correct': {True: Colors.GOOD_GREEN, False: Colors.BAD_RED},
+}
 
-    Built-in palettes (``good_bad``, ``good_bad_dark``) are ready to use directly
-    or as a starting point when subclassing.
-
-    Subclass this and add class-level dicts where each attribute name is a
-    column name used as ``hue`` (or ``x``/``col``) in plot calls.
-
-    Example::
-
-        class MyPalettes(Palette):
-            category: dict = {"A": "#57ccff", "B": "#e3c2ff"}
-            is_correct: dict = Palette.is_correct
-
-        plot = PlotGraphs(palette=MyPalettes, label_mapping=MyLabels)
-
-    Per-call ``palette=`` / ``label_map=`` arguments always take priority over
-    the class-level defaults.
-    """
-
-    is_correct: Dict[Any, str] = {
-        True:  Colors.GOOD_GREEN,
-        False: Colors.BAD_RED,
-    }
-
-    @classmethod
-    def get(cls, column: str) -> Union[Dict[Any, str], str, None]:
-        return vars(cls).get(column)
+DEFAULT_LABEL_MAPPING: LabelMappingInput = {
+    'is_correct': {True: 'Correct', False: 'Incorrect'},
+}
 
 
-class LabelMapping:
-    """Base class for per-column label mappings.
-
-    Same structure as :class:`Palette` — each attribute name is a column name.
-
-    Example::
-
-        class MyLabels(LabelMapping):
-            is_correct: dict = {True: "Good", False: "Bad"}
-    """
-
-    is_correct: Dict[Any, str] = {
-        True:  'Correct',
-        False: 'Incorrect',
-    }
-
-    @classmethod
-    def get(cls, column: str) -> Union[Dict[Any, str], None]:
-        return vars(cls).get(column)
+def merge_column_config(name: str, defaults: Dict[str, Any], user: Optional[Dict[str, Any]], allowed: Tuple[type, ...]) -> Dict[str, Any]:
+    """Validate a ``{column: mapping}`` dict and layer it over the built-in defaults."""
+    if user is None:
+        return dict(defaults)
+    if not isinstance(user, dict):
+        raise TypeError(f"{name} must be a dict of {{column: mapping}}, got {type(user).__name__}")
+    for column, value in user.items():
+        if not isinstance(value, allowed):
+            expected = ' or '.join(t.__name__ for t in allowed)
+            raise TypeError(f"{name}[{column!r}] must be a {expected}, got {type(value).__name__}")
+    return {**defaults, **user}

@@ -1,9 +1,8 @@
 import pandas as pd
-import pytest
 from shirin.plot.common.sorting import (
     sort_alphabetically,
     sort_by_frequency,
-    create_colors_list,
+    palette_colors,
 )
 
 
@@ -38,23 +37,17 @@ def test_sort_by_frequency():
     
     result = sort_by_frequency(df, ascending=False)
     
-    # B should be first (sum=60), then C (sum=15), then A (sum=6)
-    # The function sorts by sum, so index 2 (B=60), index 1 (B=20), index 0 (B=10)
     assert list(result.index) == [2, 1, 0]
     assert 'A' in result.columns
-    assert '_order' not in result.columns  # Should be removed
+    assert '_order' not in result.columns
 
 
-def test_create_colors_list():
+def test_palette_colors():
     """Test creating color list from palette."""
-    df = pd.DataFrame({
-        'red': [1, 2],
-        'blue': [3, 4]
-    })
     palette = {'red': '#FF0000', 'blue': '#0000FF'}
-    
-    result = create_colors_list(df, palette)
-    
+
+    result = palette_colors(palette, ['red', 'blue'])
+
     assert result == ['#FF0000', '#0000FF']
 
 

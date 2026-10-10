@@ -1,80 +1,54 @@
 import pandas as pd
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterable, Optional
 
-from ..config import OrderTypeInput
-
-
-def is_all_numeric(values: list) -> tuple[bool, list[float]]:
-    numeric_values = []
-    for v in values:
-        try:
-            numeric_values.append(float(str(v)))
-        except (ValueError, TypeError):
-            return False, []
-    return True, numeric_values
+from ..config import SortInput
 
 
-def is_all_numeric(values: list) -> tuple[bool, list[float]]:
-    numeric_values = []
-    for v in values:
-        try:
-            numeric_values.append(float(str(v)))
-        except (ValueError, TypeError):
-            return False, []
-    return True, numeric_values
+def _as_float(value: Any) -> float:
+    return float(str(value))
 
 
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
+    """Sort numerically when every value parses as a number, otherwise as plain values."""
     values_list = list(values)
-    is_numeric, numeric_vals = is_all_numeric(values_list)
-    
-    if is_numeric:
-        sorted_pairs = sorted(zip(numeric_vals, values_list), key=lambda x: x[0], reverse=not ascending)
-        return [original_val for _, original_val in sorted_pairs]
-    else:
+    try:
+        return sorted(values_list, key=_as_float, reverse=not ascending)
+    except (ValueError, TypeError):
         return sorted(values_list, reverse=not ascending)
 
 
-def _sort_dataframe_alphabetically(df_pivot: pd.DataFrame, ascending: bool = True) -> pd.DataFrame:
-    sorted_index = sort_alphabetically(df_pivot.index, ascending=ascending)
-    return df_pivot.loc[sorted_index]
+def get_order(
+    sort: SortInput,
+    df: pd.DataFrame,
+    column: str,
+    value_column: Optional[str] = None,
+) -> Optional[list]:
+    """Category order: by total (value sum or count), alphabetical, or None (data order)."""
+    if sort == 'frequency':
+        totals = df.groupby(column)[value_column].sum() if value_column else df[column].value_counts()
+        return list(totals.sort_values(ascending=False).index)
+    if sort == 'alphabetical':
+        return sort_alphabetically(df[column].unique())
+    return None
 
 
 def sort_by_frequency(df_pivot: pd.DataFrame, ascending: bool = False) -> pd.DataFrame:
-    df_pivot['_order'] = df_pivot.sum(axis=1)
-    df_sorted = df_pivot.sort_values(by='_order', ascending=ascending)
-    return df_sorted.drop(columns=['_order'])
+    return df_pivot.loc[df_pivot.sum(axis=1).sort_values(ascending=ascending).index]
 
 
-def sort_pivot_table(df_pivot: pd.DataFrame, order_type: OrderTypeInput, ascending: bool = False) -> pd.DataFrame:
-    if order_type == 'frequency':
+def sort_pivot_table(df_pivot: pd.DataFrame, sort: Optional[SortInput], ascending: bool = False) -> pd.DataFrame:
+    if sort == 'frequency':
         return sort_by_frequency(df_pivot, ascending=ascending)
-    if order_type == 'alphabetical':
-        return _sort_dataframe_alphabetically(df_pivot, ascending=ascending)
+    if sort == 'alphabetical':
+        return df_pivot.loc[sort_alphabetically(df_pivot.index, ascending=ascending)]
     return df_pivot
 
 
-def apply_label_mapping(df: pd.DataFrame, label_map: Optional[Dict[Any, str]]) -> pd.DataFrame:
-    if not label_map:
-        return df
-    df = df.copy()
-    # Convert column names to strings for consistent lookup
-    df.columns = [str(col) for col in df.columns]
-    df.columns = [label_map.get(col, col) for col in df.columns]
-    return df
+def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> list[str]:
+    """Color per key; every plot raises the same KeyError when the palette misses a key."""
+    keys = [str(key) for key in keys]
+    missing = [key for key in keys if key not in palette]
+    if missing:
+        raise KeyError(f"Palette missing keys: {missing}. Available keys: {list(palette.keys())}")
+    return [palette[key] for key in keys]
 
-
-def create_colors_list(df: pd.DataFrame, palette: Dict[Any, str]) -> list[str]:
-    colors = []
-    for col in df.columns:
-        # Convert column name to string for consistent lookup
-        str_col = str(col)
-        if str_col in palette:
-            colors.append(palette[str_col])
-        else:
-            raise KeyError(f"Column '{col}' not found in palette. Available keys: {list(palette.keys())}")
-    return colors
-
-
-def create_default_label_map(df: pd.DataFrame, hue: str) -> Dict[Any, Any]:
-    return {str(key): str(key) for key in df[hue].unique()}
