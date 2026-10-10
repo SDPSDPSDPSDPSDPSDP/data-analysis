@@ -128,10 +128,6 @@
   min-height: 0;
 }
 
-.runnable > .code-block {
-  align-self: start;
-}
-
 /* Bounded height lets .cm-scroller scroll long code instead of clipping. */
 .runnable > .code-block .cm-editor {
   max-height: var(--runnable-height);

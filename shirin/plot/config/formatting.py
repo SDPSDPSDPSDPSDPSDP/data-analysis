@@ -36,6 +36,7 @@ class Layout:
     WEDGE_SEAM = 1  # stroke in the slice's own color: anti-aliased edges of touching slices leave a white seam
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
     HAIRLINE = 0.5  # stroke width of grid lines and rect outlines
+    AXIS_MARGIN = 0.05  # share of the data range padded on each side of an auto-scaled axis
 
 
 class Marks:

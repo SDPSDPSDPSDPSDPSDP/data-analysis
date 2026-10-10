@@ -34,7 +34,6 @@ class StackableCategoricalPlot(AbstractPlot):
     """Shared draw/format logic for count and bar plots (plain or stacked by hue)."""
 
     options: CategoricalPlotOptions
-    _horizontal_width = Marks.HORIZONTAL_BAR_WIDTH
 
     def __init__(self, options: CategoricalPlotOptions):
         super().__init__(options)
@@ -73,9 +72,9 @@ class StackableCategoricalPlot(AbstractPlot):
             return self._draw_stacked(chart, data)
         return self._draw_unstacked(chart, data)
 
-    def _prepare_stacked(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Pivot to one column per hue value and one row per category, in drawing order."""
-        return prepare_stacked_data(
+    def _draw_stacked(self, chart: Chart, data: pd.DataFrame) -> Any:
+        horizontal = self.options.orientation == 'horizontal'
+        df_prepared = prepare_stacked_data(
             data,
             self.options.hue,  # type: ignore[arg-type]
             self.options.axis_column,
@@ -83,16 +82,12 @@ class StackableCategoricalPlot(AbstractPlot):
             value_col=self._value_column(),
             orientation=self.options.orientation,
         )
-
-    def _draw_stacked(self, chart: Chart, data: pd.DataFrame) -> Any:
-        horizontal = self.options.orientation == 'horizontal'
-        df_prepared = self._prepare_stacked(data)
         plot = renderer.render_stacked_barplot(
             chart,
             df=df_prepared,
             horizontal=horizontal,
             colors=palette_colors(self._palette, df_prepared.columns),  # type: ignore[arg-type]
-            width=self._horizontal_width if horizontal else Marks.BAR_WIDTH,
+            width=Marks.HORIZONTAL_BAR_WIDTH if horizontal else Marks.BAR_WIDTH,
         )
         self._df_unlabeled = df_prepared
         return plot

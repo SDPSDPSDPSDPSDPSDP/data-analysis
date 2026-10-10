@@ -15,7 +15,6 @@ from .ticks import date_ticks, nice_ticks
 
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
-MARGIN = 0.05
 _CLIP_IDS = itertools.count()
 
 Ticks = List[Tuple[float, str]]
@@ -30,7 +29,7 @@ def _limits(axis: Axis, values: List[float]) -> Tuple[float, float]:
     lo, hi = min(values), max(values)
     if lo == hi:
         lo, hi = lo - 0.5, hi + 0.5
-    pad = (hi - lo) * MARGIN
+    pad = (hi - lo) * Layout.AXIS_MARGIN
     return (lo if lo in axis.sticky else lo - pad, hi if hi in axis.sticky else hi + pad)
 
 

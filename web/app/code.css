@@ -65,7 +65,6 @@
 
 .chart > .copy-button:hover {
   background: var(--color-overlay-button-hover);
-  color: var(--text-on-dark-pure);
 }
 
 /* overflow: hidden clips the inner scroller to the rounded corners. */

@@ -25,50 +25,20 @@ def _count_fruit(df: DataFrame) -> DataFrame:
 
 
 def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
-    """Creates dataframe with 2 rows per year (one for each type: True/False)."""
-    
-    start_year = 2000
-    end_year = 2023
-    years = range(start_year, end_year)
-    
-    cutoff_year = 2010
-    
+    """Two rows per year 2000-2022 (example_hue_3 True/False) with cumulative document counts."""
     rows = []
-    cumul_true = 0
-    cumul_false = 0
-    
-    for year in years:
-        hue_value = year < cutoff_year
-        
-        count_true = int(rng.integers(80, 150))
-        count_false = int(rng.integers(20, 60))
-        
-        cumul_true += count_true
-        cumul_false += count_false
-        
-        rows.append({
-            'year': year,
-            'cumul_total_docs': cumul_true,
-            'example_hue_4': hue_value,
-            'example_hue_3': True
-        })
-        rows.append({
-            'year': year,
-            'cumul_total_docs': cumul_false,
-            'example_hue_4': hue_value,
-            'example_hue_3': False
-        })
-    
+    cumul = {True: 0, False: 0}
+    for year in range(2000, 2023):
+        cumul[True] += int(rng.integers(80, 150))
+        cumul[False] += int(rng.integers(20, 60))
+        for flag in (True, False):
+            rows.append({'year': year, 'cumul_total_docs': cumul[flag], 'example_hue_4': year < 2010, 'example_hue_3': flag})
     return pd.DataFrame(rows)
 
 
 def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
-    df = _create_fruit_dataframe(rng)
-
-    df_documents_by_year = _create_documents_by_year_dataframe(rng)
-    
-    return df, df_documents_by_year
+    return _create_fruit_dataframe(rng), _create_documents_by_year_dataframe(rng)
 
 
 def generate_time_series(
@@ -127,13 +97,12 @@ def _build_lazy_frames() -> dict:
         'df': df,
         'df_documents_by_year': df_documents_by_year,
         'df_fruit_counts': _count_fruit(df),
-        'df_time': generate_time_series(yearly_growth=0.5),
+        'df_time': generate_time_series(),
     }
 
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    frames = _build_lazy_frames() if name in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time') else {}
-    if name in frames:
-        return frames[name].copy()
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    if name not in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time'):
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    return _build_lazy_frames()[name].copy()

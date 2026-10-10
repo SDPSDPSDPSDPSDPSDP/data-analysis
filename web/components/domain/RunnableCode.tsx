@@ -86,18 +86,11 @@ export default function RunnableCode({ initialCode, setup }: Props) {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (visible) execute(code);
-  }, [visible]);
-
   // Running a setup cell (like after picking a palette color) re-renders the chart.
   // An example that has not run yet picks up the new setup when it becomes visible.
-  const lastSetup = useRef(setup);
   useEffect(() => {
-    if (lastSetup.current === setup) return;
-    lastSetup.current = setup;
     if (visible) execute(code);
-  }, [setup]);
+  }, [visible, setup]);
 
   async function execute(source: string) {
     setResult(await run(`${setup}\n${source}`));

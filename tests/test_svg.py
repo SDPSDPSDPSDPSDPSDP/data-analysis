@@ -111,3 +111,10 @@ def test_legend_value_drawn_lighter_after_label() -> None:
     svg = to_svg(c)
     assert 'fill="#444444">Apple<' in svg
     assert 'fill="#aaaaaa">9.027<' in svg
+
+
+def test_categorical_tick_label_map_requires_tick_labels() -> None:
+    from shirin.plot.common.formatting import format_categorical_tick_labels
+
+    with pytest.raises(ValueError, match="no tick labels"):
+        format_categorical_tick_labels(Chart(width=1, plot_height=1), {'a': 'A'}, axis='x')
