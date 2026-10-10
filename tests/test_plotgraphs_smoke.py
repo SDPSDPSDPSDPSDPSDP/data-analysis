@@ -87,3 +87,12 @@ def test_render_does_not_mutate_caller_options(df: pd.DataFrame) -> None:
     create_plot('count', options).render()
     assert options.palette == before.palette
     assert options.label_map is None
+
+
+@pytest.mark.filterwarnings("error::FutureWarning")
+@pytest.mark.parametrize("palette", [None, '#123456'])
+def test_hue_without_dict_palette_has_no_seaborn_warning(df: pd.DataFrame, palette) -> None:
+    options = CountPlotOptions(df=df, axis_column='category', hue='group', palette=palette)
+    rendered = create_plot('count', options)
+    rendered.render()
+    assert rendered._color is None

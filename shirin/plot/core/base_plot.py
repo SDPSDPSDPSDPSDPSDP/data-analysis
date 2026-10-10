@@ -89,4 +89,10 @@ class AbstractPlot(ABC):
             if no_hue_color is not None:
                 self._color = no_hue_color
             return df
+        if self._palette is None:
+            # seaborn deprecated color= with hue: a single color becomes a gradient palette,
+            # no palette falls back to seaborn's default categorical colors.
+            if isinstance(self.options.palette, str):
+                self._palette = f'dark:{self.options.palette}'  # type: ignore[assignment]
+            self._color = None
         return ensure_column_is_string(df, self.options.hue)
