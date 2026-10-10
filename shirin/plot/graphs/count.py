@@ -29,9 +29,9 @@ class CountPlotsMixin:
         df: pd.DataFrame,
         x: str,
         hue: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = 'Count',
-        plot_legend: bool = True,
+        x_axis_label: str = '',
+        y_axis_label: str = 'Count',
+        legend: bool = False,
         title: str = '',
         subtitle: str = '',
         top_n: Optional[int] = None,
@@ -52,9 +52,9 @@ class CountPlotsMixin:
             df: DataFrame containing the data to plot.
             x: Column name for the x-axis categories.
             hue: Column name for grouping data by color. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Count'`*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
+            x_axis_label: Label for the x-axis. *Default: `''`*.
+            y_axis_label: Label for the y-axis. *Default: `'Count'`*.
+            legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
@@ -81,9 +81,9 @@ class CountPlotsMixin:
             hue=hue,
             palette=palette,
             label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
             title=title,
             subtitle=subtitle,
             top_n=top_n,
@@ -99,9 +99,9 @@ class CountPlotsMixin:
         df: pd.DataFrame,
         y: str,
         hue: Optional[str] = None,
-        xlabel: str = 'Count',
-        ylabel: str = '',
-        plot_legend: bool = True,
+        x_axis_label: str = 'Count',
+        y_axis_label: str = '',
+        legend: bool = False,
         title: str = '',
         subtitle: str = '',
         top_n: Optional[int] = None,
@@ -122,9 +122,9 @@ class CountPlotsMixin:
             df: DataFrame containing the data to plot.
             y: Column name for the y-axis categories.
             hue: Column name for grouping data by color. *Optional*.
-            xlabel: Label for the x-axis. *Default: `'Count'`*.
-            ylabel: Label for the y-axis. *Default: `''`*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
+            x_axis_label: Label for the x-axis. *Default: `'Count'`*.
+            y_axis_label: Label for the y-axis. *Default: `''`*.
+            legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
             top_n: Show only the top N most frequent categories. *Optional*.
@@ -151,9 +151,9 @@ class CountPlotsMixin:
             hue=hue,
             palette=palette,
             label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
             title=title,
             subtitle=subtitle,
             top_n=top_n,

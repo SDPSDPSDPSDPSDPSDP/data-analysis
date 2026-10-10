@@ -70,9 +70,9 @@ class BasePlotOptions:
     df: pd.DataFrame
     palette: Optional[Union[Dict[Any, str], str]] = None
     label_map: Optional[Dict[Any, str]] = None
-    xlabel: str = ''
-    ylabel: str = ''
-    plot_legend: bool = True
+    x_axis_label: str = ''
+    y_axis_label: str = ''
+    legend: bool = False
     hue: Optional[str] = None
     title: str = ''
     subtitle: str = ''

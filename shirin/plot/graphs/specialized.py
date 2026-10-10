@@ -45,8 +45,8 @@ class SpecializedPlotsMixin:
         x: str,
         group_by: TimeGroupByInput = 'day',
         palette: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = 'Total',
+        x_axis_label: str = '',
+        y_axis_label: str = 'Total',
         plot_type: str = 'bar',
         display_month: bool = True,
         cumulative: bool = False,
@@ -65,8 +65,8 @@ class SpecializedPlotsMixin:
             group_by: Time period to group counts by. **Options:** `'year'`, `'month'`, `'day'`.
                 *Default: `'day'`*.
             palette: Color for the bars (single color string, e.g. `'#FF5733'`). *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Total'`*.
+            x_axis_label: Label for the x-axis. *Default: `''`*.
+            y_axis_label: Label for the y-axis. *Default: `'Total'`*.
             plot_type: Chart type. **Options:** `'bar'`, `'line'`. *Default: `'bar'`*.
             display_month: Show month ticks (with year labels below) when grouping by month;
                 `False` shows only years. *Default: `True`*.
@@ -84,8 +84,8 @@ class SpecializedPlotsMixin:
             x=x,
             group_by=group_by,
             palette=palette,
-            xlabel=xlabel,
-            ylabel=ylabel,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
             plot_type=plot_type,
             display_month=display_month,
             cumulative=cumulative,
@@ -106,7 +106,7 @@ class SpecializedPlotsMixin:
         accuracy_label: str = '',
         orientation: str = 'vertical',
         reverse_order: bool = False,
-        plot_legend: bool = False,
+        legend: bool = False,
         suffix: Optional[str] = None,
         title: str = '',
         subtitle: str = '',
@@ -131,7 +131,7 @@ class SpecializedPlotsMixin:
                 - Vertical default is highest accuracy first; with ``True`` lowest is first.
                 - Horizontal default is highest at the top; with ``True`` lowest is at the top.
                 *Default: ``False``*.
-            plot_legend: Whether to show the legend. *Default: ``False``*.
+            legend: Whether to show the legend. *Default: ``False``*.
             suffix: Optional suffix appended to stacked labels.
                 When omitted, accuracy labels keep their default ``%`` formatting.
             title: Chart title above the plot. *Default: ``''``*.
@@ -154,11 +154,11 @@ class SpecializedPlotsMixin:
             axis_column=experiment,
             value_column=accuracy,
             palette={'Correct': color_correct, 'Incorrect': color_incorrect},
-            xlabel=experiment_label,
-            ylabel=accuracy_label,
+            x_axis_label=experiment_label,
+            y_axis_label=accuracy_label,
             orientation=orientation,
             reverse_order=reverse_order,
-            plot_legend=plot_legend,
+            legend=legend,
             suffix=suffix,
             title=title,
             subtitle=subtitle,

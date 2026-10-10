@@ -120,14 +120,16 @@ def test_barplot_uses_mean_per_category() -> None:
 
 
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs(font='satoshi').countplot_x(df, x='category', hue='group', title='Totals', label_map={'x': 'Ex'})
+    PlotGraphs(font='satoshi').countplot_x(
+        df, x='category', hue='group', title='Totals', label_map={'x': 'Ex'}, legend=True
+    )
     assert '>Totals</text>' in shown[0]
     assert '>Ex</text>' in shown[0]
     assert '@font-face' in shown[0]
 
 
 def test_hidden_legend(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().countplot_x(df, x='category', hue='group', plot_legend=False)
+    PlotGraphs().countplot_x(df, x='category', hue='group')
     assert '>x</text>' not in shown[0]
 
 

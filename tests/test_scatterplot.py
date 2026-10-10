@@ -39,8 +39,8 @@ class TestScatterPlotRender:
             df=df,
             x="height",
             y="weight",
-            xlabel="Height",
-            ylabel="Weight",
+            x_axis_label="Height",
+            y_axis_label="Weight",
         )
 
         plot = ScatterPlot(options)
@@ -62,7 +62,7 @@ class TestScatterPlotRender:
             x="height",
             y="weight",
             hue="group",
-            plot_legend=True,
+            legend=True,
         )
 
         plot = ScatterPlot(options)

@@ -85,7 +85,7 @@ class TimePlot(AbstractPlot):
         return {'year': 300, 'month': 25}.get(self.options.group_by, 0.8)
 
     def format_plot(self, plot: Any) -> None:
-        format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
+        format_xy_labels(plot, x_axis_label=self.options.x_axis_label, y_axis_label=self.options.y_axis_label)
         format_ticks(plot, y_grid=True, numeric_y=True)
         self._format_date_axis(plot)
 

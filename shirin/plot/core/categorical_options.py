@@ -85,7 +85,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
     """Always a 100%-stacked plot of hue shares; `stacked`/`stacked_labels` are ignored."""
 
     top_n: Optional[int] = None
-    ylabel: str = 'Percentage'
+    y_axis_label: str = 'Percentage'
 
     def validate(self) -> None:
         super().validate()

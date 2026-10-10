@@ -117,7 +117,7 @@ class TestAxisLabelMapping:
             axis_column='is_contentious',
             orientation='vertical',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
-            plot_legend=False,
+            legend=False,
             show_labels=False,
         )
 
@@ -143,7 +143,7 @@ class TestAxisLabelMapping:
             value='count',
             orientation='horizontal',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
-            plot_legend=False,
+            legend=False,
             percentage_labels=False,
         )
 

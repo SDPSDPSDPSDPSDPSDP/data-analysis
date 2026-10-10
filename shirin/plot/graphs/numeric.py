@@ -14,12 +14,12 @@ class NumericPlotsMixin:
         df: pd.DataFrame,
         x: str,
         hue: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = 'Count',
+        x_axis_label: str = '',
+        y_axis_label: str = 'Count',
         xlimit: Optional[Union[float, int]] = None,
         bins: int = 100,
         stacked: Optional[bool] = None,
-        plot_legend: bool = True,
+        legend: bool = False,
         title: str = '',
         subtitle: str = '',
         # injected by @resolve_palette
@@ -32,28 +32,28 @@ class NumericPlotsMixin:
             df: DataFrame containing the data to plot.
             x: Column name with the numeric values.
             hue: Column name for grouping data by color. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Count'`*.
+            x_axis_label: Label for the x-axis. *Default: `''`*.
+            y_axis_label: Label for the y-axis. *Default: `'Count'`*.
             xlimit: Upper bound only: rows with `x` above it are dropped. *Optional*.
             bins: Maximum number of bins; whole-number data gets at most one bin per value.
                 *Default: `100`*.
             stacked: With `hue`, `False` dodges the groups, otherwise they stack. *Optional*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
+            legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
         """
         options = HistogramOptions(
             df=df,
             x=x,
-            xlabel=xlabel,
-            ylabel=ylabel,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
             xlimit=xlimit,
             bins=bins,
             palette=palette,
             label_map=label_map,
             hue=hue,
             stacked=stacked,
-            plot_legend=plot_legend,
+            legend=legend,
             title=title,
             subtitle=subtitle,
         )
@@ -66,9 +66,9 @@ class NumericPlotsMixin:
         x: str,
         y: str,
         hue: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = '',
-        plot_legend: bool = True,
+        x_axis_label: str = '',
+        y_axis_label: str = '',
+        legend: bool = False,
         title: str = '',
         subtitle: str = '',
         rotation: int = 0,
@@ -84,9 +84,9 @@ class NumericPlotsMixin:
             hue=hue,
             palette=palette,
             label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
             title=title,
             subtitle=subtitle,
             rotation=rotation,
@@ -102,9 +102,9 @@ class NumericPlotsMixin:
         y: str,
         hue: Optional[str] = None,
         size: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = '',
-        plot_legend: bool = True,
+        x_axis_label: str = '',
+        y_axis_label: str = '',
+        legend: bool = False,
         title: str = '',
         subtitle: str = '',
         # injected by @resolve_palette
@@ -119,9 +119,9 @@ class NumericPlotsMixin:
             y: Column name for the y-axis values.
             hue: Column name for grouping data by color. *Optional*.
             size: Column name for scaling point size. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `''`*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
+            x_axis_label: Label for the x-axis. *Default: `''`*.
+            y_axis_label: Label for the y-axis. *Default: `''`*.
+            legend: Whether to show the legend. *Default: `False`*.
             title: Chart title above the plot. *Default: `''`*.
             subtitle: Grey line under the title. *Default: `''`*.
         """
@@ -133,9 +133,9 @@ class NumericPlotsMixin:
             size=size,
             palette=palette,
             label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
             title=title,
             subtitle=subtitle,
         )

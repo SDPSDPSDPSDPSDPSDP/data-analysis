@@ -63,15 +63,15 @@ class AccuracyPlot(StackableCategoricalPlot):
 
     def format_plot(self, plot: Any) -> None:
         if self.options.orientation == 'horizontal':
-            format_xy_labels(plot, xlabel=self.options.ylabel, ylabel=self.options.xlabel)
+            format_xy_labels(plot, x_axis_label=self.options.y_axis_label, y_axis_label=self.options.x_axis_label)
             value_axis = plot.x
         else:
-            format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel)
+            format_xy_labels(plot, x_axis_label=self.options.x_axis_label, y_axis_label=self.options.y_axis_label)
             value_axis = plot.y
         format_optional_legend(
             plot,
             hue=self.options.hue,
-            plot_legend=self.options.plot_legend,
+            legend=self.options.legend,
             label_map=self.options.label_map,
         )
 

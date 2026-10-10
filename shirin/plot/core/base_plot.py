@@ -91,12 +91,12 @@ class AbstractPlot(ABC):
         """Axis labels plus hue legend; builds a default label_map from the data when missing."""
         options = self.options
         label_map = options.label_map
-        if label_map is None and options.plot_legend and options.hue is not None:
+        if label_map is None and options.legend and options.hue is not None:
             label_map = create_default_label_map(self._preprocessed_df, options.hue)  # type: ignore[arg-type]
         self._label_map_legend = label_map or None
 
-        format_xy_labels(plot, xlabel=options.xlabel, ylabel=options.ylabel)
-        format_optional_legend(plot, options.hue, options.plot_legend, self._label_map_legend)
+        format_xy_labels(plot, x_axis_label=options.x_axis_label, y_axis_label=options.y_axis_label)
+        format_optional_legend(plot, options.hue, options.legend, self._label_map_legend)
 
     def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:
         """Set _color/_palette and stringify hue so it matches the (stringified) palette keys.
