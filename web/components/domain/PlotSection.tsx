@@ -48,7 +48,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
   );
   const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));
   const Heading = standalone ? "h2" : "h3";
-  return (
+  const heading = (
     <>
       <Heading id={sectionId(title)}>{title}</Heading>
       {setup.map((cell, i) => (
@@ -57,6 +57,20 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           <CodeBlock value={cell.code} />
         </section>
       ))}
+    </>
+  );
+  // Tools: no data format, every example shown.
+  if (dataFormats.length === 0) {
+    return (
+      <>
+        {heading}
+        <div className="tool-examples">{examples.map((example, i) => runnable(example, i))}</div>
+      </>
+    );
+  }
+  return (
+    <>
+      {heading}
       <section className="data-format">
         <div className="setup-cell">
           <h4>{dataFormats.length > 1 ? "Data formats" : "Data format"}</h4>

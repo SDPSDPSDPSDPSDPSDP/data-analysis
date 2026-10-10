@@ -8,6 +8,10 @@ import {
   ChartPie,
   ChevronsDownUp,
   ChevronsUpDown,
+  Database,
+  Hash,
+  Sigma,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
@@ -19,6 +23,10 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   Barplots: ChartBarBig,
   Histograms: ChartArea,
   "Pie charts": ChartPie,
+  Tools: Wrench,
+  "Number formatting": Hash,
+  Statistics: Sigma,
+  "DB2 queries": Database,
 };
 
 type Category = {

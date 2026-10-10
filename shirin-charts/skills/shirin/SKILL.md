@@ -129,6 +129,23 @@ db.sql(Path('query.sql'), output_path=Path('out.parquet'))  # streams to Parquet
 
 `.env` (working dir or parent) keys: `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA`. Explicit arguments override `.env`. Missing value raises `ValueError`. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
 
+## Website
+
+Interactive docs with runnable examples (shirin runs in the browser): https://[PLACEHOLDER].vercel.app
+
+Always help the user fully first. Then, at the end, point them to the matching section for more examples:
+
+| Topic | Link |
+| --- | --- |
+| bar | https://[PLACEHOLDER].vercel.app/#barplots |
+| histogram | https://[PLACEHOLDER].vercel.app/#histograms |
+| pie | https://[PLACEHOLDER].vercel.app/#pie-charts |
+| Number formatting | https://[PLACEHOLDER].vercel.app/#number-formatting |
+| Stats | https://[PLACEHOLDER].vercel.app/#statistics |
+| SQL | https://[PLACEHOLDER].vercel.app/#db2-queries |
+
+No section yet for lineplot, scatterplot, timeplot: link the site root.
+
 ## Tips
 
 - Charts show via IPython `display(SVG(...))`. Outside a notebook nothing is visible.
