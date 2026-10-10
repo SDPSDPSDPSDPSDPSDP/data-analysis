@@ -1,10 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { keymap, Prec } from "@uiw/react-codemirror";
-import { load, run, type RunResult } from "@/lib/pyodide";
+import { hoverTooltip, keymap, Prec } from "@uiw/react-codemirror";
+import { docOf, load, run, type RunResult } from "@/lib/pyodide";
 import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
+
+const DOTTED_NAME = /^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$/;
+
+// Docstring of the dotted name under the cursor, cut off after the hovered word.
+const docTooltip = hoverTooltip(async (view, pos) => {
+  const line = view.state.doc.lineAt(pos);
+  const offset = pos - line.from;
+  const start = offset - line.text.slice(0, offset).match(/[\w.]*$/)![0].length;
+  const end = offset + line.text.slice(offset).match(/^\w*/)![0].length;
+  const name = line.text.slice(start, end);
+  if (!DOTTED_NAME.test(name)) return null;
+  const doc = await docOf(name);
+  if (!doc) return null;
+  return {
+    pos: line.from + start,
+    end: line.from + end,
+    create: () => {
+      const dom = document.createElement("pre");
+      dom.className = "doc-tooltip";
+      dom.textContent = doc;
+      return { dom };
+    },
+  };
+});
 
 type Props = {
   initialCode: string;
@@ -38,7 +62,7 @@ export default function RunnableCode({ initialCode, setup }: Props) {
 
   return (
     <div className="runnable">
-      <CodeBlock value={code} onChange={setCode} extensions={[runKey]} />
+      <CodeBlock value={code} onChange={setCode} extensions={[runKey, docTooltip]} />
       <section className="output">
         {result?.images.map((src, i) => (
           <CopyableImage key={i} src={`data:image/png;base64,${src}`} alt="Rendered chart" />

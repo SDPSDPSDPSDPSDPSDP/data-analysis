@@ -31,6 +31,8 @@
   --transition: 120ms ease;
 
   --runnable-height: 75vh;
+  --tooltip-max-width: 560px;
+  --tooltip-max-height: 320px;
 }
 
 * {
@@ -178,4 +180,14 @@ pre {
     grid-template-rows: 50vh auto;
     height: auto;
   }
+}
+
+.doc-tooltip {
+  margin: 0;
+  padding: var(--space-1) var(--space-1-5);
+  max-width: var(--tooltip-max-width);
+  max-height: var(--tooltip-max-height);
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: var(--font-size-small);
 }

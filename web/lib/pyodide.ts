@@ -35,3 +35,14 @@ export function run(code: string): Promise<RunResult> {
     worker!.postMessage({ id, code });
   });
 }
+
+/** Docstring of a dotted name in the session's globals. Empty if undefined or undocumented. */
+export async function docOf(name: string): Promise<string> {
+  const result = await run(`import inspect
+try:
+    print(inspect.getdoc(eval(${JSON.stringify(name)})) or "")
+except (NameError, AttributeError, SyntaxError):
+    pass`);
+  if (result.error) throw new Error(result.error);
+  return result.stdout.trim();
+}
