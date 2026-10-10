@@ -1,0 +1,134 @@
+---
+name: shirin
+description: Use the shirin Python package to make charts, descriptive stats, Dutch number formatting and DB2 SQL queries, and to upgrade old shirin code (2.x/3.x, pre-4.0) to the current API. Use when the user wants a bar chart, count plot, histogram, line plot, scatter plot, pie/donut chart or time series plot in a notebook, mentions "shirin" or PlotGraphs, sees old calls like countplot_x, barplot_y, accuracy, Palette subclasses or export=, or asks to query DB2 into pandas/Parquet. Prefer shirin over matplotlib/seaborn in projects that depend on it.
+---
+
+# shirin
+
+Data analysis toolkit. Own SVG renderer (no matplotlib). Charts render inline in Jupyter. This skill documents version 4.x.
+
+**Old code?** If code uses `countplot_x/_y`, `barplot_x/_y`, `accuracy`/`accuracy_plot`, `Palette`/`LabelMapping` classes, `export=`, `output_name=`, `xlabel=`, `plot_legend=` or per-call `palette=`, it predates 4.0. Read [migration.md](migration.md) and convert it before changing anything else.
+
+## Install
+
+```powershell
+uv add "shirin @ git+https://github.com/SDPSDPSDPSDPSDPSDP/data-analysis.git"
+# with DB2 helpers:
+uv add "shirin[sql] @ git+https://github.com/SDPSDPSDPSDPSDPSDP/data-analysis.git"
+```
+
+Python 3.9+. Deps: numpy, pandas>=2. Always use uv, never pip.
+
+## Charts
+
+```python
+from shirin.plot import PlotGraphs, Colors
+
+plot = PlotGraphs(
+    palette={'is_ripe': {True: Colors.GREEN, False: Colors.RED}},    # {column: {value: color}} or {column: color}
+    label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},      # {column: {value: label}}
+)
+```
+
+Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`.
+
+Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
+
+### bar
+
+```python
+plot.bar(df, x='fruit')                                   # count rows per category, vertical
+plot.bar(df, y='fruit')                                   # horizontal
+plot.bar(df, x='fruit', value='sales')                    # sum pre-aggregated column
+plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True)
+plot.bar(df, x='fruit', hue='is_ripe', normalized=True)   # 100% stacked hue shares
+plot.bar(df, x='fruit', normalized=True)                  # labels show share of total
+plot.bar(df, x='model', value='accuracy', normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
+plot.bar(df, x='fruit', top_n=5, sort='alphabetical')
+```
+
+Rules (raise `ValueError` otherwise):
+- Exactly one of `x` or `y`.
+- `top_n` only without `value`.
+- `remainder=True` needs `value` and `normalized=True`; `hue` must be `None` or same as the category column.
+
+Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `''` hides), `suffix` (appended to data labels), `data_labels=True`, `legend=False`, `sort='frequency'|'alphabetical'`.
+
+### histogram
+
+```python
+plot.histogram(df, x='price', hue='shop', bins=50, xlimit=1000, stacked=False, suffix='%')
+```
+
+`bins` is a maximum; whole-number data gets at most one bin per value. `xlimit` drops rows above it.
+
+### lineplot
+
+```python
+plot.lineplot(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
+```
+
+`fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`.
+
+### scatterplot
+
+```python
+plot.scatterplot(df, x='height', y='weight', hue='species', size='age')
+```
+
+### pie
+
+```python
+plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
+```
+
+Slices are value counts of `col`. Slices below `value_datalabel` percent get no label.
+
+### timeplot
+
+```python
+plot.timeplot(df, x='created_at', group_by='month', plot_type='line', cumulative=True)
+```
+
+`x` must be `datetime64[ns]`. `group_by`: `'year'|'month'|'day'`. `plot_type`: `'bar'|'line'`. `display_month=False` shows only years.
+
+### Colors
+
+`Colors.GREY`, `DARK_GREY`, `BLACK`, `BROWN`, `PINK`, `LIGHT_BLUE`, `DARK_BLUE`, `GREEN`, `RED`, `GOOD_GREEN`, `BAD_RED` and more. Any hex string works too.
+
+## Stats
+
+Importing `shirin.stats` registers a pandas Series accessor.
+
+```python
+import shirin.stats
+df['price'].stats()                 # prints mean, median, min, max, missing values
+d = df['price'].stats(printing=False)  # dict: mean, median, min, max, missing_values
+```
+
+## Number formatting (Dutch)
+
+```python
+from shirin.number_format import format_thousands, format_percentage, format_compact
+format_thousands(1234567.8, decimals=1)   # '1.234.567,8'
+format_percentage(12.5, decimals=1)        # '12,5%' (input is already a percentage, not a fraction)
+format_compact(1500000)                    # '1,5M' (also 'k')
+```
+
+## SQL (IBM DB2, needs `shirin[sql]`)
+
+```python
+from pathlib import Path
+from shirin.sql import run_sql_query
+
+df = run_sql_query("SELECT * FROM t WHERE year = :year", Path('db_config.json'), params={'year': 2024})
+run_sql_query(Path('query.sql'), db_config, output_path=Path('out.parquet'))  # streams to Parquet, returns None
+```
+
+Config keys required: `user`, `password`, `host`, `port`, `db_name`, `schema`. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.
+
+## Tips
+
+- Charts show via IPython `display(SVG(...))`. Outside a notebook nothing is visible.
+- Count data (one row per observation): omit `value`. Pre-aggregated data: pass `value`.
+- Check a method's docstring (`help(plot.bar)`) for full argument docs.
