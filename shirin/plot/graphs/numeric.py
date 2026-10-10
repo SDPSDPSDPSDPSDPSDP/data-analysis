@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Optional, Union
+from typing import Optional, Union
 
 from ..config import FillMissingValuesInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
@@ -8,7 +8,6 @@ from ..plots import Histogram, LinePlot, ScatterPlot
 
 
 class NumericPlotsMixin:
-    @resolve_palette
     def histogram(
         self,
         df: pd.DataFrame,
@@ -22,9 +21,6 @@ class NumericPlotsMixin:
         legend: bool = False,
         title: str = '',
         subtitle: str = '',
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **histogram** of a numeric column.
 
@@ -49,8 +45,7 @@ class NumericPlotsMixin:
             y_axis_label=y_axis_label,
             xlimit=xlimit,
             bins=bins,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             hue=hue,
             stacked=stacked,
             legend=legend,
@@ -59,7 +54,6 @@ class NumericPlotsMixin:
         )
         self._render(Histogram(options))
 
-    @resolve_palette
     def lineplot(
         self,
         df: pd.DataFrame,
@@ -73,17 +67,13 @@ class NumericPlotsMixin:
         subtitle: str = '',
         rotation: int = 0,
         fill_missing_values: FillMissingValuesInput = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         options = LinePlotOptions(
             df=df,
             x=x,
             y=y,
             hue=hue,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,
@@ -94,7 +84,6 @@ class NumericPlotsMixin:
         )
         self._render(LinePlot(options))
 
-    @resolve_palette
     def scatterplot(
         self,
         df: pd.DataFrame,
@@ -107,9 +96,6 @@ class NumericPlotsMixin:
         legend: bool = False,
         title: str = '',
         subtitle: str = '',
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **scatter plot** showing the relationship between two numeric columns.
 
@@ -131,8 +117,7 @@ class NumericPlotsMixin:
             y=y,
             hue=hue,
             size=size,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,

@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional
 
 from ..config import OrderTypeInput, StackedLabelTypeInput
 from ..core import CountPlotOptions, NormalizedCountPlotOptions
@@ -23,7 +23,6 @@ class CountPlotsMixin:
             )
             self._render(CountPlot(options))
 
-    @resolve_palette
     def countplot_x(
         self,
         df: pd.DataFrame,
@@ -41,9 +40,6 @@ class CountPlotsMixin:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **vertical count plot** showing category frequencies.
 
@@ -62,7 +58,7 @@ class CountPlotsMixin:
                 or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
-            normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
+            normalized: Whether to normalize counts to percentages (_requires `hue`_).
                 *Default: `False`*.
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
@@ -76,8 +72,7 @@ class CountPlotsMixin:
             axis_column=x,
             orientation='vertical',
             hue=hue,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,
@@ -89,7 +84,6 @@ class CountPlotsMixin:
             suffix=suffix,
         )
 
-    @resolve_palette
     def countplot_y(
         self,
         df: pd.DataFrame,
@@ -107,9 +101,6 @@ class CountPlotsMixin:
         normalized: bool = False,
         show_labels: bool = True,
         suffix: Optional[str] = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **horizontal count plot** showing category frequencies.
 
@@ -128,7 +119,7 @@ class CountPlotsMixin:
                 or `None`. *Default: `None`*.
             order_type: How to order categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*.
-            normalized: Whether to normalize counts to percentages (_requires `hue` and dict `palette`_).
+            normalized: Whether to normalize counts to percentages (_requires `hue`_).
                 *Default: `False`*.
             show_labels: Whether to show data labels on bars. *Default: `True`*.
             suffix: Optional suffix appended to each data label (e.g. `'%'` -> `'12 %'`).
@@ -142,8 +133,7 @@ class CountPlotsMixin:
             axis_column=y,
             orientation='horizontal',
             hue=hue,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,

@@ -18,8 +18,7 @@ class Palette:
 
         plot = PlotGraphs(palette=MyPalettes, label_mapping=MyLabels)
 
-    Per-call ``palette=`` / ``label_map=`` arguments always take priority over
-    the class-level defaults.
+    This is the only way to set plot colors.
     """
 
     is_correct: Dict[Any, str] = {

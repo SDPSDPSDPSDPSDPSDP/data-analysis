@@ -5,7 +5,7 @@ from typing import List
 import pandas as pd
 import pytest
 
-from shirin.plot import PlotGraphs
+from shirin.plot import LabelMapping, Palette, PlotGraphs
 from shirin.plot.common.data_conversion import fill_missing_values_in_data
 from shirin.plot.core import (
     AccuracyPlotOptions,
@@ -33,13 +33,21 @@ def plot() -> PlotGraphs:
     return PlotGraphs()
 
 
-def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame, shown: List[str]) -> None:
-    palette = {'x': '#111111', 'y': '#eeeeee'}
+class GroupPalette(Palette):
+    group = {'x': '#111111', 'y': '#eeeeee'}
+
+
+class GroupLabels(LabelMapping):
+    group = {'x': 'Ex'}
+
+
+def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
+    plot = PlotGraphs(palette=GroupPalette)
     plot.countplot_x(df, x='category')
-    plot.countplot_y(df, y='category', hue='group', palette=palette, stacked=True, stacked_labels='standard')
-    plot.countplot_x(df, x='category', hue='group', palette=palette, normalized=True)
+    plot.countplot_y(df, y='category', hue='group', stacked=True, stacked_labels='standard')
+    plot.countplot_x(df, x='category', hue='group', normalized=True)
     plot.barplot_x(df, x='category', value='value')
-    plot.barplot_y(df, y='category', value='value', hue='group', palette=palette, stacked=True)
+    plot.barplot_y(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
     plot.lineplot(df, x='date', y='value', hue='group')
     plot.scatterplot(df, x='value', y='value')
@@ -120,8 +128,8 @@ def test_barplot_uses_mean_per_category() -> None:
 
 
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs(font='satoshi').countplot_x(
-        df, x='category', hue='group', title='Totals', label_map={'x': 'Ex'}, legend=True
+    PlotGraphs(font='satoshi', label_mapping=GroupLabels).countplot_x(
+        df, x='category', hue='group', title='Totals', legend=True
     )
     assert '>Totals</text>' in shown[0]
     assert '>Ex</text>' in shown[0]

@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Optional, Union
+from typing import Optional
 
 from ..config import OrderTypeInput, StackedLabelTypeInput
 from ..core import BarPlotOptions
@@ -8,7 +8,6 @@ from ..plots import BarPlot
 
 
 class BarPlotsMixin:
-    @resolve_palette
     def barplot_x(
         self,
         df: pd.DataFrame,
@@ -25,9 +24,6 @@ class BarPlotsMixin:
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **vertical bar plot** with pre-aggregated data.
 
@@ -58,8 +54,7 @@ class BarPlotsMixin:
             value=value,
             orientation='vertical',
             hue=hue,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,
@@ -74,7 +69,6 @@ class BarPlotsMixin:
 
         self._render(BarPlot(options))
 
-    @resolve_palette
     def barplot_y(
         self,
         df: pd.DataFrame,
@@ -91,9 +85,6 @@ class BarPlotsMixin:
         order_type: OrderTypeInput = 'frequency',
         percentage_labels: bool = False,
         suffix: Optional[str] = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **horizontal bar plot** with pre-aggregated data.
 
@@ -124,8 +115,7 @@ class BarPlotsMixin:
             value=value,
             orientation='horizontal',
             hue=hue,
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, hue),
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             legend=legend,

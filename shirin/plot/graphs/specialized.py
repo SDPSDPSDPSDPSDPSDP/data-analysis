@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from ..config import TimeGroupByInput
 from ..config.colors import Colors
@@ -11,7 +11,6 @@ from ..plots import AccuracyPlot, PieChart, TimePlot
 class SpecializedPlotsMixin:
     """Plots with chart-specific layouts: pie, time series, accuracy."""
 
-    @resolve_palette
     def pie(
         self,
         df: pd.DataFrame,
@@ -21,16 +20,12 @@ class SpecializedPlotsMixin:
         donut: bool = False,
         title: str = '',
         subtitle: str = '',
-        # injected by @resolve_palette
-        palette: Optional[Dict[Any, str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         # Reserved name: a user column called 'count' must not collide with the counts.
         options = PiePlotOptions(
             df=df[col].value_counts().rename('__count__').to_frame(),
             col='__count__',
-            palette=palette,
-            label_map=label_map,
+            **resolve_palette(self, col),
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
             donut=donut,
@@ -44,7 +39,6 @@ class SpecializedPlotsMixin:
         df: pd.DataFrame,
         x: str,
         group_by: TimeGroupByInput = 'day',
-        palette: Optional[str] = None,
         x_axis_label: str = '',
         y_axis_label: str = 'Total',
         plot_type: str = 'bar',
@@ -64,7 +58,6 @@ class SpecializedPlotsMixin:
             x: Column name containing datetime values (`datetime64[ns]`).
             group_by: Time period to group counts by. **Options:** `'year'`, `'month'`, `'day'`.
                 *Default: `'day'`*.
-            palette: Color for the bars (single color string, e.g. `'#FF5733'`). *Optional*.
             x_axis_label: Label for the x-axis. *Default: `''`*.
             y_axis_label: Label for the y-axis. *Default: `'Total'`*.
             plot_type: Chart type. **Options:** `'bar'`, `'line'`. *Default: `'bar'`*.
@@ -83,7 +76,6 @@ class SpecializedPlotsMixin:
             df=df,
             x=x,
             group_by=group_by,
-            palette=palette,
             x_axis_label=x_axis_label,
             y_axis_label=y_axis_label,
             plot_type=plot_type,
@@ -114,7 +106,7 @@ class SpecializedPlotsMixin:
         """Create a **stacked accuracy bar plot** from pre-computed accuracy values.
 
         Each bar is split into two segments: *Correct* (the accuracy fraction) at
-        the bottom and *Incorrect* (1 − accuracy) stacked on top.
+        the bottom and *Incorrect* (1 âˆ’ accuracy) stacked on top.
 
         Args:
             df: DataFrame with one row per run / category.
