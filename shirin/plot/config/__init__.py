@@ -1,34 +1,29 @@
 from .colors import Colors, TextColors
-from .palettes import Palette, LabelMapping
-from .formatting import FontSizes, FigureSize
+from .palettes import PaletteInput, LabelMappingInput
+from .formatting import FontSizes, FigureSize, Layout
 from .types import (
     OrderType,
-    FigureSizeMode,
-    StackedLabelType,
     FillMissingValues,
     TimeGroupBy,
     OrderTypeInput,
-    StackedLabelTypeInput,
-    FigureSizeInput,
     FillMissingValuesInput,
     TimeGroupByInput,
+    TitleInput,
 )
 
 __all__ = [
     'Colors',
     'TextColors',
-    'Palette',
-    'LabelMapping',
+    'PaletteInput',
+    'LabelMappingInput',
     'FontSizes',
     'FigureSize',
+    'Layout',
     'OrderType',
-    'FigureSizeMode',
-    'StackedLabelType',
     'FillMissingValues',
     'TimeGroupBy',
     'OrderTypeInput',
-    'StackedLabelTypeInput',
-    'FigureSizeInput',
     'FillMissingValuesInput',
     'TimeGroupByInput',
+    'TitleInput',
 ]

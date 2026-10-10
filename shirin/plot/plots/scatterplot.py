@@ -6,6 +6,7 @@ from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import ScatterPlotOptions
 from ..common.formatting import format_ticks
+from ..config import Colors
 
 
 class ScatterPlot(AbstractPlot):
@@ -15,11 +16,11 @@ class ScatterPlot(AbstractPlot):
         return self.options.df.copy()
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self._resolve_hue_palette(df, no_hue_color='black')
+        return self._resolve_hue_palette(df, no_hue_color=Colors.BLACK)
 
     def draw(self, data: pd.DataFrame) -> Any:
         return renderer.render_scatterplot(
-            self._standard_axes(),
+            self._standard_chart(),
             df=data,
             x=self.options.x,
             y=self.options.y,

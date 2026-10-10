@@ -36,7 +36,7 @@ class NormalizedCountPlot(AbstractPlot):
         return renderer.render_stacked_barplot(
             create_sized_figure(self, data),
             df=self._normalized_pivot,  # type: ignore[arg-type]
-            kind='bar' if vertical else 'barh',
+            horizontal=not vertical,
             colors=create_colors_list(self._normalized_pivot, self._palette),  # type: ignore[arg-type]
             width=0.6 if vertical else 0.8,
         )
@@ -45,11 +45,11 @@ class NormalizedCountPlot(AbstractPlot):
         self._format_labels_and_legend(plot)
 
         if self.options.orientation == 'vertical':
-            format_ticks(plot=plot, y_grid=True, percentage_y=True)
+            format_ticks(plot, y_grid=True, percentage_y=True)
         else:
-            format_ticks(plot=plot, x_grid=True, percentage_x=True)
+            format_ticks(plot, x_grid=True, percentage_x=True)
 
-        if self.options.show_labels:
+        if self.options.data_labels:
             format_datalabels_stacked_normalized(
                 plot,
                 self._normalized_pivot,  # type: ignore[arg-type]

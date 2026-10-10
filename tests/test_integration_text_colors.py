@@ -34,8 +34,7 @@ class TestStackedCountPlotTextColors:
             orientation='horizontal',
             hue='status',
             palette=palette,
-            stacked=True,
-            stacked_labels='percentage'
+            stacked=True
         )
         
         plot = CountPlot(options)
@@ -65,8 +64,7 @@ class TestStackedBarPlotTextColors:
             orientation='horizontal',
             hue='status',
             palette=palette,
-            stacked=True,
-            stacked_labels='percentage'
+            stacked=True
         )
         
         plot = BarPlot(options)
@@ -93,7 +91,7 @@ class TestNormalizedCountPlotPaletteKeys:
             orientation='vertical',
             hue='status',
             palette=palette,
-            show_labels=False,
+            data_labels=False,
         )
 
         plot = NormalizedCountPlot(options)
@@ -117,14 +115,14 @@ class TestAxisLabelMapping:
             axis_column='is_contentious',
             orientation='vertical',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
-            plot_legend=False,
-            show_labels=False,
+            legend=False,
+            data_labels=False,
         )
 
         plot = CountPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        xtick_labels = [tick.get_text() for tick in ax.get_xticklabels()]
+        xtick_labels = chart.x.tick_labels
         assert 'Non-Contentious' in xtick_labels
         assert 'Contentious' in xtick_labels
         assert '0' not in xtick_labels
@@ -143,14 +141,14 @@ class TestAxisLabelMapping:
             value='count',
             orientation='horizontal',
             label_map={0: 'Non-Contentious', 1: 'Contentious'},
-            plot_legend=False,
+            legend=False,
             percentage_labels=False,
         )
 
         plot = BarPlot(options)
-        ax = plot.render()
+        chart = plot.render()
 
-        ytick_labels = [tick.get_text() for tick in ax.get_yticklabels()]
+        ytick_labels = chart.y.tick_labels
         assert 'Non-Contentious' in ytick_labels
         assert 'Contentious' in ytick_labels
         assert '0' not in ytick_labels

@@ -1,9 +1,9 @@
 from typing import Any
 
 import pandas as pd
-from matplotlib.axes import Axes
 
 from ..core import renderer
+from ..svg import Chart
 from ..core.categorical_options import CountPlotOptions
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
 from ..common.sorting import get_order
@@ -23,9 +23,9 @@ class CountPlot(StackableCategoricalPlot):
         self._order = get_order(self.options.order_type, df, self.options.axis_column)
         return self._resolve_hue_palette(df)
 
-    def _draw_unstacked(self, ax: Axes, data: pd.DataFrame) -> Any:
+    def _draw_unstacked(self, chart: Chart, data: pd.DataFrame) -> Any:
         return renderer.render_countplot(
-            ax,
+            chart,
             df=data,
             column=self.options.axis_column,
             horizontal=self.options.orientation == 'horizontal',

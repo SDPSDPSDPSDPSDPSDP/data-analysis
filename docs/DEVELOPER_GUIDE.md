@@ -29,10 +29,11 @@ shirin/
   plot/
     all_plots.py   PlotGraphs: public entry point, composed of the graphs/ mixins
     graphs/        public methods (countplot_x, pie, ...): build an Options object, pick the plot class
-    core/          Options dataclasses + validation, AbstractPlot, renderer (matplotlib calls)
+    core/          Options dataclasses + validation, AbstractPlot, renderer (fills a Chart with marks)
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)
-    config/        colors, font sizes, palette/label-mapping base classes, matplotlib rc settings
+    config/        colors, font sizes, layout sizes, palette/label-mapping base classes
+    svg/           Chart data model, nice/date ticks, font metrics, layout + SVG writer
   number_format.py Dutch number formatting, shared by plot and stats
   stats/           descriptive statistics accessor
   sql/             DB2 query helpers (optional `sql` extra)
@@ -40,5 +41,8 @@ shirin/
 ```
 
 Flow of one call: `PlotGraphs.countplot_x(...)` -> `CountPlotOptions` -> `CountPlot(options).render()`
-(validates a copy of the options, draws on its own figure) -> `PlotExporter` saves/shows/closes that figure.
-Styling is applied with `plt.rc_context`, so matplotlib's global `rcParams` are never changed.
+(validates a copy of the options, fills a `Chart` in data coordinates) -> `svg.to_svg` lays it out and writes
+the SVG -> `all_plots.show` displays it in the notebook (the web worker replaces `show` to collect the SVG).
+
+Text is measured with Satoshi glyph widths from `assets/fonts/satoshi_metrics.json`. After changing the fonts, run
+`uv run python scripts/build_font_metrics.py`.

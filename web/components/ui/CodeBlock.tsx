@@ -2,7 +2,28 @@
 
 import CodeMirror, { type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { oneDarkTheme } from "@codemirror/theme-one-dark";
+import { tags } from "@lezer/highlight";
 import CopyButton from "@/components/ui/CopyButton";
+
+// oneDark editor chrome, but syntax colors come from --code-* tokens in globals.css.
+const highlightStyle = HighlightStyle.define([
+  { tag: tags.keyword, color: "var(--code-keyword)" },
+  { tag: [tags.name, tags.propertyName], color: "var(--code-name)" },
+  { tag: [tags.function(tags.variableName), tags.labelName], color: "var(--code-function)" },
+  {
+    tag: [tags.constant(tags.name), tags.standard(tags.name), tags.atom, tags.bool, tags.special(tags.variableName)],
+    color: "var(--code-constant)",
+  },
+  { tag: [tags.definition(tags.name), tags.separator, tags.punctuation], color: "var(--code-text)" },
+  { tag: [tags.typeName, tags.className, tags.number, tags.self, tags.namespace], color: "var(--code-class)" },
+  { tag: [tags.operator, tags.operatorKeyword, tags.escape, tags.special(tags.string)], color: "var(--code-operator)" },
+  { tag: tags.string, color: "var(--code-string)" },
+  { tag: [tags.meta, tags.comment], color: "var(--code-comment)" },
+]);
+
+const theme = [oneDarkTheme, syntaxHighlighting(highlightStyle)];
 
 type Props = {
   value: string;
@@ -19,7 +40,7 @@ export default function CodeBlock({ value, onChange, extensions = [] }: Props) {
         onChange={onChange}
         editable={Boolean(onChange)}
         readOnly={!onChange}
-        theme="dark"
+        theme={theme}
         extensions={[python(), ...extensions]}
         height="100%"
       />

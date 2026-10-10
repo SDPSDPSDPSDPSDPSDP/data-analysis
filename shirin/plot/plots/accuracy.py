@@ -63,23 +63,20 @@ class AccuracyPlot(StackableCategoricalPlot):
 
     def format_plot(self, plot: Any) -> None:
         if self.options.orientation == 'horizontal':
-            format_xy_labels(plot, xlabel=self.options.ylabel, x_labelpad=0, ylabel=self.options.xlabel)
-            value_axis = plot.xaxis
+            format_xy_labels(plot, x_axis_label=self.options.y_axis_label, y_axis_label=self.options.x_axis_label)
+            value_axis = plot.x
         else:
-            format_xy_labels(plot, xlabel=self.options.xlabel, ylabel=self.options.ylabel, y_labelpad=0)
-            value_axis = plot.yaxis
+            format_xy_labels(plot, x_axis_label=self.options.x_axis_label, y_axis_label=self.options.y_axis_label)
+            value_axis = plot.y
         format_optional_legend(
             plot,
             hue=self.options.hue,
-            plot_legend=self.options.plot_legend,
+            legend=self.options.legend,
             label_map=self.options.label_map,
-            ncol=self.options.ncol,
-            legend_offset=self.options.legend_offset,
         )
 
         format_ticks(plot)
-        value_axis.set_ticklabels([])
-        value_axis.set_ticks_position('none')
+        value_axis.show_tick_labels = False
 
         if self._df_unlabeled is not None:
             format_datalabels_stacked(

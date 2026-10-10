@@ -22,6 +22,16 @@ function inlineMarkdown(text: string): string {
     .replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[Number(i)]}</code>`);
 }
 
+// Unindented "Input:" lines are section headings; "    name:" lines start an argument.
+// Docstring wraps (8-space continuation lines) are joined so Options/Default/Optional each get a line of their own.
+function formatDoc(doc: string): string {
+  return inlineMarkdown(doc.replace(/\n {8}(?=\S)/g, " "))
+    .replace(/^([A-Z]\w*):$/gm, '<span class="doc-heading">$1</span>')
+    .replace(/^ {4}(\w+):/gm, "<strong>$1</strong>:")
+    .replace(/ (<em>(?:Optional|Default:.*?)<\/em>\.?)/g, '\n    <span class="doc-meta">$1</span>')
+    .replace(/ (<strong>Options:<\/strong>.*)$/gm, '\n    <span class="doc-meta">$1</span>');
+}
+
 const DOCS: Record<string, string> = docstrings;
 
 // Docstring of the dotted name under the cursor, looked up by its last part.
@@ -40,7 +50,7 @@ const docTooltip = hoverTooltip((view, pos) => {
     create: () => {
       const dom = document.createElement("pre");
       dom.className = "doc-tooltip";
-      dom.innerHTML = inlineMarkdown(doc);
+      dom.innerHTML = formatDoc(doc);
       return { dom };
     },
   };
@@ -81,11 +91,11 @@ export default function RunnableCode({ initialCode, setup }: Props) {
       <CodeBlock value={code} onChange={setCode} extensions={[runKey, docTooltip]} />
       <section className="output">
         {result?.images.map((src, i) => (
-          <CopyableImage key={i} src={`data:image/png;base64,${src}`} alt="Rendered chart" />
+          <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && <p className="hint">Rendering chart…</p>}
+        {!result && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>
   );

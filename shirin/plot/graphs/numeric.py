@@ -1,100 +1,109 @@
 import pandas as pd
-from typing import Any, Dict, Optional, Union
+from typing import Optional, Union
 
-from ..config import FillMissingValuesInput
+from ..config import TitleInput, FillMissingValuesInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
 from ..common.resolve_palette import resolve_palette
 from ..plots import Histogram, LinePlot, ScatterPlot
 
 
 class NumericPlotsMixin:
-    @resolve_palette
     def histogram(
         self,
         df: pd.DataFrame,
         x: str,
         hue: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = 'Count',
-        xlimit: Optional[Union[float, int]] = None,
+        title: Optional[TitleInput] = None,
+        x_axis_label: Optional[str] = None,
+        y_axis_label: Optional[str] = None,
+        legend: bool = False,
         bins: int = 100,
+        xlimit: Optional[Union[float, int]] = None,
         stacked: Optional[bool] = None,
-        plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **histogram** of a numeric column.
 
-        Args:
+        Input:
             df: DataFrame containing the data to plot.
             x: Column name with the numeric values.
             hue: Column name for grouping data by color. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `'Count'`*.
-            xlimit: Upper bound only: rows with `x` above it are dropped. *Optional*.
+
+        Text:
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
+            x_axis_label: Label for the x-axis. *Optional*.
+            y_axis_label: Label for the y-axis. *Optional*.
+            legend: Whether to show the legend. *Default: `False`*.
+
+        Layout:
             bins: Maximum number of bins; whole-number data gets at most one bin per value.
                 *Default: `100`*.
+            xlimit: Upper bound only: rows with `x` above it are dropped. *Optional*.
             stacked: With `hue`, `False` dodges the groups, otherwise they stack. *Optional*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
         """
         options = HistogramOptions(
             df=df,
             x=x,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlimit=xlimit,
-            bins=bins,
-            palette=palette,
-            label_map=label_map,
             hue=hue,
+            **resolve_palette(self, hue),
+            title=title,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
+            bins=bins,
+            xlimit=xlimit,
             stacked=stacked,
-            plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol
         )
         self._render(Histogram(options))
 
-    @resolve_palette
     def lineplot(
         self,
         df: pd.DataFrame,
         x: str,
         y: str,
         hue: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = '',
-        plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
+        title: Optional[TitleInput] = None,
+        x_axis_label: Optional[str] = None,
+        y_axis_label: Optional[str] = None,
         rotation: int = 0,
+        legend: bool = False,
         fill_missing_values: FillMissingValuesInput = None,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
     ) -> None:
+        """Create a **line plot**, one line per `hue` group.
+
+        Input:
+            df: DataFrame containing the data to plot.
+            x: Column name for the x-axis values.
+            y: Column name for the y-axis values.
+            hue: Column name for grouping data by color. *Optional*.
+
+        Text:
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
+            x_axis_label: Label for the x-axis. *Optional*.
+            y_axis_label: Label for the y-axis. *Optional*.
+            rotation: Rotation angle for x-axis tick labels. *Default: `0`*.
+            legend: Whether to show the legend. *Default: `False`*.
+
+        Layout:
+            fill_missing_values: How to fill gaps in `y`. **Options:** `'shift'` (interpolate
+                between neighbours), `'zero'`. *Optional*.
+        """
         options = LinePlotOptions(
             df=df,
             x=x,
             y=y,
             hue=hue,
-            palette=palette,
-            label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            **resolve_palette(self, hue),
+            title=title,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
             rotation=rotation,
-            fill_missing_values=fill_missing_values
+            legend=legend,
+            fill_missing_values=fill_missing_values,
         )
         self._render(LinePlot(options))
 
-    @resolve_palette
     def scatterplot(
         self,
         df: pd.DataFrame,
@@ -102,28 +111,26 @@ class NumericPlotsMixin:
         y: str,
         hue: Optional[str] = None,
         size: Optional[str] = None,
-        xlabel: str = '',
-        ylabel: str = '',
-        plot_legend: bool = True,
-        legend_offset: float = 1.13,
-        ncol: int = 2,
-        # injected by @resolve_palette
-        palette: Optional[Union[Dict[Any, str], str]] = None,
-        label_map: Optional[Dict[Any, str]] = None,
+        title: Optional[TitleInput] = None,
+        x_axis_label: Optional[str] = None,
+        y_axis_label: Optional[str] = None,
+        legend: bool = False,
     ) -> None:
         """Create a **scatter plot** showing the relationship between two numeric columns.
 
-        Args:
+        Input:
             df: DataFrame containing the data to plot.
             x: Column name for the x-axis values.
             y: Column name for the y-axis values.
             hue: Column name for grouping data by color. *Optional*.
             size: Column name for scaling point size. *Optional*.
-            xlabel: Label for the x-axis. *Default: `''`*.
-            ylabel: Label for the y-axis. *Default: `''`*.
-            plot_legend: Whether to show the legend. *Default: `True`*.
-            legend_offset: Vertical position offset for legend. *Default: `1.13`*.
-            ncol: Number of columns in the legend. *Default: `2`*.
+
+        Text:
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
+            x_axis_label: Label for the x-axis. *Optional*.
+            y_axis_label: Label for the y-axis. *Optional*.
+            legend: Whether to show the legend. *Default: `False`*.
         """
         options = ScatterPlotOptions(
             df=df,
@@ -131,12 +138,10 @@ class NumericPlotsMixin:
             y=y,
             hue=hue,
             size=size,
-            palette=palette,
-            label_map=label_map,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            plot_legend=plot_legend,
-            legend_offset=legend_offset,
-            ncol=ncol,
+            **resolve_palette(self, hue),
+            title=title,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
         )
         self._render(ScatterPlot(options))

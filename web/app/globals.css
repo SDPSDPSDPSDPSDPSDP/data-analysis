@@ -1,25 +1,50 @@
 :root {
   --color-bg: #fff;
   --color-surface: rgba(0, 0, 0, 0.04);
-  --color-border: rgba(0, 0, 0, 0.1);
+  --color-shimmer: rgba(0, 0, 0, 0.08);
   --color-error: #b00020;
+  --color-glass: rgba(242, 242, 244, 0.7);
+  --glass-blur: 16px;
+  --glass-saturate: 180%;
+  /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
+  --z-nav: 1000;
+  --z-tooltip: 1100;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
+  /* Syntax colors, applied by CodeBlock's highlight style. */
+  --code-text: #d3d8e1;
+  --code-keyword: #ffffff;
+  --code-name: #f5c0ff;
+  --code-function: #d23cff;
+  --code-constant: #75bb75;
+  --code-class: #66ff00;
+  --code-operator: #feffff;
+  --code-string: #d6ffb9;
+  --code-comment: #7d8799;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
+  --color-overlay-button: rgba(0, 0, 0, 0.5);
+  --color-overlay-button-hover: rgba(0, 0, 0, 0.7);
 
   --text-primary: rgba(0, 0, 0, 0.93);
+  --text-muted: rgba(0, 0, 0, 0.7);
   --text-secondary: rgba(0, 0, 0, 0.53);
   --text-on-dark: rgba(255, 255, 255, 0.93);
   --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
+  --text-on-dark-pure: rgba(255, 255, 255, 1);
 
-  --font-body: system-ui, sans-serif;
+  --font-body: var(--font-satoshi), sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
-  --font-doc: var(--font-satoshi), sans-serif;
+  --font-size-brand: 28px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
   --font-size-small: 13px;
   --font-size-code: 14px;
   --font-size-doc: 15px;
+  --font-size-doc-heading: 19px;
   --font-weight-heading: 500;
+  --font-weight-nav: 500;
+  --font-weight-doc-heading: 700;
   --letter-spacing-heading: 0.015em;
 
   --space-0-5: 4px;
@@ -27,13 +52,16 @@
   --space-1-5: 12px;
   --space-2: 16px;
   --space-3: 24px;
+  --space-6: 48px;
+  --nav-height: 56px;
 
-  --border-width: 1px;
   --radius: 6px;
   --button-height: 28px;
   --transition: 120ms ease;
 
   --runnable-height: 75vh;
+  --chart-aspect-ratio: 4 / 3;
+  --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;
   --tooltip-max-height: 400px;
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -57,11 +85,116 @@ body {
   padding: var(--space-3) var(--space-2);
 }
 
-.page h1 {
-  margin: 0;
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--nav-height);
+  padding: 0 var(--space-2);
+}
+
+/* Glass on a pseudo-element: backdrop-filter on .nav itself would stop the dropdown's own blur from seeing the page. */
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-brand {
+  font-size: var(--font-size-brand);
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
+}
+
+.nav-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  flex-direction: column;
+  padding: var(--space-0-5);
+  white-space: nowrap;
+  border-radius: var(--radius);
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--shadow-tooltip);
+}
+
+.nav-menu:hover .nav-dropdown,
+.nav-menu:focus-within .nav-dropdown {
+  display: flex;
+}
+
+.nav-menu.nav-menu-closed .nav-dropdown {
+  display: none;
+}
+
+.nav-dropdown a {
+  font-weight: var(--font-weight-nav);
+  padding: var(--space-1) var(--space-1-5);
+  border-radius: var(--radius);
+  transition: background var(--transition);
+}
+
+.nav-dropdown a:hover {
+  background: var(--color-surface);
+}
+
+.nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+}
+
+.page h2,
+.page h3 {
+  text-align: center;
+  scroll-margin-top: var(--nav-height);
+}
+
+.page h2 {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-h2);
+}
+
+.page h3 {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+
+.setup-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.setup-cell p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 .code-block {
@@ -80,6 +213,14 @@ body {
 .code-block .cm-editor .cm-gutters {
   background: var(--color-code-bg);
   border: none;
+}
+
+.code-block .cm-editor {
+  color: var(--code-text);
+}
+
+.code-block .cm-scroller {
+  padding: var(--space-1) 0;
 }
 
 .code-block .cm-editor .cm-activeLine,
@@ -117,14 +258,24 @@ body {
 }
 
 .chart > .copy-button {
-  background: var(--color-code-bg);
+  background: var(--color-overlay-button);
+  color: var(--text-on-dark-pure);
+}
+
+.chart > .copy-button:hover {
+  background: var(--color-overlay-button-hover);
+  color: var(--text-on-dark-pure);
 }
 
 .runnable {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
-  height: var(--runnable-height);
+  align-items: start;
+}
+
+.runnable + .runnable {
+  margin-top: var(--space-6);
 }
 
 .runnable > * {
@@ -145,10 +296,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  overflow: auto;
-  padding: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
 }
 
 .chart {
@@ -159,6 +306,8 @@ body {
 .chart img {
   width: 100%;
   height: auto;
+  max-height: var(--runnable-height);
+  object-fit: contain;
   display: block;
 }
 
@@ -172,24 +321,46 @@ pre {
   color: var(--color-error);
 }
 
-.hint {
-  color: var(--text-secondary);
-  font-size: var(--font-size-small);
+.skeleton {
+  width: 100%;
+  aspect-ratio: var(--chart-aspect-ratio);
+  max-height: var(--runnable-height);
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-shimmer) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer var(--shimmer-duration) linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
 }
 
 /* Custom properties are not allowed in media queries. */
 @media (max-width: 800px) {
   .runnable {
     grid-template-columns: 1fr;
-    grid-template-rows: 50vh auto;
-    height: auto;
   }
 }
 
+/* overflow: hidden clips the inner scroller to the rounded corners. */
 .code-block .cm-editor .cm-tooltip:has(.doc-tooltip) {
-  background: var(--color-bg);
+  z-index: var(--z-tooltip);
   border: none;
   border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--shadow-tooltip);
 }
 
@@ -197,14 +368,22 @@ pre {
   margin: 0;
   padding: var(--space-1-5) var(--space-2);
   color: var(--text-primary);
-  background: var(--color-bg);
   line-height: 1.5;
   max-width: var(--tooltip-max-width);
   max-height: var(--tooltip-max-height);
   overflow: auto;
   white-space: pre-wrap;
-  font-family: var(--font-doc);
+  font-family: var(--font-body);
   font-size: var(--font-size-doc);
+}
+
+.doc-heading {
+  font-size: var(--font-size-doc-heading);
+  font-weight: var(--font-weight-doc-heading);
+}
+
+.doc-meta {
+  color: var(--text-secondary);
 }
 
 .doc-tooltip code {

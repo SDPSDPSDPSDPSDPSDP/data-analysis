@@ -1,12 +1,13 @@
-import matplotlib
+from typing import List
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import pytest
+
+import shirin.plot.all_plots as all_plots
 
 
 @pytest.fixture(autouse=True)
-def close_plots():
-    """Close all matplotlib figures after each test."""
-    yield
-    plt.close('all')
+def shown(monkeypatch: pytest.MonkeyPatch) -> List[str]:
+    """Collect the SVGs PlotGraphs would display instead of needing a notebook."""
+    svgs: List[str] = []
+    monkeypatch.setattr(all_plots, 'show', svgs.append)
+    return svgs

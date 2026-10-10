@@ -7,7 +7,8 @@ from ..core.base_plot import AbstractPlot, default_colors
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.sorting import palette_colors
-from ..config import FigureSize, FontSizes, TextColors
+from ..config import FigureSize
+from ..svg import Text
 from ...number_format import format_thousands
 
 
@@ -19,7 +20,7 @@ class PieChart(AbstractPlot):
         self._labels: List[str] = []
         self._colors: List[str] = []
         self._values: List[float] = []
-        self._autotexts: List[Any] = []
+        self._autotexts: List[Text] = []
 
     def preprocess(self) -> pd.DataFrame:
         return self.options.df.copy()
@@ -40,33 +41,22 @@ class PieChart(AbstractPlot):
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
-        ax = self._new_axes((FigureSize.PIE, FigureSize.PIE))
+        chart = self._new_chart(None, FigureSize.PIE)
         self._autotexts = renderer.render_piechart(
-            ax,
+            chart,
             values=self._values,
             colors=self._colors,
             donut=self.options.donut,
             n_after_comma=self.options.n_after_comma,
             value_datalabel=self.options.value_datalabel,
-            pctdistance=0.775 if self.options.donut else 0.6
+            pctdistance=0.8 if self.options.donut else 0.6
         )
-        return ax
+        return chart
 
     def format_plot(self, plot: Any) -> None:
-        legend_labels = [
-            f'{label}: {format_thousands(val)}'
-            for label, val in zip(self._labels, self._values)
+        plot.legend = [
+            (color, f'{label}: {format_thousands(val)}')
+            for color, label, val in zip(self._colors, self._labels, self._values)
         ]
-        legend = plot.legend(
-            legend_labels,
-            loc="lower center",
-            bbox_to_anchor=(0.5, 0.98),
-            fontsize=FontSizes.LEGEND,
-            framealpha=0.0,
-            ncol=1,
-        )
-        for text in legend.get_texts():
-            text.set_color(TextColors.DARK_GREY)
-
         for bg_color, autotext in zip(self._colors, self._autotexts):
-            autotext.set_color(get_text_color_for_background(bg_color))
+            autotext.color = get_text_color_for_background(bg_color)

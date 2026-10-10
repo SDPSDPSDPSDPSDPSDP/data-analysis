@@ -1,6 +1,7 @@
 // The only entry point to Python. One worker per browser tab, created on first
 // use and kept across client-side navigation, so Pyodide loads once per visit.
 
+// images are SVG markup.
 export type RunResult = { images: string[]; stdout: string; error?: string };
 
 let worker: Worker | undefined;

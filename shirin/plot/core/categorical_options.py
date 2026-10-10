@@ -2,14 +2,11 @@ from dataclasses import dataclass
 from typing import ClassVar, Optional
 
 from ..config.colors import Colors
-from ..config import FigureSizeInput, OrderType, OrderTypeInput, StackedLabelType, StackedLabelTypeInput
+from ..config import OrderType, OrderTypeInput
 from .base_options import (
     VALID_ORDER_TYPES,
     VALID_ORIENTATIONS,
-    VALID_STACKED_LABEL_TYPES,
-    VALID_FIGURE_SIZES,
     BasePlotOptions,
-    InvalidOptionError,
     validate_str_or_enum_option,
 )
 
@@ -20,11 +17,9 @@ class CategoricalPlotOptions(BasePlotOptions):
 
     axis_column: str = ''
     orientation: str = 'vertical'
-    figsize: FigureSizeInput = 'dynamic'
     stacked: bool = False
-    stacked_labels: StackedLabelTypeInput = None
     order_type: OrderTypeInput = 'frequency'
-    show_labels: bool = True
+    data_labels: bool = True
     suffix: Optional[str] = None
 
     def validate(self) -> None:
@@ -45,20 +40,11 @@ class CategoricalPlotOptions(BasePlotOptions):
             enum_type=OrderType,
         )
 
-        validate_str_or_enum_option(
-            option_name='stacked_labels',
-            value=self.stacked_labels,
-            valid_options=VALID_STACKED_LABEL_TYPES,
-            enum_type=StackedLabelType,
-            allow_none=True,
-        )
 
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
         if self.stacked and self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) when stacked=True")
-        if not isinstance(self.figsize, (int, float)) and self.figsize not in VALID_FIGURE_SIZES:
-            raise InvalidOptionError('figsize', self.figsize, VALID_FIGURE_SIZES, 'strings or numbers')
 
 
 @dataclass
@@ -82,10 +68,9 @@ class BarPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class NormalizedCountPlotOptions(CategoricalPlotOptions):
-    """Always a 100%-stacked plot of hue shares; `stacked`/`stacked_labels` are ignored."""
+    """Always a 100%-stacked plot of hue shares; `stacked` is ignored."""
 
     top_n: Optional[int] = None
-    ylabel: str = 'Percentage'
 
     def validate(self) -> None:
         super().validate()
@@ -97,7 +82,7 @@ class NormalizedCountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class AccuracyPlotOptions(CategoricalPlotOptions):
-    """`stacked`, `hue`, `figsize`, `stacked_labels` and `order_type` are fixed for accuracy plots."""
+    """`stacked`, `hue` and `order_type` are fixed for accuracy plots."""
 
     # hue is a synthetic column added in transform, so it is not checked against df.
     column_fields: ClassVar[tuple[str, ...]] = ('axis_column', 'value_column')
@@ -108,8 +93,6 @@ class AccuracyPlotOptions(CategoricalPlotOptions):
     def __post_init__(self) -> None:
         self.stacked = True
         self.hue = '__is_correct__'
-        self.figsize = 'dynamic'
-        self.stacked_labels = 'standard'
         if not isinstance(self.palette, dict):
             self.palette = {'Correct': Colors.GOOD_GREEN, 'Incorrect': Colors.BAD_RED}
 
