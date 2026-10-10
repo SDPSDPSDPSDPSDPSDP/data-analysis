@@ -22,12 +22,15 @@
   --code-comment: #7d8799;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
+  --color-overlay-button: rgba(0, 0, 0, 0.5);
+  --color-overlay-button-hover: rgba(0, 0, 0, 0.7);
 
   --text-primary: rgba(0, 0, 0, 0.93);
   --text-muted: rgba(0, 0, 0, 0.7);
   --text-secondary: rgba(0, 0, 0, 0.53);
   --text-on-dark: rgba(255, 255, 255, 0.93);
   --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
+  --text-on-dark-pure: rgba(255, 255, 255, 1);
 
   --font-body: var(--font-satoshi), sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
@@ -253,7 +256,13 @@ body {
 }
 
 .chart > .copy-button {
-  background: var(--color-code-bg);
+  background: var(--color-overlay-button);
+  color: var(--text-on-dark-pure);
+}
+
+.chart > .copy-button:hover {
+  background: var(--color-overlay-button-hover);
+  color: var(--text-on-dark-pure);
 }
 
 .runnable {
