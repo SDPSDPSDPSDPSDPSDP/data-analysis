@@ -5,8 +5,8 @@ from shirin.assets.data import df
 from shirin.plot import PlotGraphs
 
 plot = PlotGraphs(
-    palette={'ripe': {True: "#e9d0ff", False: "#6f2525"}},
-    label_mapping={'ripe': {True: 'Ripe', False: 'Unripe'}},
+    palette={'is_ripe': {True: "#e9d0ff", False: "#6f2525"}},
+    label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},
 )
 
 # %% Plain
@@ -46,7 +46,7 @@ plot.countplot(
 plot.countplot(
     df,
     x='fruit',
-    hue='ripe',
+    hue='is_ripe',
     legend=True,
     title='Grouped by ripeness',
 )
@@ -55,7 +55,7 @@ plot.countplot(
 plot.countplot(
     df,
     y='fruit',
-    hue='ripe',
+    hue='is_ripe',
     normalized=True,
     legend=True,
     title=['Normalized', 'Share ripe per fruit'],

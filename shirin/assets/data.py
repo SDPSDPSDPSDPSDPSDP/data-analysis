@@ -10,7 +10,7 @@ def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 300) -> Da
     fruit = rng.choice(list(fruit_share), num_rows, p=list(fruit_share.values()))
     return pd.DataFrame({
         'fruit': fruit,
-        'ripe': rng.random(num_rows) < pd.Series(fruit).map(ripe_share).to_numpy(),
+        'is_ripe': rng.random(num_rows) < pd.Series(fruit).map(ripe_share).to_numpy(),
     })
 
 
