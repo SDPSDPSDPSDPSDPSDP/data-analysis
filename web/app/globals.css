@@ -3,6 +3,8 @@
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-border: rgba(0, 0, 0, 0.1);
   --color-error: #b00020;
+  --color-code-bg: #1e1e1e;
+  --color-code-highlight: rgba(255, 255, 255, 0.05);
 
   --text-primary: rgba(0, 0, 0, 0.93);
   --text-secondary: rgba(0, 0, 0, 0.53);
@@ -21,6 +23,8 @@
 
   --border-width: 1px;
   --radius: 6px;
+
+  --runnable-height: 75vh;
 }
 
 * {
@@ -34,13 +38,15 @@ body {
   color: var(--text-primary);
 }
 
-.header {
-  padding: var(--space-3) var(--space-2) var(--space-2);
-  border-bottom: var(--border-width) solid var(--color-border);
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
 }
 
-.header h1 {
-  margin: 0 0 var(--space-1-5);
+.page h1 {
+  margin: 0;
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
@@ -49,13 +55,24 @@ body {
 .code-block {
   position: relative;
   font-size: var(--font-size-code);
-  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
 }
 
 .code-block > div {
   height: 100%;
+}
+
+/* Overrides the bluish CodeMirror dark theme. */
+.code-block .cm-editor,
+.code-block .cm-editor .cm-gutters {
+  background: var(--color-code-bg);
+  border: none;
+}
+
+.code-block .cm-editor .cm-activeLine,
+.code-block .cm-editor .cm-activeLineGutter {
+  background: var(--color-code-highlight);
 }
 
 .copyable .copy-button {
@@ -70,39 +87,38 @@ body {
   opacity: 1;
 }
 
-.playground {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 100vh;
+.code-actions {
+  position: absolute;
+  right: var(--space-1);
+  bottom: var(--space-1);
 }
 
-.pane {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  border-right: var(--border-width) solid var(--color-border);
-}
-
-.toolbar {
+.run-button {
   display: flex;
   align-items: center;
-  gap: var(--space-1-5);
-  padding: var(--space-1) var(--space-1-5);
-  border-bottom: var(--border-width) solid var(--color-border);
+  gap: var(--space-1);
 }
 
-.editor {
-  flex: 1;
+.runnable {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  height: var(--runnable-height);
+}
+
+.runnable > * {
+  min-width: 0;
   min-height: 0;
-  border: none;
-  border-radius: 0;
 }
 
 .output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   overflow: auto;
   padding: var(--space-2);
-  gap: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 .chart {
@@ -133,7 +149,7 @@ pre {
 
 /* Custom properties are not allowed in media queries. */
 @media (max-width: 800px) {
-  .playground {
+  .runnable {
     grid-template-columns: 1fr;
     grid-template-rows: 50vh auto;
     height: auto;
