@@ -1,7 +1,6 @@
 from typing import Any
 
 import pandas as pd
-import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 from ..core.base_plot import AbstractPlot, split_palette
@@ -74,35 +73,16 @@ class TimePlot(AbstractPlot):
     def draw(self, data: pd.DataFrame) -> Any:
         self._create_standard_figure()
 
-        ax = plt.gca()
         if self.options.plot_type == 'bar':
-            ax.bar(
-                data['_time_group'],
-                data['count'],
-                color=self._color,
-                edgecolor='none',
-                alpha=1,
-                width=self._get_bar_width()
+            return self.renderer.render_time_bars(
+                data['_time_group'], data['count'], color=self._color, width=self._get_bar_width()
             )
-        else:  # line
-            show_markers = not (self.options.group_by == 'day' and len(data) > 25)
-            marker = 'o' if show_markers else None
-            markersize = 3 if show_markers else 0
-
-            ax.plot(
-                data['_time_group'],
-                data['count'],
-                color=Colors.BLACK,
-                linewidth=2,
-                marker=marker,
-                markersize=markersize,
-                markerfacecolor=Colors.BLACK,
-                markeredgecolor=Colors.BLACK,
-                markeredgewidth=0,
-                alpha=0.9,
-            )
-
-        return ax
+        return self.renderer.render_time_line(
+            data['_time_group'],
+            data['count'],
+            color=Colors.BLACK,
+            show_markers=not (self.options.group_by == 'day' and len(data) > 25),
+        )
 
     def _get_bar_width(self) -> float:
         """Bar width in days for the grouping."""
@@ -140,7 +120,9 @@ class TimePlot(AbstractPlot):
         else:  # day
             ax.xaxis.set_major_locator(mdates.AutoDateLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            plt.setp(ax.get_xticklabels(), rotation=self.options.rotation, ha='right')
+            ax.tick_params(axis='x', labelrotation=self.options.rotation)
+            for label in ax.get_xticklabels():
+                label.set_horizontalalignment('right')
 
         ax.figure.tight_layout()
 

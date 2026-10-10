@@ -140,6 +140,27 @@ class SeabornRenderer:
             width=width
         )
     
+    def render_time_bars(self, dates: pd.Series, counts: pd.Series, color: Optional[str], width: float) -> Any:
+        ax = plt.gca()
+        ax.bar(dates, counts, color=color, edgecolor='none', alpha=1, width=width)
+        return ax
+
+    def render_time_line(self, dates: pd.Series, counts: pd.Series, color: str, show_markers: bool) -> Any:
+        ax = plt.gca()
+        ax.plot(
+            dates,
+            counts,
+            color=color,
+            linewidth=2,
+            marker='o' if show_markers else None,
+            markersize=3 if show_markers else 0,
+            markerfacecolor=color,
+            markeredgecolor=color,
+            markeredgewidth=0,
+            alpha=0.9,
+        )
+        return ax
+
     def render_piechart(
         self,
         values: list[float],

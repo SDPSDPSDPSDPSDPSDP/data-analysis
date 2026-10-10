@@ -38,7 +38,8 @@ def test_every_method_renders(plot: PlotGraphs, df: pd.DataFrame) -> None:
     plot.scatterplot(df, x='value', y='value')
     plot.pie(df, col='category')
     plot.timeplot(df, x='date', group_by='month')
-    plot.accuracy(pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]}), experiment='run', accuracy='acc')
+    plot.timeplot(df, x='date', group_by='day', plot_type='line', rotation=45)
+    plot.accuracy(pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]}), experiment='run', accuracy='acc', reverse_order=True)
     assert plt.get_fignums() == []  # exporter closes every figure
 
 

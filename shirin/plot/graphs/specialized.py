@@ -44,7 +44,7 @@ class SpecializedPlotsMixin:
         palette: Optional[str] = None,
         xlabel: str = '',
         ylabel: str = 'Total',
-        type: str = 'bar',
+        plot_type: str = 'bar',
         display_month: bool = True,
         cumulative: bool = False,
         rotation: int = 0,
@@ -63,6 +63,9 @@ class SpecializedPlotsMixin:
             palette: Color for the bars (single color string, e.g. `'#FF5733'`). *Optional*.
             xlabel: Label for the x-axis. *Default: `''`*.
             ylabel: Label for the y-axis. *Default: `'Total'`*.
+            plot_type: Chart type. **Options:** `'bar'`, `'line'`. *Default: `'bar'`*.
+            display_month: Show month ticks (with year labels below) when grouping by month;
+                `False` shows only years. *Default: `True`*.
             cumulative: Whether to calculate cumulative values by group. *Default: `False`*.
             rotation: Rotation angle for x-axis labels when grouping by day. *Default: `0`*.
             output_name: Name for the exported file. *Default: `'timeplot'`*.
@@ -78,7 +81,7 @@ class SpecializedPlotsMixin:
             palette=palette,
             xlabel=xlabel,
             ylabel=ylabel,
-            plot_type=type,
+            plot_type=plot_type,
             display_month=display_month,
             cumulative=cumulative,
             rotation=rotation,
@@ -95,7 +98,6 @@ class SpecializedPlotsMixin:
         experiment_label: str = '',
         accuracy_label: str = '',
         orientation: str = 'vertical',
-        reverse: Optional[bool] = None,
         reverse_order: bool = False,
         plot_legend: bool = False,
         suffix: Optional[str] = None,
@@ -117,8 +119,6 @@ class SpecializedPlotsMixin:
             accuracy_label: Label for the value axis. *Default: ``''``*.
             orientation: Direction of the bars. **Options:** ``'vertical'`` (bars grow upward),
                 ``'horizontal'`` (bars grow rightward). *Default: ``'vertical'``*.
-            reverse: Backward-compatible alias for ``reverse_order``.
-                If provided, it overrides ``reverse_order``.
             reverse_order: Whether to reverse the default sorting order.
                 - Vertical default is highest accuracy first; with ``True`` lowest is first.
                 - Horizontal default is highest at the top; with ``True`` lowest is at the top.
@@ -148,7 +148,7 @@ class SpecializedPlotsMixin:
             xlabel=experiment_label,
             ylabel=accuracy_label,
             orientation=orientation,
-            reverse_order=reverse if reverse is not None else reverse_order,
+            reverse_order=reverse_order,
             plot_legend=plot_legend,
             suffix=suffix,
         )
