@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import Playground from "@/components/domain/Playground";
-import type { DataFormat, PlotSectionData } from "@/components/domain/PlotSection";
+import type { DataFormat, Example, PlotSectionData } from "@/components/domain/PlotSection";
 
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
-// "# %% [hidden]" cells run before every example but are not shown.
+// "# %% [hidden]" cells run before every example below them but are not shown.
 // Other "# %% label" cells are runnable examples; their labels are not shown.
 function parseExamples(file: string) {
   const source = readFileSync(join(process.cwd(), "examples", file), "utf8");
@@ -18,12 +18,13 @@ function parseExamples(file: string) {
   const setup = cells
     .filter((cell) => cell.label.startsWith("[setup]"))
     .map((cell) => ({ explanation: cell.label.replace("[setup]", "").trim(), code: cell.code }));
-  const hiddenSetup = cells
-    .filter((cell) => cell.label.startsWith("[hidden]"))
-    .map((cell) => cell.code)
-    .join("\n\n");
-  const examples = cells.filter((cell) => !cell.label.startsWith("[")).map((cell) => cell.code);
-  return { setup, hiddenSetup, examples };
+  const hidden: string[] = [];
+  const examples: Example[] = [];
+  for (const cell of cells) {
+    if (cell.label.startsWith("[hidden]")) hidden.push(cell.code);
+    else if (!cell.label.startsWith("[")) examples.push({ code: cell.code, hiddenSetup: hidden.join("\n\n") });
+  }
+  return { setup, examples };
 }
 
 function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {
@@ -33,7 +34,7 @@ function section(title: string, file: string, ...dataFormats: DataFormat[]): Plo
 export default function Home() {
   const barCharts = [
     section("Barplots", "bar.py", {
-      description: "Without value (df): one row per observation. The plot counts the rows per category.",
+      description: "Without value: one row per observation. The plot counts the rows per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },
@@ -45,7 +46,7 @@ export default function Home() {
         ["Mango", "True"],
       ],
     }, {
-      description: "With value (df_fruit_counts): one row per category and hue, with the value already calculated. The plot sums the values per category.",
+      description: "With value: one row per category and hue, with the value already calculated. The plot sums the values per category.",
       columns: [
         { name: "fruit", role: "x or y" },
         { name: "is_ripe", role: "hue" },

@@ -1,4 +1,5 @@
 - custom scrollbar
+- skill
 
 # later
 - dark mode
