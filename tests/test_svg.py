@@ -38,6 +38,16 @@ def test_title_adds_height_instead_of_squeezing_plot() -> None:
     assert _attr(to_svg(chart('Title')), 'height') > _attr(to_svg(chart('')), 'height')
 
 
+def test_title_is_centered_over_plot() -> None:
+    def title_center(title: str) -> float:
+        c = Chart(width=6, plot_height=3, title=title)
+        c.rects.append(Rect(0, 1, 0, 5, '#123456'))
+        shift = float(to_svg(c).split('translate(')[1].split(' ')[0])
+        return shift + text_width(title, 15, bold=True) / 2
+
+    assert title_center('T') == pytest.approx(title_center('A much longer title'))
+
+
 def test_long_data_label_shrinks_plot_width() -> None:
     def bar_width(label: str) -> float:
         c = Chart(width=6, plot_height=1)

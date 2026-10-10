@@ -22,7 +22,7 @@ class Layout:
     ROW_GAP = 6
     PLOT_GAP = 12
     TICK_GAP = 6
-    LABEL_GAP = 8
+    LABEL_GAP = 14
     DATALABEL_GAP = 3
     SWATCH = 8
     SWATCH_GAP = 4

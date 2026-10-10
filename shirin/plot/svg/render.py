@@ -139,8 +139,8 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     width = chart.width * PT_PER_INCH if fixed_width else plot_left + plot_h + Layout.PAD  # type: ignore[operator]
     plot_w = width - plot_left - Layout.PAD
 
-    header: List[str] = []
-    header_widths: List[float] = []
+    # Rows are drawn from x=0 and shifted to center over the plot once its final width is known.
+    header_rows: List[Tuple[float, List[str]]] = []
     top = float(Layout.PAD)
 
     def header_row(height: float) -> float:
@@ -155,18 +155,18 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     ):
         if text:
             row_top = header_row(size)
-            header.append(_text(plot_left, row_top + cap_height(size), text, size, color, bold=bold))
-            header_widths.append(text_width(text, size, bold))
+            header_rows.append((text_width(text, size, bold), [_text(0, row_top + cap_height(size), text, size, color, bold=bold)]))
     for row in _legend_rows(chart.legend, plot_w):
         row_top = header_row(Layout.SWATCH)
-        x = plot_left
+        x = 0.0
+        items: List[str] = []
         for color, label, item_width in row:
-            header.append(f'<rect x="{x:.2f}" y="{row_top:.2f}" width="{Layout.SWATCH}" height="{Layout.SWATCH}" fill="{color}"/>')
+            items.append(f'<rect x="{x:.2f}" y="{row_top:.2f}" width="{Layout.SWATCH}" height="{Layout.SWATCH}" fill="{color}"/>')
             baseline = row_top + Layout.SWATCH / 2 + cap_height(FontSizes.LEGEND) / 2
-            header.append(_text(x + Layout.SWATCH + Layout.SWATCH_GAP, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
+            items.append(_text(x + Layout.SWATCH + Layout.SWATCH_GAP, baseline, label, FontSizes.LEGEND, TextColors.DARK_GREY))
             x += item_width + Layout.LEGEND_ITEM_GAP
-        header_widths.append(x - Layout.LEGEND_ITEM_GAP - plot_left)
-    plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if header else top
+        header_rows.append((x - Layout.LEGEND_ITEM_GAP, items))
+    plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if header_rows else top
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
@@ -179,9 +179,13 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     if fixed_width:
         plot_w -= right_overflow
     else:
-        width = max(width + right_overflow, plot_left + max(header_widths, default=0) + Layout.PAD)
+        width = max([width + right_overflow] + [row_width + 2 * Layout.PAD for row_width, _ in header_rows])
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
     plot_bottom = plot_top + plot_h
+    header = [
+        f'<g transform="translate({max(Layout.PAD, min(plot_left + (plot_w - w) / 2, width - Layout.PAD - w)):.2f} 0)">{"".join(items)}</g>'
+        for w, items in header_rows
+    ]
 
     body: List[str] = []
     grid = 'stroke="{}" stroke-width="0.5" stroke-dasharray="1 1.5"'.format(GRID_COLOR)
