@@ -27,9 +27,9 @@ function inlineMarkdown(text: string): string {
 function formatDoc(doc: string): string {
   return inlineMarkdown(doc.replace(/\n {8}(?=\S)/g, " "))
     .replace(/^([A-Z]\w*):$/gm, '<span class="doc-heading">$1</span>')
-    .replace(/^( {4})(\w+):/gm, "$1<strong>$2</strong>:")
-    .replace(/ (<em>(?:Optional|Default:.*?)<\/em>\.?)/g, '\n        <span class="doc-meta">$1</span>')
-    .replace(/ (<strong>Options:<\/strong>.*)$/gm, '\n        <span class="doc-meta">$1</span>');
+    .replace(/^ {4}(\w+):/gm, "<strong>$1</strong>:")
+    .replace(/ (<em>(?:Optional|Default:.*?)<\/em>\.?)/g, '\n    <span class="doc-meta">$1</span>')
+    .replace(/ (<strong>Options:<\/strong>.*)$/gm, '\n    <span class="doc-meta">$1</span>');
 }
 
 const DOCS: Record<string, string> = docstrings;

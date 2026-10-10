@@ -8,6 +8,7 @@
   --glass-saturate: 180%;
   /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
   --z-nav: 1000;
+  --z-tooltip: 1100;
   --color-code-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
   /* Syntax colors, applied by CodeBlock's highlight style. */
@@ -51,6 +52,7 @@
   --space-1-5: 12px;
   --space-2: 16px;
   --space-3: 24px;
+  --space-6: 48px;
   --nav-height: 56px;
 
   --radius: 6px;
@@ -272,6 +274,10 @@ body {
   align-items: start;
 }
 
+.runnable + .runnable {
+  margin-top: var(--space-6);
+}
+
 .runnable > * {
   min-width: 0;
   min-height: 0;
@@ -347,10 +353,14 @@ pre {
   }
 }
 
+/* overflow: hidden clips the inner scroller to the rounded corners. */
 .code-block .cm-editor .cm-tooltip:has(.doc-tooltip) {
-  background: var(--color-bg);
+  z-index: var(--z-tooltip);
   border: none;
   border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--shadow-tooltip);
 }
 
@@ -358,7 +368,6 @@ pre {
   margin: 0;
   padding: var(--space-1-5) var(--space-2);
   color: var(--text-primary);
-  background: var(--color-bg);
   line-height: 1.5;
   max-width: var(--tooltip-max-width);
   max-height: var(--tooltip-max-height);
