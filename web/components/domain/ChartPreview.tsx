@@ -1,6 +1,4 @@
-"use client";
-
-import { useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 type Props = {
   // Prerendered SVG from scripts/build-previews.mjs, drawn without its title.
@@ -9,21 +7,22 @@ type Props = {
   subtitle: string | null;
   // Position in the grid, staggers the entrance animation.
   index: number;
-  // Gets the card so the modal can animate out of it.
+  // Another card was clicked, this one shrinks out of the way.
+  shrunk: boolean;
+  // Gets the card button, its transition timing decides when the modal opens.
   onOpen: (card: HTMLElement) => void;
 };
 
 // Chart only, no code: opens the example in a modal where it can be edited.
-export default function ChartPreview({ src, title, subtitle, index, onOpen }: Props) {
-  const card = useRef<HTMLSpanElement>(null);
+export default function ChartPreview({ src, title, subtitle, index, shrunk, onOpen }: Props) {
   return (
     <button
       type="button"
-      className="chart-preview"
+      className={shrunk ? "chart-preview shrunk" : "chart-preview"}
       style={{ "--i": index } as CSSProperties}
-      onClick={() => onOpen(card.current!)}
+      onClick={(event) => onOpen(event.currentTarget)}
     >
-      <span className="chart-preview-card" ref={card}>
+      <span className="chart-preview-card">
         <span className="chart-preview-title">{title}</span>
         {subtitle && <span className="chart-preview-subtitle">{subtitle}</span>}
         <img src={src} alt={title} loading="lazy" />

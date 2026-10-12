@@ -23,7 +23,7 @@ plot.histogram(
     title=['Sour fruit', 'Sugar up to 10%'],
 )
 
-# %% Stacked by hue
+# %% Stacked by hue [no-home]
 plot.histogram(
     df,
     x='sweetness',

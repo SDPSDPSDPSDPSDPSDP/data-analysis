@@ -63,9 +63,7 @@
   --home-chart-enter-duration: 1200ms;
   --home-chart-enter-stagger: 120ms;
   --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);
-  --home-chart-modal-duration: 600ms;
-  --home-chart-modal-shrink: 0.85;
-
+  --home-chart-modal-duration: 400ms;
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;

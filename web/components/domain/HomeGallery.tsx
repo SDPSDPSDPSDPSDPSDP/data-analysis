@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { flushSync } from "react-dom";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
@@ -17,6 +16,8 @@ type Props = {
 
 export default function HomeGallery({ categories, charts }: Props) {
   const [active, setActive] = useState<string | null>(null);
+  // Clicked card; the others shrink first, the modal opens once they are done.
+  const [selected, setSelected] = useState<Chart | null>(null);
   const [open, setOpen] = useState<Chart | null>(null);
   const [order, setOrder] = useState<Chart[] | null>(null);
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
@@ -30,15 +31,12 @@ export default function HomeGallery({ categories, charts }: Props) {
     setOrder(shuffled);
   }, [charts]);
 
-  // View transition morphs the clicked card into the modal chart, both share one view-transition-name.
+  // Computed transitionDuration is always in seconds; the raw token may be minified to another unit.
   function openChart(chart: Chart, card: HTMLElement) {
-    if (!document.startViewTransition) return setOpen(chart);
-    card.style.viewTransitionName = "chart-hero";
-    document.startViewTransition(() => {
-      card.style.viewTransitionName = "";
-      flushSync(() => setOpen(chart));
-    });
+    setSelected(chart);
+    setTimeout(() => setOpen(chart), parseFloat(getComputedStyle(card).transitionDuration) * 1000);
   }
+
   return (
     <>
       <Nav
@@ -62,6 +60,7 @@ export default function HomeGallery({ categories, charts }: Props) {
                 title={chart.title}
                 subtitle={chart.subtitle}
                 index={index}
+                shrunk={selected !== null && selected !== chart}
                 onOpen={(card) => openChart(chart, card)}
               />
             ))}
@@ -73,7 +72,10 @@ export default function HomeGallery({ categories, charts }: Props) {
           code={open.code}
           preview={open.preview}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.section)}`}
-          onClose={() => setOpen(null)}
+          onClose={() => {
+            setOpen(null);
+            setSelected(null);
+          }}
         />
       )}
     </>
