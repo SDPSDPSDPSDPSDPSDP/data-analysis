@@ -65,6 +65,8 @@
   --nav-height: 56px;
   --nav-dim-opacity: 0.4;
   --nav-dim-blur: 1.5px;
+  --nav-dim-transition: 350ms ease;
+  --nav-brand-hover-scale: 1.08;
   --home-chart-columns: 4;
   --home-chart-scale: 70%;
   --home-chart-enter-stagger: 180ms;

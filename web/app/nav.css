@@ -29,6 +29,12 @@
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
+  display: inline-block;
+  transition: transform var(--transition);
+}
+
+.nav-brand:hover {
+  transform: scale(var(--nav-brand-hover-scale));
 }
 
 .nav-menus {
@@ -36,16 +42,17 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: var(--space-3);
   height: 100%;
 }
 
+/* Padding instead of a gap on .nav-menus: crossing a gap un-hovers every menu, so the dim would flash off and on. */
 .nav-menu {
   position: relative;
   display: flex;
   align-items: center;
   height: 100%;
-  transition: opacity var(--transition), filter var(--transition);
+  padding: 0 calc(var(--space-3) / 2);
+  transition: opacity var(--nav-dim-transition), filter var(--nav-dim-transition);
 }
 
 .nav-menus:has(.nav-menu:hover) .nav-menu:not(:hover) {
