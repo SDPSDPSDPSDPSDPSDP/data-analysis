@@ -39,7 +39,9 @@ export default function HomeGallery({ categories, charts }: Props) {
   const [leaving, setLeaving] = useState(false);
 
   // Computed transitionDuration is always in seconds; the raw token may be minified to another unit.
-  function afterShrink(card: Element | null, then: () => void) {
+  function shrinkAll(then: () => void) {
+    setLeaving(true);
+    const card = document.querySelector(".chart-preview");
     setTimeout(then, card ? parseFloat(getComputedStyle(card).transitionDuration) * 1000 : 0);
   }
 
@@ -52,8 +54,7 @@ export default function HomeGallery({ categories, charts }: Props) {
   }
 
   function selectFilter(next: string | null) {
-    setLeaving(true);
-    afterShrink(document.querySelector(".chart-preview"), () => {
+    shrinkAll(() => {
       setActive(next);
       setLeaving(false);
     });
@@ -68,10 +69,7 @@ export default function HomeGallery({ categories, charts }: Props) {
           active,
           // Clicking the active category again shows every chart.
           onSelect: (title) => selectFilter(title === active ? null : title),
-          onLeave: (href) => {
-            setLeaving(true);
-            afterShrink(document.querySelector(".chart-preview"), () => router.push(href));
-          },
+          onLeave: (href) => shrinkAll(() => router.push(href)),
         }}
       />
       <main className="page home">

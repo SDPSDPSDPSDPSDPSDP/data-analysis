@@ -39,17 +39,21 @@ export default function Playground({ setup, categories, showSetup, expanded }: P
   }, []);
   return (
     <main className="page" ref={main}>
-      {showSetup && <h2>Setup</h2>}
-      {showSetup && setup.map((cell, i) => (
-        <section key={i} className="setup-cell">
-          {cell.explanation && <p>{cell.explanation}</p>}
-          <CodeBlock
-            value={setupCodes[i]}
-            onChange={(code) => setSetupCodes((codes) => codes.map((c, j) => (j === i ? code : c)))}
-            onRun={(code) => setSetupCode(setupCodes.map((c, j) => (j === i ? code : c)).join("\n\n"))}
-          />
-        </section>
-      ))}
+      {showSetup && (
+        <>
+          <h2>Setup</h2>
+          {setup.map((cell, i) => (
+            <section key={i} className="setup-cell">
+              {cell.explanation && <p>{cell.explanation}</p>}
+              <CodeBlock
+                value={setupCodes[i]}
+                onChange={(code) => setSetupCodes((codes) => codes.map((c, j) => (j === i ? code : c)))}
+                onRun={(code) => setSetupCode(setupCodes.map((c, j) => (j === i ? code : c)).join("\n\n"))}
+              />
+            </section>
+          ))}
+        </>
+      )}
       {categories.map((category) => (
         <div key={category.title}>
           {category.sections.length > 1 && <h2 id={sectionId(category.title)}>{category.title}</h2>}
