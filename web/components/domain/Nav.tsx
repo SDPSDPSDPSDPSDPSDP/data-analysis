@@ -19,11 +19,20 @@ type Props = {
 export default function Nav({ categories, filter }: Props) {
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
-  // Home has no link to every example, so the brand leads there.
+  // Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter.
   const pathname = usePathname();
   return (
     <nav className="nav">
-      <Link href={pathname === "/" ? "/all" : "/"} className="nav-brand">
+      <Link
+        href={pathname === "/" && !filter?.active ? "/all" : "/"}
+        className="nav-brand"
+        onClick={(e) => {
+          if (!filter?.active) return;
+          e.preventDefault();
+          // Selecting the active category again clears the filter.
+          filter.onSelect(filter.active);
+        }}
+      >
         shirin
       </Link>
       <div className="nav-menus">
