@@ -63,6 +63,8 @@
   --space-3: 24px;
   --space-6: 48px;
   --nav-height: 56px;
+  --nav-dim-opacity: 0.4;
+  --nav-dim-blur: 1.5px;
   --home-chart-columns: 4;
   --home-chart-scale: 70%;
   --home-chart-enter-stagger: 180ms;

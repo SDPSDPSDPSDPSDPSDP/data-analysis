@@ -45,6 +45,12 @@
   display: flex;
   align-items: center;
   height: 100%;
+  transition: opacity var(--transition), filter var(--transition);
+}
+
+.nav-menus:has(.nav-menu:hover) .nav-menu:not(:hover) {
+  opacity: var(--nav-dim-opacity);
+  filter: blur(var(--nav-dim-blur));
 }
 
 .nav-dropdown {
