@@ -5,7 +5,7 @@
 
 .home-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--home-chart-min-width), 1fr));
+  grid-template-columns: repeat(var(--home-chart-columns), minmax(0, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-6);
 }
@@ -92,4 +92,11 @@ html:has(.chart-modal[open]) {
 /* Default shimmer is black on light, invisible on the dark backdrop. */
 .chart-modal .skeleton {
   background-image: linear-gradient(90deg, var(--color-button) 25%, var(--color-button-hover) 50%, var(--color-button) 75%);
+}
+
+/* Custom properties are not allowed in media queries. */
+@media (max-width: 800px) {
+  .home-charts {
+    grid-template-columns: 1fr 1fr;
+  }
 }

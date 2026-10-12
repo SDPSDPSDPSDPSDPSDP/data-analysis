@@ -55,7 +55,7 @@
   --space-3: 24px;
   --space-6: 48px;
   --nav-height: 56px;
-  --home-chart-min-width: 280px;
+  --home-chart-columns: 4;
   --home-chart-scale: 70%;
 
   --radius: 6px;
