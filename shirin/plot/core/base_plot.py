@@ -38,7 +38,6 @@ class AbstractPlot(ABC):
     def __init__(self, options: BasePlotOptions):
         self.options = options
         self.chart: Optional[Chart] = None
-        self._preprocessed_df: Optional[pd.DataFrame] = None
         self._color: Optional[str] = None
         self._palette: Optional[Dict[Any, str]] = None
 
@@ -47,8 +46,7 @@ class AbstractPlot(ABC):
         self.options = dataclasses.replace(self.options)
         self.options.validate()
 
-        self._preprocessed_df = self.preprocess()
-        transformed_data = self.transform(self._preprocessed_df)
+        transformed_data = self.transform(self.preprocess())
         chart = self.draw(transformed_data)
         self.format_plot(chart)
         return chart

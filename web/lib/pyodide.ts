@@ -51,8 +51,10 @@ export function load(): Promise<void> {
     current.onmessage = (e) => {
       const msg = e.data;
       if (msg.type === "ready") {
-        if (msg.error) reject(new Error(msg.error));
-        else resolve();
+        if (!msg.error) return resolve();
+        reject(new Error(msg.error));
+        // Drop the broken worker so the next run retries the load instead of failing until reload.
+        if (worker === current) restart(`Python failed to load: ${msg.error}`);
       } else if (msg.type === "result") {
         const resolveRun = pending.get(msg.id);
         if (!resolveRun) return restart(`Result for unknown run id ${msg.id}. Python was restarted.`);

@@ -91,6 +91,13 @@ def test_bar_rejects_options_of_the_other_mode(df: pd.DataFrame) -> None:
         PlotGraphs().bar(df, x='category', value='value', top_n=2)
 
 
+def test_empty_filters_raise_named_errors(df: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match='top_n must be at least 1'):
+        PlotGraphs().bar(df, x='category', top_n=0)
+    with pytest.raises(ValueError, match='xlimit=-1000 leaves no'):
+        PlotGraphs().histogram(df, x='value', xlimit=-1000)
+
+
 def test_bar_group_by_fills_empty_periods_in_time_order(shown: List[str]) -> None:
     df = pd.DataFrame({'date': pd.to_datetime(['2024-03-02', '2024-01-05', '2024-03-09'])})
     PlotGraphs().bar(df, x='date', group_by='month')

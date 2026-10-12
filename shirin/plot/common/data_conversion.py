@@ -22,6 +22,8 @@ def ensure_column_is_string(df: pd.DataFrame, col: str) -> pd.DataFrame:
 
 
 def filter_top_n_categories(df: pd.DataFrame, col: str, top_n: int) -> pd.DataFrame:
+    if top_n < 1:
+        raise ValueError(f"top_n must be at least 1, got {top_n}")
     top_categories = df[col].value_counts().nlargest(top_n).index
     return df[df[col].isin(top_categories)].copy()
 
