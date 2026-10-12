@@ -52,5 +52,5 @@ class Marks:
     DONUT_HOLE_RADIUS = 0.6
     LINE_WIDTH = 1.5
     DOT_AREA = 36.0  # square points
-    DOT_AREA_RANGE = (18, 72)  # square points, when sized by a column
+    DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8

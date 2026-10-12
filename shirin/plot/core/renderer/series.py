@@ -50,7 +50,7 @@ def render_scatterplot(
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
 ) -> Chart:
-    """size scales marker area linearly between 18 and 72 square points over the numeric size column."""
+    """size scales marker area linearly between Marks.DOT_AREA_RANGE square points over the numeric size column."""
     areas = pd.Series(Marks.DOT_AREA, index=df.index)
     if size is not None:
         values = df[size].astype(float)
