@@ -36,10 +36,10 @@ def format_datalabels(
         if formatting == 'percentage':
             _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
         else:
-            _add_text(chart, rect, _with_suffix(format_thousands(length), suffix), orientation, _with_suffix(format_compact(length), suffix))
+            _add_text(chart, rect, with_suffix(format_thousands(length), suffix), orientation, with_suffix(format_compact(length), suffix))
 
 
-def _with_suffix(text: str, suffix: Optional[str]) -> str:
+def with_suffix(text: str, suffix: Optional[str]) -> str:
     return f'{text} {suffix.strip()}' if suffix and suffix.strip() else text
 
 
@@ -47,7 +47,7 @@ def _percentage_label(percentage: float, decimals: int, suffix: Optional[str]) -
     """A suffix replaces the '%' sign; an empty suffix drops it."""
     if suffix is None:
         return format_percentage(percentage, decimals)
-    return _with_suffix(format_thousands(percentage, decimals), suffix)
+    return with_suffix(format_thousands(percentage, decimals), suffix)
 
 
 def _add_stacked_labels(

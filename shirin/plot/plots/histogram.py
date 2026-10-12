@@ -6,6 +6,7 @@ from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import HistogramOptions
 from ..common.formatting import format_ticks
+from ..common.formatting.datalabels import with_suffix
 
 
 # Whole numbers in this range are treated as years: their ticks get no thousands separator.
@@ -65,4 +66,4 @@ class Histogram(AbstractPlot):
         )
         if self.options.suffix:
             plain = plot.x.formatter
-            plot.x.formatter = lambda val: f"{plain(val)} {self.options.suffix.strip()}"
+            plot.x.formatter = lambda val: with_suffix(plain(val), self.options.suffix)
