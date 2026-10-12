@@ -32,6 +32,10 @@ export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
+export function exampleSetup(globalSetup: string, setup: SetupCell[], example: Example): string {
+  return [globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n");
+}
+
 type Props = PlotSectionData & {
   globalSetup: string;
   // Only section of its category: takes the category's heading level instead.
@@ -44,7 +48,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
     <RunnableCode
       key={key}
       initialCode={example.code}
-      setup={[globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n")}
+      setup={exampleSetup(globalSetup, setup, example)}
     />
   );
   const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));

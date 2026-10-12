@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { sectionId } from "@/components/domain/PlotSection";
 import SectionIcon from "@/components/domain/SectionIcon";
@@ -12,9 +13,11 @@ type Props = {
 export default function Nav({ categories }: Props) {
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
+  // Home has no link to every example, so the brand leads there.
+  const pathname = usePathname();
   return (
     <nav className="nav">
-      <Link href="/" className="nav-brand">
+      <Link href={pathname === "/" ? "/all" : "/"} className="nav-brand">
         shirin
       </Link>
       <div className="nav-menus">

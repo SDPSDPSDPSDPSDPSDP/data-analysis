@@ -1,32 +1,30 @@
-import Link from "next/link";
 import Nav from "@/components/domain/Nav";
-import { sectionId } from "@/components/domain/PlotSection";
-import SectionIcon from "@/components/domain/SectionIcon";
-import { getCategories } from "@/app/categories";
+import ChartPreview from "@/components/domain/ChartPreview";
+import { exampleSetup, sectionId } from "@/components/domain/PlotSection";
+import { getCategories, getSetup } from "@/app/categories";
 
 export default function Home() {
   const categories = getCategories();
-  const cards = [
-    ...categories.map((category) => ({
-      title: category.title,
-      href: `/${sectionId(category.title)}`,
-      items: category.sections.map((section) => section.title),
-    })),
-    { title: "All", href: "/all", items: ["Every example on one page"] },
-  ];
+  const globalSetup = getSetup().map((cell) => cell.code).join("\n\n");
+  // The first example of each section is shown on its category page, so only the others.
+  // Sections without a data format are tools, not charts.
+  const charts = categories.flatMap((category) =>
+    category.sections
+      .filter((section) => section.dataFormats.length > 0)
+      .flatMap((section) =>
+        section.examples.slice(1).map((example) => ({
+          code: `${exampleSetup(globalSetup, section.setup, example)}\n${example.code}`,
+          href: `/${sectionId(category.title)}`,
+        })),
+      ),
+  );
   return (
     <>
       <Nav categories={categories} />
       <main className="page">
-        <div className="home-cards">
-          {cards.map((card) => (
-            <Link key={card.title} href={card.href} className="home-card">
-              <span className="home-card-icon">
-                <SectionIcon title={card.title} />
-              </span>
-              <h3>{card.title}</h3>
-              <p>{card.items.join(", ")}</p>
-            </Link>
+        <div className="home-charts">
+          {charts.map((chart, i) => (
+            <ChartPreview key={i} {...chart} />
           ))}
         </div>
       </main>
