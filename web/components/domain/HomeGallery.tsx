@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
@@ -16,6 +16,16 @@ type Props = {
 export default function HomeGallery({ categories, charts }: Props) {
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState<Chart | null>(null);
+  const [order, setOrder] = useState(charts);
+  // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
+  useEffect(() => {
+    const shuffled = [...charts];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setOrder(shuffled);
+  }, [charts]);
   return (
     <>
       <Nav
@@ -29,7 +39,7 @@ export default function HomeGallery({ categories, charts }: Props) {
       />
       <main className="page home">
         <div className="home-charts">
-          {charts
+          {order
             .filter((chart) => !active || chart.category === active)
             .map((chart) => (
               <ChartPreview key={chart.code} setup={chart.setup} code={chart.code} onOpen={() => setOpen(chart)} />

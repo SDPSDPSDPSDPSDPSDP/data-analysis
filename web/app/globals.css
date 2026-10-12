@@ -72,7 +72,7 @@
   --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;
   --page-max-width: 1200px;
-  --modal-width: 90vw;
+  --modal-width: min(90vw, 960px);
   --color-backdrop: rgba(0, 0, 0, 0.7);
   --tooltip-max-height: 400px;
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);

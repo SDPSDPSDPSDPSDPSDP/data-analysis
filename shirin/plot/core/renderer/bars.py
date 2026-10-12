@@ -73,6 +73,20 @@ def render_barplot(
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
 
+def _stacked_bars(
+    chart: Chart, centers: List[float], width: float, values: np.ndarray, colors: List[str], horizontal: bool
+) -> None:
+    """One bar per row of values, columns stacked in order as segments cut to one rounded outline."""
+    n_columns = values.shape[1]
+    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, values.sum(axis=1))]
+    base = np.zeros(len(values))
+    for column, color in enumerate(colors[:n_columns]):
+        for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
+            fade_to = next((colors[later] for later in range(column + 1, n_columns) if values[row, later]), None)
+            chart.rects.append(_bar_rect(center, width, start, value, color, horizontal, clip=outlines[row], fade_to=fade_to))
+        base += values[:, column]
+
+
 def render_stacked_barplot(
     chart: Chart,
     df: pd.DataFrame,
@@ -97,13 +111,7 @@ def render_stacked_barplot(
             _bar(chart, position, width, 0, total, back, horizontal, rounded=True)
             _bar(chart, position, width, 0, first, front, horizontal, rounded=True)
     else:
-        outlines = [_bar_rect(position, width, 0, total, '', horizontal, rounded=True) for position, total in enumerate(totals)]
-        base = np.zeros(len(df))
-        for column, color in enumerate(colors[:len(df.columns)]):
-            for position, (start, value) in enumerate(zip(base, values[:, column])):
-                fade_to = next((colors[later] for later in range(column + 1, len(df.columns)) if values[position, later]), None)
-                chart.rects.append(_bar_rect(position, width, start, value, color, horizontal, clip=outlines[position], fade_to=fade_to))
-            base += values[:, column]
+        _stacked_bars(chart, list(range(len(df))), width, values, colors, horizontal)
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     set_legend(chart, colors, list(df.columns))
     return chart
@@ -128,10 +136,8 @@ def render_histogram(
     group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
     inset = (edges[1] - edges[0]) * Marks.HISTOGRAM_GAP / 2
     if hue is not None and stacked is not False:
-        # Each group is a pill from 0 to its cumulative count, drawn back to front, like the barplot remainder.
-        for top, group_color in reversed(list(zip(np.cumsum(group_counts, axis=0), colors))):
-            for left, right, count in zip(edges[:-1], edges[1:], top):
-                chart.rects.append(Rect(left + inset, right - inset, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
+        centers = list((edges[:-1] + edges[1:]) / 2)
+        _stacked_bars(chart, centers, edges[1] - edges[0] - 2 * inset, np.column_stack(group_counts), colors, horizontal=False)
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
         for left, right, count in zip(edges[:-1] + inset, edges[1:] - inset, counts):
