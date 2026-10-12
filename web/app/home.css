@@ -55,10 +55,15 @@
 }
 
 .chart-modal-actions,
-.chart-modal-docs,
 .chart-modal .runnable > :first-child {
   /* Waits for the chart to land before fading in. */
   animation: chart-preview-in var(--home-chart-grow-duration) ease var(--home-chart-fly-duration) both;
+}
+
+/* Last in: after the chart lands and the editor has faded in. */
+.chart-modal-docs {
+  animation: chart-preview-in var(--home-chart-grow-duration) ease
+    calc(var(--home-chart-fly-duration) + var(--home-chart-grow-duration)) both;
 }
 
 /* Darkens while the chart flies in. */
