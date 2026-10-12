@@ -18,7 +18,8 @@ export default function HomeGallery({ categories, charts }: Props) {
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
-  const [open, setOpen] = useState<Chart | null>(null);
+  // Origin is the clicked card's spot, the modal chart flies out of it.
+  const [open, setOpen] = useState<{ chart: Chart; origin: DOMRect } | null>(null);
   const [order, setOrder] = useState<Chart[] | null>(null);
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
   // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
@@ -31,10 +32,28 @@ export default function HomeGallery({ categories, charts }: Props) {
     setOrder(shuffled);
   }, [charts]);
 
+  // Set while switching filter: every card shrinks away before the new ones fade in.
+  const [leaving, setLeaving] = useState(false);
+
   // Computed transitionDuration is always in seconds; the raw token may be minified to another unit.
+  function afterShrink(card: Element | null, then: () => void) {
+    setTimeout(then, card ? parseFloat(getComputedStyle(card).transitionDuration) * 1000 : 0);
+  }
+
+  // Chart flies out while the others shrink. Modal image decoded first so the modal can measure its final size on open.
   function openChart(chart: Chart, card: HTMLElement) {
     setSelected(chart);
-    setTimeout(() => setOpen(chart), parseFloat(getComputedStyle(card).transitionDuration) * 1000);
+    const image = new Image();
+    image.src = chart.preview;
+    image.decode().then(() => setOpen({ chart, origin: card.querySelector(".chart-preview-card")!.getBoundingClientRect() }));
+  }
+
+  function selectFilter(next: string | null) {
+    setLeaving(true);
+    afterShrink(document.querySelector(".chart-preview"), () => {
+      setActive(next);
+      setLeaving(false);
+    });
   }
 
   return (
@@ -45,7 +64,7 @@ export default function HomeGallery({ categories, charts }: Props) {
           categories: [...new Set(charts.map((chart) => chart.category))],
           active,
           // Clicking the active category again shows every chart.
-          onSelect: (title) => setActive(title === active ? null : title),
+          onSelect: (title) => selectFilter(title === active ? null : title),
         }}
       />
       <main className="page home">
@@ -60,7 +79,8 @@ export default function HomeGallery({ categories, charts }: Props) {
                 title={chart.title}
                 subtitle={chart.subtitle}
                 index={index}
-                shrunk={selected !== null && selected !== chart}
+                shrunk={leaving || (selected !== null && selected !== chart)}
+                hidden={open?.chart === chart}
                 onOpen={(card) => openChart(chart, card)}
               />
             ))}
@@ -68,10 +88,11 @@ export default function HomeGallery({ categories, charts }: Props) {
       </main>
       {open && (
         <ChartModal
-          setup={open.setup}
-          code={open.code}
-          preview={open.preview}
-          href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.section)}`}
+          setup={open.chart.setup}
+          code={open.chart.code}
+          preview={open.chart.preview}
+          origin={open.origin}
+          href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           onClose={() => {
             setOpen(null);
             setSelected(null);

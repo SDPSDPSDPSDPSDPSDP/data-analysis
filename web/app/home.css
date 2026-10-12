@@ -24,13 +24,41 @@
   pointer-events: none;
   /* On the button, not the card: the card's entrance animation would override a transform transition. */
   transition:
-    transform var(--home-chart-modal-duration) var(--home-chart-enter-ease),
-    opacity var(--home-chart-modal-duration) var(--home-chart-enter-ease);
+    transform var(--home-chart-grow-duration) var(--home-chart-enter-ease),
+    opacity var(--home-chart-grow-duration) var(--home-chart-enter-ease);
 }
 
 .chart-preview.shrunk {
   transform: scale(0);
   opacity: 0;
+}
+
+.chart-preview.hidden {
+  visibility: hidden;
+}
+
+/* Modal chart flies from the clicked card's spot, offsets set by ChartModal. */
+.chart-modal .chart.flying {
+  transform-origin: top left;
+  animation: chart-modal-fly var(--home-chart-fly-duration) var(--home-chart-enter-ease);
+}
+
+@keyframes chart-modal-fly {
+  from {
+    transform: translate(var(--fly-x), var(--fly-y)) scale(var(--fly-scale));
+  }
+}
+
+/* Dialog box would clip the chart while it flies in from outside it. */
+.chart-modal:has(.flying) {
+  overflow: visible;
+}
+
+.chart-modal::backdrop,
+.chart-modal-actions,
+.chart-modal .runnable > :first-child {
+  /* Waits for the chart to land before fading in. */
+  animation: chart-preview-in var(--home-chart-grow-duration) ease var(--home-chart-fly-duration) both;
 }
 
 .chart-preview-card {
@@ -46,19 +74,22 @@
   background: var(--color-bg);
   border-radius: var(--radius-home-chart);
   overflow: hidden;
-  animation: chart-preview-in var(--home-chart-enter-duration) var(--home-chart-enter-ease) both;
+  animation: chart-preview-in var(--home-chart-fade-duration) ease both;
   animation-delay: calc(var(--i) * var(--home-chart-enter-stagger));
 }
 
 @keyframes chart-preview-in {
   from {
     opacity: 0;
-    transform: scale(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chart-preview-card {
+  .chart-preview-card,
+  .chart-modal .chart.flying,
+  .chart-modal::backdrop,
+  .chart-modal-actions,
+  .chart-modal .runnable > :first-child {
     animation: none;
   }
 

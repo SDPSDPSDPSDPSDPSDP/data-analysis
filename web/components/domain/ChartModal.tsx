@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { ExternalLink, X } from "lucide-react";
 import RunnableCode from "@/components/domain/RunnableCode";
@@ -9,16 +9,30 @@ type Props = {
   setup: string;
   code: string;
   preview: string;
+  // Spot of the card that opened the modal, the chart flies from there into place.
+  origin: DOMRect;
   // Full page with this chart's examples.
   href: string;
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, preview, href, onClose }: Props) {
+export default function ChartModal({ setup, code, preview, origin, href, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
 
-  useEffect(() => {
-    dialog.current!.showModal();
+  // Layout effect: figure must start at the card's spot before first paint.
+  // FLIP: figure laid out in place, CSS animates it from the card's rect back to it.
+  useLayoutEffect(() => {
+    const modal = dialog.current!;
+    if (!modal.open) modal.showModal();
+    const figure = modal.querySelector<HTMLElement>(".output .chart")!;
+    // StrictMode runs this twice in dev: measuring while already flying would read the card's spot, not the target.
+    figure.classList.remove("flying");
+    const target = figure.getBoundingClientRect();
+    figure.style.setProperty("--fly-x", `${origin.left - target.left}px`);
+    figure.style.setProperty("--fly-y", `${origin.top - target.top}px`);
+    figure.style.setProperty("--fly-scale", `${origin.width / target.width}`);
+    figure.classList.add("flying");
+    figure.addEventListener("animationend", () => figure.classList.remove("flying"), { once: true });
   }, []);
 
   return (
