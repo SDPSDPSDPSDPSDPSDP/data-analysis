@@ -8,6 +8,20 @@
   grid-template-columns: repeat(var(--home-chart-columns), minmax(0, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-6);
+  transition: transform var(--home-chart-modal-duration) var(--home-chart-enter-ease);
+}
+
+html:has(.chart-modal[open]) .home-charts {
+  transform: scale(var(--home-chart-modal-shrink));
+}
+
+.chart-modal .copyable {
+  view-transition-name: chart-hero;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--home-chart-modal-duration);
+  animation-timing-function: var(--home-chart-enter-ease);
 }
 
 .chart-preview {
@@ -50,6 +64,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .chart-preview-card {
+    animation: none;
+  }
+
+  .home-charts {
+    transition: none;
+  }
+
+  ::view-transition-group(*) {
     animation: none;
   }
 }

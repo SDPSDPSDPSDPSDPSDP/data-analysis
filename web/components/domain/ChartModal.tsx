@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { ExternalLink, X } from "lucide-react";
 import RunnableCode from "@/components/domain/RunnableCode";
@@ -17,7 +17,8 @@ type Props = {
 export default function ChartModal({ setup, code, preview, href, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
 
-  useEffect(() => {
+  // Layout effect: dialog must be open before the opening view transition snapshots the page.
+  useLayoutEffect(() => {
     dialog.current!.showModal();
   }, []);
 

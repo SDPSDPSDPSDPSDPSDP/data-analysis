@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
@@ -28,6 +29,16 @@ export default function HomeGallery({ categories, charts }: Props) {
     }
     setOrder(shuffled);
   }, [charts]);
+
+  // View transition morphs the clicked card into the modal chart, both share one view-transition-name.
+  function openChart(chart: Chart, card: HTMLElement) {
+    if (!document.startViewTransition) return setOpen(chart);
+    card.style.viewTransitionName = "chart-hero";
+    document.startViewTransition(() => {
+      card.style.viewTransitionName = "";
+      flushSync(() => setOpen(chart));
+    });
+  }
   return (
     <>
       <Nav
@@ -51,7 +62,7 @@ export default function HomeGallery({ categories, charts }: Props) {
                 title={chart.title}
                 subtitle={chart.subtitle}
                 index={index}
-                onOpen={() => setOpen(chart)}
+                onOpen={(card) => openChart(chart, card)}
               />
             ))}
         </div>
