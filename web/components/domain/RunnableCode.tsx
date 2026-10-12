@@ -91,12 +91,15 @@ export default function RunnableCode({ initialCode, setup, preview }: Props) {
     <div className="runnable" ref={root}>
       <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={DOC_TOOLTIP} />
       <section className="output">
-        {result?.images.map((src, i) => (
-          <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />
-        ))}
+        {/* Preview and result share one list so the first figure stays the same element when the result lands,
+            keeping any animation running on it (the home modal flies it in). */}
+        {(result ? result.images.map((src) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`) : preview ? [preview] : []).map(
+          (src, i) => (
+            <CopyableImage key={i} src={src} alt="Rendered chart" />
+          ),
+        )}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && preview && <CopyableImage src={preview} alt="Rendered chart" />}
         {!result && !preview && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>

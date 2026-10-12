@@ -71,7 +71,7 @@ plot.time(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rota
 plot.time(df, x='created_at', group_by='month', cumulative=True)
 ```
 
-Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`.
+Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`. `fill=True`: gradient area under each line, fading out towards the bottom.
 
 ### scatter
 
@@ -85,7 +85,7 @@ plot.scatter(df, x='height', y='weight', hue='species', size='age')
 plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
 ```
 
-Slices are value counts of `col`. Slices below `value_datalabel` percent get no label.
+Slices are value counts of `col`. Slices below `value_datalabel` percent get no label. `legend_percentages=True` drops slice labels and shows percentages in the legend instead of counts.
 
 ### Colors
 

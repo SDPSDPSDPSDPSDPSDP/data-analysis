@@ -9,7 +9,7 @@ from ..common.formatting.text_contrast import get_text_color_for_background
 from ..common.colors import default_colors, default_palette, palette_colors
 from ..config import FigureSize, Marks
 from ..svg import Text
-from ...number_format import format_thousands
+from ...number_format import format_percentage, format_thousands
 
 
 class PieChart(AbstractPlot):
@@ -48,13 +48,16 @@ class PieChart(AbstractPlot):
             donut=self.options.donut,
             n_after_comma=self.options.n_after_comma,
             value_datalabel=self.options.value_datalabel,
-            pctdistance=Marks.DONUT_LABEL_RADIUS if self.options.donut else Marks.PIE_LABEL_RADIUS
+            pctdistance=Marks.DONUT_LABEL_RADIUS if self.options.donut else Marks.PIE_LABEL_RADIUS,
+            datalabels=not self.options.legend_percentages,
         )
         return chart
 
     def format_plot(self, plot: Any) -> None:
+        total = sum(self._values)
         plot.legend = [
-            (color, label, format_thousands(val))
+            (color, label, format_percentage(val / total * 100, self.options.n_after_comma)
+             if self.options.legend_percentages else format_thousands(val))
             for color, label, val in zip(self._colors, self._labels, self._values)
         ]
         for bg_color, autotext in zip(self._colors, self._autotexts):

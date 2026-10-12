@@ -30,13 +30,14 @@ def render_lineplot(
     hue: Optional[str] = None,
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
+    fill: bool = False,
 ) -> Chart:
     """One line per hue value; duplicate x values are averaged."""
     df = df.assign(**{x: _numeric_x(chart, df[x])})
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
-        chart.lines.append(Line(list(line.index), list(line.values), group_color))  # type: ignore[arg-type]
+        chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
     return chart
 
 

@@ -55,6 +55,7 @@ class Marks:
     DONUT_LABEL_RADIUS = 0.8
     DONUT_HOLE_RADIUS = 0.6
     LINE_WIDTH = 1.5
+    LINE_FILL_ALPHA = 0.3  # area opacity at the top of the fill, fades to 0 at the plot bottom
     DOT_AREA = 36.0  # square points
     DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8

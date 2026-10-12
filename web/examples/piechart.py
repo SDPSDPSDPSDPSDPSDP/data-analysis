@@ -28,5 +28,6 @@ plot.pie(
     df,
     col='is_ripe',
     donut=True,
+    legend_percentages=True,
     title='Ripe vs unripe fruit',
 )

@@ -40,7 +40,7 @@ class TimePlot(AbstractPlot):
         options = self.options
         chart = self._standard_chart()
         self._periods = data[options.x].drop_duplicates().sort_values()
-        return renderer.render_lineplot(chart, df=data, x=options.x, y=self._y, hue=options.hue, color=self._color, palette=self._palette)
+        return renderer.render_lineplot(chart, df=data, x=options.x, y=self._y, hue=options.hue, color=self._color, palette=self._palette, fill=options.fill)
 
     def format_plot(self, plot: Any) -> None:
         self._format_labels_and_legend(plot)

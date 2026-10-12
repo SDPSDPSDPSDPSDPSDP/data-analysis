@@ -84,7 +84,7 @@ plot.bar(
 # %% [hidden]
 from shirin.assets.data import df_time as df
 
-# %% Bars per year
+# %% Bars per year [no-home]
 plot.bar(
     df,
     x='date',
