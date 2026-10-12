@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Info, X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import RunnableCode from "@/components/domain/RunnableCode";
 
 type Props = {
@@ -30,7 +30,7 @@ export default function ChartModal({ setup, code, href, onClose }: Props) {
     >
       <div className="chart-modal-actions">
         <Link href={href} className="chart-modal-button" aria-label="Open full page">
-          <Info size="1em" />
+          <ExternalLink size="1em" />
         </Link>
         <button type="button" className="chart-modal-button" onClick={() => dialog.current!.close()} aria-label="Close">
           <X size="1em" />

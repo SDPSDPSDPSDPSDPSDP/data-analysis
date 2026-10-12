@@ -43,10 +43,9 @@
   width: var(--modal-width);
   max-width: none;
   max-height: none;
-  padding: var(--space-6) var(--space-3) var(--space-3);
+  padding: 0;
   border: none;
-  border-radius: var(--radius-home-chart);
-  background: var(--color-bg);
+  background: none;
 }
 
 .chart-modal::backdrop {
@@ -54,9 +53,9 @@
 }
 
 .chart-modal-actions {
-  position: absolute;
-  top: var(--space-1);
-  right: var(--space-1);
+  position: fixed;
+  top: var(--space-2);
+  right: var(--space-2);
   display: flex;
   gap: 0;
 }
@@ -72,14 +71,14 @@
   border: none;
   border-radius: var(--radius);
   background: none;
-  color: var(--text-secondary);
+  color: var(--text-on-dark-secondary);
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
 }
 
 .chart-modal-button:hover {
-  background: var(--color-surface);
-  color: var(--text-primary);
+  background: var(--color-button-hover);
+  color: var(--text-on-dark);
 }
 
 /* Native modal dialogs still let the page behind them scroll. */
@@ -89,4 +88,5 @@ html:has(.chart-modal[open]) {
 
 .chart-modal .runnable {
   align-items: center;
+  gap: var(--space-6);
 }
