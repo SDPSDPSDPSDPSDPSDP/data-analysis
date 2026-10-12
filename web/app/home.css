@@ -31,3 +31,52 @@
   margin: 0 auto;
   border-radius: var(--radius-home-chart);
 }
+
+.chart-preview {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.chart-modal {
+  width: var(--modal-width);
+  max-width: none;
+  max-height: none;
+  padding: var(--space-6) var(--space-3) var(--space-3);
+  border: none;
+  border-radius: var(--radius-home-chart);
+  background: var(--color-bg);
+}
+
+.chart-modal::backdrop {
+  background: var(--color-backdrop);
+}
+
+.chart-modal-actions {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  display: flex;
+  gap: var(--space-0-5);
+}
+
+.chart-modal-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.chart-modal-button:hover {
+  background: var(--color-surface);
+  color: var(--text-primary);
+}

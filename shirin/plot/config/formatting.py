@@ -50,6 +50,7 @@ class Marks:
     BAR_WIDTH = 0.6
     HORIZONTAL_BAR_WIDTH = 0.8
     HISTOGRAM_GAP = 0.15  # share of a bin left empty between neighbouring histogram bars
+    PIE_RADIUS = 0.8  # share of the square plot area, leaves whitespace around the pie
     PIE_LABEL_RADIUS = 0.6
     DONUT_LABEL_RADIUS = 0.8
     DONUT_HOLE_RADIUS = 0.6

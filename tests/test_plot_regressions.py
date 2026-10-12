@@ -29,6 +29,12 @@ def test_pie_without_palette_uses_distinct_colors(df: pd.DataFrame) -> None:
     assert len({wedge.color for wedge in chart.wedges}) == 3
 
 
+def test_pie_leaves_whitespace_around_wedges(df: pd.DataFrame) -> None:
+    counts = df['category'].value_counts().to_frame()
+    chart = PieChart(PiePlotOptions(df=counts, col='count')).render()
+    assert chart.x.lim[1] > max(wedge.radius for wedge in chart.wedges)
+
+
 def test_histogram_keeps_fractional_values() -> None:
     df = pd.DataFrame({'x': [0.1, 0.2, 0.5, 0.9, None]})
     chart = Histogram(HistogramOptions(df=df, x='x', bins=10)).render()

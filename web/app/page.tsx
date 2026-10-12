@@ -1,5 +1,5 @@
 import HomeGallery from "@/components/domain/HomeGallery";
-import { exampleSetup, sectionId } from "@/components/domain/PlotSection";
+import { exampleSetup } from "@/components/domain/PlotSection";
 import { getCategories, getSetup } from "@/app/categories";
 
 export default function Home() {
@@ -14,8 +14,8 @@ export default function Home() {
       .filter((section) => section.dataFormats.length > 0)
       .flatMap((section) =>
         section.examples.slice(1).map((example) => ({
-          code: `${exampleSetup(globalSetup, section.setup, example)}\n${example.code}`,
-          href: `/${sectionId(category.title)}`,
+          setup: exampleSetup(globalSetup, section.setup, example),
+          code: example.code,
           category: category.title,
         })),
       ),

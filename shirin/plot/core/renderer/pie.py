@@ -17,7 +17,7 @@ def render_piechart(
     pctdistance: float,
 ) -> List[Text]:
     """Draw the pie clockwise from 12 o'clock; returns one percentage text per slice ('' below value_datalabel)."""
-    chart.x.lim = chart.y.lim = (-1, 1)
+    chart.x.lim = chart.y.lim = (-1 / Marks.PIE_RADIUS, 1 / Marks.PIE_RADIUS)
     chart.x.visible = chart.y.visible = False
     total = sum(values)
     texts: List[Text] = []

@@ -3,14 +3,19 @@
 import { useState } from "react";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
+import ChartModal from "@/components/domain/ChartModal";
+import { sectionId } from "@/components/domain/PlotSection";
+
+type Chart = { setup: string; code: string; category: string };
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
-  charts: { code: string; href: string; category: string }[];
+  charts: Chart[];
 };
 
 export default function HomeGallery({ categories, charts }: Props) {
   const [active, setActive] = useState<string | null>(null);
+  const [open, setOpen] = useState<Chart | null>(null);
   return (
     <>
       <Nav
@@ -26,11 +31,19 @@ export default function HomeGallery({ categories, charts }: Props) {
         <div className="home-charts">
           {charts
             .filter((chart) => !active || chart.category === active)
-            .map(({ code, href }) => (
-              <ChartPreview key={code} code={code} href={href} />
+            .map((chart) => (
+              <ChartPreview key={chart.code} setup={chart.setup} code={chart.code} onOpen={() => setOpen(chart)} />
             ))}
         </div>
       </main>
+      {open && (
+        <ChartModal
+          setup={open.setup}
+          code={open.code}
+          href={active ? `/${sectionId(active)}` : "/all"}
+          onClose={() => setOpen(null)}
+        />
+      )}
     </>
   );
 }
