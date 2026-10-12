@@ -20,6 +20,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     sort: SortInput = 'frequency'
     data_labels: bool = True
     suffix: Optional[str] = None
+    group_by: Optional[str] = None  # categories are date periods; 'month' gets month ticks with a year row
 
     def validate(self) -> None:
         super().validate()

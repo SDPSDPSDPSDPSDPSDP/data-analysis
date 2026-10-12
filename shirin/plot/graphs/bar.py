@@ -1,11 +1,15 @@
 import pandas as pd
 from typing import Optional
 
-from ..config import TitleInput, SortInput
+from ..config import TitleInput, SortInput, TimeGroupBy, TimeGroupByInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
+from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..core.base_plot import default_palette
-from ..common.data_conversion import REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder
+from ..common.data_conversion import COUNT_COL, REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder, totals_per_x
 from ..plots import BarPlot, CountPlot, NormalizedPlot
+
+# ISO labels sort alphabetically in time order.
+_PERIOD_LABELS = {'year': '%Y', 'month': '%Y-%m', 'day': '%Y-%m-%d'}
 
 
 class BarPlotsMixin:
@@ -24,9 +28,10 @@ class BarPlotsMixin:
         data_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
-        sort: SortInput = 'frequency',
+        sort: Optional[SortInput] = None,
         top_n: Optional[int] = None,
         remainder: bool = False,
+        group_by: Optional[TimeGroupByInput] = None,
     ) -> None:
         """Create a **bar plot**.
 
@@ -57,16 +62,35 @@ class BarPlotsMixin:
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
-                *Default: `'frequency'`*.
+                *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.
             remainder: Fill each bar up to 100% with a lighter segment when `value` holds fractions
                 in [0, 1] (e.g. `value='accuracy'`). Needs `value` and `normalized=True`. The filled segment is
                 labelled with the `value` column name, the rest with `'Remainder'`. Pass `hue` equal to `x`/`y`
                 to color each bar by its category instead. *Optional*.
+            group_by: Treat `x` as dates and draw one bar per period, in time order. Empty periods
+                count as zero. `'month'` shows month ticks with a year row below. Needs `x`; not with
+                `sort`, `top_n` or `remainder`. **Options:** `'year'`, `'month'`, `'day'`. *Optional*.
         """
         if (x is None) == (y is None):
             raise ValueError('bar needs exactly one of x or y.')
         vertical = x is not None
+        if group_by is not None:
+            validate_str_or_enum_option(
+                option_name='group_by', value=group_by, valid_options=VALID_TIME_GROUP_BY, enum_type=TimeGroupBy,
+            )
+            if not vertical:
+                raise ValueError('group_by needs x: periods run along the x-axis.')
+            if sort is not None or top_n is not None or remainder:
+                raise ValueError('group_by does not work with sort, top_n or remainder.')
+            group_by = TimeGroupBy(group_by).value
+            if value is None and y_axis_label is None:
+                y_axis_label = 'Count'
+            totals = totals_per_x(df, x, value, hue, group_by)  # type: ignore[arg-type]
+            value = value or COUNT_COL
+            df = totals.rename(value).reset_index()
+            df[x] = df[x].dt.strftime(_PERIOD_LABELS[group_by])
+            sort = 'alphabetical'
         common = dict(
             df=df,
             axis_column=x if vertical else y,
@@ -79,7 +103,8 @@ class BarPlotsMixin:
             suffix=suffix,
             legend=legend,
             data_labels=data_labels,
-            sort=sort,
+            sort='frequency' if sort is None else sort,
+            group_by=group_by,
         )
         if value is None:
             if remainder:

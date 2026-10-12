@@ -4,7 +4,7 @@ import dataclasses
 import pandas as pd
 import pytest
 
-from shirin.plot.common.data_conversion import fill_missing_values_in_data
+from shirin.plot.common.data_conversion import COUNT_COL, fill_missing_values_in_data
 from shirin.plot.core import (
     BarPlotOptions,
     CountPlotOptions,
@@ -14,7 +14,7 @@ from shirin.plot.core import (
     TimePlotOptions,
 )
 from shirin.plot.plots import BarPlot, CountPlot, Histogram, NormalizedPlot, PieChart, TimePlot
-from shirin.plot.plots.timeplot import COUNT_COL
+from shirin.plot.svg import to_svg
 
 
 def test_countplot_data_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
@@ -144,3 +144,10 @@ def test_time_long_monthly_axis_thins_month_ticks() -> None:
     chart = TimePlot(TimePlotOptions(df=df, x='date', group_by='month')).render()
     assert chart.x.tick_labels[:3] == ['Jan', 'Apr', 'Jul']
     assert len(chart.x.sub_labels) == 6
+
+
+def test_time_lines_have_no_point_markers() -> None:
+    df = pd.DataFrame({'year': [2000, 2001, 2002], 'n': [1, 2, 3]})
+    chart = TimePlot(TimePlotOptions(df=df, x='year', y='n')).render()
+    assert chart.lines and not chart.dots
+    assert '<circle' not in to_svg(chart)

@@ -18,6 +18,7 @@ plot.time(
     df,
     x='date',
     group_by='month',
+    title='Fruits picked per month',
 )
 
 # %% [hidden]

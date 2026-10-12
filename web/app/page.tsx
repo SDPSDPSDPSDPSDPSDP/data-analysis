@@ -94,7 +94,7 @@ export default function Home() {
       description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
       columns: [
         { name: "year", role: "x" },
-        { name: "harvest", role: "y" },
+        { name: "n_harvested", role: "y" },
         { name: "is_ripe", role: "hue" },
       ],
       rows: [

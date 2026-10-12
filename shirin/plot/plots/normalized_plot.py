@@ -12,7 +12,7 @@ from ..common.stacked_plots import sort_stacked_pivot
 from ..common.colors import blend
 from ..config import Marks, TextColors
 from ..config.colors import REMAINDER_TINT
-from .categorical import create_sized_figure
+from .categorical import create_sized_figure, format_period_axis
 
 
 class NormalizedPlot(AbstractPlot):
@@ -85,6 +85,7 @@ class NormalizedPlot(AbstractPlot):
 
         if self.options.orientation == 'vertical':
             format_ticks(plot, y_grid=True, percentage_y=True)
+            format_period_axis(plot, self.options)
         else:
             format_ticks(plot, x_grid=True, percentage_x=True)
 
