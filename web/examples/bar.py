@@ -82,8 +82,7 @@ plot.bar(
 
 
 # %% [hidden]
-from shirin.assets.data import df_time
-df = df_time.drop(columns='hue')
+from shirin.assets.data import df_time as df
 
 # %% Bars per year
 plot.bar(

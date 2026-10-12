@@ -22,8 +22,8 @@ class TestPaletteLookupWithBooleanKeys:
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
         palette_str = convert_palette_to_strings(palette)
         
-        bg_color_true = palette_str.get('True', '#000000')
-        bg_color_false = palette_str.get('False', '#000000')
+        bg_color_true = palette_str['True']
+        bg_color_false = palette_str['False']
         
         assert get_text_color_for_background(bg_color_true) == TextColors.WHITE
         assert get_text_color_for_background(bg_color_false) == TextColors.BLACK
@@ -37,16 +37,6 @@ class TestPaletteLookupWithBooleanKeys:
         assert text_colors[0] == TextColors.WHITE
         assert text_colors[1] == TextColors.BLACK
     
-    def test_failed_lookup_returns_black_background(self):
-        """Test that failed palette lookup defaults to black (white text)."""
-        palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
-        
-        # Regression: a str key never matches a bool-keyed dict, so the fallback black wins.
-        bg_color = palette.get('True', '#000000')
-        
-        assert bg_color == '#000000'
-        assert get_text_color_for_background(bg_color) == TextColors.WHITE
-
 
 class TestPaletteLookupWithIntegerKeys:
     """Tests for palette color lookup with integer keys."""
@@ -66,8 +56,8 @@ class TestPaletteLookupWithIntegerKeys:
         palette = {1: Colors.BAD_RED, 2: Colors.GOOD_GREEN}
         palette_str = convert_palette_to_strings(palette)
         
-        bg_color_1 = palette_str.get('1', '#000000')
-        bg_color_2 = palette_str.get('2', '#000000')
+        bg_color_1 = palette_str['1']
+        bg_color_2 = palette_str['2']
         
         assert get_text_color_for_background(bg_color_1) == TextColors.WHITE
         assert get_text_color_for_background(bg_color_2) == TextColors.BLACK

@@ -21,7 +21,7 @@ def test_stats_accessor_with_missing():
     
     result = series.stats(printing=False)
     
-    assert result['mean'] == 3.0  # (1+2+4+5)/4
+    assert result['mean'] == 3.0
     assert result['missing_values'] == 1
 
 

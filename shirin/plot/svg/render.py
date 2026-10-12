@@ -1,4 +1,4 @@
-"""Lays out a Chart (see PLAN.md for the layout spec) and writes it as an SVG string."""
+"""Lays out a Chart and writes it as an SVG string."""
 import itertools
 import math
 from typing import Dict, List, Optional, Tuple
@@ -134,7 +134,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         )
 
     cap = cap_height(tick_size)
-    body +=[marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
+    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
              for t, label in y_ticks if label]
     bottom = plot_bottom
     labelled_x_ticks = [(t, label) for t, label in x_ticks if label]

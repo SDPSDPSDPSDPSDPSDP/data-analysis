@@ -2,6 +2,7 @@ import pandas as pd
 from typing import Optional
 
 from ..config import FillMissingValuesInput, TitleInput, TimeGroupByInput
+from ..common.data_conversion import COUNT_COL
 from ..core import PiePlotOptions, TimePlotOptions
 from ..plots import PieChart, TimePlot
 
@@ -33,10 +34,9 @@ class SpecializedPlotsMixin:
         Layout:
             donut: Whether to draw a donut instead of a full pie. *Default: `False`*.
         """
-        # Reserved name: a user column called 'count' must not collide with the counts.
         options = PiePlotOptions(
-            df=df[col].value_counts().rename('__count__').to_frame(),
-            col='__count__',
+            df=df[col].value_counts().rename(COUNT_COL).to_frame(),
+            col=COUNT_COL,
             **self._column_config(col),
             title=title,
             n_after_comma=n_after_comma,

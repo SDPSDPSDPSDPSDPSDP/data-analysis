@@ -1,7 +1,6 @@
 # %% [hidden]
-from shirin.assets.data import df_documents_by_year, df_time
-df = df_documents_by_year.rename(columns={'cumul_total_docs': 'n_harvested', 'example_hue_3': 'is_ripe'})
-df = df.groupby('year', as_index=False)['n_harvested'].sum()
+from shirin.assets.data import df_harvest_by_year, df_time
+df = df_harvest_by_year.groupby('year', as_index=False)['n_harvested'].sum()
 
 # %% Plain
 plot.time(
@@ -11,7 +10,7 @@ plot.time(
 )
 
 # %% [hidden]
-df = df_time.drop(columns='hue')
+df = df_time
 
 # %% Without y: count rows per month
 plot.time(
@@ -22,7 +21,7 @@ plot.time(
 )
 
 # %% [hidden]
-df = df_documents_by_year.rename(columns={'cumul_total_docs': 'n_harvested', 'example_hue_3': 'is_ripe'})
+df = df_harvest_by_year
 
 # %% One line per hue, title, axis labels, legend, rotated ticks
 plot.time(
@@ -38,7 +37,7 @@ plot.time(
 )
 
 # %% [hidden]
-df = df_time.drop(columns='hue')
+df = df_time
 
 # %% Cumulative, years only
 plot.time(

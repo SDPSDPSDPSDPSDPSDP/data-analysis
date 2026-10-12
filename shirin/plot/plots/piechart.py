@@ -30,8 +30,8 @@ class PieChart(AbstractPlot):
         self._values = df[self.options.col].tolist()
         keys = [str(val) for val in df.index]
 
-        label_map = self.options.label_map or {}
-        self._labels = [label_map.get(key, key) for key in keys]
+        label_map = self.options.label_map
+        self._labels = [label_map.get(key, key) for key in keys] if label_map else keys
 
         palette = self.options.palette
         if isinstance(palette, str):

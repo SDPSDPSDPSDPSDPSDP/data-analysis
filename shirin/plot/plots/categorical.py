@@ -22,8 +22,7 @@ def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tu
     """(figure width, plot height) in inches; vertical width grows with the category count."""
     n_categories = data[options.axis_column].nunique()
     if options.orientation == 'vertical':
-        # ponytail: +1 inch approximates the margins; measure them if wide charts look off.
-        width = n_categories * FigureSize.CATEGORY_SLOT + 1
+        width = n_categories * FigureSize.CATEGORY_SLOT + FigureSize.CATEGORY_MARGIN
         # Long time series get thinner bars instead of an ever wider figure.
         return (min(width, FigureSize.WIDTH) if options.group_by else width, FigureSize.PLOT_HEIGHT)
     return (FigureSize.HORIZONTAL_WIDTH, n_categories * FigureSize.BAR_ROW)

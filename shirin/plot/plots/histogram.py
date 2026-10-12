@@ -8,6 +8,10 @@ from ..core.options import HistogramOptions
 from ..common.formatting import format_ticks
 
 
+# Whole numbers in this range are treated as years: their ticks get no thousands separator.
+_YEAR_RANGE = (1600, 2300)
+
+
 def _is_whole_numbers(values: pd.Series) -> bool:
     return pd.api.types.is_numeric_dtype(values) and bool((values % 1 == 0).all())
 
@@ -37,7 +41,7 @@ class Histogram(AbstractPlot):
 
     def _is_year_column(self) -> bool:
         values = self._preprocessed_df[self.options.x]  # type: ignore[index]
-        return not values.empty and _is_whole_numbers(values) and bool(values.between(1600, 2300).all())
+        return not values.empty and _is_whole_numbers(values) and bool(values.between(*_YEAR_RANGE).all())
 
     def draw(self, data: pd.DataFrame) -> Any:
         return renderer.render_histogram(
