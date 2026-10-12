@@ -20,18 +20,40 @@
   background: none;
   font: inherit;
   outline: none;
-  /* Button fills grid cell; only image should react to pointer. */
+  /* Button fills grid cell; only card should react to pointer. */
   pointer-events: none;
 }
 
-.chart-preview img {
+.chart-preview-card {
   pointer-events: auto;
   cursor: pointer;
   width: var(--home-chart-scale);
+  margin: 0 auto;
+  padding-top: var(--space-0-5);
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-home-chart);
+  overflow: hidden;
+}
+
+.chart-preview-title {
+  color: var(--text-primary);
+  font-size: var(--font-size-tiny);
+  font-weight: 600;
+}
+
+.chart-preview-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-micro);
+}
+
+.chart-preview img {
+  width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto;
-  border-radius: var(--radius-home-chart);
 }
 
 .chart-modal {

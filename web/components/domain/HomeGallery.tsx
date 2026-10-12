@@ -5,8 +5,9 @@ import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { sectionId } from "@/components/domain/PlotSection";
+import type { getHomeCharts } from "@/app/categories";
 
-type Chart = { setup: string; code: string; preview: string; category: string; section: string };
+type Chart = ReturnType<typeof getHomeCharts>[number];
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -42,7 +43,13 @@ export default function HomeGallery({ categories, charts }: Props) {
           {order
             .filter((chart) => !active || chart.category === active)
             .map((chart) => (
-              <ChartPreview key={chart.code} src={chart.preview} onOpen={() => setOpen(chart)} />
+              <ChartPreview
+                key={chart.code}
+                src={chart.cardPreview}
+                title={chart.title}
+                subtitle={chart.subtitle}
+                onOpen={() => setOpen(chart)}
+              />
             ))}
         </div>
       </main>
@@ -50,6 +57,7 @@ export default function HomeGallery({ categories, charts }: Props) {
         <ChartModal
           setup={open.setup}
           code={open.code}
+          preview={open.preview}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.section)}`}
           onClose={() => setOpen(null)}
         />

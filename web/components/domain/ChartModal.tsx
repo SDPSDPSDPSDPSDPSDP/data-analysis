@@ -8,12 +8,13 @@ import RunnableCode from "@/components/domain/RunnableCode";
 type Props = {
   setup: string;
   code: string;
+  preview: string;
   // Full page with this chart's examples.
   href: string;
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, href, onClose }: Props) {
+export default function ChartModal({ setup, code, preview, href, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function ChartModal({ setup, code, href, onClose }: Props) {
           <X size="1em" />
         </button>
       </div>
-      <RunnableCode initialCode={code} setup={setup} />
+      <RunnableCode initialCode={code} setup={setup} preview={preview} />
     </dialog>
   );
 }

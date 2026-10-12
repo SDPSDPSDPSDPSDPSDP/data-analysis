@@ -29,7 +29,7 @@ function parseExamples(file: string) {
   for (const cell of cells) {
     if (cell.label.startsWith("[hidden]")) hidden.push(cell.code);
     else if (!cell.label.startsWith("[")) {
-      const example = { code: cell.code, hiddenSetup: hidden.join("\n\n") };
+      const example = { code: cell.code, hiddenSetup: hidden.join("\n\n"), preview: null };
       const homeOnly = cell.label.endsWith("[home-only]");
       if (!homeOnly) examples.push(example);
       if (homeOnly || (examples.length > 1 && !cell.label.endsWith("[no-home]"))) homeExamples.push(example);
@@ -38,8 +38,25 @@ function parseExamples(file: string) {
   return { setup, examples, homeExamples };
 }
 
+// Code of every prerendered SVG by its path, filled as sections are built; read by scripts/build-previews.mjs.
+const previewCodes = new Map<string, string>();
+
+function previewPath(code: string) {
+  const path = `/previews/${createHash("sha1").update(code).digest("hex").slice(0, 16)}.svg`;
+  previewCodes.set(path, code);
+  return path;
+}
+
+// Sections without a data format are tools: they draw no chart to prerender.
 function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {
-  return { title, dataFormats, ...parseExamples(file) };
+  const { setup, examples, homeExamples } = parseExamples(file);
+  if (dataFormats.length === 0) return { title, dataFormats, setup, examples, homeExamples };
+  const globalSetup = getGlobalSetup();
+  const withPreview = (example: Example) => ({
+    ...example,
+    preview: previewPath(`${exampleSetup(globalSetup, setup, example)}\n${example.code}`),
+  });
+  return { title, dataFormats, setup, examples: examples.map(withPreview), homeExamples: homeExamples.map(withPreview) };
 }
 
 export function getCategories(): Category[] {
@@ -163,27 +180,52 @@ export function getSetup() {
   return parseExamples("setup.py").setup;
 }
 
-// Home gallery charts. Sections without a data format are tools, not charts.
-// preview is the prerendered SVG written by scripts/build-previews.mjs, named by a hash of the code that draws it.
-export function getHomeCharts() {
-  const globalSetup = getSetup()
+function getGlobalSetup() {
+  return getSetup()
     .map((cell) => cell.code)
     .join("\n\n");
+}
+
+const TITLE_LINE = /^[ \t]*title=(.*),[ \t]*\r?\n/m;
+
+// Home gallery shows the title as text above the chart, so the preview is drawn without it.
+function splitTitle(code: string) {
+  const match = code.match(TITLE_LINE);
+  if (!match) throw new Error(`Home gallery example has no single-line title=:\n${code}`);
+  const [title, subtitle = null] = [...match[1].matchAll(/'([^']*)'|"([^"]*)"/g)].map((m) => m[1] ?? m[2]);
+  if (title === undefined) throw new Error(`Home gallery title is not a string or list of strings: ${match[1]}`);
+  return { title, subtitle, previewCode: code.replace(TITLE_LINE, "") };
+}
+
+// Home gallery charts. Sections without a data format are tools, not charts.
+// cardPreview is the gallery image without title, preview the full chart for the modal.
+export function getHomeCharts() {
+  const globalSetup = getGlobalSetup();
   return getCategories().flatMap((category) =>
     category.sections
       .filter((section) => section.dataFormats.length > 0)
       .flatMap((section) =>
         section.homeExamples.map((example) => {
           const setup = exampleSetup(globalSetup, section.setup, example);
-          const hash = createHash("sha1").update(`${setup}\n${example.code}`).digest("hex").slice(0, 16);
+          const { title, subtitle, previewCode } = splitTitle(example.code);
+          if (!example.preview) throw new Error(`Home gallery example has no preview:\n${example.code}`);
           return {
             setup,
             code: example.code,
-            preview: `/previews/${hash}.svg`,
+            title,
+            subtitle,
+            preview: example.preview,
+            cardPreview: previewPath(`${setup}\n${previewCode}`),
             section: section.title,
             category: category.title,
           };
         }),
       ),
   );
+}
+
+// Every prerendered SVG with the code that draws it.
+export function getPreviews() {
+  getHomeCharts();
+  return [...previewCodes].map(([path, code]) => ({ path, code }));
 }

@@ -62,9 +62,11 @@ type Props = {
   initialCode: string;
   // Prepended to every run, not shown in the editor.
   setup: string;
+  // Prerendered SVG shown while Python loads, null shows a skeleton.
+  preview: string | null;
 };
 
-export default function RunnableCode({ initialCode, setup }: Props) {
+export default function RunnableCode({ initialCode, setup, preview }: Props) {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<RunResult | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -94,7 +96,8 @@ export default function RunnableCode({ initialCode, setup }: Props) {
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && <div className="skeleton" role="status" aria-label="Rendering chart" />}
+        {!result && preview && <CopyableImage src={preview} alt="Rendered chart" />}
+        {!result && !preview && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>
   );

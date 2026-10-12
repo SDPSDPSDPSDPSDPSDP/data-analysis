@@ -19,6 +19,8 @@ export type Example = {
   code: string;
   // Runs after the section setup, not shown.
   hiddenSetup: string;
+  // Prerendered SVG shown until Python has run, null for examples that draw no chart.
+  preview: string | null;
 };
 
 export type PlotSectionData = {
@@ -46,6 +48,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
     <RunnableCode
       key={key}
       initialCode={example.code}
+      preview={example.preview}
       setup={exampleSetup(globalSetup, setup, example)}
     />
   );
