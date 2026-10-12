@@ -40,6 +40,3 @@ shirin = ["assets/fonts/*.woff2", "assets/fonts/*.json"]
 include = ["shirin*"]
 exclude = ["tests*", "docs*", "scripts*"]
 
-[tool.setuptools.exclude-package-data]
-"*" = ["*.ipynb"]
-

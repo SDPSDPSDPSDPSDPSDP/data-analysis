@@ -1,4 +1,3 @@
-- remove dead code: example notebook, ... readme, 
 - homepage with cards
 - redesign layout
 
