@@ -42,6 +42,9 @@
   --font-size-small: 13px;
   --font-size-tiny: 11px;
   --font-size-micro: 8px;
+  --font-size-eyebrow: 10px;
+  --docs-icon-size: 1.75em;
+  --docs-icon-stroke: 1.6;
   --font-size-code: 14px;
   --font-size-doc: 15px;
   --font-size-doc-heading: 19px;

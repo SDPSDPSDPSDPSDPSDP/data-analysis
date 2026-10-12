@@ -179,15 +179,22 @@
   gap: var(--space-2);
   padding: var(--space-1-5) var(--space-3);
   border-radius: var(--radius-pill);
-  background: var(--color-bg);
+  /* Same glass as the nav bar. */
+  background: var(--color-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   color: var(--text-primary);
-  font-size: var(--font-size-doc-heading);
   font-weight: var(--font-weight-nav);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
   outline: none;
   transition: filter var(--transition);
+}
+
+.chart-modal-docs > svg {
+  width: var(--docs-icon-size);
+  height: var(--docs-icon-size);
+  stroke-width: var(--docs-icon-stroke);
 }
 
 .chart-modal-docs-text {
@@ -197,7 +204,7 @@
 
 .chart-modal-docs-eyebrow {
   color: var(--text-secondary);
-  font-size: var(--font-size-tiny);
+  font-size: var(--font-size-eyebrow);
   letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
