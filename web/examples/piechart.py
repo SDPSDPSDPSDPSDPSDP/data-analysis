@@ -28,5 +28,5 @@ plot.pie(
     df,
     col='is_ripe',
     donut=True,
-    title='Ripeness',
+    title='Ripe vs unripe fruit',
 )
