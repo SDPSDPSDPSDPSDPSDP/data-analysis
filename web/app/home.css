@@ -32,6 +32,12 @@
   visibility: hidden;
 }
 
+/* Crossfades with the modal chart over the second half of its flight back, see chart-modal-fly-back. */
+.chart-preview.returning {
+  animation: chart-preview-in calc(var(--modal-exit-fly-duration) / 2) ease
+    calc(var(--modal-exit-chart-delay) + var(--modal-exit-fly-duration) / 2) both;
+}
+
 /* Modal chart flies from the clicked card's spot, offsets set by ChartModal. */
 .chart-modal .chart.flying {
   transform-origin: top left;
@@ -87,8 +93,13 @@
     both;
 }
 
+/* Fades out on the way, the card underneath has its title as text, the chart has it drawn in. */
 @keyframes chart-modal-fly-back {
+  50% {
+    opacity: 1;
+  }
   to {
+    opacity: 0;
     transform: translate(var(--fly-x), var(--fly-y)) scale(var(--fly-scale));
   }
 }
@@ -140,6 +151,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .chart-preview-card,
+  .chart-preview.returning,
   .chart-modal .chart.flying,
   .chart-modal::backdrop,
   .chart-modal-actions,

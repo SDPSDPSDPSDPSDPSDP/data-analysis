@@ -17,10 +17,12 @@ type Props = {
   href: string;
   // Section title, names the documentation button.
   section: string;
+  // Chart starts flying back: its card shows again underneath so the two crossfade.
+  onReturn: () => void;
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, preview, origin, href, section, onClose }: Props) {
+export default function ChartModal({ setup, code, preview, origin, href, section, onReturn, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -42,7 +44,10 @@ export default function ChartModal({ setup, code, preview, origin, href, section
   function leave(kind: "to-card" | "to-docs", then: () => void) {
     const modal = dialog.current!;
     if (modal.classList.contains("closing")) return;
-    if (kind === "to-card") aim(figure());
+    if (kind === "to-card") {
+      aim(figure());
+      onReturn();
+    }
     modal.classList.add("closing", kind);
     const last = getComputedStyle(kind === "to-card" ? figure() : modal.querySelector(".output")!);
     setTimeout(then, (parseFloat(last.animationDelay) + parseFloat(last.animationDuration)) * 1000);

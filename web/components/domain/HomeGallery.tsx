@@ -21,7 +21,8 @@ export default function HomeGallery({ categories, charts }: Props) {
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
   // Origin is the clicked card's spot, the modal chart flies out of it.
-  const [open, setOpen] = useState<{ chart: Chart; origin: DOMRect } | null>(null);
+  // Returning: modal chart is flying back, its card shows again.
+  const [open, setOpen] = useState<{ chart: Chart; origin: DOMRect; returning?: boolean } | null>(null);
   const [order, setOrder] = useState<Chart[] | null>(null);
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
   // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
@@ -86,7 +87,8 @@ export default function HomeGallery({ categories, charts }: Props) {
                 subtitle={chart.subtitle}
                 index={index}
                 shrunk={leaving || (selected !== null && selected !== chart)}
-                hidden={open?.chart === chart}
+                hidden={open?.chart === chart && !open.returning}
+                returning={open?.chart === chart && !!open.returning}
                 onOpen={(card) => openChart(chart, card)}
               />
             ))}
@@ -100,6 +102,7 @@ export default function HomeGallery({ categories, charts }: Props) {
           origin={open.origin}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           section={open.chart.section}
+          onReturn={() => setOpen({ ...open, returning: true })}
           onClose={() => {
             setOpen(null);
             setSelected(null);

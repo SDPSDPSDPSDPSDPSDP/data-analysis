@@ -11,16 +11,18 @@ type Props = {
   shrunk: boolean;
   // Its modal is open, the modal chart took its place.
   hidden: boolean;
+  // Its modal chart is flying back, this one fades in as the chart fades out.
+  returning: boolean;
   // Gets the card button, its transition timing decides when the modal opens.
   onOpen: (card: HTMLElement) => void;
 };
 
 // Chart only, no code: opens the example in a modal where it can be edited.
-export default function ChartPreview({ src, title, subtitle, index, shrunk, hidden, onOpen }: Props) {
+export default function ChartPreview({ src, title, subtitle, index, shrunk, hidden, returning, onOpen }: Props) {
   return (
     <button
       type="button"
-      className={`chart-preview${shrunk ? " shrunk" : ""}${hidden ? " hidden" : ""}`}
+      className={`chart-preview${shrunk ? " shrunk" : ""}${hidden ? " hidden" : ""}${returning ? " returning" : ""}`}
       style={{ "--i": index } as CSSProperties}
       onClick={(event) => onOpen(event.currentTarget)}
     >
