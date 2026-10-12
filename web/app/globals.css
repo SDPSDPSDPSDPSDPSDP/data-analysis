@@ -70,6 +70,12 @@
   --home-chart-grow-duration: 400ms;
   --home-chart-fly-duration: 750ms;
   --home-chart-fade-duration: 1000ms;
+  --docs-enter-stagger: 250ms;
+  --docs-enter-duration: 600ms;
+  /* Blocks past this one share its delay, so long pages don't keep the bottom waiting. */
+  --docs-enter-max-index: 8;
+  --modal-exit-stagger: 120ms;
+  --modal-exit-duration: 250ms;
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;
@@ -120,6 +126,8 @@ body {
 }
 
 .page {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--color-bg-home);
   display: flex;
   flex-direction: column;
   padding: var(--space-3) max(var(--space-2), (100% - var(--page-max-width)) / 2);
@@ -149,6 +157,13 @@ body {
 
 .page h3 ~ h3 {
   margin-top: var(--space-6);
+}
+
+/* Docs blocks fade in one after another. Sections render as fragments, so sibling-index() stands in for a passed --i. */
+.page:not(.home) > :not(div),
+.page:not(.home) > div > * {
+  animation: chart-preview-in var(--docs-enter-duration) ease both;
+  animation-delay: calc(min(sibling-index(), var(--docs-enter-max-index)) * var(--docs-enter-stagger));
 }
 
 pre {
@@ -182,7 +197,9 @@ pre {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton {
+  .skeleton,
+  .page:not(.home) > :not(div),
+  .page:not(.home) > div > * {
     animation: none;
   }
 }
