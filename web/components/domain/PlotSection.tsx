@@ -111,17 +111,21 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {runnable(examples[0])}
         </div>
       </section>
-      <details className="more-examples" open={expanded}>
-        <summary>
-          <span className="more-examples-button">
-            <SectionIcon title={title} />
-            <span className="more-examples-closed">{examples.length - 1} more examples</span>
-            <span className="more-examples-open">Hide examples</span>
-            <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
-          </span>
-        </summary>
-        {moreExamples}
-      </details>
+      {expanded ? (
+        <div className="more-examples">{moreExamples}</div>
+      ) : (
+        <details className="more-examples">
+          <summary>
+            <span className="more-examples-button">
+              <SectionIcon title={title} />
+              <span className="more-examples-closed">{examples.length - 1} more examples</span>
+              <span className="more-examples-open">Hide examples</span>
+              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
+            </span>
+          </summary>
+          {moreExamples}
+        </details>
+      )}
     </>
   );
 }

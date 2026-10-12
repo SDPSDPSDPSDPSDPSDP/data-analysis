@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: repeat(var(--home-chart-columns), minmax(0, 1fr));
   gap: var(--space-3);
-  margin-top: var(--space-6);
 }
 
 .chart-preview {

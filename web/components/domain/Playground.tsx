@@ -13,7 +13,7 @@ type Props = {
   setup: SetupCell[];
   categories: Category[];
   showSetup: boolean;
-  // Open every "more examples" list.
+  // Show every example directly, no "more examples" toggle.
   expanded: boolean;
 };
 
