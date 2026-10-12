@@ -97,7 +97,7 @@ If the same hue column needs different colors in different charts, make a second
 | `histogram(...)` | Same name. Rename shared args. `suffix=` now applies to x ticks. |
 | `lineplot(...)` | `time(...)`. Rename shared args. |
 | `pie(df, col, palette=...)` | `pie(df, col)` with palette in the constructor under key `col`. |
-| `timeplot(df, x)` (bars) | `bar(df.assign(day=df[x].dt.date), x='day')`. `time` draws lines only. |
+| `timeplot(df, x)` (bars) | `bar(df, x=x, group_by='day')`. `time` draws lines only. |
 | `timeplot(..., type='line')` | `time(..., group_by='day')` |
 | `timeplot(..., palette='#hex')` | Remove. No color argument. |
 | `timeplot` (now `time`) default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it. |
