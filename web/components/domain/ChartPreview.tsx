@@ -1,15 +1,19 @@
+import type { CSSProperties } from "react";
+
 type Props = {
   // Prerendered SVG from scripts/build-previews.mjs, drawn without its title.
   src: string;
   title: string;
   subtitle: string | null;
+  // Position in the grid, staggers the entrance animation.
+  index: number;
   onOpen: () => void;
 };
 
 // Chart only, no code: opens the example in a modal where it can be edited.
-export default function ChartPreview({ src, title, subtitle, onOpen }: Props) {
+export default function ChartPreview({ src, title, subtitle, index, onOpen }: Props) {
   return (
-    <button type="button" className="chart-preview" onClick={onOpen}>
+    <button type="button" className="chart-preview" style={{ "--i": index } as CSSProperties} onClick={onOpen}>
       <span className="chart-preview-card">
         <span className="chart-preview-title">{title}</span>
         {subtitle && <span className="chart-preview-subtitle">{subtitle}</span>}

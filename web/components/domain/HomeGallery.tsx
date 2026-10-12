@@ -17,8 +17,9 @@ type Props = {
 export default function HomeGallery({ categories, charts }: Props) {
   const [active, setActive] = useState<string | null>(null);
   const [open, setOpen] = useState<Chart | null>(null);
-  const [order, setOrder] = useState(charts);
+  const [order, setOrder] = useState<Chart[] | null>(null);
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
+  // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
   useEffect(() => {
     const shuffled = [...charts];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -39,15 +40,17 @@ export default function HomeGallery({ categories, charts }: Props) {
         }}
       />
       <main className="page home">
-        <div className="home-charts">
+        {/* Keyed on filter so the entrance wave replays on every category switch. */}
+        <div className="home-charts" key={active ?? ""}>
           {order
-            .filter((chart) => !active || chart.category === active)
-            .map((chart) => (
+            ?.filter((chart) => !active || chart.category === active)
+            .map((chart, index) => (
               <ChartPreview
                 key={chart.code}
                 src={chart.cardPreview}
                 title={chart.title}
                 subtitle={chart.subtitle}
+                index={index}
                 onOpen={() => setOpen(chart)}
               />
             ))}
