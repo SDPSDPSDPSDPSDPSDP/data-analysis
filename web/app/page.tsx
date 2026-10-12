@@ -16,6 +16,7 @@ export default function Home() {
         section.examples.slice(1).map((example) => ({
           setup: exampleSetup(globalSetup, section.setup, example),
           code: example.code,
+          section: section.title,
           category: category.title,
         })),
       ),

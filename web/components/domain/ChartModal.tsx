@@ -27,6 +27,8 @@ export default function ChartModal({ setup, code, href, onClose }: Props) {
       onClose={onClose}
       // Clicks on the backdrop land on the dialog itself.
       onClick={(event) => event.target === dialog.current && dialog.current.close()}
+      // CodeMirror swallows Escape while the editor has focus, so the native cancel never fires.
+      onKeyDown={(event) => event.key === "Escape" && dialog.current!.close()}
     >
       <div className="chart-modal-actions">
         <Link href={href} className="chart-modal-button" aria-label="Open full page">

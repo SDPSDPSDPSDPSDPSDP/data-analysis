@@ -6,7 +6,7 @@ import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { sectionId } from "@/components/domain/PlotSection";
 
-type Chart = { setup: string; code: string; category: string };
+type Chart = { setup: string; code: string; category: string; section: string };
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -40,7 +40,7 @@ export default function HomeGallery({ categories, charts }: Props) {
         <ChartModal
           setup={open.setup}
           code={open.code}
-          href={active ? `/${sectionId(active)}` : "/all"}
+          href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.section)}`}
           onClose={() => setOpen(null)}
         />
       )}
