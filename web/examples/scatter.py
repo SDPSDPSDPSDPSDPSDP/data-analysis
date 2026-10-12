@@ -38,7 +38,7 @@ plot.scatter(
     title=['Days on tree', 'Size = days'],
 )
 
-# %% Same data, colored by fruit
+# %% Same data, colored by fruit [no-home]
 plot.scatter(
     df,
     x='weight',

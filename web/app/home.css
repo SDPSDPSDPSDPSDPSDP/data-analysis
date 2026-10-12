@@ -19,8 +19,14 @@
   border: none;
   background: none;
   font: inherit;
-  cursor: pointer;
   outline: none;
+  /* Button fills grid cell; only image should react to pointer. */
+  pointer-events: none;
+}
+
+.chart-preview img {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .chart-preview:focus-visible {

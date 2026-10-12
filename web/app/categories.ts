@@ -6,6 +6,8 @@ import type { DataFormat, Example, PlotSectionData } from "@/components/domain/P
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
 // "# %% [hidden]" cells run before every example below them but are not shown.
 // Other "# %% label" cells are runnable examples; their labels are not shown.
+// The home gallery shows every example except the first (already on the category page).
+// A label ending in "[no-home]" keeps the example off the home gallery, "[home-only]" off the category page.
 function parseExamples(file: string) {
   const source = readFileSync(join(process.cwd(), "examples", file), "utf8");
   const cells = source
@@ -20,11 +22,17 @@ function parseExamples(file: string) {
     .map((cell) => ({ explanation: cell.label.replace("[setup]", "").trim(), code: cell.code }));
   const hidden: string[] = [];
   const examples: Example[] = [];
+  const homeExamples: Example[] = [];
   for (const cell of cells) {
     if (cell.label.startsWith("[hidden]")) hidden.push(cell.code);
-    else if (!cell.label.startsWith("[")) examples.push({ code: cell.code, hiddenSetup: hidden.join("\n\n") });
+    else if (!cell.label.startsWith("[")) {
+      const example = { code: cell.code, hiddenSetup: hidden.join("\n\n") };
+      const homeOnly = cell.label.endsWith("[home-only]");
+      if (!homeOnly) examples.push(example);
+      if (homeOnly || (examples.length > 1 && !cell.label.endsWith("[no-home]"))) homeExamples.push(example);
+    }
   }
-  return { setup, examples };
+  return { setup, examples, homeExamples };
 }
 
 function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {

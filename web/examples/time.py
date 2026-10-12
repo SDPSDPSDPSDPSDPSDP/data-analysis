@@ -39,7 +39,7 @@ plot.time(
 # %% [hidden]
 df = df_time
 
-# %% Cumulative, years only
+# %% Cumulative, years only [no-home]
 plot.time(
     df,
     x='date',

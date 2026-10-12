@@ -26,6 +26,7 @@ export type PlotSectionData = {
   // Shown in the section and run before each of its examples, after the global setup.
   setup: SetupCell[];
   examples: Example[];
+  homeExamples: Example[];
 };
 
 export function sectionId(title: string): string {
