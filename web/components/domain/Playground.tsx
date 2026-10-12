@@ -12,18 +12,19 @@ export type Category = {
 type Props = {
   setup: SetupCell[];
   categories: Category[];
+  showSetup: boolean;
   // Open every "more examples" list.
   expanded: boolean;
 };
 
-export default function Playground({ setup, categories, expanded }: Props) {
+export default function Playground({ setup, categories, showSetup, expanded }: Props) {
   const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
   // Edits apply to the examples only once a setup cell is run.
   const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
   return (
     <main className="page">
-      <h2>Setup</h2>
-      {setup.map((cell, i) => (
+      {showSetup && <h2>Setup</h2>}
+      {showSetup && setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           {cell.explanation && <p>{cell.explanation}</p>}
           <CodeBlock

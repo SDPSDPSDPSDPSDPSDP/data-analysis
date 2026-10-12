@@ -1,3 +1,8 @@
+.home {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--color-bg-home);
+}
+
 .home-charts {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--home-chart-min-width), 1fr));
@@ -18,8 +23,11 @@
   background: var(--color-surface);
 }
 
-.chart-preview img {
-  width: 100%;
+.chart-preview img,
+.chart-preview .skeleton {
+  width: var(--home-chart-scale);
   height: auto;
   display: block;
+  margin: 0 auto;
+  border-radius: var(--radius-home-chart);
 }

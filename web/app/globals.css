@@ -1,5 +1,6 @@
 :root {
   --color-bg: #fff;
+  --color-bg-home: #f1f4f8;
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-shimmer: rgba(0, 0, 0, 0.08);
   --color-error: #b00020;
@@ -55,8 +56,10 @@
   --space-6: 48px;
   --nav-height: 56px;
   --home-chart-min-width: 280px;
+  --home-chart-scale: 70%;
 
   --radius: 6px;
+  --radius-home-chart: 10px;
   --border-width: 1px;
   --radius-pill: 999px;
   --radius-swatch: 2px;

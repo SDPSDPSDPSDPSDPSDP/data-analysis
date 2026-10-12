@@ -15,7 +15,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   return (
     <>
       <Nav categories={categories} />
-      <Playground setup={getSetup()} categories={[category]} expanded />
+      <Playground setup={getSetup()} categories={[category]} showSetup={slug !== "tools"} expanded />
     </>
   );
 }

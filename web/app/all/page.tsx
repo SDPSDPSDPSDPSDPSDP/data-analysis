@@ -7,7 +7,7 @@ export default function All() {
   return (
     <>
       <Nav categories={categories} />
-      <Playground setup={getSetup()} categories={categories} expanded={false} />
+      <Playground setup={getSetup()} categories={categories} showSetup expanded={false} />
     </>
   );
 }
