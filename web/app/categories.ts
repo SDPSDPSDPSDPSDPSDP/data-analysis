@@ -1,7 +1,10 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Category } from "@/components/domain/Playground";
 import type { DataFormat, Example, PlotSectionData } from "@/components/domain/PlotSection";
+// Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
+import { exampleSetup } from "../lib/exampleSetup.ts";
 
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
 // "# %% [hidden]" cells run before every example below them but are not shown.
@@ -158,4 +161,29 @@ export function getCategories(): Category[] {
 
 export function getSetup() {
   return parseExamples("setup.py").setup;
+}
+
+// Home gallery charts. Sections without a data format are tools, not charts.
+// preview is the prerendered SVG written by scripts/build-previews.mjs, named by a hash of the code that draws it.
+export function getHomeCharts() {
+  const globalSetup = getSetup()
+    .map((cell) => cell.code)
+    .join("\n\n");
+  return getCategories().flatMap((category) =>
+    category.sections
+      .filter((section) => section.dataFormats.length > 0)
+      .flatMap((section) =>
+        section.homeExamples.map((example) => {
+          const setup = exampleSetup(globalSetup, section.setup, example);
+          const hash = createHash("sha1").update(`${setup}\n${example.code}`).digest("hex").slice(0, 16);
+          return {
+            setup,
+            code: example.code,
+            preview: `/previews/${hash}.svg`,
+            section: section.title,
+            category: category.title,
+          };
+        }),
+      ),
+  );
 }

@@ -27,10 +27,6 @@
 .chart-preview img {
   pointer-events: auto;
   cursor: pointer;
-}
-
-.chart-preview img,
-.chart-preview .skeleton {
   width: var(--home-chart-scale);
   height: auto;
   display: block;

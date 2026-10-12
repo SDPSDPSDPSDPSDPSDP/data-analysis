@@ -6,7 +6,7 @@ import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { sectionId } from "@/components/domain/PlotSection";
 
-type Chart = { setup: string; code: string; category: string; section: string };
+type Chart = { setup: string; code: string; preview: string; category: string; section: string };
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -42,7 +42,7 @@ export default function HomeGallery({ categories, charts }: Props) {
           {order
             .filter((chart) => !active || chart.category === active)
             .map((chart) => (
-              <ChartPreview key={chart.code} setup={chart.setup} code={chart.code} onOpen={() => setOpen(chart)} />
+              <ChartPreview key={chart.code} src={chart.preview} onOpen={() => setOpen(chart)} />
             ))}
         </div>
       </main>

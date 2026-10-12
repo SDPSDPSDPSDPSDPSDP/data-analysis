@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
+import { exampleSetup } from "@/lib/exampleSetup";
 
 export type SetupCell = {
   explanation: string;
@@ -31,10 +32,6 @@ export type PlotSectionData = {
 
 export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
-}
-
-export function exampleSetup(globalSetup: string, setup: SetupCell[], example: Example): string {
-  return [globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n");
 }
 
 type Props = PlotSectionData & {
