@@ -29,10 +29,6 @@
   cursor: pointer;
 }
 
-.chart-preview:focus-visible {
-  outline: var(--focus-ring);
-}
-
 .chart-preview img,
 .chart-preview .skeleton {
   width: var(--home-chart-scale);
