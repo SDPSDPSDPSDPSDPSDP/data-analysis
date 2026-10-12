@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
 import SectionIcon from "@/components/domain/SectionIcon";
@@ -22,7 +21,6 @@ export default function Playground({ setup, categories }: Props) {
   const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
-  const [expandAll, setExpandAll] = useState(false);
   return (
     <>
       <nav className="nav">
@@ -61,22 +59,6 @@ export default function Playground({ setup, categories }: Props) {
             </div>
           ))}
         </div>
-        <label className="switch" title={expandAll ? "Collapse examples" : "Expand all examples"}>
-          <input
-            type="checkbox"
-            role="switch"
-            aria-label="Expand all examples"
-            checked={expandAll}
-            onChange={(e) => setExpandAll(e.target.checked)}
-          />
-          <span className="switch-track" aria-hidden>
-            <ChevronsDownUp size="1em" />
-            <ChevronsUpDown size="1em" />
-            <span className="switch-knob">
-              {expandAll ? <ChevronsUpDown size="1em" /> : <ChevronsDownUp size="1em" />}
-            </span>
-          </span>
-        </label>
       </nav>
       <main className="page">
         <h2>Setup</h2>
@@ -98,7 +80,6 @@ export default function Playground({ setup, categories }: Props) {
                 key={section.title}
                 {...section}
                 globalSetup={setupCode}
-                expandAll={expandAll}
                 standalone={category.sections.length === 1}
               />
             ))}
