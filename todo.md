@@ -1,8 +1,10 @@
-# later
-- dark mode
-- portfolio
+- remove dead code: example notebook, ... readme, 
 - finetune plots:
   - scatterplot
   - timeplot
   - lineplot
-- more fun, less basic website
+
+# later
+- dark mode
+- portfolio
+- more fun, less basic website (so redesign)
