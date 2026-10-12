@@ -1,5 +1,6 @@
 """Stream a query result into a parquet file without pandas."""
 
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import pyarrow as pa
@@ -36,12 +37,12 @@ def _widen(schema: pa.Schema) -> pa.Schema:
     ])
 
 
-def query_to_parquet(
+def _stream_to_parquet(
     sql_query: str,
     engine: Engine,
     output_path: Path,
-    params: Optional[Dict[str, Any]] = None,
-    chunk_rows: int = PARQUET_CHUNK_ROWS,
+    params: Optional[Dict[str, Any]],
+    chunk_rows: int,
 ) -> None:
     """Stream the result into one parquet file, chunk_rows rows at a time, without pandas.
 
@@ -80,3 +81,21 @@ def query_to_parquet(
         else:
             table = pa.schema([(column, pa.null()) for column in columns]).empty_table()
         pq.write_table(table, output_path)
+
+
+def query_to_parquet(
+    sql_query: str,
+    engine: Engine,
+    output_path: Path,
+    params: Optional[Dict[str, Any]] = None,
+    chunk_rows: int = PARQUET_CHUNK_ROWS,
+) -> None:
+    """Write to a .part file first, so a failed query never leaves a truncated parquet at output_path."""
+    output_path = Path(output_path)
+    part_path = output_path.with_name(output_path.name + '.part')
+    try:
+        _stream_to_parquet(sql_query, engine, part_path, params, chunk_rows)
+    except BaseException:
+        part_path.unlink(missing_ok=True)
+        raise
+    os.replace(part_path, output_path)

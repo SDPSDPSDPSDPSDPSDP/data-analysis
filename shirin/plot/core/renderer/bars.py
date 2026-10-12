@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ...common.sorting import palette_colors
+from ...common.colors import palette_colors
 from ...config import FigureSize, Marks
 from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend

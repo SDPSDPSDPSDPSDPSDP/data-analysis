@@ -137,7 +137,7 @@ export default function Home() {
   const tools = [
     section("Number formatting", "number_format.py"),
     section("Statistics", "stats.py"),
-    section("DB2 queries", "sql.py"),
+    section("DB2 connection", "sql.py"),
   ];
   return (
     <Playground

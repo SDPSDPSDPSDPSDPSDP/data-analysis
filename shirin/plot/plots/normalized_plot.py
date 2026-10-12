@@ -7,11 +7,10 @@ from ..core.categorical_options import NormalizedPlotOptions
 from ..core.base_plot import AbstractPlot
 from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
-from ..common.sorting import palette_colors
 from ..common.stacked_plots import sort_stacked_pivot
-from ..common.colors import blend
-from ..config import Marks, TextColors
-from ..config.colors import REMAINDER_TINT
+from ..common.colors import blend, palette_colors
+from ..config import Marks
+from ..config.colors import BACKGROUND_COLOR, REMAINDER_TINT
 from .categorical import create_sized_figure, format_period_axis
 
 
@@ -30,7 +29,7 @@ class NormalizedPlot(AbstractPlot):
         remainder = self.options.remainder
         if remainder is not None and not (isinstance(self.options.palette, dict) and remainder in self.options.palette):
             filled = next(level for level in df[self.options.hue].unique() if level != remainder)
-            self._palette = {**self._palette, remainder: blend(self._palette[filled], TextColors.WHITE, REMAINDER_TINT)}  # type: ignore[dict-item]
+            self._palette = {**self._palette, remainder: blend(self._palette[filled], BACKGROUND_COLOR, REMAINDER_TINT)}  # type: ignore[dict-item]
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df
@@ -70,7 +69,7 @@ class NormalizedPlot(AbstractPlot):
             width=Marks.BAR_WIDTH if vertical else Marks.HORIZONTAL_BAR_WIDTH,
             overlap=len(self._normalized_pivot.columns) == 2,  # type: ignore[union-attr]
             row_colors=None if category_colors is None else [
-                (color, blend(color, TextColors.WHITE, REMAINDER_TINT)) for color in category_colors
+                (color, blend(color, BACKGROUND_COLOR, REMAINDER_TINT)) for color in category_colors
             ],
         )
 

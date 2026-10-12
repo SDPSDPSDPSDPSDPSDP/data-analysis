@@ -4,7 +4,7 @@ from typing import Optional
 from ..config import TitleInput, SortInput, TimeGroupBy, TimeGroupByInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
-from ..core.base_plot import default_palette
+from ..common.colors import default_palette
 from ..common.data_conversion import COUNT_COL, REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder, totals_per_x
 from ..plots import BarPlot, CountPlot, NormalizedPlot
 

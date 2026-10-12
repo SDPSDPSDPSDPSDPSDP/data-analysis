@@ -55,7 +55,7 @@ export function load(): Promise<void> {
         else resolve();
       } else if (msg.type === "result") {
         const resolveRun = pending.get(msg.id);
-        if (!resolveRun) throw new Error(`Result for unknown run id ${msg.id}`);
+        if (!resolveRun) return restart(`Result for unknown run id ${msg.id}. Python was restarted.`);
         resolveRun(msg);
         pending.delete(msg.id);
         armWatchdog();

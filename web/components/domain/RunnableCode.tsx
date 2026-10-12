@@ -58,6 +58,8 @@ const docTooltip = hoverTooltip((view, pos) => {
   };
 });
 
+const DOC_TOOLTIP = [docTooltip];
+
 type Props = {
   initialCode: string;
   // Prepended to every run, not shown in the editor.
@@ -98,7 +100,7 @@ export default function RunnableCode({ initialCode, setup }: Props) {
 
   return (
     <div className="runnable" ref={root}>
-      <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={[docTooltip]} />
+      <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={DOC_TOOLTIP} />
       <section className="output">
         {result?.images.map((src, i) => (
           <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />

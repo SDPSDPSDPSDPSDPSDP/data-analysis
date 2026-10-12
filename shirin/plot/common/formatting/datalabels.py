@@ -1,4 +1,6 @@
 from typing import Dict, List, Optional
+
+import numpy as np
 import pandas as pd
 
 from ...config import FontSizes, Layout, TextColors
@@ -86,7 +88,8 @@ def format_datalabels_stacked(
     suffix: Optional[str] = None,
 ) -> None:
     values = pivot_data.values
-    percentages = values / values.sum(axis=1, keepdims=True) * 100
+    totals = values.sum(axis=1, keepdims=True)
+    percentages = np.divide(values * 100, totals, out=np.zeros(values.shape), where=totals != 0)
     threshold = Layout.STACKED_LABEL_MIN_SHARE * pivot_data.sum(axis=1).max()
     _add_stacked_labels(chart, pivot_data, percentages, palette, orientation, suffix, threshold)
 

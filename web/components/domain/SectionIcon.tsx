@@ -11,7 +11,7 @@ const SECTION_ICONS: Record<string, LucideIcon> = {
   Tools: Wrench,
   "Number formatting": Hash,
   Statistics: Sigma,
-  "DB2 queries": Database,
+  "DB2 connection": Database,
 };
 
 export default function SectionIcon({ title }: { title: string }) {

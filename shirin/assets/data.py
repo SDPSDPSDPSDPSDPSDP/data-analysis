@@ -1,7 +1,7 @@
 import functools
 import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 
 
 def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> DataFrame:

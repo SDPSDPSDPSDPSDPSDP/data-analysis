@@ -73,6 +73,15 @@ def test_parquet_empty_result(db, tmp_path) -> None:
     assert pq.read_table(out).num_rows == 0
 
 
+def test_parquet_failed_query_keeps_existing_file(sqlite_engine, tmp_path) -> None:
+    out = tmp_path / 'out.parquet'
+    out.write_bytes(b'previous')
+    with pytest.raises(Exception):
+        parquet.query_to_parquet('SELECT * FROM missing_table', sqlite_engine, out)
+    assert out.read_bytes() == b'previous'
+    assert list(tmp_path.iterdir()) == [out]
+
+
 def test_engine_is_cached_and_password_escaped(monkeypatch) -> None:
     # Building a real ibm_db_sa engine loads the DB2 driver DLLs; capture the URL instead.
     urls = []

@@ -3,10 +3,10 @@ from typing import Any, List
 import pandas as pd
 
 from ..core import renderer
-from ..core.base_plot import AbstractPlot, default_colors, default_palette
+from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
-from ..common.sorting import palette_colors
+from ..common.colors import default_colors, default_palette, palette_colors
 from ..config import FigureSize, Marks
 from ..svg import Text
 from ...number_format import format_thousands

@@ -13,7 +13,8 @@ from ..common.formatting import (
     format_period_ticks,
     format_ticks,
 )
-from ..common.sorting import get_order, palette_colors
+from ..common.colors import palette_colors
+from ..common.sorting import get_order
 from ..common.stacked_plots import prepare_stacked_data
 from ..svg import Chart
 

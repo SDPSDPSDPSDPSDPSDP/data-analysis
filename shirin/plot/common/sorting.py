@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Optional
 
 from ..config import SortInput
 
@@ -42,13 +42,3 @@ def sort_pivot_table(df_pivot: pd.DataFrame, sort: Optional[SortInput], ascendin
     if sort == 'alphabetical':
         return df_pivot.loc[sort_alphabetically(df_pivot.index, ascending=ascending)]
     return df_pivot
-
-
-def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> list[str]:
-    """Color per key; every plot raises the same KeyError when the palette misses a key."""
-    keys = [str(key) for key in keys]
-    missing = [key for key in keys if key not in palette]
-    if missing:
-        raise KeyError(f"Palette missing keys: {missing}. Available keys: {list(palette.keys())}")
-    return [palette[key] for key in keys]
-

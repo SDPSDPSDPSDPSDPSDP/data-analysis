@@ -17,6 +17,7 @@ def _echo(value):
         print(value)
 
 # Notebook-style: every top-level expression prints its value, so examples need no print().
+# Fresh namespace per run: examples cannot leak state into each other or shadow _out.
 async def _run(code):
     runner = _CodeRunner(code, return_mode="none")
     for node in runner.ast.body:
@@ -24,7 +25,7 @@ async def _run(code):
             call = _ast.Call(_ast.Name("_echo", _ast.Load()), [node.value], [])
             node.value = _ast.copy_location(call, node.value)
     _ast.fix_missing_locations(runner.ast)
-    await runner.compile().run_async(globals())
+    await runner.compile().run_async({"__name__": "__main__", "_echo": _echo})
 `;
 
 let stdout = [];
