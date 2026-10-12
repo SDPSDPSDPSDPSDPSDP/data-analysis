@@ -26,6 +26,7 @@
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);
   --color-overlay-button-hover: rgba(0, 0, 0, 0.7);
+  --color-overlay-button-light: rgba(0, 0, 0, 0.42);
 
   --text-primary: rgba(0, 0, 0, 0.93);
   --text-muted: rgba(0, 0, 0, 0.7);
