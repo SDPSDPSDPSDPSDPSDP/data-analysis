@@ -36,9 +36,10 @@ type Props = PlotSectionData & {
   globalSetup: string;
   // Only section of its category: takes the category's heading level instead.
   standalone: boolean;
+  expanded: boolean;
 };
 
-export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone }: Props) {
+export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone, expanded }: Props) {
   const runnable = (example: Example, key?: number) => (
     <RunnableCode
       key={key}
@@ -105,7 +106,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {runnable(examples[0])}
         </div>
       </section>
-      <details className="more-examples">
+      <details className="more-examples" open={expanded}>
         <summary>
           <span className="more-examples-button">
             <SectionIcon title={title} />

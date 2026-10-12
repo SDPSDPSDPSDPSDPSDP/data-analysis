@@ -1,0 +1,35 @@
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--home-card-min-width), 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-shimmer);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--transition);
+}
+
+.home-card:hover {
+  background: var(--color-surface);
+}
+
+.home-card-icon {
+  font-size: var(--font-size-h3);
+}
+
+.page .home-card h3 {
+  text-align: left;
+}
+
+.home-card p {
+  margin: 0;
+  color: var(--text-muted);
+}

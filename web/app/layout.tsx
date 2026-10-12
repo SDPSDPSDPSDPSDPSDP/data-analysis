@@ -5,6 +5,7 @@ import "./globals.css";
 import "./nav.css";
 import "./code.css";
 import "./examples.css";
+import "./home.css";
 
 const futura = localFont({
   src: "../public/fonts/FuturaND-Medium.woff2",
