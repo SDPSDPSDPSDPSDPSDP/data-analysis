@@ -117,6 +117,23 @@ export default function Home() {
       ],
     }),
   ];
+  const scatterCharts = [
+    section("Scatter plots", "scatter.py", {
+      description: "One row per observation with two numeric values. The plot draws one point per row.",
+      columns: [
+        { name: "fruit", role: "hue" },
+        { name: "weight", role: "x" },
+        { name: "sweetness", role: "y" },
+        { name: "days_on_tree", role: "size" },
+      ],
+      rows: [
+        ["Apple", "221.4", "14.1", "32"],
+        ["Cherry", "187.9", "11.6", "18"],
+        ["Orange", "236.0", "15.3", "47"],
+        ["Fig", "170.2", "9.8", "25"],
+      ],
+    }),
+  ];
   const tools = [
     section("Number formatting", "number_format.py"),
     section("Statistics", "stats.py"),
@@ -129,6 +146,7 @@ export default function Home() {
         { title: "Bar charts", sections: barCharts },
         { title: "Pie charts", sections: pieCharts },
         { title: "Line charts", sections: lineCharts },
+        { title: "Scatter plots", sections: scatterCharts },
         { title: "Tools", sections: tools },
       ]}
     />

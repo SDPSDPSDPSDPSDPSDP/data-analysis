@@ -149,4 +149,5 @@
   gap: var(--space-1);
   color: var(--text-primary);
   font-weight: var(--font-weight-nav);
+  white-space: nowrap;
 }
