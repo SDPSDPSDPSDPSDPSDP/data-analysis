@@ -52,13 +52,13 @@
 .chart-modal-actions,
 .chart-modal .runnable > :first-child {
   /* Fades in while the chart is still landing. */
-  animation: chart-preview-in var(--home-chart-grow-duration) ease var(--modal-enter-content-delay) both;
+  animation: chart-preview-in var(--modal-enter-content-duration) ease var(--modal-enter-content-delay) both;
 }
 
 /* Last in: after the editor has faded in. */
 .chart-modal-docs {
   animation: chart-preview-in var(--home-chart-grow-duration) ease
-    calc(var(--modal-enter-content-delay) + var(--home-chart-grow-duration)) both;
+    calc(var(--modal-enter-content-delay) + var(--modal-enter-content-duration)) both;
 }
 
 /* Closing fades back to front: docs button, then editor and close button, then the chart leaves as the backdrop lightens.
@@ -80,15 +80,27 @@
   animation-delay: var(--modal-exit-chart-delay);
 }
 
-/* Reverse of opening: chart flies back into its card while the backdrop lightens at the same pace. */
+/* Chart flies back into its card while the backdrop lightens at the same pace.
+   Own keyframes, not the opening reversed: reversing flips the easing too, a slow start that snaps into the card. */
 .chart-modal.to-card .chart.flying {
-  animation-direction: reverse;
-  animation-fill-mode: both;
-  animation-delay: var(--modal-exit-chart-delay);
+  animation: chart-modal-fly-back var(--modal-exit-fly-duration) var(--home-chart-enter-ease) var(--modal-exit-chart-delay)
+    both;
+}
+
+@keyframes chart-modal-fly-back {
+  to {
+    transform: translate(var(--fly-x), var(--fly-y)) scale(var(--fly-scale));
+  }
 }
 
 .chart-modal.to-card::backdrop {
-  animation-duration: var(--home-chart-fly-duration);
+  animation-duration: var(--modal-exit-fly-duration);
+}
+
+/* Leaving for the docs page: everything fades at once, the docs page staggers in after. */
+.chart-modal.to-docs :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child, .output),
+.chart-modal.to-docs::backdrop {
+  animation-delay: 0s;
 }
 
 @keyframes chart-modal-out {

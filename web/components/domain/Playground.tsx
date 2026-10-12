@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
 
@@ -21,8 +21,24 @@ export default function Playground({ setup, categories, showSetup, expanded }: P
   const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
   // Edits apply to the examples only once a setup cell is run.
   const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
+  const main = useRef<HTMLElement>(null);
+  // Blocks fade in the first time they scroll into view; ones arriving together stagger.
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries
+        .filter((entry) => entry.isIntersecting)
+        .forEach((entry, i) => {
+          const block = entry.target as HTMLElement;
+          block.style.setProperty("--i", `${i}`);
+          block.classList.add("seen");
+          observer.unobserve(block);
+        });
+    });
+    main.current!.querySelectorAll(":scope > :not(div), :scope > div > *").forEach((block) => observer.observe(block));
+    return () => observer.disconnect();
+  }, []);
   return (
-    <main className="page">
+    <main className="page" ref={main}>
       {showSetup && <h2>Setup</h2>}
       {showSetup && setup.map((cell, i) => (
         <section key={i} className="setup-cell">
