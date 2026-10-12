@@ -19,7 +19,7 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot.bar(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
     plot.time(df, x='date', y='value', hue='group')
-    plot.scatterplot(df, x='value', y='value')
+    plot.scatter(df, x='value', y='value')
     plot.pie(df, col='category')
     plot.time(df, x='date', group_by='month')
     plot.time(df, x='date', group_by='day', rotation=45)

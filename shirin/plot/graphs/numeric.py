@@ -58,7 +58,7 @@ class NumericPlotsMixin:
         )
         self._render(Histogram(options))
 
-    def scatterplot(
+    def scatter(
         self,
         df: pd.DataFrame,
         x: str,

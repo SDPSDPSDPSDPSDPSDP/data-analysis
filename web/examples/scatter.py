@@ -11,14 +11,14 @@ start = df['fruit'].map({'Cherry': 32, 'Fig': 12, 'Date': 40, 'Apple': 10, 'Oran
 df['days_on_tree'] = (start + df.groupby('fruit')['sweetness'].rank(pct=True) * 25).round().astype(int)
 
 # %% Plain
-plot.scatterplot(
+plot.scatter(
     df,
     x='weight',
     y='sweetness',
 )
 
 # %% Color by hue, title, axis labels, legend
-plot.scatterplot(
+plot.scatter(
     df,
     x='weight',
     y='sweetness',
@@ -30,7 +30,7 @@ plot.scatterplot(
 )
 
 # %% Point size by column
-plot.scatterplot(
+plot.scatter(
     df,
     x='weight',
     y='sweetness',
@@ -39,7 +39,7 @@ plot.scatterplot(
 )
 
 # %% Same data, colored by fruit
-plot.scatterplot(
+plot.scatter(
     df,
     x='weight',
     y='sweetness',

@@ -101,7 +101,8 @@ If the same hue column needs different colors in different charts, make a second
 | `timeplot(..., type='line')` | `time(..., group_by='day')` |
 | `timeplot(..., palette='#hex')` | Remove. No color argument. |
 | `timeplot` (now `time`) default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it. |
-| - | New: `scatterplot(df, x, y, hue=, size=)` |
+| - | New: `scatter(df, x, y, hue=, size=)` |
+| `scatterplot(...)` | `scatter(...)` |
 
 Accuracy charts: segments are now labelled with the value column name and `'Remainder'` instead of `'Correct'`/`'Incorrect'`. Rename the column (`df.rename(columns={'acc': 'Correct'})`) if the old label matters.
 

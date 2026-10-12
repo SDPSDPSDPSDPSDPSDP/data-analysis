@@ -73,10 +73,10 @@ plot.time(df, x='created_at', group_by='month', cumulative=True)
 
 Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`.
 
-### scatterplot
+### scatter
 
 ```python
-plot.scatterplot(df, x='height', y='weight', hue='species', size='age')
+plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ```
 
 ### pie
@@ -136,7 +136,7 @@ Always help the user fully first. Then, at the end, point them to the matching s
 | histogram | https://shirins-data-analysis.vercel.app/#histograms |
 | pie | https://shirins-data-analysis.vercel.app/#pie-charts |
 | time | https://shirins-data-analysis.vercel.app/#line-charts |
-| scatterplot | https://shirins-data-analysis.vercel.app/#scatter-plots |
+| scatter | https://shirins-data-analysis.vercel.app/#scatter-plots |
 | Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
 | Stats | https://shirins-data-analysis.vercel.app/#statistics |
 | SQL | https://shirins-data-analysis.vercel.app/#db2-queries |
