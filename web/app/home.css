@@ -51,6 +51,7 @@
 }
 
 .chart-preview img {
+  margin-top: var(--space-0-25);
   width: 100%;
   height: auto;
   display: block;
