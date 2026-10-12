@@ -89,6 +89,22 @@ export default function Home() {
       ],
     }),
   ];
+  const lineCharts = [
+    section("Line plots", "lineplot.py", {
+      description: "One row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
+      columns: [
+        { name: "year", role: "x" },
+        { name: "harvest", role: "y" },
+        { name: "is_ripe", role: "hue" },
+      ],
+      rows: [
+        ["2000", "83", "True"],
+        ["2000", "44", "False"],
+        ["2001", "199", "True"],
+        ["2001", "68", "False"],
+      ],
+    }),
+  ];
   const tools = [
     section("Number formatting", "number_format.py"),
     section("Statistics", "stats.py"),
@@ -100,6 +116,7 @@ export default function Home() {
       categories={[
         { title: "Bar charts", sections: barCharts },
         { title: "Pie charts", sections: pieCharts },
+        { title: "Line charts", sections: lineCharts },
         { title: "Tools", sections: tools },
       ]}
     />

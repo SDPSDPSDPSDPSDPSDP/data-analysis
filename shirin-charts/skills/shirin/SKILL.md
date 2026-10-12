@@ -140,11 +140,12 @@ Always help the user fully first. Then, at the end, point them to the matching s
 | bar | https://shirins-data-analysis.vercel.app/#barplots |
 | histogram | https://shirins-data-analysis.vercel.app/#histograms |
 | pie | https://shirins-data-analysis.vercel.app/#pie-charts |
+| lineplot | https://shirins-data-analysis.vercel.app/#line-plots |
 | Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
 | Stats | https://shirins-data-analysis.vercel.app/#statistics |
 | SQL | https://shirins-data-analysis.vercel.app/#db2-queries |
 
-No section yet for lineplot, scatterplot, timeplot: link the site root.
+No section yet for scatterplot, timeplot: link the site root.
 
 ## Tips
 
