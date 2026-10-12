@@ -179,16 +179,15 @@
   gap: var(--space-2);
   padding: var(--space-1-5) var(--space-3);
   border-radius: var(--radius-pill);
-  /* Same glass as the nav bar. */
-  background: var(--color-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  color: var(--text-primary);
+  background: var(--color-overlay-button);
+  backdrop-filter: blur(var(--glass-blur));
+  color: var(--text-on-dark);
   font-weight: var(--font-weight-nav);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
   outline: none;
-  transition: filter var(--transition);
+  transition: background var(--transition);
 }
 
 .chart-modal-docs > svg {
@@ -203,16 +202,15 @@
 }
 
 .chart-modal-docs-eyebrow {
-  color: var(--text-secondary);
+  color: var(--text-on-dark-secondary);
   font-size: var(--font-size-eyebrow);
   letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
-/* Opacity is held by the fade-in animation's fill, so hover dims via filter. */
 .chart-modal-docs:hover,
 .chart-modal-docs:focus-visible {
-  filter: brightness(0.9);
+  background: var(--color-overlay-button-hover);
 }
 
 /* Native modal dialogs still let the page behind them scroll. */
