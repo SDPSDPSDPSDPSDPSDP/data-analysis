@@ -49,6 +49,7 @@
   --font-weight-nav: 500;
   --font-weight-doc-heading: 700;
   --letter-spacing-heading: 0.015em;
+  --letter-spacing-eyebrow: 0.08em;
 
   --space-0-25: 2px;
   --space-0-5: 4px;
@@ -75,6 +76,7 @@
 
   --runnable-height: 75vh;
   --data-format-chart-height: 50vh;
+  --modal-chart-height: 55vh;
   --chart-aspect-ratio: 4 / 3;
   --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;

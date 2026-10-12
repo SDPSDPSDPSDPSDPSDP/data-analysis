@@ -2,8 +2,9 @@
 
 import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
-import { BookOpen, X } from "lucide-react";
+import { X } from "lucide-react";
 import RunnableCode from "@/components/domain/RunnableCode";
+import SectionIcon from "@/components/domain/SectionIcon";
 
 type Props = {
   setup: string;
@@ -54,8 +55,11 @@ export default function ChartModal({ setup, code, preview, origin, href, section
       </div>
       <RunnableCode initialCode={code} setup={setup} preview={preview} />
       <Link href={href} className="chart-modal-docs">
-        <BookOpen size="1em" />
-        {section} documentation
+        <SectionIcon title={section} />
+        <span className="chart-modal-docs-text">
+          <span className="chart-modal-docs-eyebrow">Documentation</span>
+          {section}
+        </span>
       </Link>
     </dialog>
   );
