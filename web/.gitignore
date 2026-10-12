@@ -5,3 +5,4 @@ next-env.d.ts
 *.tsbuildinfo
 public/shirin.whl
 lib/docstrings.json
+public/previews/

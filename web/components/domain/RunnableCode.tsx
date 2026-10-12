@@ -6,9 +6,7 @@ import { load, run, type RunResult } from "@/lib/pyodide";
 import docstrings from "@/lib/docstrings.json";
 import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
-
-// Start a run slightly before the example scrolls into view.
-const RUN_AHEAD_MARGIN = "200px";
+import { useVisible } from "@/lib/useVisible";
 
 const DOTTED_NAME = /^[A-Za-z_]\w*(\.[A-Za-z_]\w*)*$/;
 
@@ -64,28 +62,19 @@ type Props = {
   initialCode: string;
   // Prepended to every run, not shown in the editor.
   setup: string;
+  // Prerendered SVG shown while Python loads, null shows a skeleton.
+  preview: string | null;
 };
 
-export default function RunnableCode({ initialCode, setup }: Props) {
+export default function RunnableCode({ initialCode, setup, preview }: Props) {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<RunResult | null>(null);
   const root = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const visible = useVisible(root);
 
-  // Python loads right away; the example only runs once visible. Content of a closed
-  // <details> never intersects, so collapsed examples run when opened.
+  // Python loads right away; the example only runs once visible.
   useEffect(() => {
     load().catch((err) => setResult({ images: [], stdout: "", error: String(err) }));
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setVisible(true);
-        observer.disconnect();
-      },
-      { rootMargin: RUN_AHEAD_MARGIN },
-    );
-    observer.observe(root.current!);
-    return () => observer.disconnect();
   }, []);
 
   // Running a setup cell (like after picking a palette color) re-renders the chart.
@@ -98,16 +87,24 @@ export default function RunnableCode({ initialCode, setup }: Props) {
     setResult(await run(`${setup}\n${source}`));
   }
 
+  const images = result
+    ? result.images.map((src) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`)
+    : preview
+      ? [preview]
+      : [];
+
   return (
     <div className="runnable" ref={root}>
       <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={DOC_TOOLTIP} />
       <section className="output">
-        {result?.images.map((src, i) => (
-          <CopyableImage key={i} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`} alt="Rendered chart" />
+        {/* Preview and result share one list so the first figure stays the same element when the result lands,
+            keeping any animation running on it (the home modal flies it in). */}
+        {images.map((src, i) => (
+          <CopyableImage key={i} src={src} alt="Rendered chart" />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}
-        {!result && <div className="skeleton" role="status" aria-label="Rendering chart" />}
+        {!result && !preview && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>
   );

@@ -1,0 +1,99 @@
+.home-charts {
+  display: grid;
+  grid-template-columns: repeat(var(--home-chart-columns), minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.chart-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  border: none;
+  background: none;
+  font: inherit;
+  outline: none;
+  /* Button fills grid cell; only card should react to pointer. */
+  pointer-events: none;
+  /* On the button, not the card: the card's entrance animation would override a transform transition. */
+  transition:
+    transform var(--home-chart-grow-duration) var(--home-chart-enter-ease),
+    opacity var(--home-chart-grow-duration) var(--home-chart-enter-ease);
+}
+
+.chart-preview.shrunk {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.chart-preview.hidden {
+  visibility: hidden;
+}
+
+/* Crossfades with the modal chart over the second half of its flight back, see chart-modal-fly-back. */
+.chart-preview.returning {
+  animation: chart-preview-in calc(var(--modal-exit-fly-duration) / 2) ease
+    calc(var(--modal-exit-chart-delay) + var(--modal-exit-fly-duration) / 2) both;
+}
+
+.chart-preview-card {
+  pointer-events: auto;
+  cursor: pointer;
+  width: var(--home-chart-scale);
+  margin: 0 auto;
+  padding-top: var(--space-0-5);
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-heading);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-home-chart);
+  overflow: hidden;
+  animation: chart-preview-in var(--home-chart-fade-duration) ease both;
+  animation-delay: calc(var(--i) * var(--home-chart-enter-stagger));
+}
+
+@keyframes chart-preview-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-preview-card,
+  .chart-preview.returning {
+    animation: none;
+  }
+
+  .chart-preview {
+    transition: none;
+  }
+}
+
+.chart-preview-title {
+  color: var(--text-primary);
+  font-size: var(--font-size-tiny);
+  font-weight: 600;
+}
+
+.chart-preview-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-heading);
+}
+
+.chart-preview img {
+  margin-top: var(--space-0-25);
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Custom properties are not allowed in media queries. */
+@media (max-width: 800px) {
+  .home-charts {
+    grid-template-columns: 1fr 1fr;
+  }
+}

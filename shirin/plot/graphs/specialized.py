@@ -18,6 +18,7 @@ class SpecializedPlotsMixin:
         n_after_comma: int = 0,
         value_datalabel: int = 5,
         donut: bool = False,
+        legend_percentages: bool = False,
     ) -> None:
         """Create a **pie chart** of the value counts in a column.
 
@@ -30,6 +31,8 @@ class SpecializedPlotsMixin:
                 subtitle line. *Optional*.
             n_after_comma: Decimals in the percentage labels. *Default: `0`*.
             value_datalabel: Slices below this percentage get no label. *Default: `5`*.
+            legend_percentages: Show percentages in the legend instead of counts, and no
+                labels on the slices. *Default: `False`*.
 
         Layout:
             donut: Whether to draw a donut instead of a full pie. *Default: `False`*.
@@ -42,6 +45,7 @@ class SpecializedPlotsMixin:
             n_after_comma=n_after_comma,
             value_datalabel=value_datalabel,
             donut=donut,
+            legend_percentages=legend_percentages,
         )
         self._render(PieChart(options))
 
@@ -60,6 +64,7 @@ class SpecializedPlotsMixin:
         cumulative: bool = False,
         display_month: bool = True,
         fill_missing_values: FillMissingValuesInput = None,
+        fill: bool = False,
     ) -> None:
         """Create a **time plot**: a line over `x`, one line per `hue` group.
 
@@ -86,6 +91,8 @@ class SpecializedPlotsMixin:
             cumulative: Running total over `x`, per `hue` group. *Default: `False`*.
             fill_missing_values: How to fill gaps in `y`. **Options:** `'shift'` (interpolate
                 between neighbours), `'zero'`. *Optional*.
+            fill: Shade the area under each line with a gradient that fades out towards
+                the bottom. *Default: `False`*.
 
         Example:
             >>> plot = PlotGraphs()
@@ -106,5 +113,6 @@ class SpecializedPlotsMixin:
             cumulative=cumulative,
             display_month=display_month,
             fill_missing_values=fill_missing_values,
+            fill=fill,
         )
         self._render(TimePlot(options))

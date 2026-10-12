@@ -52,6 +52,7 @@ class PiePlotOptions(BasePlotOptions):
     n_after_comma: int = 0
     value_datalabel: int = 5
     donut: bool = False
+    legend_percentages: bool = False
 
     def validate(self) -> None:
         super().validate()
@@ -70,6 +71,7 @@ class TimePlotOptions(BasePlotOptions):
     display_month: bool = True
     rotation: int = 0
     fill_missing_values: FillMissingValuesInput = None
+    fill: bool = False
 
     def validate(self) -> None:
         super().validate()

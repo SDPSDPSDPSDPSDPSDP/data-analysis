@@ -70,3 +70,12 @@ class TestIntegerPaletteKeys:
         )
 
         _assert_contrasting_text(plot)
+
+
+def test_legend_percentages_replaces_counts_and_hides_slice_labels():
+    df = pd.DataFrame({'count': [25, 75]}, index=['a', 'b'])
+    plot = PieChart(PiePlotOptions(df=df, col='count', legend_percentages=True))
+    chart = plot.render()
+
+    assert [value for _, _, value in chart.legend] == ['25%', '75%']
+    assert not any(text in chart.texts for text in plot._autotexts)

@@ -56,16 +56,33 @@ def fade(r: Rect, sx: Scale, sy: Scale, gradient_id: str) -> str:
             f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="url(#{gradient_id})"/>')
 
 
-def line(line: Line, sx: Scale, sy: Scale) -> str:
+def _segments(line: Line, sx: Scale, sy: Scale) -> List[List[Tuple[float, float]]]:
     segments: List[List[Tuple[float, float]]] = [[]]
     for x, y in zip(line.xs, line.ys):
         if y != y:  # NaN breaks the line
             segments.append([])
         else:
             segments[-1].append((sx(x), sy(y)))
-    d = ' '.join('M' + ' L'.join(f'{x:.2f} {y:.2f}' for x, y in seg) for seg in segments if seg)
+    return [seg for seg in segments if seg]
+
+
+def _path(points: List[Tuple[float, float]]) -> str:
+    return 'M' + ' L'.join(f'{x:.2f} {y:.2f}' for x, y in points)
+
+
+def line(line: Line, sx: Scale, sy: Scale) -> str:
+    d = ' '.join(_path(seg) for seg in _segments(line, sx, sy))
     return (f'<path d="{d}" fill="none" stroke="{line.color}" stroke-width="{Marks.LINE_WIDTH}" '
             'stroke-linejoin="round" stroke-linecap="round"/>')
+
+
+def area(line: Line, sx: Scale, sy: Scale, bottom: float, gradient_id: str) -> str:
+    """Area under the line down to `bottom`, fading out towards the bottom."""
+    d = ' '.join(_path(seg + [(seg[-1][0], bottom), (seg[0][0], bottom)]) + ' Z' for seg in _segments(line, sx, sy))
+    return (f'<linearGradient id="{gradient_id}" x1="0" y1="0" x2="0" y2="1">'
+            f'<stop offset="0" stop-color="{line.color}" stop-opacity="{Marks.LINE_FILL_ALPHA}"/>'
+            f'<stop offset="1" stop-color="{line.color}" stop-opacity="0"/></linearGradient>'
+            f'<path d="{d}" fill="url(#{gradient_id})"/>')
 
 
 def dots(dots: Dots, sx: Scale, sy: Scale) -> str:

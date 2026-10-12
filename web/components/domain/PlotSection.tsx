@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
+import { exampleSetup } from "@/lib/exampleSetup";
 
 export type SetupCell = {
   explanation: string;
@@ -18,6 +19,8 @@ export type Example = {
   code: string;
   // Runs after the section setup, not shown.
   hiddenSetup: string;
+  // Prerendered SVG shown until Python has run, null for examples that draw no chart.
+  preview: string | null;
 };
 
 export type PlotSectionData = {
@@ -26,6 +29,7 @@ export type PlotSectionData = {
   // Shown in the section and run before each of its examples, after the global setup.
   setup: SetupCell[];
   examples: Example[];
+  homeExamples: Example[];
 };
 
 export function sectionId(title: string): string {
@@ -36,14 +40,16 @@ type Props = PlotSectionData & {
   globalSetup: string;
   // Only section of its category: takes the category's heading level instead.
   standalone: boolean;
+  expanded: boolean;
 };
 
-export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone }: Props) {
+export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone, expanded }: Props) {
   const runnable = (example: Example, key?: number) => (
     <RunnableCode
       key={key}
       initialCode={example.code}
-      setup={[globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n")}
+      preview={example.preview}
+      setup={exampleSetup(globalSetup, setup, example)}
     />
   );
   const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));
@@ -105,17 +111,21 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {runnable(examples[0])}
         </div>
       </section>
-      <details className="more-examples">
-        <summary>
-          <span className="more-examples-button">
-            <SectionIcon title={title} />
-            <span className="more-examples-closed">{examples.length - 1} more examples</span>
-            <span className="more-examples-open">Hide examples</span>
-            <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
-          </span>
-        </summary>
-        {moreExamples}
-      </details>
+      {expanded ? (
+        <div className="more-examples">{moreExamples}</div>
+      ) : (
+        <details className="more-examples">
+          <summary>
+            <span className="more-examples-button">
+              <SectionIcon title={title} />
+              <span className="more-examples-closed">{examples.length - 1} more examples</span>
+              <span className="more-examples-open">Hide examples</span>
+              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
+            </span>
+          </summary>
+          {moreExamples}
+        </details>
+      )}
     </>
   );
 }

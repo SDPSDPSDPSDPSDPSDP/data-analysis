@@ -4,7 +4,7 @@ plot.bar(
     x='fruit',
 )
 
-# %% Title, axis label, top n, suffix
+# %% Title, axis label, top n, suffix [no-home]
 plot.bar(
     df,
     y='fruit',
@@ -25,7 +25,7 @@ plot.bar(
     hue='fruit',
     sort='alphabetical',
     data_labels=False,
-    title='Alphabetical',
+    title='Fruits A to Z',
 )
 
 # %% Percentage labels
@@ -34,7 +34,7 @@ plot.bar(
     y='fruit',
     value='count',
     normalized=True,
-    title='Share of total',
+    title='Share of all fruit',
 )
 
 # %% Counts grouped by hue
@@ -44,7 +44,7 @@ plot.bar(
     value='count',
     hue='is_ripe',
     legend=True,
-    title='Grouped by ripeness',
+    title='Ripe vs unripe fruit',
 )
 
 # %% Stacked by hue
@@ -55,7 +55,7 @@ plot.bar(
     hue='is_ripe',
     legend=True,
     stacked=True,
-    title='Stacked',
+    title='Fruit stock by ripeness',
 )
 
 # %% Share: fill each bar up to 100% with the remainder
@@ -66,7 +66,7 @@ plot.bar(
     remainder=True,
     normalized=True,
     data_labels=False,
-    title='Share sold',
+    title='Share of fruit sold',
 )
 
 # %% Share, colored per fruit
@@ -77,14 +77,14 @@ plot.bar(
     hue='fruit',
     remainder=True,
     normalized=True,
-    title='Share sold per fruit',
+    title='Which fruit sells best',
 )
 
 
 # %% [hidden]
 from shirin.assets.data import df_time as df
 
-# %% Bars per year
+# %% Bars per year [no-home]
 plot.bar(
     df,
     x='date',

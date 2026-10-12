@@ -23,7 +23,7 @@ plot.time(
 # %% [hidden]
 df = df_harvest_by_year
 
-# %% One line per hue, title, axis labels, legend, rotated ticks
+# %% One line per hue, title, axis labels, legend, rotated ticks, fill under lines
 plot.time(
     df,
     x='year',
@@ -34,17 +34,19 @@ plot.time(
     y_axis_label='Fruits harvested',
     rotation=45,
     legend=True,
+    fill=True,
 )
 
 # %% [hidden]
 df = df_time
 
-# %% Cumulative, years only
+# %% Cumulative, years only [no-home]
 plot.time(
     df,
     x='date',
     group_by='month',
     cumulative=True,
+    fill=True,
     display_month=False,
     title='Fruits picked so far',
 )

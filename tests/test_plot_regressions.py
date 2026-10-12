@@ -29,6 +29,12 @@ def test_pie_without_palette_uses_distinct_colors(df: pd.DataFrame) -> None:
     assert len({wedge.color for wedge in chart.wedges}) == 3
 
 
+def test_pie_leaves_whitespace_around_wedges(df: pd.DataFrame) -> None:
+    counts = df['category'].value_counts().to_frame()
+    chart = PieChart(PiePlotOptions(df=counts, col='count')).render()
+    assert chart.x.lim[1] > max(wedge.radius for wedge in chart.wedges)
+
+
 def test_histogram_keeps_fractional_values() -> None:
     df = pd.DataFrame({'x': [0.1, 0.2, 0.5, 0.9, None]})
     chart = Histogram(HistogramOptions(df=df, x='x', bins=10)).render()
@@ -42,16 +48,18 @@ def test_histogram_suffix_on_tick_labels() -> None:
     assert chart.x.formatter(10) == '10 %'
 
 
-def test_histogram_bars_round_and_stacks_overlap_as_pills() -> None:
+def test_histogram_bars_round_and_stacks_are_clipped_segments() -> None:
     df = pd.DataFrame({'x': [1, 1, 2, 3], 'hue': ['a', 'b', 'a', 'b']})
     plain = Histogram(HistogramOptions(df=df, x='x', bins=3)).render()
     assert all(rect.rounded and rect.clip is None for rect in plain.rects)
     palette = {'a': '#111111', 'b': '#eeeeee'}
     stacked = Histogram(HistogramOptions(df=df, x='x', bins=3, hue='hue', palette=palette)).render()
-    assert all(rect.rounded and rect.clip is None and rect.fade_to is None for rect in stacked.rects)
-    back, front = stacked.rects[:3], stacked.rects[3:]
-    assert [r.color for r in back + front] == ['#eeeeee'] * 3 + ['#111111'] * 3
-    assert [r.height for r in back] == [2, 1, 1] and [r.height for r in front] == [1, 1, 0]
+    # Segments must not overlap: a full back pill bleeds through the front pill's anti-aliased edges.
+    assert all(rect.clip is not None and rect.clip.rounded for rect in stacked.rects)
+    bottom, top = stacked.rects[:3], stacked.rects[3:]
+    assert [r.color for r in bottom + top] == ['#111111'] * 3 + ['#eeeeee'] * 3
+    assert [r.height for r in bottom] == [1, 1, 0] and [r.height for r in top] == [1, 0, 1]
+    assert [r.y0 for r in top] == [1, 1, 0]
 
 
 def test_stacked_barplot_sums_duplicate_rows() -> None:

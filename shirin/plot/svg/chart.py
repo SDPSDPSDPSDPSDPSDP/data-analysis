@@ -49,6 +49,7 @@ class Line:
     xs: List[float]
     ys: List[float]
     color: str
+    fill: bool = False  # gradient area from the line down to the plot bottom
 
 
 @dataclass

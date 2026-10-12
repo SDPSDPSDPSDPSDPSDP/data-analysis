@@ -23,14 +23,14 @@ plot.histogram(
     title=['Sour fruit', 'Sugar up to 10%'],
 )
 
-# %% Stacked by hue
+# %% Stacked by hue [no-home]
 plot.histogram(
     df,
     x='sweetness',
     hue='is_ripe',
     bins=30,
     legend=True,
-    title='Stacked by ripeness',
+    title='Sweetness by ripeness',
 )
 
 # %% Dodged by hue
@@ -41,5 +41,5 @@ plot.histogram(
     bins=30,
     stacked=False,
     legend=True,
-    title='Side by side',
+    title='Sweetness, ripe vs unripe',
 )

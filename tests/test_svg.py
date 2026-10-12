@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from shirin.plot.svg import Chart, Rect, Text, Wedge, to_svg
+from shirin.plot.svg import Chart, Line, Rect, Text, Wedge, to_svg
 from shirin.plot.svg.fonts import text_width
 from shirin.plot.svg.ticks import date_ticks, nice_ticks, to_days
 
@@ -133,3 +133,12 @@ def test_crowded_data_labels_get_shortened() -> None:
     assert [t.text for t in crowded.texts] == ['10.915', '10.915']
     assert '>11k<' in to_svg(crowded)
     assert '>10.915<' in to_svg(chart(5))
+
+
+def test_filled_line_draws_fading_area_per_segment() -> None:
+    c = Chart(width=6, plot_height=3)
+    c.lines += [Line([0, 1, 2, 3], [1, 2, float('nan'), 3], '#123456', fill=True), Line([0, 3], [0, 1], '#654321')]
+    svg = to_svg(c)
+    assert svg.count('<linearGradient') == 1 and 'stop-opacity="0"' in svg
+    area = svg.split('" fill="url(#area')[0].rsplit('<path d="', 1)[1]
+    assert area.count('Z') == 2

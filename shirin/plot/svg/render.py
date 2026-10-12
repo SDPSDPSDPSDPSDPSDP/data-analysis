@@ -119,6 +119,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         body.append(rect)
         fades.append(fade)
     body += fades
+    body += [marks.area(line, sx, sy, plot_bottom, f'area{next(_CLIP_IDS)}') for line in chart.lines if line.fill]
     body += [marks.line(line, sx, sy) for line in chart.lines]
     body += [marks.dots(dots, sx, sy) for dots in chart.dots]
     for t in texts:

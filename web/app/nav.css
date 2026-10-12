@@ -29,6 +29,12 @@
   font-family: var(--font-heading);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--letter-spacing-heading);
+  display: inline-block;
+  transition: transform var(--transition);
+}
+
+.nav-brand:hover {
+  transform: scale(var(--nav-brand-hover-scale));
 }
 
 .nav-menus {
@@ -36,15 +42,22 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: var(--space-3);
   height: 100%;
 }
 
+/* Padding instead of a gap on .nav-menus: crossing a gap un-hovers every menu, so the dim would flash off and on. */
 .nav-menu {
   position: relative;
   display: flex;
   align-items: center;
   height: 100%;
+  padding: 0 calc(var(--space-3) / 2);
+  transition: opacity var(--nav-dim-transition), filter var(--nav-dim-transition);
+}
+
+.nav-menus:has(.nav-menu:hover) .nav-menu:not(:hover) {
+  opacity: var(--nav-dim-opacity);
+  filter: blur(var(--nav-dim-blur));
 }
 
 .nav-dropdown {
@@ -89,4 +102,26 @@
   color: var(--text-primary);
   font-weight: var(--font-weight-nav);
   white-space: nowrap;
+}
+
+/* Negative margin keeps the padded button in line with the plain links. */
+.nav button.nav-link {
+  padding: var(--space-1) var(--space-1-5);
+  margin: 0 calc(-1 * var(--space-1-5));
+  border: none;
+  outline: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  font: inherit;
+  font-weight: var(--font-weight-nav);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.nav button.nav-link[aria-pressed="true"] {
+  background: var(--color-bg);
+}
+
+.nav .nav-link-inactive {
+  color: var(--text-secondary);
 }
