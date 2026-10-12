@@ -68,6 +68,7 @@
   margin: 0 auto;
   padding-top: var(--space-0-5);
   line-height: 1.2;
+  letter-spacing: var(--letter-spacing-tight);
   display: flex;
   flex-direction: column;
   text-align: center;
