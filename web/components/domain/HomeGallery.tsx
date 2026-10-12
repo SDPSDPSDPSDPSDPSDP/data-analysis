@@ -99,6 +99,7 @@ export default function HomeGallery({ categories, charts }: Props) {
           preview={open.chart.preview}
           origin={open.origin}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
+          section={open.chart.section}
           onClose={() => {
             setOpen(null);
             setSelected(null);

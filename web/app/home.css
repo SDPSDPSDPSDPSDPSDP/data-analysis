@@ -56,6 +56,7 @@
 
 .chart-modal::backdrop,
 .chart-modal-actions,
+.chart-modal-docs,
 .chart-modal .runnable > :first-child {
   /* Waits for the chart to land before fading in. */
   animation: chart-preview-in var(--home-chart-grow-duration) ease var(--home-chart-fly-duration) both;
@@ -90,6 +91,7 @@
   .chart-modal .chart.flying,
   .chart-modal::backdrop,
   .chart-modal-actions,
+  .chart-modal-docs,
   .chart-modal .runnable > :first-child {
     animation: none;
   }
@@ -161,6 +163,31 @@
 .chart-modal-button:focus-visible {
   background: var(--color-button-hover);
   color: var(--text-on-dark);
+}
+
+.chart-modal-docs {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1-5) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+  transition: filter var(--transition);
+}
+
+/* Opacity is held by the fade-in animation's fill, so hover dims via filter. */
+.chart-modal-docs:hover,
+.chart-modal-docs:focus-visible {
+  filter: brightness(0.9);
 }
 
 /* Native modal dialogs still let the page behind them scroll. */

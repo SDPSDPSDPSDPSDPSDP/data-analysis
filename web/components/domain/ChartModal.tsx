@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
-import { ExternalLink, X } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 import RunnableCode from "@/components/domain/RunnableCode";
 
 type Props = {
@@ -13,10 +13,12 @@ type Props = {
   origin: DOMRect;
   // Full page with this chart's examples.
   href: string;
+  // Section title, names the documentation button.
+  section: string;
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, preview, origin, href, onClose }: Props) {
+export default function ChartModal({ setup, code, preview, origin, href, section, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
 
   // Layout effect: figure must start at the card's spot before first paint.
@@ -46,14 +48,15 @@ export default function ChartModal({ setup, code, preview, origin, href, onClose
       onKeyDown={(event) => event.key === "Escape" && dialog.current!.close()}
     >
       <div className="chart-modal-actions">
-        <Link href={href} className="chart-modal-button" aria-label="Open full page">
-          <ExternalLink size="1em" />
-        </Link>
         <button type="button" className="chart-modal-button" onClick={() => dialog.current!.close()} aria-label="Close">
           <X size="1em" />
         </button>
       </div>
       <RunnableCode initialCode={code} setup={setup} preview={preview} />
+      <Link href={href} className="chart-modal-docs">
+        <BookOpen size="1em" />
+        {section} documentation
+      </Link>
     </dialog>
   );
 }
