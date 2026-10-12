@@ -58,7 +58,7 @@
   top: var(--space-1);
   right: var(--space-1);
   display: flex;
-  gap: var(--space-0-5);
+  gap: 0;
 }
 
 .chart-modal-button {
@@ -68,6 +68,7 @@
   width: var(--button-height);
   height: var(--button-height);
   padding: 0;
+  font: inherit;
   border: none;
   border-radius: var(--radius);
   background: none;
@@ -79,4 +80,13 @@
 .chart-modal-button:hover {
   background: var(--color-surface);
   color: var(--text-primary);
+}
+
+/* Native modal dialogs still let the page behind them scroll. */
+html:has(.chart-modal[open]) {
+  overflow: hidden;
+}
+
+.chart-modal .runnable {
+  align-items: center;
 }
