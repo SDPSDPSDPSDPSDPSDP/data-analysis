@@ -51,7 +51,7 @@ class TimePlot(AbstractPlot):
     def _format_date_axis(self, chart: Chart) -> None:
         """Year ticks, month ticks with a year row below, or automatic day ticks."""
         if self.options.group_by == 'day':
-            chart.x.dates, chart.x.date_format = True, '%Y-%m-%d'
+            chart.x.date_format = '%Y-%m-%d'
             return
         months = self.options.group_by == 'month' and self.options.display_month
         format_period_ticks(chart, self._periods, to_days(self._periods), months)

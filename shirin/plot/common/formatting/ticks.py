@@ -53,10 +53,10 @@ def format_period_ticks(chart: Chart, periods: pd.Series, positions: pd.Series, 
 
     Long monthly axes label every 2nd, 3rd or 6th month, or fall back to years.
     """
-    step = next((s for s in (1, 2, 3, 6) if len(periods) / s <= Layout.MAX_MONTH_TICKS), None)
+    step = next((s for s in Layout.MONTH_TICK_STEPS if len(periods) / s <= Layout.MAX_MONTH_TICKS), None)
     if months and step is not None:
         shown, fmt = (periods.dt.month - 1) % step == 0, '%b'
-        chart.x.rotation = 90
+        chart.x.rotation = Layout.MONTH_TICK_ROTATION
         first_of_year = periods.groupby(periods.dt.year).idxmin()
         chart.x.sub_labels = [(positions[i], str(periods[i].year)) for i in first_of_year]
     else:

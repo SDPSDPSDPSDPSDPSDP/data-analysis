@@ -39,6 +39,8 @@ class Layout:
     HAIRLINE = 0.5  # stroke width of grid lines and rect outlines
     AXIS_MARGIN = 0.05  # share of the data range padded on each side of an auto-scaled axis
     MAX_MONTH_TICKS = 24  # longer monthly axes label every 2nd, 3rd or 6th month; past that only years
+    MONTH_TICK_STEPS = (1, 2, 3, 6)  # divide a year evenly so the labelled months repeat each year
+    MONTH_TICK_ROTATION = 90
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
 
 

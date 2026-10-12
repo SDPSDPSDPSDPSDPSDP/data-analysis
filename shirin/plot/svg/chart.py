@@ -2,8 +2,6 @@
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
-from ..config import Marks
-
 
 def plain_number(value: float) -> str:
     return f'{value:g}'
@@ -51,8 +49,6 @@ class Line:
     xs: List[float]
     ys: List[float]
     color: str
-    width: float = Marks.LINE_WIDTH
-    alpha: float = 1
 
 
 @dataclass
