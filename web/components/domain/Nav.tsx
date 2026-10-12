@@ -13,6 +13,8 @@ type Props = {
     categories: string[];
     active: string | null;
     onSelect: (title: string) => void;
+    // Cards shrink away before leaving home.
+    onLeave: (href: string) => void;
   };
 };
 
@@ -21,13 +23,19 @@ export default function Nav({ categories, filter }: Props) {
   const [dropdownClosed, setDropdownClosed] = useState(false);
   // Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter.
   const pathname = usePathname();
+  // Modified clicks open a new tab, home stays as is.
+  function leave(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (!filter || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    filter.onLeave(e.currentTarget.getAttribute("href")!);
+  }
   return (
     <nav className="nav">
       <Link
         href={pathname === "/" && !filter?.active ? "/all" : "/"}
         className="nav-brand"
         onClick={(e) => {
-          if (!filter?.active) return;
+          if (!filter?.active) return leave(e);
           e.preventDefault();
           // Selecting the active category again clears the filter.
           filter.onSelect(filter.active);
@@ -64,6 +72,7 @@ export default function Nav({ categories, filter }: Props) {
               <Link
                 href={`/${sectionId(category.title)}`}
                 className={filter?.active ? "nav-link nav-link-inactive" : "nav-link"}
+                onClick={leave}
               >
                 <SectionIcon title={category.title} />
                 {category.title}
@@ -78,6 +87,7 @@ export default function Nav({ categories, filter }: Props) {
                       onClick={(e) => {
                         e.currentTarget.blur();
                         setDropdownClosed(true);
+                        leave(e);
                       }}
                     >
                       <SectionIcon title={section.title} />

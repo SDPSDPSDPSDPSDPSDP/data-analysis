@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export default function HomeGallery({ categories, charts }: Props) {
+  const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
@@ -65,6 +67,10 @@ export default function HomeGallery({ categories, charts }: Props) {
           active,
           // Clicking the active category again shows every chart.
           onSelect: (title) => selectFilter(title === active ? null : title),
+          onLeave: (href) => {
+            setLeaving(true);
+            afterShrink(document.querySelector(".chart-preview"), () => router.push(href));
+          },
         }}
       />
       <main className="page home">
