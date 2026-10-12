@@ -1,13 +1,12 @@
 # %% [hidden]
 import numpy as np
+import pandas as pd
 rng = np.random.default_rng(0)
 df = df.sample(300, random_state=0)
-centers = {'Cherry': (60, 9), 'Date': (100, 15), 'Fig': (140, 12), 'Apple': (180, 14), 'Orange': (225, 11), 'Banana': (265, 17)}
-weight_center, sweetness_center = zip(*df['fruit'].map(centers))
-ripe_shift = np.where(df['is_ripe'], 1.2, -1.2)
-df['weight'] = (np.array(weight_center) + ripe_shift * 6 + rng.normal(0, 12, len(df))).round(1)
-df['sweetness'] = (np.array(sweetness_center) + ripe_shift + rng.normal(0, 1, len(df))).round(2)
+df['weight'] = (100 + df['sweetness'] * 8 + rng.normal(0, 20, len(df))).round(1)
 df['days_on_tree'] = rng.integers(10, 60, len(df))
+trend = (df['weight'] - df['weight'].mean()) / df['weight'].std() + (df['sweetness'] - df['sweetness'].mean()) / df['sweetness'].std()
+df['fruit'] = pd.qcut(trend, 6, labels=['Cherry', 'Fig', 'Date', 'Apple', 'Orange', 'Banana']).astype(str)
 
 # %% Plain
 plot.scatterplot(
