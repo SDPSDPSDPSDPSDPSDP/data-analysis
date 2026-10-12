@@ -74,6 +74,8 @@
   --docs-enter-duration: 600ms;
   /* Blocks past this one share its delay, so long pages don't keep the bottom waiting. */
   --docs-enter-max-index: 8;
+  --modal-enter-content-delay: 300ms;
+  --docs-scroll-fade-distance: 200px;
   --modal-exit-stagger: 120ms;
   --modal-exit-duration: 250ms;
   --modal-exit-chart-delay: calc(var(--modal-exit-stagger) + var(--modal-exit-duration));
@@ -160,11 +162,17 @@ body {
   margin-top: var(--space-6);
 }
 
-/* Docs blocks fade in one after another. Sections render as fragments, so sibling-index() stands in for a passed --i. */
+/* Docs blocks fade in one after another on load, and again as they scroll in from the bottom.
+   Sections render as fragments, so sibling-index() stands in for a passed --i.
+   The scroll fade has no end keyframe, so blocks already in view just show the load fade underneath. */
 .page:not(.home) > :not(div),
 .page:not(.home) > div > * {
-  animation: chart-preview-in var(--docs-enter-duration) ease both;
-  animation-delay: calc(min(sibling-index(), var(--docs-enter-max-index)) * var(--docs-enter-stagger));
+  animation:
+    chart-preview-in var(--docs-enter-duration) ease both,
+    chart-preview-in linear both;
+  animation-delay: calc(min(sibling-index(), var(--docs-enter-max-index)) * var(--docs-enter-stagger)), 0s;
+  animation-timeline: auto, view();
+  animation-range: normal, entry 0px entry var(--docs-scroll-fade-distance);
 }
 
 pre {

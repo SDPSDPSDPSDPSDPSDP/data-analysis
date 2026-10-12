@@ -51,14 +51,14 @@
 
 .chart-modal-actions,
 .chart-modal .runnable > :first-child {
-  /* Waits for the chart to land before fading in. */
-  animation: chart-preview-in var(--home-chart-grow-duration) ease var(--home-chart-fly-duration) both;
+  /* Fades in while the chart is still landing. */
+  animation: chart-preview-in var(--home-chart-grow-duration) ease var(--modal-enter-content-delay) both;
 }
 
-/* Last in: after the chart lands and the editor has faded in. */
+/* Last in: after the editor has faded in. */
 .chart-modal-docs {
   animation: chart-preview-in var(--home-chart-grow-duration) ease
-    calc(var(--home-chart-fly-duration) + var(--home-chart-grow-duration)) both;
+    calc(var(--modal-enter-content-delay) + var(--home-chart-grow-duration)) both;
 }
 
 /* Closing fades back to front: docs button, then editor and close button, then the chart leaves as the backdrop lightens.
