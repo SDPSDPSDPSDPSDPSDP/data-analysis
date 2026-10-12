@@ -1,10 +1,11 @@
 :root {
   --color-bg: #fff;
-  --color-bg-home: #f1f4f8;
+  --color-bg-home: #f8fafc;
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-shimmer: rgba(0, 0, 0, 0.08);
+  --focus-ring: 2px solid rgba(0, 0, 0, 0.2);
   --color-error: #b00020;
-  --color-glass: rgba(242, 242, 244, 0.7);
+  --color-glass: rgba(241, 244, 248, 0.7);
   --glass-blur: 16px;
   --glass-saturate: 180%;
   /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
