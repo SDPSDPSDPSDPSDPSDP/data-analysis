@@ -24,32 +24,44 @@ export default function ChartModal({ setup, code, preview, origin, href, section
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
-  // Staggered fade out, then `then`. Chart fades last, so its end is the end of the whole fade.
+  const figure = () => dialog.current!.querySelector<HTMLElement>(".output .chart")!;
+
+  // FLIP: figure laid out in place, CSS animates it between the card's rect and its own.
+  // Measuring while already flying would read the card's spot, not the target, so the flight is dropped first.
+  function aim(chart: HTMLElement) {
+    chart.classList.remove("flying");
+    const target = chart.getBoundingClientRect();
+    chart.style.setProperty("--fly-x", `${origin.left - target.left}px`);
+    chart.style.setProperty("--fly-y", `${origin.top - target.top}px`);
+    chart.style.setProperty("--fly-scale", `${origin.width / target.width}`);
+    chart.classList.add("flying");
+  }
+
+  // Runs the closing animation (CSS picks it by `kind`), then `then` once the slowest part, the chart, is done.
   // Computed times are always in seconds; reduced motion drops the animation, so they read 0.
-  function leave(then: () => void) {
+  function leave(kind: "to-card" | "to-docs", then: () => void) {
     const modal = dialog.current!;
     if (modal.classList.contains("closing")) return;
-    modal.classList.add("closing");
-    const last = getComputedStyle(modal.querySelector(".output")!);
+    if (kind === "to-card") aim(figure());
+    modal.classList.add("closing", kind);
+    const last = getComputedStyle(kind === "to-card" ? figure() : modal.querySelector(".output")!);
     setTimeout(then, (parseFloat(last.animationDelay) + parseFloat(last.animationDuration)) * 1000);
   }
 
-  const close = () => leave(() => dialog.current!.close());
+  // Reverse of opening: chart flies back into its card.
+  const close = () => leave("to-card", () => dialog.current!.close());
 
   // Layout effect: figure must start at the card's spot before first paint.
-  // FLIP: figure laid out in place, CSS animates it from the card's rect back to it.
   useLayoutEffect(() => {
     const modal = dialog.current!;
     if (!modal.open) modal.showModal();
-    const figure = modal.querySelector<HTMLElement>(".output .chart")!;
-    // StrictMode runs this twice in dev: measuring while already flying would read the card's spot, not the target.
-    figure.classList.remove("flying");
-    const target = figure.getBoundingClientRect();
-    figure.style.setProperty("--fly-x", `${origin.left - target.left}px`);
-    figure.style.setProperty("--fly-y", `${origin.top - target.top}px`);
-    figure.style.setProperty("--fly-scale", `${origin.width / target.width}`);
-    figure.classList.add("flying");
-    figure.addEventListener("animationend", () => figure.classList.remove("flying"), { once: true });
+    const chart = figure();
+    // StrictMode runs this twice in dev, aim drops the first flight.
+    aim(chart);
+    // A close mid-flight reuses the class for the way back, it must stay on.
+    chart.addEventListener("animationend", () => modal.classList.contains("closing") || chart.classList.remove("flying"), {
+      once: true,
+    });
   }, []);
 
   return (
@@ -79,7 +91,7 @@ export default function ChartModal({ setup, code, preview, origin, href, section
           // Modified clicks open a new tab, the modal stays.
           if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) return;
           event.preventDefault();
-          leave(() => router.push(href));
+          leave("to-docs", () => router.push(href));
         }}
       >
         <SectionIcon title={section} />

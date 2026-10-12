@@ -76,6 +76,7 @@
   --docs-enter-max-index: 8;
   --modal-exit-stagger: 120ms;
   --modal-exit-duration: 250ms;
+  --modal-exit-chart-delay: calc(var(--modal-exit-stagger) + var(--modal-exit-duration));
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;

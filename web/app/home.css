@@ -61,10 +61,12 @@
     calc(var(--home-chart-fly-duration) + var(--home-chart-grow-duration)) both;
 }
 
-/* Closing fades back to front: docs button, then editor and close button, then chart with the backdrop.
-   ChartModal waits for the chart's fade to end, keep it last. */
-.chart-modal.closing :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child, .output),
-.chart-modal.closing::backdrop {
+/* Closing fades back to front: docs button, then editor and close button, then the chart leaves as the backdrop lightens.
+   ChartModal waits for the chart, keep it last. */
+.chart-modal.closing :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child),
+.chart-modal.closing::backdrop,
+.chart-modal.to-docs .output,
+.chart-modal.to-card .output > :not(.flying) {
   animation: chart-modal-out var(--modal-exit-duration) ease both;
 }
 
@@ -72,9 +74,21 @@
   animation-delay: var(--modal-exit-stagger);
 }
 
-.chart-modal.closing .output,
-.chart-modal.closing::backdrop {
-  animation-delay: calc(2 * var(--modal-exit-stagger));
+.chart-modal.closing::backdrop,
+.chart-modal.to-docs .output,
+.chart-modal.to-card .output > :not(.flying) {
+  animation-delay: var(--modal-exit-chart-delay);
+}
+
+/* Reverse of opening: chart flies back into its card while the backdrop lightens at the same pace. */
+.chart-modal.to-card .chart.flying {
+  animation-direction: reverse;
+  animation-fill-mode: both;
+  animation-delay: var(--modal-exit-chart-delay);
+}
+
+.chart-modal.to-card::backdrop {
+  animation-duration: var(--home-chart-fly-duration);
 }
 
 @keyframes chart-modal-out {
@@ -119,8 +133,12 @@
   .chart-modal-actions,
   .chart-modal-docs,
   .chart-modal .runnable > :first-child,
-  .chart-modal.closing :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child, .output),
-  .chart-modal.closing::backdrop {
+  .chart-modal.closing :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child),
+  .chart-modal.closing::backdrop,
+  .chart-modal.to-docs .output,
+  .chart-modal.to-card .output > *,
+  .chart-modal.to-card .chart.flying,
+  .chart-modal.to-card::backdrop {
     animation: none;
   }
 
