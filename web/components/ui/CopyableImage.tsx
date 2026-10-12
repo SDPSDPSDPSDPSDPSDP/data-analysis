@@ -1,6 +1,5 @@
-﻿"use client";
+"use client";
 
-import { useEffect, useState } from "react";
 import CopyButton from "@/components/ui/CopyButton";
 
 // Clipboards only reliably accept PNG, so vector images are rasterized at this scale.
@@ -21,37 +20,12 @@ async function toPng(src: string): Promise<Blob> {
   );
 }
 
+// Rasterized only on copy; the promise keeps the clipboard write inside the click's user gesture (Safari).
 export default function CopyableImage({ src, alt }: { src: string; alt: string }) {
-  const [png, setPng] = useState<{ blob: Blob; url: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let url: string | null = null;
-    let cancelled = false;
-    setError(null);
-    toPng(src).then(
-      (blob) => {
-        if (cancelled) return;
-        url = URL.createObjectURL(blob);
-        setPng({ blob, url });
-      },
-      (err) => {
-        if (!cancelled) setError(`Rendering chart failed: ${err}`);
-      },
-    );
-    return () => {
-      cancelled = true;
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, [src]);
-
-  if (error) return <pre className="error">{error}</pre>;
-  if (!png) return <div className="skeleton" role="status" aria-label="Rendering chart" />;
-
   return (
     <figure className="chart copyable">
-      <img src={png.url} alt={alt} />
-      <CopyButton copy={() => navigator.clipboard.write([new ClipboardItem({ "image/png": png.blob })])} />
+      <img src={src} alt={alt} />
+      <CopyButton copy={() => navigator.clipboard.write([new ClipboardItem({ "image/png": toPng(src) })])} />
     </figure>
   );
 }

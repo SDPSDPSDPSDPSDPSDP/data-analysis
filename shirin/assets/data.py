@@ -1,7 +1,7 @@
 import functools
 import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
+from pandas import DataFrame
 
 
 def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> DataFrame:
@@ -24,21 +24,21 @@ def _count_fruit(df: DataFrame) -> DataFrame:
     return counts
 
 
-def _create_documents_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
-    """Two rows per year 2000-2022 (example_hue_3 True/False) with cumulative document counts."""
+def _create_harvest_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
+    """Two rows per year 2000-2022 (is_ripe True/False) with cumulative harvest counts."""
     rows = []
     cumul = {True: 0, False: 0}
     for year in range(2000, 2023):
         cumul[True] += int(rng.integers(80, 150))
         cumul[False] += int(rng.integers(20, 60))
-        for flag in (True, False):
-            rows.append({'year': year, 'cumul_total_docs': cumul[flag], 'example_hue_4': year < 2010, 'example_hue_3': flag})
+        for is_ripe in (True, False):
+            rows.append({'year': year, 'n_harvested': cumul[is_ripe], 'is_ripe': is_ripe})
     return pd.DataFrame(rows)
 
 
 def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
-    return _create_fruit_dataframe(rng), _create_documents_by_year_dataframe(rng)
+    return _create_fruit_dataframe(rng), _create_harvest_by_year_dataframe(rng)
 
 
 def generate_time_series(
@@ -70,9 +70,6 @@ def generate_time_series(
         year_end = min(end, pd.Timestamp(year=year, month=12, day=31))
         days = pd.date_range(start=year_start, end=year_end, freq='D')
         n_days = len(days)
-        if n_days == 0:
-            continue
-
         base_year_events = int(max(1, round(avg_events_per_day * n_days)))
 
         min_increment = max(1, int(round(base_year_events * yearly_growth)))
@@ -85,17 +82,17 @@ def generate_time_series(
 
         prev_total = target_total
 
-    all_dates = dates[0].append(dates[1:]) if dates else pd.DatetimeIndex([])
-    hues = rng.choice(["category_1", "category_2"], size=len(all_dates))
-    return pd.DataFrame({"date": all_dates, "hue": hues})
+    if not dates:
+        raise ValueError(f"start_date {start_date} is after end_date {end_date}")
+    return pd.DataFrame({"date": dates[0].append(dates[1:])})
 
 
 @functools.lru_cache(maxsize=None)
 def _build_lazy_frames() -> dict:
-    df, df_documents_by_year = generate_demo_data()
+    df, df_harvest_by_year = generate_demo_data()
     return {
         'df': df,
-        'df_documents_by_year': df_documents_by_year,
+        'df_harvest_by_year': df_harvest_by_year,
         'df_fruit_counts': _count_fruit(df),
         'df_time': generate_time_series(),
     }
@@ -103,6 +100,6 @@ def _build_lazy_frames() -> dict:
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    if name not in ('df', 'df_documents_by_year', 'df_fruit_counts', 'df_time'):
+    if name not in ('df', 'df_harvest_by_year', 'df_fruit_counts', 'df_time'):
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
     return _build_lazy_frames()[name].copy()

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shirin"
-version = "4.0.0"
+version = "4.1.0"
 description = "A data analysis toolkit for statistical computing, visualization, and SQL operations"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -39,7 +39,4 @@ shirin = ["assets/fonts/*.woff2", "assets/fonts/*.json"]
 [tool.setuptools.packages.find]
 include = ["shirin*"]
 exclude = ["tests*", "docs*", "scripts*"]
-
-[tool.setuptools.exclude-package-data]
-"*" = ["*.ipynb"]
 

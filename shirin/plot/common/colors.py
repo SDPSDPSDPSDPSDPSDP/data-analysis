@@ -1,5 +1,10 @@
 import re
-from typing import Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+
+from ..config.colors import DEFAULT_CYCLE, SHADE_BASE, SHADE_DARKEST_MIX
 
 RGB = Tuple[float, float, float]
 
@@ -18,3 +23,25 @@ def blend(start: str, end: str, t: float) -> str:
     """Hex color t of the way from start to end."""
     mixed = [a + (b - a) * t for a, b in zip(to_rgb(start), to_rgb(end))]
     return '#' + ''.join(f'{round(c * 255):02x}' for c in mixed)
+
+
+def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> List[str]:
+    """Color per key; every plot raises the same KeyError when the palette misses a key."""
+    keys = [str(key) for key in keys]
+    missing = [key for key in keys if key not in palette]
+    if missing:
+        raise KeyError(f"Palette missing keys: {missing}. Available keys: {list(palette.keys())}")
+    return [palette[key] for key in keys]
+
+
+def default_colors(n: int) -> List[str]:
+    """First n colors of the default color cycle, repeating when n is larger."""
+    return [DEFAULT_CYCLE[i % len(DEFAULT_CYCLE)] for i in range(n)]
+
+
+def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:
+    """Color per sorted value: shades of color when given, else the default color cycle."""
+    keys = sorted(values.astype(str).unique())
+    if color is None:
+        return dict(zip(keys, default_colors(len(keys))))
+    return {key: blend(SHADE_BASE, color, t) for key, t in zip(keys, np.linspace(1, SHADE_DARKEST_MIX, len(keys)))}

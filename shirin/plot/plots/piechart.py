@@ -3,10 +3,10 @@ from typing import Any, List
 import pandas as pd
 
 from ..core import renderer
-from ..core.base_plot import AbstractPlot, default_colors, default_palette
+from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
 from ..common.formatting.text_contrast import get_text_color_for_background
-from ..common.sorting import palette_colors
+from ..common.colors import default_colors, default_palette, palette_colors
 from ..config import FigureSize, Marks
 from ..svg import Text
 from ...number_format import format_thousands
@@ -30,8 +30,8 @@ class PieChart(AbstractPlot):
         self._values = df[self.options.col].tolist()
         keys = [str(val) for val in df.index]
 
-        label_map = self.options.label_map or {}
-        self._labels = [label_map.get(key, key) for key in keys]
+        label_map = self.options.label_map
+        self._labels = [label_map.get(key, key) for key in keys] if label_map else keys
 
         palette = self.options.palette
         if isinstance(palette, str):

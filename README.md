@@ -1,17 +1,26 @@
-This is a reusable package to create data visualizations quickly, efficiently and uniformly. 
-As well as repetitive data cleaning tasks.
 
-### Documentation
+A reusable package to create data visualizations quickly, efficiently and uniformly, plus helpers for repetitive data tasks:
 
-Comprehensive documentation is available in the [`docs/`](./docs/) folder, including a developer guide with setup steps and an overview of the package layout.
+- `shirin.plot`: SVG charts (bar, histogram, time, scatter, pie) with its own renderer.
+- `shirin.stats`: descriptive statistics on a pandas Series.
+- `shirin.number_format`: Dutch number formatting.
+- `shirin.sql`: DB2 query helpers (optional `sql` extra).
+
+### Install
+
+```powershell
+uv add "shirin @ git+https://github.com/SDPSDPSDPSDPSDPSDP/data-analysis.git"
+# with DB2 helpers:
+uv add "shirin[sql] @ git+https://github.com/SDPSDPSDPSDPSDPSDP/data-analysis.git"
+```
 
 ### Example Usage
 
-The notebook ([`example_notebook.ipynb`](./example_notebook.ipynb)) is provided to demonstrate everything it has to offer:
+Runnable examples for every chart and module are on the website: https://shirins-data-analysis.vercel.app
 
-- **How to install** the package.
-- An overview of all the key functionalities across different modules.
-- **Practical examples.**
+### Documentation
+
+The [`docs/`](./docs/) folder has a developer guide with setup steps and an overview of the package layout, and the coding standards.
 
 ### Claude Code skill
 

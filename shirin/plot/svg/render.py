@@ -1,4 +1,5 @@
-"""Lays out a Chart (see PLAN.md for the layout spec) and writes it as an SVG string."""
+"""Lays out a Chart and writes it as an SVG string."""
+import dataclasses
 import itertools
 import math
 from typing import Dict, List, Optional, Tuple
@@ -7,7 +8,7 @@ from xml.sax.saxutils import escape
 from ..config import FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, GRID_COLOR
 from . import marks
-from .chart import Axis, Chart
+from .chart import Axis, Chart, Text
 from .fonts import cap_height, font_css, text_width
 from .header import header_rows as build_header
 from .marks import Scale
@@ -51,12 +52,12 @@ def _scale(lo: float, hi: float, start: float, end: float) -> Scale:
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
 
-def _shorten_crowded_labels(chart: Chart, sx: Scale, sy: Scale) -> None:
-    labels = [t for t in chart.texts if t.short_text]
-    spans = sorted(marks.place(t, sx, sy)[2:4] for t in labels)
-    if any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
-        for t in labels:
-            t.text = t.short_text  # type: ignore[assignment]
+def _shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
+    """Copies with short_text swapped in when side-by-side labels overlap; the chart stays untouched."""
+    spans = sorted(marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
+    if not any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
+        return texts
+    return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
 def to_svg(chart: Chart, font: Optional[str] = None) -> str:
@@ -76,8 +77,8 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
-    _shorten_crowded_labels(chart, sx, sy)
-    boxes = [marks.place(t, sx, sy)[2:] for t in chart.texts if t.text]
+    texts = _shorten_crowded_labels(chart.texts, sx, sy)
+    boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
     if x_ticks and not chart.x.rotation:
         position, label = x_ticks[-1]
         boxes.append((0, sx(position) + text_width(label, tick_size) / 2, plot_top))
@@ -120,7 +121,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     body += fades
     body += [marks.line(line, sx, sy) for line in chart.lines]
     body += [marks.dots(dots, sx, sy) for dots in chart.dots]
-    for t in chart.texts:
+    for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
             body.append(marks.text(x, baseline, t.text, t.size, t.color, marks.ANCHOR[t.ha]))
@@ -134,7 +135,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         )
 
     cap = cap_height(tick_size)
-    body +=[marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
+    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
              for t, label in y_ticks if label]
     bottom = plot_bottom
     labelled_x_ticks = [(t, label) for t, label in x_ticks if label]

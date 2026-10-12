@@ -1,8 +1,5 @@
 # Ignore folders
-/shirin/plot/fonts/static/
 /plot_output/
-/shirin_packages.egg-info/
-/shirin.egg-info/
 /archive/
 /data
 /todo/

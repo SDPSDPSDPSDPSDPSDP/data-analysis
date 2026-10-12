@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useRef, type RefObject } from "react";
 import CodeMirror, { EditorSelection, keymap, Prec, type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
@@ -46,6 +47,12 @@ const keepIndentOnEnter = Prec.high(
   ]),
 );
 
+const NO_EXTENSIONS: Extension[] = [];
+
+function runKey(onRun: RefObject<((value: string) => void) | undefined>) {
+  return Prec.highest(keymap.of([{ key: "Mod-Enter", run: (view) => (onRun.current!(view.state.doc.toString()), true) }]));
+}
+
 type Props = {
   value: string;
   onChange?: (value: string) => void;
@@ -55,19 +62,30 @@ type Props = {
 };
 
 // Read-only unless onChange is given.
-export default function CodeBlock({ value, onChange, onRun, extensions = [] }: Props) {
-  const runKey = onRun
-    ? [Prec.highest(keymap.of([{ key: "Mod-Enter", run: (view) => (onRun(view.state.doc.toString()), true) }]))]
-    : [];
+export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTENSIONS }: Props) {
+  // Callbacks change every render; a ref keeps the extension list stable so CodeMirror is not reconfigured per keystroke.
+  const onRunRef = useRef(onRun);
+  onRunRef.current = onRun;
+  const editable = Boolean(onChange);
+  const runnable = Boolean(onRun);
+  const allExtensions = useMemo(
+    () => [
+      python(),
+      ...(editable ? [colorSwatches, keepIndentOnEnter] : []),
+      ...(runnable ? [runKey(onRunRef)] : []),
+      ...extensions,
+    ],
+    [editable, runnable, extensions],
+  );
   return (
     <div className="code-block copyable">
       <CodeMirror
         value={value}
         onChange={onChange}
-        editable={Boolean(onChange)}
-        readOnly={!onChange}
+        editable={editable}
+        readOnly={!editable}
         theme={theme}
-        extensions={[python(), ...(onChange ? [colorSwatches, keepIndentOnEnter] : []), ...runKey, ...extensions]}
+        extensions={allExtensions}
         height="100%"
       />
       <CopyButton copy={() => navigator.clipboard.writeText(value)} />

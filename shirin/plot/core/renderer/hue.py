@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from ...common.sorting import palette_colors
+from ...common.colors import palette_colors
 from ...svg import Chart
 
 

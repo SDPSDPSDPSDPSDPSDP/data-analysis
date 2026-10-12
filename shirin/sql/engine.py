@@ -16,8 +16,13 @@ def _validate_schema(schema: str) -> None:
 @functools.lru_cache(maxsize=None)
 def _add_db2_dll_directory() -> None:
     """Windows needs the DB2 client DLLs on the search path; override with DB2_DLL_DIR."""
-    dll_dir = os.environ.get("DB2_DLL_DIR", r"C:\Program Files\IBM\SQLLIB\BIN")
-    if hasattr(os, "add_dll_directory") and os.path.isdir(dll_dir):
+    if not hasattr(os, "add_dll_directory"):
+        return
+    override = os.environ.get("DB2_DLL_DIR")
+    if override is not None and not os.path.isdir(override):
+        raise FileNotFoundError(f"DB2_DLL_DIR={override!r} is not a directory")
+    dll_dir = override or r"C:\Program Files\IBM\SQLLIB\BIN"
+    if os.path.isdir(dll_dir):
         os.add_dll_directory(dll_dir)
 
 

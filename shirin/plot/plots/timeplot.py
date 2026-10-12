@@ -5,11 +5,8 @@ import pandas as pd
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import TimePlotOptions
-from ..common.formatting import (
-    format_ticks,
-    format_xy_labels,
-)
-from ..config import Marks
+from ..common.data_conversion import COUNT_COL, fill_missing_values_in_data, to_period_start, totals_per_x
+from ..common.formatting import format_period_ticks, format_ticks
 from ..config.colors import Colors
 from ..svg import Chart
 from ..svg.ticks import to_days
@@ -18,87 +15,43 @@ from ..svg.ticks import to_days
 class TimePlot(AbstractPlot):
     options: TimePlotOptions
 
-    def __init__(self, options: TimePlotOptions):
-        super().__init__(options)
-        self._aggregated_df: pd.DataFrame = pd.DataFrame()
-
     def preprocess(self) -> pd.DataFrame:
-        df = self.options.df.copy()
-        date_col = self.options.x
-
-        if not pd.api.types.is_datetime64_any_dtype(df[date_col]):
-            df[date_col] = pd.to_datetime(df[date_col])
+        options = self.options
+        df = options.df.copy()
+        if options.group_by is not None:
+            df[options.x] = to_period_start(df[options.x], options.group_by)  # type: ignore[arg-type]
+        if options.fill_missing_values is not None:
+            df = fill_missing_values_in_data(df, options.x, options.y, options.hue, options.fill_missing_values)  # type: ignore[arg-type]
         return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Bars default to grey, the line to black; a palette string overrides both.
-        self._color = self.options.palette or (Colors.BLACK if self.options.plot_type == 'line' else Colors.GREY)  # type: ignore[assignment]
+        options = self.options
+        df = self._resolve_hue_palette(df, no_hue_color=Colors.BLACK)
+        self._y = options.y or COUNT_COL
+        if options.y is not None and options.group_by is None and not options.cumulative:
+            return df
 
-        group_by = self.options.group_by
-        date_col = self.options.x
-
-        period = {'year': 'Y', 'month': 'M', 'day': 'D'}[group_by]
-        df['__time_group__'] = df[date_col].dt.to_period(period).dt.to_timestamp()
-
-        self._aggregated_df = (
-            df.groupby('__time_group__')
-            .size()
-            .reset_index(name='count')
-            .sort_values('__time_group__')
-        )
-
-        # Include empty periods with zero counts so the x-axis stays continuous.
-        if not self._aggregated_df.empty:
-            groups = self._aggregated_df['__time_group__']
-            full_range = pd.date_range(
-                start=groups.min(),
-                end=groups.max(),
-                freq={'year': 'YS', 'month': 'MS', 'day': 'D'}[group_by],
-            )
-
-            full_df = pd.DataFrame({'__time_group__': full_range})
-            self._aggregated_df = (
-                full_df.merge(self._aggregated_df, on='__time_group__', how='left')
-                .fillna({'count': 0})
-            )
-            self._aggregated_df['count'] = self._aggregated_df['count'].astype(int)
-
-        if self.options.cumulative:
-            self._aggregated_df['count'] = self._aggregated_df['count'].cumsum()
-
-        return self._aggregated_df
+        values = totals_per_x(df, options.x, options.y, options.hue, options.group_by)  # type: ignore[arg-type]
+        if options.cumulative:
+            values = values.groupby(level=options.hue).cumsum() if options.hue else values.cumsum()
+        return values.rename(self._y).reset_index()
 
     def draw(self, data: pd.DataFrame) -> Any:
+        options = self.options
         chart = self._standard_chart()
-        days = to_days(data['__time_group__'])
-        if self.options.plot_type == 'bar':
-            return renderer.render_time_bars(chart, days, data['count'], color=self._color, width=Marks.TIME_BAR_DAYS[self.options.group_by])  # type: ignore[arg-type]
-        return renderer.render_time_line(
-            chart,
-            days,
-            data['count'],
-            color=self._color,  # type: ignore[arg-type]
-            show_markers=not (self.options.group_by == 'day' and len(data) > Marks.TIME_LINE_MAX_MARKED_DAYS),
-        )
+        self._periods = data[options.x].drop_duplicates().sort_values()
+        return renderer.render_lineplot(chart, df=data, x=options.x, y=self._y, hue=options.hue, color=self._color, palette=self._palette)
 
     def format_plot(self, plot: Any) -> None:
-        format_xy_labels(plot, x_axis_label=self.options.x_axis_label, y_axis_label=self.options.y_axis_label)
-        format_ticks(plot, y_grid=True, numeric_y=True)
-        self._format_date_axis(plot)
+        self._format_labels_and_legend(plot)
+        format_ticks(plot, y_grid=True, numeric_y=True, rotation=self.options.rotation)
+        if self.options.group_by is not None:
+            self._format_date_axis(plot)
 
     def _format_date_axis(self, chart: Chart) -> None:
         """Year ticks, month ticks with a year row below, or automatic day ticks."""
-        groups = self._aggregated_df['__time_group__']
         if self.options.group_by == 'day':
-            chart.x.dates, chart.x.date_format = True, '%Y-%m-%d'
-            chart.x.rotation = self.options.rotation
+            chart.x.date_format = '%Y-%m-%d'
             return
-        if self.options.group_by == 'month' and self.options.display_month:
-            ticks, fmt = groups, '%b'
-            chart.x.rotation = 90
-            first_of_year = groups.groupby(groups.dt.year).min()
-            chart.x.sub_labels = list(zip(to_days(first_of_year), (str(d.year) for d in first_of_year)))
-        else:
-            ticks, fmt = groups[groups.dt.month == 1], '%Y'
-        chart.x.ticks = list(to_days(ticks))
-        chart.x.tick_labels = [d.strftime(fmt) for d in ticks]
+        months = self.options.group_by == 'month' and self.options.display_month
+        format_period_ticks(chart, self._periods, to_days(self._periods), months)

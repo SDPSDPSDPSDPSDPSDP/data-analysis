@@ -128,5 +128,8 @@ def test_crowded_data_labels_get_shortened() -> None:
             c.rects.append(Rect(i * gap, i * gap + 0.1, 0, 5, '#123456'))
             c.texts.append(Text(i * gap + 0.05, 5, '10.915', '#000000', 8, 'center', 'bottom', short_text='11k'))
         return c
-    assert '>11k<' in to_svg(chart(0.5))
+    crowded = chart(0.5)
+    assert '>11k<' in to_svg(crowded)
+    assert [t.text for t in crowded.texts] == ['10.915', '10.915']
+    assert '>11k<' in to_svg(crowded)
     assert '>10.915<' in to_svg(chart(5))

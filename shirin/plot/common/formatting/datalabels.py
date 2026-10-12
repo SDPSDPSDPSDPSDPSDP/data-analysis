@@ -1,4 +1,6 @@
 from typing import Dict, List, Optional
+
+import numpy as np
 import pandas as pd
 
 from ...config import FontSizes, Layout, TextColors
@@ -36,10 +38,10 @@ def format_datalabels(
         if formatting == 'percentage':
             _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
         else:
-            _add_text(chart, rect, _with_suffix(format_thousands(length), suffix), orientation, _with_suffix(format_compact(length), suffix))
+            _add_text(chart, rect, with_suffix(format_thousands(length), suffix), orientation, with_suffix(format_compact(length), suffix))
 
 
-def _with_suffix(text: str, suffix: Optional[str]) -> str:
+def with_suffix(text: str, suffix: Optional[str]) -> str:
     return f'{text} {suffix.strip()}' if suffix and suffix.strip() else text
 
 
@@ -47,7 +49,7 @@ def _percentage_label(percentage: float, decimals: int, suffix: Optional[str]) -
     """A suffix replaces the '%' sign; an empty suffix drops it."""
     if suffix is None:
         return format_percentage(percentage, decimals)
-    return _with_suffix(format_thousands(percentage, decimals), suffix)
+    return with_suffix(format_thousands(percentage, decimals), suffix)
 
 
 def _add_stacked_labels(
@@ -86,7 +88,8 @@ def format_datalabels_stacked(
     suffix: Optional[str] = None,
 ) -> None:
     values = pivot_data.values
-    percentages = values / values.sum(axis=1, keepdims=True) * 100
+    totals = values.sum(axis=1, keepdims=True)
+    percentages = np.divide(values * 100, totals, out=np.zeros(values.shape), where=totals != 0)
     threshold = Layout.STACKED_LABEL_MIN_SHARE * pivot_data.sum(axis=1).max()
     _add_stacked_labels(chart, pivot_data, percentages, palette, orientation, suffix, threshold)
 

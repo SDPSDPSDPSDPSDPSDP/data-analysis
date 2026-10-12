@@ -1,16 +1,14 @@
 import dataclasses
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
-import numpy as np
 import pandas as pd
 
 from .base_options import BasePlotOptions
-from ..common.colors import blend
+from ..common.colors import default_palette
 from ..common.data_conversion import ensure_column_is_string
-from ..common.formatting import format_optional_legend, format_xy_labels
+from ..common.formatting import format_optional_legend
 from ..config import Colors, FigureSize, TitleInput
-from ..config.colors import DEFAULT_CYCLE, SHADE_BASE, SHADE_DARKEST_MIX
 from ..svg import Chart
 
 PlotPalette = Optional[Union[Dict[Any, str], str]]
@@ -36,24 +34,10 @@ def split_palette(palette: PlotPalette) -> Tuple[Optional[str], Optional[Dict[An
     return Colors.GREY, None
 
 
-def default_colors(n: int) -> List[str]:
-    """First n colors of the default color cycle, repeating when n is larger."""
-    return [DEFAULT_CYCLE[i % len(DEFAULT_CYCLE)] for i in range(n)]
-
-
-def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:
-    """Color per sorted value: shades of color when given, else the default color cycle."""
-    keys = sorted(values.astype(str).unique())
-    if color is None:
-        return dict(zip(keys, default_colors(len(keys))))
-    return {key: blend(SHADE_BASE, color, t) for key, t in zip(keys, np.linspace(1, SHADE_DARKEST_MIX, len(keys)))}
-
-
 class AbstractPlot(ABC):
     def __init__(self, options: BasePlotOptions):
         self.options = options
         self.chart: Optional[Chart] = None
-        self._preprocessed_df: Optional[pd.DataFrame] = None
         self._color: Optional[str] = None
         self._palette: Optional[Dict[Any, str]] = None
 
@@ -62,8 +46,7 @@ class AbstractPlot(ABC):
         self.options = dataclasses.replace(self.options)
         self.options.validate()
 
-        self._preprocessed_df = self.preprocess()
-        transformed_data = self.transform(self._preprocessed_df)
+        transformed_data = self.transform(self.preprocess())
         chart = self.draw(transformed_data)
         self.format_plot(chart)
         return chart
@@ -95,7 +78,7 @@ class AbstractPlot(ABC):
 
     def _format_labels_and_legend(self, plot: Any) -> None:
         options = self.options
-        format_xy_labels(plot, x_axis_label=options.x_axis_label, y_axis_label=options.y_axis_label)
+        plot.x.label, plot.y.label = options.x_axis_label, options.y_axis_label
         format_optional_legend(plot, options.hue, options.legend, options.label_map)
 
     def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:

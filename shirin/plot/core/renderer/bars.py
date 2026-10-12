@@ -1,10 +1,10 @@
-"""Bar marks: categorical, stacked, histogram and time bars."""
+"""Bar marks: categorical, stacked and histogram."""
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
-from ...common.sorting import palette_colors
+from ...common.colors import palette_colors
 from ...config import FigureSize, Marks
 from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend
@@ -139,11 +139,4 @@ def render_histogram(
                 step = (right - left) / len(groups)
                 left, right = left + i * step, left + (i + 1) * step
             chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
-    return chart
-
-
-def render_time_bars(chart: Chart, days: pd.Series, counts: pd.Series, color: str, width: float) -> Chart:
-    chart.y.sticky = (0,)
-    for day, count in zip(days, counts):
-        _bar(chart, day, width, 0, float(count), color, horizontal=False)
     return chart

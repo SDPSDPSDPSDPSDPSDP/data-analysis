@@ -34,12 +34,11 @@ export function sectionId(title: string): string {
 
 type Props = PlotSectionData & {
   globalSetup: string;
-  expandAll: boolean;
   // Only section of its category: takes the category's heading level instead.
   standalone: boolean;
 };
 
-export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, expandAll, standalone }: Props) {
+export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone }: Props) {
   const runnable = (example: Example, key?: number) => (
     <RunnableCode
       key={key}
@@ -106,21 +105,17 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {runnable(examples[0])}
         </div>
       </section>
-      {expandAll ? (
-        moreExamples
-      ) : (
-        <details className="more-examples">
-          <summary>
-            <span className="more-examples-button">
-              <SectionIcon title={title} />
-              <span className="more-examples-closed">{examples.length - 1} more examples</span>
-              <span className="more-examples-open">Hide examples</span>
-              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
-            </span>
-          </summary>
-          {moreExamples}
-        </details>
-      )}
+      <details className="more-examples">
+        <summary>
+          <span className="more-examples-button">
+            <SectionIcon title={title} />
+            <span className="more-examples-closed">{examples.length - 1} more examples</span>
+            <span className="more-examples-open">Hide examples</span>
+            <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
+          </span>
+        </summary>
+        {moreExamples}
+      </details>
     </>
   );
 }

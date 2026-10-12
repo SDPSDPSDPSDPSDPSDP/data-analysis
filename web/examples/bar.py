@@ -79,3 +79,16 @@ plot.bar(
     normalized=True,
     title='Share sold per fruit',
 )
+
+
+# %% [hidden]
+from shirin.assets.data import df_time as df
+
+# %% Bars per year
+plot.bar(
+    df,
+    x='date',
+    group_by='year',
+    title='Fruits picked per year',
+    data_labels=False,
+)

@@ -31,7 +31,6 @@ class InvalidOptionError(ValueError):
 VALID_SORTS = tuple(sort.value for sort in Sort)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
-VALID_TIME_PLOT_TYPES = ('bar', 'line')
 VALID_FILL_MISSING_VALUES = tuple(fill_option.value for fill_option in FillMissingValues)
 
 

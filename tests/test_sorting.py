@@ -1,8 +1,8 @@
 import pandas as pd
+from shirin.plot.common.colors import palette_colors
 from shirin.plot.common.sorting import (
     sort_alphabetically,
     sort_by_frequency,
-    palette_colors,
 )
 
 

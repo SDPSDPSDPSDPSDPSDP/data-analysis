@@ -19,7 +19,7 @@ def _metrics() -> Dict[str, Any]:
     path = FONTS_DIR / "satoshi_metrics.json"
     if not path.exists():
         raise FileNotFoundError(f"Font metrics not found at {path}; reinstall the package.")
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding='utf-8'))
 
 
 def is_large(size: float) -> bool:

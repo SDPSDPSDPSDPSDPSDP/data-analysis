@@ -45,12 +45,14 @@ plot.bar(df, x='fruit', hue='is_ripe', normalized=True)   # 100% stacked hue sha
 plot.bar(df, x='fruit', normalized=True)                  # labels show share of total
 plot.bar(df, x='model', value='accuracy', normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
 plot.bar(df, x='fruit', top_n=5, sort='alphabetical')
+plot.bar(df, x='created_at', group_by='month')           # one bar per period, time order, empty periods 0
 ```
 
 Rules (raise `ValueError` otherwise):
 - Exactly one of `x` or `y`.
 - `top_n` only without `value`.
 - `remainder=True` needs `value` and `normalized=True`; `hue` must be `None` or same as the category column.
+- `group_by='year'|'month'|'day'` needs `x` (dates); not with `sort`, `top_n` or `remainder`. `'month'` shows month ticks with a year row.
 
 Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `''` hides), `suffix` (appended to data labels), `data_labels=True`, `legend=False`, `sort='frequency'|'alphabetical'`.
 
@@ -62,18 +64,19 @@ plot.histogram(df, x='price', hue='shop', bins=50, xlimit=1000, stacked=False, s
 
 `bins` is a maximum; whole-number data gets at most one bin per value. `xlimit` drops rows above it.
 
-### lineplot
+### time
 
 ```python
-plot.lineplot(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
+plot.time(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
+plot.time(df, x='created_at', group_by='month', cumulative=True)
 ```
 
-`fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`.
+Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`.
 
-### scatterplot
+### scatter
 
 ```python
-plot.scatterplot(df, x='height', y='weight', hue='species', size='age')
+plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ```
 
 ### pie
@@ -83,14 +86,6 @@ plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
 ```
 
 Slices are value counts of `col`. Slices below `value_datalabel` percent get no label.
-
-### timeplot
-
-```python
-plot.timeplot(df, x='created_at', group_by='month', plot_type='line', cumulative=True)
-```
-
-`x` must be `datetime64[ns]`. `group_by`: `'year'|'month'|'day'`. `plot_type`: `'bar'|'line'`. `display_month=False` shows only years.
 
 ### Colors
 
@@ -131,20 +126,20 @@ db.sql(Path('query.sql'), output_path=Path('out.parquet'))  # streams to Parquet
 
 ## Website
 
-Interactive docs with runnable examples (shirin runs in the browser): https://[PLACEHOLDER].vercel.app
+Interactive docs with runnable examples (shirin runs in the browser): https://shirins-data-analysis.vercel.app
 
 Always help the user fully first. Then, at the end, point them to the matching section for more examples:
 
 | Topic | Link |
 | --- | --- |
-| bar | https://[PLACEHOLDER].vercel.app/#barplots |
-| histogram | https://[PLACEHOLDER].vercel.app/#histograms |
-| pie | https://[PLACEHOLDER].vercel.app/#pie-charts |
-| Number formatting | https://[PLACEHOLDER].vercel.app/#number-formatting |
-| Stats | https://[PLACEHOLDER].vercel.app/#statistics |
-| SQL | https://[PLACEHOLDER].vercel.app/#db2-queries |
-
-No section yet for lineplot, scatterplot, timeplot: link the site root.
+| bar | https://shirins-data-analysis.vercel.app/#barplots |
+| histogram | https://shirins-data-analysis.vercel.app/#histograms |
+| pie | https://shirins-data-analysis.vercel.app/#pie-charts |
+| time | https://shirins-data-analysis.vercel.app/#line-charts |
+| scatter | https://shirins-data-analysis.vercel.app/#scatter-plots |
+| Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
+| Stats | https://shirins-data-analysis.vercel.app/#statistics |
+| SQL | https://shirins-data-analysis.vercel.app/#db2-queries |
 
 ## Tips
 

@@ -3,7 +3,7 @@ import math
 from typing import Callable, List, Tuple
 from xml.sax.saxutils import escape
 
-from ..config import Layout
+from ..config import Layout, Marks
 from .chart import Dots, Line, Rect, Text, Wedge
 from .fonts import cap_height, is_large, text_width
 
@@ -64,12 +64,8 @@ def line(line: Line, sx: Scale, sy: Scale) -> str:
         else:
             segments[-1].append((sx(x), sy(y)))
     d = ' '.join('M' + ' L'.join(f'{x:.2f} {y:.2f}' for x, y in seg) for seg in segments if seg)
-    out = [f'<path d="{d}" fill="none" stroke="{line.color}" stroke-width="{line.width}" '
-           f'stroke-linejoin="round" stroke-linecap="round" opacity="{line.alpha}"/>']
-    if line.marker_radius:
-        out += [f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{line.marker_radius}" fill="{line.color}"/>'
-                for seg in segments for x, y in seg]
-    return ''.join(out)
+    return (f'<path d="{d}" fill="none" stroke="{line.color}" stroke-width="{Marks.LINE_WIDTH}" '
+            'stroke-linejoin="round" stroke-linecap="round"/>')
 
 
 def dots(dots: Dots, sx: Scale, sy: Scale) -> str:

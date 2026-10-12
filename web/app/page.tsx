@@ -89,10 +89,55 @@ export default function Home() {
       ],
     }),
   ];
+  const lineCharts = [
+    section("Line charts", "time.py", {
+      description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
+      columns: [
+        { name: "year", role: "x" },
+        { name: "n_harvested", role: "y" },
+        { name: "is_ripe", role: "hue" },
+      ],
+      rows: [
+        ["2000", "83", "True"],
+        ["2000", "44", "False"],
+        ["2001", "199", "True"],
+        ["2001", "68", "False"],
+      ],
+    }, {
+      description: "Without y: one row per observation with a date. group_by counts the rows per year, month or day.",
+      columns: [
+        { name: "date", role: "x" },
+        { name: "is_ripe", role: "hue" },
+      ],
+      rows: [
+        ["2018-01-01", "True"],
+        ["2018-01-01", "False"],
+        ["2018-01-02", "True"],
+        ["2018-01-04", "False"],
+      ],
+    }),
+  ];
+  const scatterCharts = [
+    section("Scatter plots", "scatter.py", {
+      description: "One row per observation with two numeric values. The plot draws one point per row.",
+      columns: [
+        { name: "fruit", role: "hue" },
+        { name: "weight", role: "x" },
+        { name: "sweetness", role: "y" },
+        { name: "days_on_tree", role: "size" },
+      ],
+      rows: [
+        ["Apple", "221.4", "14.1", "32"],
+        ["Cherry", "187.9", "11.6", "18"],
+        ["Orange", "236.0", "15.3", "47"],
+        ["Fig", "170.2", "9.8", "25"],
+      ],
+    }),
+  ];
   const tools = [
     section("Number formatting", "number_format.py"),
     section("Statistics", "stats.py"),
-    section("DB2 queries", "sql.py"),
+    section("DB2 connection", "sql.py"),
   ];
   return (
     <Playground
@@ -100,6 +145,8 @@ export default function Home() {
       categories={[
         { title: "Bar charts", sections: barCharts },
         { title: "Pie charts", sections: pieCharts },
+        { title: "Line charts", sections: lineCharts },
+        { title: "Scatter plots", sections: scatterCharts },
         { title: "Tools", sections: tools },
       ]}
     />
