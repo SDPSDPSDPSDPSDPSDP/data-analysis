@@ -36,7 +36,7 @@ def render_lineplot(
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
-        chart.lines.append(Line(list(line.index), list(line.values), group_color, marker_radius=Marks.LINE_MARKER_RADIUS))  # type: ignore[arg-type]
+        chart.lines.append(Line(list(line.index), list(line.values), group_color))  # type: ignore[arg-type]
     return chart
 
 
@@ -61,10 +61,3 @@ def render_scatterplot(
         chart.dots.append(Dots(list(xs[rows]), list(df.loc[rows, y]), list(radii[rows]), level_color, alpha=Marks.DOT_ALPHA))
     return chart
 
-
-def render_time_line(chart: Chart, days: pd.Series, counts: pd.Series, color: str, show_markers: bool) -> Chart:
-    chart.lines.append(Line(
-        list(days), list(counts), color, width=Marks.TIME_LINE_WIDTH,
-        marker_radius=Marks.TIME_LINE_MARKER_RADIUS if show_markers else 0, alpha=Marks.TIME_LINE_ALPHA,
-    ))
-    return chart

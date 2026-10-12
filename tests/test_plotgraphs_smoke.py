@@ -18,12 +18,13 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     plot.bar(df, x='category', value='value')
     plot.bar(df, y='category', value='value', hue='group', stacked=True)
     plot.histogram(df, x='value')
-    plot.lineplot(df, x='date', y='value', hue='group')
+    plot.time(df, x='date', y='value', hue='group')
     plot.scatterplot(df, x='value', y='value')
     plot.pie(df, col='category')
-    plot.timeplot(df, x='date', group_by='month')
-    plot.timeplot(df, x='date', group_by='day', plot_type='line', rotation=45)
-    assert len(shown) == 11
+    plot.time(df, x='date', group_by='month')
+    plot.time(df, x='date', group_by='day', rotation=45)
+    plot.time(df, x='date', y='value', hue='group', group_by='year', cumulative=True)
+    assert len(shown) == 12
     assert all(svg.startswith('<svg') for svg in shown)
 
 

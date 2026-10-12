@@ -1,9 +1,9 @@
 import pandas as pd
 from typing import Optional, Union
 
-from ..config import TitleInput, FillMissingValuesInput
-from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
-from ..plots import Histogram, LinePlot, ScatterPlot
+from ..config import TitleInput
+from ..core import HistogramOptions, ScatterPlotOptions
+from ..plots import Histogram, ScatterPlot
 
 
 class NumericPlotsMixin:
@@ -57,54 +57,6 @@ class NumericPlotsMixin:
             suffix=suffix,
         )
         self._render(Histogram(options))
-
-    def lineplot(
-        self,
-        df: pd.DataFrame,
-        x: str,
-        y: str,
-        hue: Optional[str] = None,
-        title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
-        rotation: int = 0,
-        legend: bool = False,
-        fill_missing_values: FillMissingValuesInput = None,
-    ) -> None:
-        """Create a **line plot**, one line per `hue` group.
-
-        Input:
-            df: DataFrame containing the data to plot.
-            x: Column name for the x-axis values.
-            y: Column name for the y-axis values.
-            hue: Column name for grouping data by color. *Optional*.
-
-        Text:
-            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
-                subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. *Optional*.
-            y_axis_label: Label for the y-axis. *Optional*.
-            rotation: Rotation angle for x-axis tick labels. *Default: `0`*.
-            legend: Whether to show the legend. *Default: `False`*.
-
-        Layout:
-            fill_missing_values: How to fill gaps in `y`. **Options:** `'shift'` (interpolate
-                between neighbours), `'zero'`. *Optional*.
-        """
-        options = LinePlotOptions(
-            df=df,
-            x=x,
-            y=y,
-            hue=hue,
-            **self._column_config(hue),
-            title=title,
-            x_axis_label=x_axis_label,
-            y_axis_label=y_axis_label,
-            rotation=rotation,
-            legend=legend,
-            fill_missing_values=fill_missing_values,
-        )
-        self._render(LinePlot(options))
 
     def scatterplot(
         self,

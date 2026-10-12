@@ -38,6 +38,7 @@ class Layout:
     STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
     HAIRLINE = 0.5  # stroke width of grid lines and rect outlines
     AXIS_MARGIN = 0.05  # share of the data range padded on each side of an auto-scaled axis
+    MAX_MONTH_TICKS = 24  # longer monthly axes label every 2nd, 3rd or 6th month; past that only years
 
 
 class Marks:
@@ -45,16 +46,10 @@ class Marks:
     BAR_WIDTH = 0.6
     HORIZONTAL_BAR_WIDTH = 0.8
     HISTOGRAM_GAP = 0.15  # share of a bin left empty between neighbouring histogram bars
-    TIME_BAR_DAYS = {'year': 300, 'month': 25, 'day': 0.8}  # bar width in days per time grouping
     PIE_LABEL_RADIUS = 0.6
     DONUT_LABEL_RADIUS = 0.8
     DONUT_HOLE_RADIUS = 0.6
     LINE_WIDTH = 1.5
-    TIME_LINE_WIDTH = 2
-    LINE_MARKER_RADIUS = 2
-    TIME_LINE_MARKER_RADIUS = 1.5
-    TIME_LINE_ALPHA = 0.9
-    TIME_LINE_MAX_MARKED_DAYS = 25  # longer daily lines drop markers
     DOT_AREA = 36.0  # square points
     DOT_AREA_RANGE = (18, 72)  # square points, when sized by a column
     DOT_ALPHA = 0.8

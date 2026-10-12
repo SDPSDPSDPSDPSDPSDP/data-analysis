@@ -95,11 +95,12 @@ If the same hue column needs different colors in different charts, make a second
 | `accuracy(..., color_correct=c)` | `PlotGraphs(palette={a: c})` (a = accuracy column name) |
 | `accuracy(..., color_incorrect=, reverse=, reverse_order=)` | Remove. Remainder color and order are automatic. |
 | `histogram(...)` | Same name. Rename shared args. `suffix=` now applies to x ticks. |
-| `lineplot(...)` | Same name. Rename shared args. |
+| `lineplot(...)` | `time(...)`. Rename shared args. |
 | `pie(df, col, palette=...)` | `pie(df, col)` with palette in the constructor under key `col`. |
-| `timeplot(..., type='line')` | `timeplot(..., plot_type='line')` |
+| `timeplot(df, x)` (bars) | `bar(df.assign(day=df[x].dt.date), x='day')`. `time` draws lines only. |
+| `timeplot(..., type='line')` | `time(..., group_by='day')` |
 | `timeplot(..., palette='#hex')` | Remove. No color argument. |
-| `timeplot` default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it. |
+| `timeplot` (now `time`) default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it. |
 | - | New: `scatterplot(df, x, y, hue=, size=)` |
 
 Accuracy charts: segments are now labelled with the value column name and `'Remainder'` instead of `'Correct'`/`'Incorrect'`. Rename the column (`df.rename(columns={'acc': 'Correct'})`) if the old label matters.

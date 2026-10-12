@@ -8,7 +8,6 @@ from .categorical_options import (
 )
 from .options import (
     HistogramOptions,
-    LinePlotOptions,
     PiePlotOptions,
     TimePlotOptions,
     ScatterPlotOptions,
@@ -23,7 +22,6 @@ __all__ = [
     'BarPlotOptions',
     'NormalizedPlotOptions',
     'HistogramOptions',
-    'LinePlotOptions',
     'PiePlotOptions',
     'TimePlotOptions',
     'ScatterPlotOptions',

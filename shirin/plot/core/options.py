@@ -5,7 +5,6 @@ from ..config import FillMissingValues, FillMissingValuesInput, TimeGroupBy, Tim
 from .base_options import (
     VALID_FILL_MISSING_VALUES,
     VALID_TIME_GROUP_BY,
-    VALID_TIME_PLOT_TYPES,
     BasePlotOptions,
     validate_str_or_enum_option,
 )
@@ -27,31 +26,6 @@ class HistogramOptions(BasePlotOptions):
             raise ValueError("x column must be specified")
         if self.bins <= 0:
             raise ValueError("bins must be positive")
-
-
-@dataclass
-class LinePlotOptions(BasePlotOptions):
-    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y')
-
-    x: str = ''
-    y: str = ''
-    rotation: int = 0
-    fill_missing_values: FillMissingValuesInput = None
-
-    def validate(self) -> None:
-        super().validate()
-        if not self.x:
-            raise ValueError("x column must be specified")
-        if not self.y:
-            raise ValueError("y column must be specified")
-
-        validate_str_or_enum_option(
-            option_name='fill_missing_values',
-            value=self.fill_missing_values,
-            valid_options=VALID_FILL_MISSING_VALUES,
-            enum_type=FillMissingValues,
-            allow_none=True,
-        )
 
 
 @dataclass
@@ -87,30 +61,33 @@ class PiePlotOptions(BasePlotOptions):
 
 @dataclass
 class TimePlotOptions(BasePlotOptions):
-    column_fields: ClassVar[tuple[str, ...]] = ('x',)
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y')
 
     x: str = ''
-    group_by: TimeGroupByInput = 'day'
-    plot_type: str = 'bar'
-    display_month: bool = True
+    y: Optional[str] = None
+    group_by: Optional[TimeGroupByInput] = None
     cumulative: bool = False
+    display_month: bool = True
     rotation: int = 0
+    fill_missing_values: FillMissingValuesInput = None
 
     def validate(self) -> None:
         super().validate()
         if not self.x:
             raise ValueError("x column must be specified")
-        if self.palette is not None and not isinstance(self.palette, str):
-            raise ValueError("palette must be a single color string for time plots")
-
         validate_str_or_enum_option(
             option_name='group_by',
             value=self.group_by,
             valid_options=VALID_TIME_GROUP_BY,
             enum_type=TimeGroupBy,
+            allow_none=True,
         )
         validate_str_or_enum_option(
-            option_name='plot_type',
-            value=self.plot_type,
-            valid_options=VALID_TIME_PLOT_TYPES,
+            option_name='fill_missing_values',
+            value=self.fill_missing_values,
+            valid_options=VALID_FILL_MISSING_VALUES,
+            enum_type=FillMissingValues,
+            allow_none=True,
         )
+        if self.fill_missing_values is not None and self.y is None:
+            raise ValueError("fill_missing_values needs y: without y the plot counts rows, which has no gaps")

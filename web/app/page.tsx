@@ -90,8 +90,8 @@ export default function Home() {
     }),
   ];
   const lineCharts = [
-    section("Line plots", "lineplot.py", {
-      description: "One row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
+    section("Line charts", "time.py", {
+      description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
       columns: [
         { name: "year", role: "x" },
         { name: "harvest", role: "y" },
@@ -102,6 +102,18 @@ export default function Home() {
         ["2000", "44", "False"],
         ["2001", "199", "True"],
         ["2001", "68", "False"],
+      ],
+    }, {
+      description: "Without y: one row per observation with a date. group_by counts the rows per year, month or day.",
+      columns: [
+        { name: "date", role: "x" },
+        { name: "is_ripe", role: "hue" },
+      ],
+      rows: [
+        ["2018-01-01", "True"],
+        ["2018-01-01", "False"],
+        ["2018-01-02", "True"],
+        ["2018-01-04", "False"],
       ],
     }),
   ];

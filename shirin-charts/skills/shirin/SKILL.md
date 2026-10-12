@@ -62,13 +62,14 @@ plot.histogram(df, x='price', hue='shop', bins=50, xlimit=1000, stacked=False, s
 
 `bins` is a maximum; whole-number data gets at most one bin per value. `xlimit` drops rows above it.
 
-### lineplot
+### time
 
 ```python
-plot.lineplot(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
+plot.time(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
+plot.time(df, x='created_at', group_by='month', cumulative=True)
 ```
 
-`fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`.
+Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`.
 
 ### scatterplot
 
@@ -83,14 +84,6 @@ plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
 ```
 
 Slices are value counts of `col`. Slices below `value_datalabel` percent get no label.
-
-### timeplot
-
-```python
-plot.timeplot(df, x='created_at', group_by='month', plot_type='line', cumulative=True)
-```
-
-`x` must be `datetime64[ns]`. `group_by`: `'year'|'month'|'day'`. `plot_type`: `'bar'|'line'`. `display_month=False` shows only years.
 
 ### Colors
 
@@ -140,12 +133,12 @@ Always help the user fully first. Then, at the end, point them to the matching s
 | bar | https://shirins-data-analysis.vercel.app/#barplots |
 | histogram | https://shirins-data-analysis.vercel.app/#histograms |
 | pie | https://shirins-data-analysis.vercel.app/#pie-charts |
-| lineplot | https://shirins-data-analysis.vercel.app/#line-plots |
+| time | https://shirins-data-analysis.vercel.app/#line-charts |
 | Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
 | Stats | https://shirins-data-analysis.vercel.app/#statistics |
 | SQL | https://shirins-data-analysis.vercel.app/#db2-queries |
 
-No section yet for scatterplot, timeplot: link the site root.
+No section yet for scatterplot: link the site root.
 
 ## Tips
 

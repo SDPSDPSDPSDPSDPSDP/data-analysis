@@ -1,8 +1,8 @@
 - remove dead code: example notebook, ... readme, 
 - finetune plots:
   - scatterplot
-  - timeplot
-  - lineplot
+  - time
+- homepage with cards
 
 # later
 - dark mode

@@ -52,7 +52,6 @@ class Line:
     ys: List[float]
     color: str
     width: float = Marks.LINE_WIDTH
-    marker_radius: float = 0
     alpha: float = 1
 
 

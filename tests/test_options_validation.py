@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from shirin.plot.core import BarPlotOptions, InvalidOptionError, LinePlotOptions, TimePlotOptions
+from shirin.plot.core import BarPlotOptions, InvalidOptionError, TimePlotOptions
 
 
 @pytest.mark.parametrize(
@@ -35,7 +35,7 @@ def test_orientation_invalid_value_shows_valid_options() -> None:
 
 def test_fill_missing_values_invalid_value_shows_valid_options() -> None:
     df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
-    options = LinePlotOptions(df=df, x="x", y="y", fill_missing_values="median")
+    options = TimePlotOptions(df=df, x="x", y="y", fill_missing_values="median")
 
     with pytest.raises(ValueError, match="Valid options"):
         options.validate()
