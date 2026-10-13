@@ -58,6 +58,12 @@
   overflow: hidden;
   animation: chart-preview-in var(--home-chart-fade-duration) ease both;
   animation-delay: calc(var(--i) * var(--home-chart-enter-stagger));
+  /* `scale`, not `transform`: the button's transform drives shrink, they compose instead of clashing. */
+  transition: scale var(--home-chart-grow-duration) var(--home-chart-enter-ease);
+}
+
+.chart-preview-card:hover {
+  scale: var(--home-chart-hover-scale);
 }
 
 @keyframes chart-preview-in {
@@ -72,7 +78,8 @@
     animation: none;
   }
 
-  .chart-preview {
+  .chart-preview,
+  .chart-preview-card {
     transition: none;
   }
 }
