@@ -37,6 +37,8 @@ def header_rows(chart: Chart, plot_w: float, color: Callable[[str], str]) -> Tup
         top += height + Layout.ROW_GAP
         return row_top
 
+    if chart.title or chart.subtitle:
+        top += Layout.TITLE_TOP_GAP
     for text, size, bold, text_color in (
         (chart.title, FontSizes.TITLE, True, color(TextColors.BLACK)),
         (chart.subtitle, FontSizes.TEXT, False, color(TextColors.LIGHT_GREY)),

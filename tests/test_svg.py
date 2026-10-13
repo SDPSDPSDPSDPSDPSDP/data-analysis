@@ -45,6 +45,14 @@ def test_title_adds_height_instead_of_squeezing_plot() -> None:
     assert _attr(to_svg(chart('Title')), 'height') > _attr(to_svg(chart('')), 'height')
 
 
+def test_title_gets_extra_top_gap() -> None:
+    from shirin.plot.config import Layout
+    from shirin.plot.svg.header import header_rows
+
+    _, plot_top = header_rows(Chart(width=6, plot_height=3, title='T'), 100, str)
+    assert plot_top == Layout.PAD + Layout.TITLE_TOP_GAP + 15 + Layout.PLOT_GAP
+
+
 def test_title_is_centered_over_plot() -> None:
     def title_center(title: str) -> float:
         c = Chart(width=6, plot_height=3, title=title)

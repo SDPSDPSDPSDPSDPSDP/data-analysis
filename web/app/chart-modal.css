@@ -97,6 +97,12 @@ html:has(.chart-modal[open]) {
   gap: var(--space-6);
 }
 
+/* Fade-in animation makes the editor its own stacking context, trapping its doc tooltip under the chart and docs button. */
+.chart-modal .runnable > :first-child {
+  position: relative;
+  z-index: var(--z-modal-editor);
+}
+
 /* Short enough to keep clear of the docs button pinned to the bottom. */
 .chart-modal .chart img,
 .chart-modal .skeleton {

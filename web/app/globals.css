@@ -10,6 +10,7 @@
   /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
   --z-nav: 1000;
   --z-tooltip: 1100;
+  --z-modal-editor: 1;
   --color-code-bg: #1e1e1e;
   /* Matches the dark_mode=True chart background in shirin/plot/config/colors.py. */
   --color-chart-dark-bg: #1e1e1e;
