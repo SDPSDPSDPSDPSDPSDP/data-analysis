@@ -44,9 +44,11 @@
 .chart-preview-card {
   pointer-events: auto;
   cursor: pointer;
-  width: var(--home-chart-scale);
+  /* Shrinks to the image, so portrait charts (pie) capped by max-height get a narrower card, not side gaps. */
+  width: fit-content;
+  max-width: var(--home-chart-scale);
   margin: 0 auto;
-  padding-top: var(--space-0-5);
+  padding-top: var(--space-1);
   line-height: 1.2;
   letter-spacing: var(--letter-spacing-heading);
   display: flex;
@@ -98,9 +100,9 @@
 }
 
 .chart-preview img {
-  margin-top: var(--space-0-25);
-  width: 100%;
-  height: auto;
+  margin: var(--space-0-25) auto 0;
+  max-width: 100%;
+  max-height: var(--home-chart-max-height);
   display: block;
 }
 

@@ -45,6 +45,14 @@ def test_title_adds_height_instead_of_squeezing_plot() -> None:
     assert _attr(to_svg(chart('Title')), 'height') > _attr(to_svg(chart('')), 'height')
 
 
+def test_title_gets_extra_top_gap() -> None:
+    from shirin.plot.config import Layout
+    from shirin.plot.svg.header import header_rows
+
+    _, plot_top = header_rows(Chart(width=6, plot_height=3, title='T'), 100, str)
+    assert plot_top == Layout.PAD + Layout.TITLE_TOP_GAP + 15 + Layout.PLOT_GAP
+
+
 def test_title_is_centered_over_plot() -> None:
     def title_center(title: str) -> float:
         c = Chart(width=6, plot_height=3, title=title)
@@ -142,3 +150,13 @@ def test_filled_line_draws_fading_area_per_segment() -> None:
     assert svg.count('<linearGradient') == 1 and 'stop-opacity="0"' in svg
     area = svg.split('" fill="url(#area')[0].rsplit('<path d="', 1)[1]
     assert area.count('Z') == 2
+
+
+def test_dark_mode_darkens_background_and_whitens_text_but_keeps_labels_on_bars() -> None:
+    c = Chart(width=6, plot_height=3, title='Title')
+    c.rects.append(Rect(0, 1, 0, 5, '#ffd5ff'))
+    c.texts.append(Text(0.5, 2, 'on bar', '#000000', 10))
+    svg = to_svg(c, dark_mode=True)
+    assert 'fill="#ffffff"' not in svg
+    assert 'fill="#FFFFFF" class="b">Title<' in svg
+    assert 'fill="#000000" text-anchor="middle" class="l">on bar<' in svg

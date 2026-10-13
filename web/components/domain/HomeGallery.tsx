@@ -7,6 +7,8 @@ import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { sectionId } from "@/components/domain/PlotSection";
 import type { getHomeCharts } from "@/app/categories";
+import { useDarkMode } from "@/lib/darkMode";
+import { withDarkMode } from "@/lib/exampleSetup";
 
 type Chart = ReturnType<typeof getHomeCharts>[number];
 
@@ -25,6 +27,7 @@ const NO_PINS: (Chart | null)[] = [];
 
 export default function HomeGallery({ categories, charts, showNav = true, pinned = NO_PINS, limit = charts.length }: Props) {
   const router = useRouter();
+  const dark = useDarkMode();
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
@@ -59,7 +62,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
   function openChart(chart: Chart, card: HTMLElement) {
     setSelected(chart);
     const image = new Image();
-    image.src = chart.preview;
+    image.src = dark ? chart.darkPreview : chart.preview;
     image.decode().then(() => setOpen({ chart, origin: card.querySelector(".chart-preview-card")!.getBoundingClientRect() }));
   }
 
@@ -92,7 +95,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
             .map((chart, index) => (
               <ChartPreview
                 key={chart.code}
-                src={chart.cardPreview}
+                src={dark ? chart.darkCardPreview : chart.cardPreview}
                 title={chart.title}
                 subtitle={chart.subtitle}
                 index={index}
@@ -106,9 +109,9 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
       </main>
       {open && (
         <ChartModal
-          setup={open.chart.setup}
+          setup={withDarkMode(open.chart.setup, dark)}
           code={open.chart.code}
-          preview={open.chart.preview}
+          preview={dark ? open.chart.darkPreview : open.chart.preview}
           origin={open.origin}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           section={open.chart.section}

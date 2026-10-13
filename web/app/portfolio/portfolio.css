@@ -39,11 +39,16 @@
 
 .portfolio-still {
   --home-chart-scale: var(--portfolio-still-chart-scale);
+  --home-chart-max-height: var(--portfolio-still-chart-max-height);
 }
 
 /* Fixed count beats the narrow-screen two-column rule in home.css. */
 .portfolio-home .home-charts {
   grid-template-columns: repeat(var(--portfolio-home-columns), 1fr);
+}
+
+.portfolio-home .nav-brand {
+  visibility: hidden;
 }
 
 .portfolio-still .chart-preview {

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
+import { STORAGE_KEY } from "@/lib/darkModeKey";
 import "./globals.css";
+import "./base.css";
 import "./nav.css";
 import "./code.css";
 import "./examples.css";
@@ -29,7 +31,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${futura.variable} ${satoshi.variable}`}>
+    // The inline script sets data-theme before hydration, React would otherwise flag the mismatch.
+    <html lang="en" className={`${futura.variable} ${satoshi.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if (localStorage.getItem("${STORAGE_KEY}") !== "0") document.documentElement.dataset.theme = "dark";`,
+          }}
+        />
+      </head>
       <body>
         {children}
         <OverlayScrollbar />

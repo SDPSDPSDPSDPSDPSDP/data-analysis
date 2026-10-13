@@ -118,8 +118,13 @@
   transition: color var(--transition), background var(--transition);
 }
 
-.nav button.nav-link[aria-pressed="true"] {
+.nav button.nav-link:not(.nav-theme)[aria-pressed="true"] {
   background: var(--color-bg);
+}
+
+/* Right edge of the nav: the menus are centered absolutely, so auto margin pushes past them. */
+.nav button.nav-theme {
+  margin: 0 0 0 auto;
 }
 
 .nav .nav-link-inactive {

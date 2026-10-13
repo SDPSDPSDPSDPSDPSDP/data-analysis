@@ -23,6 +23,7 @@ class FigureSize:
 class Layout:
     """Points, measured from the figure edges."""
     PAD = 12
+    TITLE_TOP_GAP = 6  # extra whitespace above the title, on top of PAD
     CORNER_RADIUS = 6
     ROW_GAP = 6
     PLOT_GAP = 12

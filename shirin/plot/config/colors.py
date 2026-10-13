@@ -30,6 +30,15 @@ class TextColors:
 
 GRID_COLOR = '#f4f4f4'
 BACKGROUND_COLOR = '#ffffff'
+DARK_MODE_COLORS = {
+    BACKGROUND_COLOR: '#1e1e1e',
+    GRID_COLOR: '#2e2e2e',
+    TextColors.BLACK: TextColors.WHITE,
+    TextColors.DARK_GREY: '#cccccc',
+    TextColors.LIGHT_GREY: '#999999',
+    TextColors.FAINT_GREY: '#777777',
+}
+DARK_MODE_DEFAULT_COLOR = '#ffffff'  # replaces Colors.GREY for charts without hue or palette
 SHADE_BASE = '#333333'  # dark end when one color is spread over hue values
 SHADE_DARKEST_MIX = 0.3  # share of the color in the darkest shade
 

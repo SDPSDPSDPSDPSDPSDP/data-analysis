@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
+import { useDarkMode } from "@/lib/darkMode";
+import { withDarkMode } from "@/lib/exampleSetup";
 
 export type Category = {
   title: string;
@@ -21,6 +23,13 @@ export default function Playground({ setup, categories, showSetup, expanded }: P
   const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
   // Edits apply to the examples only once a setup cell is run.
   const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
+  // Toggling dark mode edits the shown PlotGraphs(...) call and reruns the examples with it.
+  const dark = useDarkMode();
+  useEffect(() => {
+    const toggle = (code: string) => (code.includes("PlotGraphs(") ? withDarkMode(code, dark) : code);
+    setSetupCodes((codes) => codes.map(toggle));
+    setSetupCode(toggle);
+  }, [dark]);
   const main = useRef<HTMLElement>(null);
   // Blocks fade in the first time they scroll into view; ones arriving together stagger.
   useEffect(() => {

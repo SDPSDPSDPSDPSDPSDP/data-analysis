@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 from xml.sax.saxutils import escape
 
 from ..config import FontSizes, Layout, TextColors
-from ..config.colors import BACKGROUND_COLOR, GRID_COLOR
+from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
 from . import marks
 from .chart import Axis, Chart, Text
 from .fonts import cap_height, font_css, text_width
@@ -60,7 +60,12 @@ def _shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Tex
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
-def to_svg(chart: Chart, font: Optional[str] = None) -> str:
+def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
+    theme = DARK_MODE_COLORS if dark_mode else {}
+
+    def color(c: str) -> str:
+        return theme.get(c, c)
+
     x_lim, y_lim = _limits(chart.x, chart.data_values('x')), _limits(chart.y, chart.data_values('y'))
     x_ticks, y_ticks = _ticks(chart.x, *x_lim), _ticks(chart.y, *y_lim)
     tick_size = FontSizes.TICKS
@@ -73,7 +78,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     width = chart.width * PT_PER_INCH if fixed_width else plot_left + plot_h + Layout.PAD  # type: ignore[operator]
     plot_w = width - plot_left - Layout.PAD
 
-    header_rows, plot_top = build_header(chart, plot_w)
+    header_rows, plot_top = build_header(chart, plot_w, color)
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
@@ -96,12 +101,12 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
     ]
 
     body: List[str] = []
-    grid = f'stroke="{GRID_COLOR}" stroke-width="{Layout.HAIRLINE}"'
+    grid = f'stroke="{color(GRID_COLOR)}" stroke-width="{Layout.HAIRLINE}"'
     if chart.y.grid:
         body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
     if chart.x.grid:
         body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
-    body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
+    body += [marks.wedge(dataclasses.replace(w, color=color(w.color)), sx, sy) for w in chart.wedges if w.end > w.start]
     clip_ids: Dict[int, str] = {}
     fades: List[str] = []  # drawn after every segment, else the next segment covers them
     for r in chart.rects:
@@ -120,23 +125,25 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         fades.append(fade)
     body += fades
     body += [marks.area(line, sx, sy, plot_bottom, f'area{next(_CLIP_IDS)}') for line in chart.lines if line.fill]
-    body += [marks.line(line, sx, sy) for line in chart.lines]
-    body += [marks.dots(dots, sx, sy) for dots in chart.dots]
+    body += [marks.line(dataclasses.replace(line, color=color(line.color)), sx, sy) for line in chart.lines]
+    body += [marks.dots(dataclasses.replace(dots, color=color(dots.color)), sx, sy) for dots in chart.dots]
     for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
-            body.append(marks.text(x, baseline, t.text, t.size, t.color, marks.ANCHOR[t.ha]))
+            # Black/white labels sit on a bar or wedge and already contrast with it.
+            text_color = t.color if t.color in (TextColors.BLACK, TextColors.WHITE) else color(t.color)
+            body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha]))
 
     if chart.y.label:
         # Rotated a quarter turn counterclockwise, so the baseline is the right edge of the text.
         x, y = Layout.PAD + cap_height(FontSizes.XYLABEL), plot_top + plot_h / 2
         body.append(
-            f'<text x="{x:.2f}" y="{y:.2f}" font-size="{FontSizes.XYLABEL}" fill="{TextColors.BLACK}" '
+            f'<text x="{x:.2f}" y="{y:.2f}" font-size="{FontSizes.XYLABEL}" fill="{color(TextColors.BLACK)}" '
             f'text-anchor="middle" transform="rotate(-90 {x:.2f} {y:.2f})">{escape(chart.y.label)}</text>'
         )
 
     cap = cap_height(tick_size)
-    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end')
+    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, color(TextColors.DARK_GREY), 'end')
              for t, label in y_ticks if label]
     bottom = plot_bottom
     labelled_x_ticks = [(t, label) for t, label in x_ticks if label]
@@ -147,16 +154,16 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
                                 for _, label in labelled_x_ticks)
         for t, label in labelled_x_ticks:
             if chart.x.rotation:
-                body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, TextColors.DARK_GREY, 'end', rotate=chart.x.rotation))
+                body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, color(TextColors.DARK_GREY), 'end', rotate=chart.x.rotation))
             else:
-                body.append(marks.text(sx(t), tick_top + cap, label, tick_size, TextColors.DARK_GREY, 'middle'))
+                body.append(marks.text(sx(t), tick_top + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle'))
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
-        body += [marks.text(sx(t), bottom + cap, label, tick_size, TextColors.DARK_GREY, 'middle') for t, label in chart.x.sub_labels]
+        body += [marks.text(sx(t), bottom + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle') for t, label in chart.x.sub_labels]
         bottom += tick_size
     if chart.x.label:
         bottom += Layout.LABEL_GAP
-        body.append(marks.text(plot_left + plot_w / 2, bottom + cap_height(FontSizes.XYLABEL), chart.x.label, FontSizes.XYLABEL, TextColors.BLACK, 'middle'))
+        body.append(marks.text(plot_left + plot_w / 2, bottom + cap_height(FontSizes.XYLABEL), chart.x.label, FontSizes.XYLABEL, color(TextColors.BLACK), 'middle'))
         bottom += FontSizes.XYLABEL
     height = bottom + Layout.PAD
 
@@ -164,7 +171,7 @@ def to_svg(chart: Chart, font: Optional[str] = None) -> str:
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width * PX_PER_PT:.0f}" height="{height * PX_PER_PT:.0f}" '
         f'viewBox="0 0 {width:.2f} {height:.2f}">',
         f'<style>{font_css(font, bool(chart.title))}</style>',
-        f'<rect width="100%" height="100%" rx="{Layout.CORNER_RADIUS}" fill="{BACKGROUND_COLOR}"/>',
+        f'<rect width="100%" height="100%" rx="{Layout.CORNER_RADIUS}" fill="{color(BACKGROUND_COLOR)}"/>',
         *header,
         *body,
         '</svg>',

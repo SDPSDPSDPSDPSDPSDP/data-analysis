@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import Optional
 
+from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS
 from ..config import TitleInput, SortInput, TimeGroupBy, TimeGroupByInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
@@ -137,6 +138,7 @@ class BarPlotsMixin:
                 value=REMAINDER_SHARE_COL,
                 hue=value,
                 remainder=REMAINDER_LABEL,
+                background=DARK_MODE_COLORS[BACKGROUND_COLOR] if self._dark_mode else BACKGROUND_COLOR,
                 **self._column_config(value),
             )
             if isinstance(common['palette'], str):
