@@ -108,9 +108,10 @@ html:has(.chart-modal[open]) {
   align-self: center;
 }
 
+/* Sized by width, not a fixed height: a width-capped fixed height letterboxes the chart away from the copy button. */
 .chart-modal .chart img {
-  width: auto;
-  height: var(--modal-chart-height);
+  width: calc(var(--modal-chart-height) * var(--aspect));
+  height: auto;
   max-width: 100%;
 }
 

@@ -46,6 +46,10 @@
   grid-template-columns: repeat(var(--portfolio-home-columns), 1fr);
 }
 
+.portfolio-still .chart-preview {
+  padding: 0;
+}
+
 .portfolio-still .home-charts {
   grid-template-columns: repeat(var(--portfolio-still-columns), 1fr);
 }
