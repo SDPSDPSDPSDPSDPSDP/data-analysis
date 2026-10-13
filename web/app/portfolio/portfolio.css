@@ -59,3 +59,8 @@
   min-height: 100vh;
   justify-content: center;
 }
+
+.portfolio-still .chart-preview-title,
+.portfolio-still .chart-preview-subtitle {
+  display: none;
+}
