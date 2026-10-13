@@ -10,8 +10,7 @@ const DARK_MODE_ARG = /,\s*dark_mode=(True|False)/g;
 
 // Palette colors too dark to read on the dark background, swapped for a lighter one in dark mode.
 const DARK_PALETTE_SWAPS: [light: string, dark: string][] = [
-  ['"#6f2525"', '"#ff5252"'],
-  ['"#d6dde6"', '"#a8feff"'],
+  ['"#d6dde6"', '"#ffffff"'],
 ];
 
 // Adds or removes dark_mode=True on every PlotGraphs(...) call, so the setup shows what draws the charts.

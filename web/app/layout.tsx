@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
-import { STORAGE_KEY } from "@/lib/darkMode";
+import { STORAGE_KEY } from "@/lib/darkModeKey";
 import "./globals.css";
 import "./nav.css";
 import "./code.css";

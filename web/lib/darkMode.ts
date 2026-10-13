@@ -1,8 +1,8 @@
+"use client";
 
 import { useSyncExternalStore } from "react";
+import { STORAGE_KEY } from "./darkModeKey";
 
-// Also read by the inline script in app/layout.tsx, which sets the theme before first paint.
-export const STORAGE_KEY = "dark-mode";
 const listeners = new Set<() => void>();
 
 function subscribe(listener: () => void) {
