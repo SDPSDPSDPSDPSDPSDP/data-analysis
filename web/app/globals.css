@@ -68,6 +68,7 @@
   --nav-dim-transition: 350ms ease;
   --nav-brand-hover-scale: 1.08;
   --home-chart-min-width: 260px;
+  --portfolio-still-columns: 5;
   --home-chart-scale: 70%;
   --home-chart-enter-stagger: 180ms;
   --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);

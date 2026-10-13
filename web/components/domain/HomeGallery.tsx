@@ -13,9 +13,11 @@ type Chart = ReturnType<typeof getHomeCharts>[number];
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
   charts: Chart[];
+  // Off on portfolio screens: the host page frames them with its own chrome.
+  showNav?: boolean;
 };
 
-export default function HomeGallery({ categories, charts }: Props) {
+export default function HomeGallery({ categories, charts, showNav = true }: Props) {
   const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
@@ -62,16 +64,18 @@ export default function HomeGallery({ categories, charts }: Props) {
 
   return (
     <>
-      <Nav
-        categories={categories}
-        filter={{
-          categories: [...new Set(charts.map((chart) => chart.category))],
-          active,
-          // Clicking the active category again shows every chart.
-          onSelect: (title) => selectFilter(title === active ? null : title),
-          onLeave: (href) => shrinkAll(() => router.push(href)),
-        }}
-      />
+      {showNav && (
+        <Nav
+          categories={categories}
+          filter={{
+            categories: [...new Set(charts.map((chart) => chart.category))],
+            active,
+            // Clicking the active category again shows every chart.
+            onSelect: (title) => selectFilter(title === active ? null : title),
+            onLeave: (href) => shrinkAll(() => router.push(href)),
+          }}
+        />
+      )}
       <main className="page home">
         {/* Keyed on filter so the entrance wave replays on every category switch. */}
         <div className="home-charts" key={active ?? ""}>
