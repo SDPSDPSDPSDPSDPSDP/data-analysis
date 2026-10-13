@@ -17,8 +17,8 @@
 
 .chart-modal-actions,
 .chart-modal .runnable > :first-child {
-  /* Fades in while the chart is still landing. */
-  animation: chart-preview-in var(--modal-enter-content-duration) ease var(--modal-enter-content-delay) both;
+  /* Fades in while the chart is still landing. Not `both`: a forwards fill keeps opacity animated, making the editor a backdrop root that cuts the doc tooltip's blur off from the chart. */
+  animation: chart-preview-in var(--modal-enter-content-duration) ease var(--modal-enter-content-delay) backwards;
 }
 
 /* Last in: after the editor has faded in. */

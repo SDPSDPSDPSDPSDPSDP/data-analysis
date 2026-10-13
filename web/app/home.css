@@ -48,7 +48,7 @@
   width: fit-content;
   max-width: var(--home-chart-scale);
   margin: 0 auto;
-  padding-top: var(--space-0-5);
+  padding-top: var(--space-1);
   line-height: 1.2;
   letter-spacing: var(--letter-spacing-heading);
   display: flex;
