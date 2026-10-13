@@ -20,7 +20,10 @@ type Props = {
   limit?: number;
 };
 
-export default function HomeGallery({ categories, charts, showNav = true, pinned = [], limit = charts.length }: Props) {
+// Module-level so the default keeps one identity: a fresh `[]` per render retriggers the shuffle effect forever.
+const NO_PINS: (Chart | null)[] = [];
+
+export default function HomeGallery({ categories, charts, showNav = true, pinned = NO_PINS, limit = charts.length }: Props) {
   const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.

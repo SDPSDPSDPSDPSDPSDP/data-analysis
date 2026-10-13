@@ -69,6 +69,7 @@
   --nav-brand-hover-scale: 1.08;
   --home-chart-min-width: 260px;
   --portfolio-still-columns: 5;
+  --portfolio-still-chart-scale: 90%;
   --home-chart-scale: 70%;
   --home-chart-enter-stagger: 180ms;
   --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);
@@ -105,6 +106,7 @@
   --color-backdrop: rgba(0, 0, 0, 0.7);
   --tooltip-max-height: 400px;
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-home-chart: 0 2px 12px rgba(0, 0, 0, 0.06);
   --color-scrollbar: rgba(0, 0, 0, 0.25);
   --scrollbar-width: 6px;
   --scrollbar-inset: 2px;

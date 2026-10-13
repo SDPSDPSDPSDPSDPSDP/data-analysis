@@ -54,6 +54,7 @@
   text-align: center;
   background: var(--color-bg);
   border-radius: var(--radius-home-chart);
+  box-shadow: var(--shadow-home-chart);
   overflow: hidden;
   animation: chart-preview-in var(--home-chart-fade-duration) ease both;
   animation-delay: calc(var(--i) * var(--home-chart-enter-stagger));
