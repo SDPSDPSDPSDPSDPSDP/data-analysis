@@ -8,7 +8,9 @@
     "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs && npm run portfolio:loc",
     "build": "next build",
     "portfolio:loc": "node scripts/loc/count_loc.mjs",
-    "portfolio:stills": "node scripts/portfolio/stills.mjs"
+    "portfolio:stills": "node scripts/portfolio/stills.mjs",
+    "portfolio:upload": "node scripts/portfolio/upload.mjs",
+    "portfolio:compare": "node scripts/portfolio/upload.mjs --compare"
   },
   "dependencies": {
     "@codemirror/lang-python": "6.2.1",

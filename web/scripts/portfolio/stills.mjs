@@ -9,7 +9,7 @@ const url = "https://shirins-data-analysis.vercel.app";
 
 export const STILLS = [
   // Past the home gallery's staggered fly-in.
-  { slug: "charts", id: "charts-hero", url: `${url}/portfolio/home-static`, at: 3 },
+  { slug: "data-analysis", id: "data-analysis-hero", url: `${url}/portfolio/home-static`, at: 3 },
 ];
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
