@@ -1,0 +1,102 @@
+.portfolio-index {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-2);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+
+.portfolio-index-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-heading);
+  margin: 0 0 var(--space-3);
+}
+
+.portfolio-index-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.portfolio-index-link {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.portfolio-index-link:hover {
+  text-decoration: underline;
+}
+
+.portfolio-index-path {
+  display: block;
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+}
+
+.portfolio-still {
+  --home-chart-scale: var(--portfolio-still-chart-scale);
+}
+
+/* Fixed count beats the narrow-screen two-column rule in home.css. */
+.portfolio-home .home-charts {
+  grid-template-columns: repeat(var(--portfolio-home-columns), 1fr);
+}
+
+.portfolio-still .chart-preview {
+  padding: 0;
+}
+
+.portfolio-still .home-charts {
+  grid-template-columns: repeat(var(--portfolio-still-columns), 1fr);
+  row-gap: var(--portfolio-still-row-gap);
+  padding-inline: var(--space-6);
+}
+
+/* No nav here, so the page fills the whole viewport. */
+.portfolio-still .page {
+  min-height: 100vh;
+  justify-content: center;
+}
+
+.portfolio-still .chart-preview-title,
+.portfolio-still .chart-preview-subtitle {
+  display: none;
+}
+
+.demo-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--demo-cursor-size);
+  height: var(--demo-cursor-size);
+  pointer-events: none;
+  z-index: var(--z-demo-cursor);
+  opacity: 0;
+  filter: var(--demo-cursor-shadow);
+  transition: opacity var(--demo-cursor-fade);
+  will-change: transform;
+}
+
+.demo-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.demo-cursor svg {
+  display: block;
+  transform-origin: var(--demo-cursor-tip-x) var(--demo-cursor-tip-y);
+  transition: transform var(--demo-cursor-press);
+}
+
+.demo-cursor svg[data-pressed="true"] {
+  transform: scale(var(--demo-cursor-pressed-scale));
+}
+
+.demo-cursor path {
+  fill: var(--demo-cursor-fill);
+  stroke: var(--demo-cursor-stroke);
+  stroke-width: var(--demo-cursor-stroke-width);
+}

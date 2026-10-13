@@ -24,7 +24,14 @@ async function toPng(src: string): Promise<Blob> {
 export default function CopyableImage({ src, alt }: { src: string; alt: string }) {
   return (
     <figure className="chart copyable">
-      <img src={src} alt={alt} />
+      <img
+        src={src}
+        alt={alt}
+        onLoad={(event) => {
+          const image = event.currentTarget;
+          image.style.setProperty("--aspect", String(image.naturalWidth / image.naturalHeight));
+        }}
+      />
       <CopyButton copy={() => navigator.clipboard.write([new ClipboardItem({ "image/png": toPng(src) })])} />
     </figure>
   );

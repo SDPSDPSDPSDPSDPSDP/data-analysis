@@ -55,7 +55,7 @@
   transition: opacity var(--nav-dim-transition), filter var(--nav-dim-transition);
 }
 
-.nav-menus:has(.nav-menu:hover) .nav-menu:not(:hover) {
+.nav-menus:has(.nav-menu:hover, .nav-menu[data-demo-hover]) .nav-menu:not(:hover, [data-demo-hover]) {
   opacity: var(--nav-dim-opacity);
   filter: blur(var(--nav-dim-blur));
 }

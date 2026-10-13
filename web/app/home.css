@@ -4,7 +4,7 @@
 
 .home-charts {
   display: grid;
-  grid-template-columns: repeat(var(--home-chart-columns), minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--home-chart-min-width), 1fr));
   gap: var(--space-3);
 }
 
@@ -54,9 +54,17 @@
   text-align: center;
   background: var(--color-bg);
   border-radius: var(--radius-home-chart);
+  box-shadow: var(--shadow-home-chart);
   overflow: hidden;
   animation: chart-preview-in var(--home-chart-fade-duration) ease both;
   animation-delay: calc(var(--i) * var(--home-chart-enter-stagger));
+  /* `scale`, not `transform`: the button's transform drives shrink, they compose instead of clashing. */
+  transition: scale var(--home-chart-grow-duration) var(--home-chart-enter-ease);
+}
+
+.chart-preview-card:hover,
+.chart-preview-card[data-demo-hover] {
+  scale: var(--home-chart-hover-scale);
 }
 
 @keyframes chart-preview-in {
@@ -71,7 +79,8 @@
     animation: none;
   }
 
-  .chart-preview {
+  .chart-preview,
+  .chart-preview-card {
     transition: none;
   }
 }

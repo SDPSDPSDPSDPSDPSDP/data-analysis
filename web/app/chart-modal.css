@@ -103,6 +103,18 @@ html:has(.chart-modal[open]) {
   max-height: var(--modal-chart-height);
 }
 
+/* Height-capped charts would letterbox inside a full-width figure, leaving the copy button off the image corner. */
+.chart-modal .chart {
+  align-self: center;
+}
+
+/* Sized by width, not a fixed height: a width-capped fixed height letterboxes the chart away from the copy button. */
+.chart-modal .chart img {
+  width: calc(var(--modal-chart-height) * var(--aspect));
+  height: auto;
+  max-width: 100%;
+}
+
 /* Default shimmer is black on light, invisible on the dark backdrop. */
 .chart-modal .skeleton {
   background-image: linear-gradient(90deg, var(--color-button) 25%, var(--color-button-hover) 50%, var(--color-button) 75%);
