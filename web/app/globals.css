@@ -112,6 +112,7 @@
   --radius-swatch: 2px;
   --button-height: 28px;
   --transition: 120ms ease;
+  --theme-fade-duration: 400ms;
 
   --runnable-height: 75vh;
   --data-format-chart-height: 50vh;
@@ -146,6 +147,19 @@
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-home-chart: 0 2px 12px rgba(0, 0, 0, 0.4);
   --color-scrollbar: rgba(255, 255, 255, 0.25);
+}
+
+/* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--theme-fade-duration);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 
 * {

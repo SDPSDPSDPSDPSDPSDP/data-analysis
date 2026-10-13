@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { flushSync } from "react-dom";
 import { STORAGE_KEY } from "./darkModeKey";
 
 const listeners = new Set<() => void>();
@@ -11,9 +12,14 @@ function subscribe(listener: () => void) {
 }
 
 export function setDarkMode(dark: boolean) {
-  localStorage.setItem(STORAGE_KEY, dark ? "1" : "0");
-  document.documentElement.dataset.theme = dark ? "dark" : "light";
-  listeners.forEach((listener) => listener());
+  const apply = () => {
+    localStorage.setItem(STORAGE_KEY, dark ? "1" : "0");
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    // Sync so the view transition snapshots the re-rendered charts, not the old ones.
+    flushSync(() => listeners.forEach((listener) => listener()));
+  };
+  if (document.startViewTransition) document.startViewTransition(apply);
+  else apply();
 }
 
 // Off during prerender, the stored choice applies after hydration.
