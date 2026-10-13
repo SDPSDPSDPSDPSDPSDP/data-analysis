@@ -107,8 +107,8 @@ export default function Nav({ categories, filter }: Props) {
         type="button"
         className="nav-link nav-theme"
         aria-pressed={dark}
-        aria-label="Dark mode charts"
-        title="Dark mode charts"
+        aria-label="Dark mode"
+        title="Dark mode"
         onClick={() => setDarkMode(!dark)}
       >
         {dark ? <Moon size="1em" aria-hidden /> : <Sun size="1em" aria-hidden />}

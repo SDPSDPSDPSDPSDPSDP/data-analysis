@@ -5,7 +5,6 @@ type Props = {
   src: string;
   title: string;
   subtitle: string | null;
-  dark: boolean;
   // Position in the grid, staggers the entrance animation.
   index: number;
   // Another card was clicked, this one shrinks out of the way.
@@ -19,7 +18,7 @@ type Props = {
 };
 
 // Chart only, no code: opens the example in a modal where it can be edited.
-export default function ChartPreview({ src, title, subtitle, dark, index, shrunk, hidden, returning, onOpen }: Props) {
+export default function ChartPreview({ src, title, subtitle, index, shrunk, hidden, returning, onOpen }: Props) {
   return (
     <button
       type="button"
@@ -27,7 +26,7 @@ export default function ChartPreview({ src, title, subtitle, dark, index, shrunk
       style={{ "--i": index } as CSSProperties}
       onClick={(event) => onOpen(event.currentTarget)}
     >
-      <span className={`chart-preview-card${dark ? " dark" : ""}`}>
+      <span className="chart-preview-card">
         <span className="chart-preview-title">{title}</span>
         {subtitle && <span className="chart-preview-subtitle">{subtitle}</span>}
         <img src={src} alt={title} loading="lazy" />

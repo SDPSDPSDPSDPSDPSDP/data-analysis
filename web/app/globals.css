@@ -131,6 +131,23 @@
   --z-scrollbar: 1200;
 }
 
+/* Set by lib/darkMode.ts. Cards match the dark_mode=True chart background, so charts sit flush. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: var(--color-chart-dark-bg);
+  --color-bg-home: #121212;
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-shimmer: rgba(255, 255, 255, 0.12);
+  --color-error: #ff6b81;
+  --color-glass: rgba(30, 30, 30, 0.7);
+  --text-primary: rgba(255, 255, 255, 0.93);
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --text-secondary: rgba(255, 255, 255, 0.53);
+  --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-home-chart: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --color-scrollbar: rgba(255, 255, 255, 0.25);
+}
+
 * {
   box-sizing: border-box;
   scrollbar-width: none;
