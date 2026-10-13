@@ -23,7 +23,7 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "shirin charts",
+  title: "Shirin's Charts",
   description: "Write Python on the left, see the shirin chart on the right.",
 };
 
