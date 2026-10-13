@@ -16,6 +16,8 @@ export default function OverlayScrollbar() {
   const thumbRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Embedded in the portfolio, the host page owns scrolling.
+    if (window.self !== window.top) return;
     const root = document.documentElement;
     const thumb = thumbRef.current!;
     let target: Element = root;
