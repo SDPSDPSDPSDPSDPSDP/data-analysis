@@ -67,7 +67,7 @@
   --nav-dim-blur: 1.5px;
   --nav-dim-transition: 350ms ease;
   --nav-brand-hover-scale: 1.08;
-  --home-chart-columns: 4;
+  --home-chart-min-width: 260px;
   --home-chart-scale: 70%;
   --home-chart-enter-stagger: 180ms;
   --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);
