@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (localStorage.getItem("${STORAGE_KEY}") === "1") document.documentElement.dataset.theme = "dark";`,
+            __html: `if (localStorage.getItem("${STORAGE_KEY}") !== "0") document.documentElement.dataset.theme = "dark";`,
           }}
         />
       </head>
