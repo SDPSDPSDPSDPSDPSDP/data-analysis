@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import HomeGallery from "@/components/domain/HomeGallery";
 import { getCategories, getHomeCharts } from "@/app/categories";
 import { getPinnedCharts } from "../pinned";
+import DemoCursor from "./DemoCursor";
 import "../portfolio.css";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function PortfolioHome() {
   return (
     <div className="portfolio-home">
       <HomeGallery categories={getCategories()} charts={charts} pinned={getPinnedCharts(charts)} />
+      <DemoCursor />
     </div>
   );
 }

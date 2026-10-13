@@ -62,7 +62,8 @@
   transition: scale var(--home-chart-grow-duration) var(--home-chart-enter-ease);
 }
 
-.chart-preview-card:hover {
+.chart-preview-card:hover,
+.chart-preview-card[data-demo-hover] {
   scale: var(--home-chart-hover-scale);
 }
 

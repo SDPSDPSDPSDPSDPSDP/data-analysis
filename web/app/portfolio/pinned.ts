@@ -15,10 +15,10 @@ const PINNED: ([string, string] | null)[] = [
   ["Bar charts", "Share of fruit sold"],
   ["Bar charts", "Ripe vs unripe fruit"],
   ["Bar charts", "Fruit sweetness"],
-  ["Bar charts", "Sour fruit"],
-  ["Bar charts", "Fruit stock by ripeness"],
   ["Pie charts", "Fruit basket"],
   ["Scatter plots", "Heavier fruit is sweeter"],
+  ["Bar charts", "Sour fruit"],
+  ["Bar charts", "Fruit stock by ripeness"],
 ];
 
 export function getPinnedCharts(charts: Chart[]): (Chart | null)[] {

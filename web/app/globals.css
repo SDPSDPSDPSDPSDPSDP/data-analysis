@@ -70,7 +70,19 @@
   --home-chart-min-width: 260px;
   --portfolio-home-columns: 4;
   --portfolio-still-columns: 5;
-  --portfolio-still-chart-scale: 80%;
+  --portfolio-still-chart-scale: 72%;
+  --z-demo-cursor: 1300;
+  --demo-cursor-size: 22px;
+  --demo-cursor-fill: #fff;
+  --demo-cursor-stroke: rgba(0, 0, 0, 0.87);
+  --demo-cursor-stroke-width: 1.5px;
+  --demo-cursor-shadow: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+  --demo-cursor-fade: 200ms ease;
+  --demo-cursor-press: 120ms ease-out;
+  --demo-cursor-pressed-scale: 0.82;
+  /* Tip of the arrow inside its 24px box, so the tip, not the corner, lands on the target. */
+  --demo-cursor-tip-x: 4px;
+  --demo-cursor-tip-y: 2px;
   --home-chart-scale: 70%;
   --home-chart-hover-scale: 1.12;
   --home-chart-enter-stagger: 180ms;

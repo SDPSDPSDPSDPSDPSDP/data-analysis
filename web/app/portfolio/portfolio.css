@@ -52,6 +52,7 @@
 
 .portfolio-still .home-charts {
   grid-template-columns: repeat(var(--portfolio-still-columns), 1fr);
+  row-gap: var(--space-6);
 }
 
 /* No nav here, so the page fills the whole viewport. */
@@ -63,4 +64,38 @@
 .portfolio-still .chart-preview-title,
 .portfolio-still .chart-preview-subtitle {
   display: none;
+}
+
+.demo-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--demo-cursor-size);
+  height: var(--demo-cursor-size);
+  pointer-events: none;
+  z-index: var(--z-demo-cursor);
+  opacity: 0;
+  filter: var(--demo-cursor-shadow);
+  transition: opacity var(--demo-cursor-fade);
+  will-change: transform;
+}
+
+.demo-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.demo-cursor svg {
+  display: block;
+  transform-origin: var(--demo-cursor-tip-x) var(--demo-cursor-tip-y);
+  transition: transform var(--demo-cursor-press);
+}
+
+.demo-cursor svg[data-pressed="true"] {
+  transform: scale(var(--demo-cursor-pressed-scale));
+}
+
+.demo-cursor path {
+  fill: var(--demo-cursor-fill);
+  stroke: var(--demo-cursor-stroke);
+  stroke-width: var(--demo-cursor-stroke-width);
 }
