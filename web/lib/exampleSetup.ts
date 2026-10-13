@@ -8,18 +8,16 @@ export function exampleSetup(globalSetup: string, setup: SetupCell[], example: E
 const PLOT_GRAPHS = /PlotGraphs\(([^)]*)\)/g;
 const DARK_MODE_ARG = /,\s*dark_mode=(True|False)/g;
 
-// Palette colors too dark to read on the dark background, swapped for a lighter one in dark mode.
-const DARK_PALETTE_SWAPS: [light: string, dark: string][] = [
-  ['"#d6dde6"', '"#ffffff"'],
-];
+// Palette grey too dark to read on the dark background, swapped for white in dark mode.
+const LIGHT_GREY = '"#d6dde6"';
+const WHITE = '"#ffffff"';
 
 // Adds or removes dark_mode=True on every PlotGraphs(...) call, so the setup shows what draws the charts.
 export function withDarkMode(code: string, dark: boolean): string {
   if (!code.includes("PlotGraphs(")) throw new Error(`No PlotGraphs(...) call to toggle dark mode on:\n${code}`);
   const stripped = code.replace(PLOT_GRAPHS, (call) => call.replace(DARK_MODE_ARG, ""));
-  const swapped = DARK_PALETTE_SWAPS.reduce(
-    (acc, [light, darkColor]) => (dark ? acc.replaceAll(light, darkColor) : acc.replaceAll(darkColor, light)),
-    stripped,
-  );
-  return dark ? swapped.replace(PLOT_GRAPHS, "PlotGraphs($1, dark_mode=True)") : swapped;
+  if (!dark) return stripped.replaceAll(WHITE, LIGHT_GREY);
+  return stripped
+    .replaceAll(LIGHT_GREY, WHITE)
+    .replace(PLOT_GRAPHS, (_, args: string) => `PlotGraphs(${args ? `${args}, ` : ""}dark_mode=True)`);
 }

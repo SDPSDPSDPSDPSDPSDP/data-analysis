@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
 import "./globals.css";
+import "./base.css";
 import "./nav.css";
 import "./code.css";
 import "./examples.css";

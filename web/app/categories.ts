@@ -165,6 +165,7 @@ export function getHomeCharts() {
         section.homeExamples.map((example) => {
           const setup = exampleSetup(globalSetup, section.setup, example);
           const { title, subtitle, previewCode } = splitTitle(example.code);
+          const cardCode = `${setup}\n${previewCode}`;
           if (!example.preview || !example.darkPreview) throw new Error(`Home gallery example has no preview:\n${example.code}`);
           return {
             setup,
@@ -173,8 +174,8 @@ export function getHomeCharts() {
             subtitle,
             preview: example.preview,
             darkPreview: example.darkPreview,
-            cardPreview: previewPath(`${setup}\n${previewCode}`),
-            darkCardPreview: previewPath(withDarkMode(`${setup}\n${previewCode}`, true)),
+            cardPreview: previewPath(cardCode),
+            darkCardPreview: previewPath(withDarkMode(cardCode, true)),
             section: section.title,
             category: category.title,
           };
