@@ -5,8 +5,9 @@
   "scripts": {
     "predev": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "dev": "node scripts/dev.mjs",
-    "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
-    "build": "next build"
+    "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs && npm run portfolio:loc",
+    "build": "next build",
+    "portfolio:loc": "node scripts/loc/count_loc.mjs"
   },
   "dependencies": {
     "@codemirror/lang-python": "6.2.1",
