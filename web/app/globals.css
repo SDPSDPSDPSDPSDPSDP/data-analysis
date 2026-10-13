@@ -73,6 +73,7 @@
   --portfolio-home-columns: 4;
   --portfolio-still-columns: 5;
   --portfolio-still-chart-scale: 80%;
+  --portfolio-still-chart-max-height: 110px;
   --portfolio-still-row-gap: 80px;
   --z-demo-cursor: 1300;
   --demo-cursor-size: 22px;
@@ -140,7 +141,7 @@
   --color-surface: rgba(255, 255, 255, 0.06);
   --color-shimmer: rgba(255, 255, 255, 0.12);
   --color-error: #ff6b81;
-  --color-glass: rgba(30, 30, 30, 0.7);
+  --color-glass: rgba(30, 30, 30, 0.92);
   --text-primary: rgba(255, 255, 255, 0.93);
   --text-muted: rgba(255, 255, 255, 0.7);
   --text-secondary: rgba(255, 255, 255, 0.53);

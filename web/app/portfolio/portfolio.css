@@ -39,6 +39,7 @@
 
 .portfolio-still {
   --home-chart-scale: var(--portfolio-still-chart-scale);
+  --home-chart-max-height: var(--portfolio-still-chart-max-height);
 }
 
 /* Fixed count beats the narrow-screen two-column rule in home.css. */
