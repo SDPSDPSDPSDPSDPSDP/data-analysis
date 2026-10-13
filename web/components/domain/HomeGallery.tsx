@@ -98,6 +98,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
                 src={dark ? chart.darkCardPreview : chart.cardPreview}
                 title={chart.title}
                 subtitle={chart.subtitle}
+                dark={dark}
                 index={index}
                 shrunk={leaving || (selected !== null && selected !== chart)}
                 hidden={open?.chart === chart && !open.returning}

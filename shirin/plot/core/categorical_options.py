@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import ClassVar, Dict, Optional
 
 from ..config import Sort, SortInput
+from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
     VALID_SORTS,
     VALID_ORIENTATIONS,
@@ -78,6 +79,7 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
     value: Optional[str] = None
     remainder: Optional[str] = None  # hue level drawn last, tinted from the other level unless the palette sets it
     category_palette: Optional[Dict[str, str]] = None  # with remainder: one color per bar instead of per hue level
+    background: str = BACKGROUND_COLOR  # remainder tint blends toward this, so it matches the dark mode background
 
     def validate(self) -> None:
         super().validate()

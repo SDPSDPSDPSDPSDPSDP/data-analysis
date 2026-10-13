@@ -97,6 +97,18 @@
   font-weight: var(--font-weight-heading);
 }
 
+.chart-preview-card.dark {
+  background: var(--color-chart-dark-bg);
+}
+
+.chart-preview-card.dark .chart-preview-title {
+  color: var(--text-on-dark);
+}
+
+.chart-preview-card.dark .chart-preview-subtitle {
+  color: var(--text-on-dark-secondary);
+}
+
 .chart-preview img {
   margin-top: var(--space-0-25);
   width: 100%;

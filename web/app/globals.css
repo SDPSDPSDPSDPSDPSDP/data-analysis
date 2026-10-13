@@ -11,6 +11,8 @@
   --z-nav: 1000;
   --z-tooltip: 1100;
   --color-code-bg: #1e1e1e;
+  /* Matches the dark_mode=True chart background in shirin/plot/config/colors.py. */
+  --color-chart-dark-bg: #1e1e1e;
   --color-code-highlight: rgba(255, 255, 255, 0.05);
   /* Syntax colors, applied by CodeBlock's highlight style. */
   --code-text: #d3d8e1;

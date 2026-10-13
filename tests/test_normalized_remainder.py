@@ -110,3 +110,12 @@ def test_normalized_barplot_hue_equal_to_axis_draws_full_width_share_bars() -> N
     plot.render()
     assert {round(rect.x1 - rect.x0, 3) for rect in plot.chart.rects} == {FigureSize.BAR_GROUP_WIDTH}
     assert sorted(text.text for text in plot.chart.texts) == ['25,0%', '75,0%']
+
+
+def test_dark_mode_remainder_tints_toward_dark_background(shown: list) -> None:
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7]})
+    PlotGraphs(dark_mode=True, palette={'run': {'a': '#ff0000'}}).bar(
+        df, y='run', value='acc', hue='run', remainder=True, normalized=True,
+    )
+    assert f'fill="{blend("#ff0000", "#1e1e1e", REMAINDER_TINT)}"' in shown[0]
+    assert f'fill="{blend("#ff0000", "#ffffff", REMAINDER_TINT)}"' not in shown[0]

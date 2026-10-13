@@ -118,7 +118,7 @@
   transition: color var(--transition), background var(--transition);
 }
 
-.nav button.nav-link[aria-pressed="true"] {
+.nav button.nav-link:not(.nav-theme)[aria-pressed="true"] {
   background: var(--color-bg);
 }
 
