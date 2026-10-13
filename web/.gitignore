@@ -7,3 +7,4 @@ public/shirin.whl
 lib/docstrings.json
 public/previews/
 public/portfolio/LOC.txt
+.env*.local

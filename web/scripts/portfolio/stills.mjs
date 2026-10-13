@@ -5,7 +5,7 @@
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { captureStills } from "../../../../../Portfolio/scripts/capture-stills.mjs";
 
-const url = process.env.SITE_BASE_URL ?? "https://shirins-data-analysis.vercel.app";
+const url = "https://shirins-data-analysis.vercel.app";
 
 export const STILLS = [
   // Past the home gallery's staggered fly-in.
