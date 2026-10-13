@@ -15,9 +15,12 @@ type Props = {
   charts: Chart[];
   // Off on portfolio screens: the host page frames them with its own chrome.
   showNav?: boolean;
+  // Fixed chart per leading slot; null slots and everything after get the shuffled rest. `limit` caps how many show.
+  pinned?: (Chart | null)[];
+  limit?: number;
 };
 
-export default function HomeGallery({ categories, charts, showNav = true }: Props) {
+export default function HomeGallery({ categories, charts, showNav = true, pinned = [], limit = charts.length }: Props) {
   const router = useRouter();
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
@@ -29,13 +32,15 @@ export default function HomeGallery({ categories, charts, showNav = true }: Prop
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
   // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
   useEffect(() => {
-    const shuffled = [...charts];
+    // Matched by preview path: props arrive as separate copies, and titles repeat.
+    const shuffled = charts.filter((chart) => !pinned.some((slot) => slot?.preview === chart.preview));
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    setOrder(shuffled);
-  }, [charts]);
+    const slotted = pinned.map((chart) => chart ?? shuffled.shift()!);
+    setOrder([...slotted, ...shuffled].slice(0, limit));
+  }, [charts, pinned, limit]);
 
   // Set while switching filter: every card shrinks away before the new ones fade in.
   const [leaving, setLeaving] = useState(false);

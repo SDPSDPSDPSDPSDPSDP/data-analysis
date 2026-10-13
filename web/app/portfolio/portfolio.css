@@ -44,4 +44,5 @@
 /* No nav here, so the page fills the whole viewport. */
 .portfolio-still .page {
   min-height: 100vh;
+  justify-content: center;
 }
