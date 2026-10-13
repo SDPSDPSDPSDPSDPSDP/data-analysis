@@ -26,7 +26,7 @@ export function parseExamples(file: string) {
   for (const cell of cells) {
     if (cell.label.startsWith("[hidden]")) hidden.push(cell.code);
     else if (!cell.label.startsWith("[")) {
-      const example = { code: cell.code, hiddenSetup: hidden.join("\n\n"), preview: null };
+      const example = { code: cell.code, hiddenSetup: hidden.join("\n\n"), preview: null, darkPreview: null };
       const homeOnly = cell.label.endsWith("[home-only]");
       if (!homeOnly) examples.push(example);
       if (homeOnly || (examples.length > 1 && !cell.label.endsWith("[no-home]"))) homeExamples.push(example);

@@ -122,6 +122,11 @@
   background: var(--color-bg);
 }
 
+/* Right edge of the nav: the menus are centered absolutely, so auto margin pushes past them. */
+.nav button.nav-theme {
+  margin: 0 0 0 auto;
+}
+
 .nav .nav-link-inactive {
   color: var(--text-secondary);
 }

@@ -1,7 +1,7 @@
 import type { Category } from "@/components/domain/Playground";
 import type { DataFormat, Example, PlotSectionData } from "@/components/domain/PlotSection";
 // Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
-import { exampleSetup } from "../lib/exampleSetup.ts";
+import { exampleSetup, withDarkMode } from "../lib/exampleSetup.ts";
 import { parseExamples, previewCodes, previewPath } from "./exampleFiles.ts";
 
 // Sections without a data format are tools: they draw no chart to prerender.
@@ -9,10 +9,10 @@ function section(title: string, file: string, ...dataFormats: DataFormat[]): Plo
   const { setup, examples, homeExamples } = parseExamples(file);
   if (dataFormats.length === 0) return { title, dataFormats, setup, examples, homeExamples };
   const globalSetup = getGlobalSetup();
-  const withPreview = (example: Example) => ({
-    ...example,
-    preview: previewPath(`${exampleSetup(globalSetup, setup, example)}\n${example.code}`),
-  });
+  const withPreview = (example: Example) => {
+    const code = `${exampleSetup(globalSetup, setup, example)}\n${example.code}`;
+    return { ...example, preview: previewPath(code), darkPreview: previewPath(withDarkMode(code, true)) };
+  };
   return { title, dataFormats, setup, examples: examples.map(withPreview), homeExamples: homeExamples.map(withPreview) };
 }
 
@@ -155,7 +155,7 @@ function splitTitle(code: string) {
 }
 
 // Home gallery charts. Sections without a data format are tools, not charts.
-// cardPreview is the gallery image without title, preview the full chart for the modal.
+// cardPreview is the gallery image without title, preview the full chart for the modal. dark* are the dark_mode=True versions.
 export function getHomeCharts() {
   const globalSetup = getGlobalSetup();
   return getCategories().flatMap((category) =>
@@ -165,14 +165,16 @@ export function getHomeCharts() {
         section.homeExamples.map((example) => {
           const setup = exampleSetup(globalSetup, section.setup, example);
           const { title, subtitle, previewCode } = splitTitle(example.code);
-          if (!example.preview) throw new Error(`Home gallery example has no preview:\n${example.code}`);
+          if (!example.preview || !example.darkPreview) throw new Error(`Home gallery example has no preview:\n${example.code}`);
           return {
             setup,
             code: example.code,
             title,
             subtitle,
             preview: example.preview,
+            darkPreview: example.darkPreview,
             cardPreview: previewPath(`${setup}\n${previewCode}`),
+            darkCardPreview: previewPath(withDarkMode(`${setup}\n${previewCode}`, true)),
             section: section.title,
             category: category.title,
           };

@@ -28,6 +28,14 @@ def test_every_method_renders(df: pd.DataFrame, shown: List[str]) -> None:
     assert all(svg.startswith('<svg') for svg in shown)
 
 
+def test_dark_mode_draws_charts_without_hue_white(df: pd.DataFrame, shown: List[str]) -> None:
+    PlotGraphs().bar(df, x='category')
+    PlotGraphs(dark_mode=True).bar(df, x='category')
+    light, dark = shown
+    assert 'fill="#d6dde6"' in light and 'fill="#d6dde6"' not in dark
+    assert 'fill="#ffffff"' in dark
+
+
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
     PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).bar(
         df, x='category', hue='group', title='Totals', legend=True

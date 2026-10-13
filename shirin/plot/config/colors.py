@@ -38,6 +38,7 @@ DARK_MODE_COLORS = {
     TextColors.LIGHT_GREY: '#999999',
     TextColors.FAINT_GREY: '#777777',
 }
+DARK_MODE_DEFAULT_COLOR = '#ffffff'  # replaces Colors.GREY for charts without hue or palette
 SHADE_BASE = '#333333'  # dark end when one color is spread over hue values
 SHADE_DARKEST_MIX = 0.3  # share of the color in the darkest shade
 

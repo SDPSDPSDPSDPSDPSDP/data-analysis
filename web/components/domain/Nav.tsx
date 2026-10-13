@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { sectionId } from "@/components/domain/PlotSection";
 import SectionIcon from "@/components/domain/SectionIcon";
+import { setDarkMode, useDarkMode } from "@/lib/darkMode";
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -23,6 +25,7 @@ export default function Nav({ categories, filter }: Props) {
   const [dropdownClosed, setDropdownClosed] = useState(false);
   // Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter.
   const pathname = usePathname();
+  const dark = useDarkMode();
   // Modified clicks open a new tab, home stays as is.
   function leave(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!filter || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -100,6 +103,16 @@ export default function Nav({ categories, filter }: Props) {
           ),
         )}
       </div>
+      <button
+        type="button"
+        className="nav-link nav-theme"
+        aria-pressed={dark}
+        aria-label="Dark mode charts"
+        title="Dark mode charts"
+        onClick={() => setDarkMode(!dark)}
+      >
+        {dark ? <Moon size="1em" aria-hidden /> : <Sun size="1em" aria-hidden />}
+      </button>
     </nav>
   );
 }

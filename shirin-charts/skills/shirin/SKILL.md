@@ -30,7 +30,7 @@ plot = PlotGraphs(
 )
 ```
 
-Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text.
+Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, white instead of grey for charts without hue.
 
 Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
 

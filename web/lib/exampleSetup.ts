@@ -4,3 +4,13 @@ import type { Example, SetupCell } from "@/components/domain/PlotSection";
 export function exampleSetup(globalSetup: string, setup: SetupCell[], example: Example): string {
   return [globalSetup, ...setup.map((cell) => cell.code), example.hiddenSetup].join("\n\n");
 }
+
+const PLOT_GRAPHS = /PlotGraphs\(([^)]*)\)/g;
+const DARK_MODE_ARG = /,\s*dark_mode=(True|False)/g;
+
+// Adds or removes dark_mode=True on every PlotGraphs(...) call, so the setup shows what draws the charts.
+export function withDarkMode(code: string, dark: boolean): string {
+  if (!code.includes("PlotGraphs(")) throw new Error(`No PlotGraphs(...) call to toggle dark mode on:\n${code}`);
+  const stripped = code.replace(PLOT_GRAPHS, (call) => call.replace(DARK_MODE_ARG, ""));
+  return dark ? stripped.replace(PLOT_GRAPHS, "PlotGraphs($1, dark_mode=True)") : stripped;
+}

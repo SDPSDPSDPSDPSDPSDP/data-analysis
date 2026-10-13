@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from .config.colors import DARK_MODE_DEFAULT_COLOR
 from .core import AbstractPlot
 from .config.palettes import (
     DEFAULT_LABEL_MAPPING,
@@ -35,7 +36,7 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
             `hue=col`, the matching palette is resolved automatically. Built-in entries
             (`is_correct`) apply unless overridden.
         label_mapping: Dict of `{column: {value: label}}`. Same resolution logic as `palette`.
-        dark_mode: Dark grey background with white text. *Default: `False`*.
+        dark_mode: Dark grey background with white text, white instead of grey for charts without hue. *Default: `False`*.
 
     Example:
         >>> plot = PlotGraphs(
@@ -62,7 +63,7 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
     def _column_config(self, column: Optional[str]) -> Dict[str, Any]:
         """palette and label_map configured for a hue (or pie col) column."""
         if column is None:
-            return {'palette': None, 'label_map': None}
+            return {'palette': DARK_MODE_DEFAULT_COLOR if self._dark_mode else None, 'label_map': None}
         return {'palette': self._palette.get(column), 'label_map': self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:

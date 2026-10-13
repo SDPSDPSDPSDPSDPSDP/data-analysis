@@ -3,6 +3,7 @@ import CodeBlock from "@/components/ui/CodeBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { exampleSetup } from "@/lib/exampleSetup";
+import { useDarkMode } from "@/lib/darkMode";
 
 export type SetupCell = {
   explanation: string;
@@ -21,6 +22,7 @@ export type Example = {
   hiddenSetup: string;
   // Prerendered SVG shown until Python has run, null for examples that draw no chart.
   preview: string | null;
+  darkPreview: string | null;
 };
 
 export type PlotSectionData = {
@@ -44,11 +46,12 @@ type Props = PlotSectionData & {
 };
 
 export default function PlotSection({ title, dataFormats, setup, examples, globalSetup, standalone, expanded }: Props) {
+  const dark = useDarkMode();
   const runnable = (example: Example, key?: number) => (
     <RunnableCode
       key={key}
       initialCode={example.code}
-      preview={example.preview}
+      preview={dark ? example.darkPreview : example.preview}
       setup={exampleSetup(globalSetup, setup, example)}
     />
   );
