@@ -35,6 +35,7 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
             `hue=col`, the matching palette is resolved automatically. Built-in entries
             (`is_correct`) apply unless overridden.
         label_mapping: Dict of `{column: {value: label}}`. Same resolution logic as `palette`.
+        dark_mode: Dark grey background with white text. *Default: `False`*.
 
     Example:
         >>> plot = PlotGraphs(
@@ -49,10 +50,12 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         font: Optional[str] = 'satoshi',
         palette: Optional[PaletteInput] = None,
         label_mapping: Optional[LabelMappingInput] = None,
+        dark_mode: bool = False,
     ) -> None:
         if font is not None and font.lower() != 'satoshi':
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         self._font = font
+        self._dark_mode = dark_mode
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
         self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
 
@@ -63,4 +66,4 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         return {'palette': self._palette.get(column), 'label_map': self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:
-        show(to_svg(plot.render(), font=self._font))
+        show(to_svg(plot.render(), font=self._font, dark_mode=self._dark_mode))
