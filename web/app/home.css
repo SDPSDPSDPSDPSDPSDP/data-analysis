@@ -26,6 +26,11 @@
     opacity var(--home-chart-grow-duration) var(--home-chart-enter-ease);
 }
 
+/* Grown card overlaps neighbours; later grid items would paint over it. */
+.chart-preview:has(> .chart-preview-card:hover, > .chart-preview-card[data-demo-hover]) {
+  z-index: 1;
+}
+
 .chart-preview.shrunk {
   transform: scale(0);
   opacity: 0;
