@@ -58,6 +58,16 @@
   color: var(--text-on-dark);
 }
 
+.code-block > .copy-button {
+  background: var(--color-code-button);
+  color: var(--code-button-text);
+}
+
+.code-block > .copy-button:hover {
+  background: var(--color-code-button-hover);
+  color: var(--code-button-text-hover);
+}
+
 .chart > .copy-button {
   background: var(--color-overlay-button);
   color: var(--text-on-dark-pure);
