@@ -115,11 +115,12 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
           origin={open.origin}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           section={open.chart.section}
-          onReturn={() => setOpen({ ...open, returning: true })}
-          onClose={() => {
-            setOpen(null);
+          // Other cards grow back while the chart flies, not after it lands.
+          onReturn={() => {
+            setOpen({ ...open, returning: true });
             setSelected(null);
           }}
+          onClose={() => setOpen(null)}
         />
       )}
     </>
