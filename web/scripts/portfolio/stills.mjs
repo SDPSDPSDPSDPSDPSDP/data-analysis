@@ -5,7 +5,8 @@
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { captureStills } from "../../../../../Portfolio/scripts/capture-stills.mjs";
 
-const url = "https://shirins-data-analysis.vercel.app";
+// --local shoots the running `npm run dev` server, to check a layout change before deploying.
+const url = process.argv.includes("--local") ? "http://localhost:6817" : "https://shirins-data-analysis.vercel.app";
 
 export const STILLS = [
   // Past the home gallery's staggered fly-in.
