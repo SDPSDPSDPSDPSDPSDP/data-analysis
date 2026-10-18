@@ -1,4 +1,3 @@
-
 A reusable package to create data visualizations quickly, efficiently and uniformly, plus helpers for repetitive data tasks:
 
 - `shirin.plot`: SVG charts (bar, histogram, time, scatter, pie) with its own renderer.
@@ -42,4 +41,5 @@ cd web; npm run dev
 Then open http://localhost:6817.
 
 ---
+
 WIP: This package is and always will be a work in progress.

@@ -27,8 +27,8 @@
     calc(var(--modal-enter-content-delay) + var(--modal-enter-content-duration)) both;
 }
 
-/* Closing fades back to front: docs button, then editor and close button, then the chart leaves as the backdrop lightens.
-   ChartModal waits for the chart, keep it last. */
+/* Closing is one movement: everything starts at once, the chart flies back as the rest fades and the backdrop lightens.
+   ChartModal waits for the chart (to-card) or the output (to-docs), keep them the slowest. */
 .chart-modal.closing :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child),
 .chart-modal.closing::backdrop,
 .chart-modal.to-docs .output,
@@ -36,21 +36,13 @@
   animation: chart-modal-out var(--modal-exit-duration) ease both;
 }
 
-.chart-modal.closing :is(.chart-modal-actions, .runnable > :first-child) {
-  animation-delay: var(--modal-exit-stagger);
-}
-
-.chart-modal.closing::backdrop,
-.chart-modal.to-docs .output,
-.chart-modal.to-card .output > :not(.flying) {
-  animation-delay: var(--modal-exit-chart-delay);
-}
-
-/* Chart flies back into its card while the backdrop lightens at the same pace.
-   Own keyframes, not the opening reversed: reversing flips the easing too, a slow start that snaps into the card. */
+/* Own keyframes, not the opening reversed: reversing flips the easing too, a slow start that snaps into the card. */
 .chart-modal.to-card .chart.flying {
-  animation: chart-modal-fly-back var(--modal-exit-fly-duration) var(--home-chart-enter-ease) var(--modal-exit-chart-delay)
-    both;
+  animation: chart-modal-fly-back var(--modal-exit-fly-duration) var(--home-chart-enter-ease) both;
+}
+
+.chart-modal.to-card::backdrop {
+  animation: chart-modal-out var(--modal-exit-fly-duration) var(--home-chart-enter-ease) both;
 }
 
 /* Fades out on the way, the card underneath has its title as text, the chart has it drawn in. */
@@ -62,16 +54,6 @@
     opacity: 0;
     transform: translate(var(--fly-x), var(--fly-y)) scale(var(--fly-scale));
   }
-}
-
-.chart-modal.to-card::backdrop {
-  animation-duration: var(--modal-exit-fly-duration);
-}
-
-/* Leaving for the docs page: everything fades at once, the docs page staggers in after. */
-.chart-modal.to-docs :is(.chart-modal-docs, .chart-modal-actions, .runnable > :first-child, .output),
-.chart-modal.to-docs::backdrop {
-  animation-delay: 0s;
 }
 
 @keyframes chart-modal-out {

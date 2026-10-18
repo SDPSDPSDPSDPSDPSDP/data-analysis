@@ -73,9 +73,9 @@
   --home-chart-min-width: 260px;
   --portfolio-home-columns: 4;
   --portfolio-still-columns: 5;
-  --portfolio-still-chart-scale: 80%;
-  --portfolio-still-chart-max-height: 110px;
-  --portfolio-still-row-gap: 80px;
+  --portfolio-still-chart-scale: 100%;
+  --portfolio-still-chart-max-height: 170px;
+  --portfolio-still-gap: var(--space-6);
   --z-demo-cursor: 1300;
   --demo-cursor-size: 22px;
   --demo-cursor-fill: #fff;
@@ -90,7 +90,7 @@
   --demo-cursor-tip-y: 2px;
   --home-chart-scale: 70%;
   --home-chart-max-height: 150px;
-  --home-chart-hover-scale: 1.12;
+  --home-chart-hover-scale: 1.5;
   --home-chart-enter-stagger: 180ms;
   --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);
   --home-chart-grow-duration: 400ms;
@@ -102,11 +102,9 @@
   --docs-enter-max-index: 8;
   --modal-enter-content-delay: 300ms;
   --modal-enter-content-duration: 900ms;
-  --modal-exit-stagger: 60ms;
   --modal-exit-duration: 180ms;
-  /* Chart leaves while the editor is still fading, closing should feel quicker than opening. */
-  --modal-exit-chart-delay: calc(2 * var(--modal-exit-stagger));
-  --modal-exit-fly-duration: 450ms;
+  /* Same as the other cards growing back, so the chart lands as they settle. */
+  --modal-exit-fly-duration: var(--home-chart-grow-duration);
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;

@@ -87,9 +87,11 @@
   background: var(--color-overlay-button);
 }
 
-/* Native modal dialogs still let the page behind them scroll. */
+/* Native modal dialogs still let the page behind them scroll.
+   Gutter kept: a vanishing scrollbar reflows the grid, so the chart would fly back to a card that moved. */
 html:has(.chart-modal[open]) {
   overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 .chart-modal .runnable {

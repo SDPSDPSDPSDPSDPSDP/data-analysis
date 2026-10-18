@@ -11,8 +11,8 @@ type Props = {
   setup: string;
   code: string;
   preview: string;
-  // Spot of the card that opened the modal, the chart flies from there into place.
-  origin: DOMRect;
+  // Card that opened the modal, the chart flies between it and its own spot.
+  card: HTMLElement;
   // Full page with this chart's examples.
   href: string;
   // Section title, names the documentation button.
@@ -22,7 +22,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, preview, origin, href, section, onReturn, onClose }: Props) {
+export default function ChartModal({ setup, code, preview, card, href, section, onReturn, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -30,8 +30,10 @@ export default function ChartModal({ setup, code, preview, origin, href, section
 
   // FLIP: figure laid out in place, CSS animates it between the card's rect and its own.
   // Measuring while already flying would read the card's spot, not the target, so the flight is dropped first.
+  // Card measured each time: its hover growth from the click is gone by the time the chart flies back.
   function aim(chart: HTMLElement) {
     chart.classList.remove("flying");
+    const origin = card.getBoundingClientRect();
     const target = chart.getBoundingClientRect();
     chart.style.setProperty("--fly-x", `${origin.left - target.left}px`);
     chart.style.setProperty("--fly-y", `${origin.top - target.top}px`);
