@@ -42,8 +42,7 @@
 
 /* Crossfades with the modal chart over the second half of its flight back, see chart-modal-fly-back. */
 .chart-preview.returning {
-  animation: chart-preview-in calc(var(--modal-exit-fly-duration) / 2) ease
-    calc(var(--modal-exit-chart-delay) + var(--modal-exit-fly-duration) / 2) both;
+  animation: chart-preview-in calc(var(--modal-exit-fly-duration) / 2) ease calc(var(--modal-exit-fly-duration) / 2) both;
 }
 
 .chart-preview-card {

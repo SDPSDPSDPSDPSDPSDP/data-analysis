@@ -102,11 +102,9 @@
   --docs-enter-max-index: 8;
   --modal-enter-content-delay: 300ms;
   --modal-enter-content-duration: 900ms;
-  --modal-exit-stagger: 60ms;
   --modal-exit-duration: 180ms;
-  /* Chart leaves while the editor is still fading, closing should feel quicker than opening. */
-  --modal-exit-chart-delay: calc(2 * var(--modal-exit-stagger));
-  --modal-exit-fly-duration: 450ms;
+  /* Same as the other cards growing back, so the chart lands as they settle. */
+  --modal-exit-fly-duration: var(--home-chart-grow-duration);
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;
