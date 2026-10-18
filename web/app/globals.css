@@ -23,8 +23,8 @@
   --code-text: rgba(0, 0, 0, 0.87);
   --code-keyword: #0000ff;
   --code-name: #001080;
-  --code-function: #e36209;
-  --code-constant: #0070c1;
+  --code-function: #795e26;
+  --code-constant: #0000ff;
   --code-class: #267f99;
   --code-operator: rgba(0, 0, 0, 0.87);
   --code-string: #a31515;
@@ -161,7 +161,7 @@
   --code-keyword: #569cd6;
   --code-name: #9cdcfe;
   --code-function: #dcdcaa;
-  --code-constant: #4fc1ff;
+  --code-constant: #569cd6;
   --code-class: #4ec9b0;
   --code-operator: #d4d4d4;
   --code-string: #ce9178;
