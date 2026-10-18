@@ -31,9 +31,9 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
   const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
-  // Origin is the clicked card's spot, the modal chart flies out of it.
+  // Card is the clicked one, the modal chart flies out of it.
   // Returning: modal chart is flying back, its card shows again.
-  const [open, setOpen] = useState<{ chart: Chart; origin: DOMRect; returning?: boolean } | null>(null);
+  const [open, setOpen] = useState<{ chart: Chart; card: HTMLElement; returning?: boolean } | null>(null);
   const [order, setOrder] = useState<Chart[] | null>(null);
   // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
   // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
@@ -63,7 +63,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
     setSelected(chart);
     const image = new Image();
     image.src = dark ? chart.darkPreview : chart.preview;
-    image.decode().then(() => setOpen({ chart, origin: card.querySelector(".chart-preview-card")!.getBoundingClientRect() }));
+    image.decode().then(() => setOpen({ chart, card }));
   }
 
   function selectFilter(next: string | null) {
@@ -112,7 +112,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
           setup={withDarkMode(open.chart.setup, dark)}
           code={open.chart.code}
           preview={dark ? open.chart.darkPreview : open.chart.preview}
-          origin={open.origin}
+          card={open.card}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           section={open.chart.section}
           // Other cards grow back while the chart flies, not after it lands.
