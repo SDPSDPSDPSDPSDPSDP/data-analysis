@@ -72,10 +72,10 @@
   --nav-brand-hover-scale: 1.08;
   --home-chart-min-width: 260px;
   --portfolio-home-columns: 4;
-  --portfolio-still-columns: 4;
+  --portfolio-still-columns: 5;
   --portfolio-still-chart-scale: 100%;
-  --portfolio-still-chart-max-height: 200px;
-  --portfolio-still-row-gap: var(--space-2);
+  --portfolio-still-chart-max-height: 170px;
+  --portfolio-still-gap: var(--space-6);
   --z-demo-cursor: 1300;
   --demo-cursor-size: 22px;
   --demo-cursor-fill: #fff;

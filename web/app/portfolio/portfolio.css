@@ -57,8 +57,8 @@
 
 .portfolio-still .home-charts {
   grid-template-columns: repeat(var(--portfolio-still-columns), 1fr);
-  row-gap: var(--portfolio-still-row-gap);
-  padding-inline: var(--space-2);
+  gap: var(--portfolio-still-gap);
+  padding-inline: var(--space-3);
 }
 
 /* No nav here, so the page fills the whole viewport. */

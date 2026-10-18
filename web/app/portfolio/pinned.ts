@@ -6,8 +6,7 @@ type Chart = ReturnType<typeof getHomeCharts>[number];
 // null slots and the rest are shuffled.
 type Slots = ([string, string] | null)[];
 
-// Live gallery and still share the 4-column grid; the still stops after three rows.
-export const PINNED: Slots = [
+export const STILL_PINNED: Slots = [
   ["Scatter plots", "Days on tree"],
   ["Bar charts", "Sweetness, ripe vs unripe"],
   ["Bar charts", "Fruits A to Z"],
@@ -18,11 +17,14 @@ export const PINNED: Slots = [
   ["Bar charts", "Share of fruit sold"],
   ["Bar charts", "Ripe vs unripe fruit"],
   ["Bar charts", "Fruit sweetness"],
-  ["Pie charts", "Fruit basket"],
-  ["Scatter plots", "Heavier fruit is sweeter"],
   ["Bar charts", "Sour fruit"],
   ["Bar charts", "Fruit stock by ripeness"],
+  ["Pie charts", "Fruit basket"],
+  ["Scatter plots", "Heavier fruit is sweeter"],
 ];
+
+// Live gallery leads its last row with the pie and scatter; the still keeps them at the end.
+export const HOME_PINNED: Slots = [...STILL_PINNED.slice(0, 10), ...STILL_PINNED.slice(12), ...STILL_PINNED.slice(10, 12)];
 
 export function getPinnedCharts(charts: Chart[], slots: Slots): (Chart | null)[] {
   return slots.map((slot) => {
