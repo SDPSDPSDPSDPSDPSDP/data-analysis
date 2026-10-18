@@ -3,6 +3,7 @@
 4.0 replaced matplotlib/seaborn with an own SVG renderer and merged the per-orientation methods into one `bar`. Rewrite old calls with the tables below. Check the installed version first: `importlib.metadata.version('shirin')`.
 
 How to spot the version of old code:
+
 - `Palette` / `LabelMapping` subclasses, `@resolve_palette`: 3.x.
 - `palette=` passed per plot call, `font=` on `PlotGraphs`: 2.6 - 2.9.
 - `accuracy_plot(...)`: 2.8. `accuracy(...)`: 2.9 - 3.x.
@@ -11,16 +12,16 @@ How to spot the version of old code:
 
 ## Removed outright
 
-| Old | 4.x |
-|-----|-----|
-| `PlotGraphs(export=, output_dir=, prefix=, format=)` | Removed. Charts display inline only. |
-| `output_name=` on every plot method | Remove. |
-| `legend_offset=`, `ncol=` | Remove. Layout is automatic. |
-| `figsize_width=`, `figsize_height=` | Remove. Size is automatic. |
-| `plt.title(...)`, `plt.savefig(...)`, any `plt.*` after a plot | Remove. Use `title=`. There is no matplotlib figure anymore. |
-| `configure_matplotlib()` | Remove. |
-| `pd.set_option('display.max_colwidth' / 'display.width')` side effect of `import shirin.plot` | Gone. Set it yourself if the notebook relied on it. |
-| seaborn palette names (`palette='viridis'`) | Not supported. A string palette is now one hex color, values get shades of it. |
+| Old                                                                                           | 4.x                                                                            |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `PlotGraphs(export=, output_dir=, prefix=, format=)`                                          | Removed. Charts display inline only.                                           |
+| `output_name=` on every plot method                                                           | Remove.                                                                        |
+| `legend_offset=`, `ncol=`                                                                     | Remove. Layout is automatic.                                                   |
+| `figsize_width=`, `figsize_height=`                                                           | Remove. Size is automatic.                                                     |
+| `plt.title(...)`, `plt.savefig(...)`, any `plt.*` after a plot                                | Remove. Use `title=`. There is no matplotlib figure anymore.                   |
+| `configure_matplotlib()`                                                                      | Remove.                                                                        |
+| `pd.set_option('display.max_colwidth' / 'display.width')` side effect of `import shirin.plot` | Gone. Set it yourself if the notebook relied on it.                            |
+| seaborn palette names (`palette='viridis'`)                                                   | Not supported. A string palette is now one hex color, values get shades of it. |
 
 Saving to a file was the point of `export=True`. 4.x has no API for it; tell the user. Workaround, same hook the web playground uses:
 
@@ -31,12 +32,12 @@ ap.show = lambda svg: open('chart.svg', 'w', encoding='utf-8').write(svg)
 
 ## PlotGraphs constructor
 
-| Old | 4.x |
-|-----|-----|
-| `font=None` default (matplotlib font) | `font='satoshi'` default. Pass `font=None` for the viewer's sans-serif. |
-| `palette=MyPalettes` (`Palette` subclass, 3.x) | `palette={'col': {...}, ...}` plain dict. One key per class attribute. |
-| `label_mapping=MyLabels` (`LabelMapping` subclass, 3.x) | `label_mapping={'col': {...}}` plain dict. |
-| `from shirin.plot import Palette, LabelMapping` | Remove import. Built-in `is_correct` entries still apply. |
+| Old                                                     | 4.x                                                                     |
+| ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `font=None` default (matplotlib font)                   | `font='satoshi'` default. Pass `font=None` for the viewer's sans-serif. |
+| `palette=MyPalettes` (`Palette` subclass, 3.x)          | `palette={'col': {...}, ...}` plain dict. One key per class attribute.  |
+| `label_mapping=MyLabels` (`LabelMapping` subclass, 3.x) | `label_mapping={'col': {...}}` plain dict.                              |
+| `from shirin.plot import Palette, LabelMapping`         | Remove import. Built-in `is_correct` entries still apply.               |
 
 ```python
 # 3.x
@@ -66,54 +67,54 @@ If the same hue column needs different colors in different charts, make a second
 
 ## Shared argument renames (all methods)
 
-| Old | 4.x |
-|-----|-----|
-| `xlabel=` | `x_axis_label=` |
-| `ylabel=` | `y_axis_label=` |
+| Old                                     | 4.x                                                                               |
+| --------------------------------------- | --------------------------------------------------------------------------------- |
+| `xlabel=`                               | `x_axis_label=`                                                                   |
+| `ylabel=`                               | `y_axis_label=`                                                                   |
 | `plot_legend=True` (default was `True`) | `legend=` (default now `False`). Pass `legend=True` where a hue legend was shown. |
-| `show_labels=` | `data_labels=` |
-| `order_type=` | `sort=` (same options `'frequency'`, `'alphabetical'`) |
-| no title argument | `title='...'` or `['title', 'subtitle']` |
+| `show_labels=`                          | `data_labels=`                                                                    |
+| `order_type=`                           | `sort=` (same options `'frequency'`, `'alphabetical'`)                            |
+| no title argument                       | `title='...'` or `['title', 'subtitle']`                                          |
 
 ## Method mapping
 
-| Old | 4.x |
-|-----|-----|
-| `countplot_x(df, x=...)` | `bar(df, x=...)` |
-| `countplot_y(df, y=...)` | `bar(df, y=...)` |
-| `countplot_x/_y(..., hue=h, normalized=True)` | `bar(..., hue=h, normalized=True)`. No dict palette needed anymore. |
-| `countplot_x/_y(..., normalized=True)` without hue | `bar(..., normalized=True)` |
-| `countplot_y_normalized(df, y, hue)` (2.0) | `bar(df, y=y, hue=hue, normalized=True)` |
-| `barplot_x(df, x=..., value=...)` | `bar(df, x=..., value=...)` |
-| `barplot_y(df, y=..., value=...)` | `bar(df, y=..., value=...)` |
-| `barplot_x/_y(..., percentage_labels=True)` | `bar(..., normalized=True)` (labels show share of total) |
-| `stacked_labels='percentage'` | No equivalent. Closest: `normalized=True` with `hue` (100% stacked bars). Ask the user. |
-| `stacked_labels='standard'` / `None` | Remove. Totals are labelled by default. |
-| `accuracy(df, experiment=e, accuracy=a)` / `accuracy_plot(...)` | `bar(df, x=e, value=a, normalized=True, remainder=True)` |
-| `accuracy(..., orientation='horizontal')` | `bar(df, y=e, value=a, normalized=True, remainder=True)` |
-| `accuracy(..., experiment_label=, accuracy_label=)` | `x_axis_label=`, `y_axis_label=` (swap for horizontal) |
-| `accuracy(..., color_correct=c)` | `PlotGraphs(palette={a: c})` (a = accuracy column name) |
-| `accuracy(..., color_incorrect=, reverse=, reverse_order=)` | Remove. Remainder color and order are automatic. |
-| `histogram(...)` | Same name. Rename shared args. `suffix=` now applies to x ticks. |
-| `lineplot(...)` | `time(...)`. Rename shared args. |
-| `pie(df, col, palette=...)` | `pie(df, col)` with palette in the constructor under key `col`. |
-| `timeplot(df, x)` (bars) | `bar(df, x=x, group_by='day')`. `time` draws lines only. |
-| `timeplot(..., type='line')` | `time(..., group_by='day')` |
-| `timeplot(..., palette='#hex')` | Remove. No color argument. |
-| `timeplot` (now `time`) default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it. |
-| - | New: `scatter(df, x, y, hue=, size=)` |
-| `scatterplot(...)` | `scatter(...)` |
+| Old                                                                                    | 4.x                                                                                     |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `countplot_x(df, x=...)`                                                               | `bar(df, x=...)`                                                                        |
+| `countplot_y(df, y=...)`                                                               | `bar(df, y=...)`                                                                        |
+| `countplot_x/_y(..., hue=h, normalized=True)`                                          | `bar(..., hue=h, normalized=True)`. No dict palette needed anymore.                     |
+| `countplot_x/_y(..., normalized=True)` without hue                                     | `bar(..., normalized=True)`                                                             |
+| `countplot_y_normalized(df, y, hue)` (2.0)                                             | `bar(df, y=y, hue=hue, normalized=True)`                                                |
+| `barplot_x(df, x=..., value=...)`                                                      | `bar(df, x=..., value=...)`                                                             |
+| `barplot_y(df, y=..., value=...)`                                                      | `bar(df, y=..., value=...)`                                                             |
+| `barplot_x/_y(..., percentage_labels=True)`                                            | `bar(..., normalized=True)` (labels show share of total)                                |
+| `stacked_labels='percentage'`                                                          | No equivalent. Closest: `normalized=True` with `hue` (100% stacked bars). Ask the user. |
+| `stacked_labels='standard'` / `None`                                                   | Remove. Totals are labelled by default.                                                 |
+| `accuracy(df, experiment=e, accuracy=a)` / `accuracy_plot(...)`                        | `bar(df, x=e, value=a, normalized=True, remainder=True)`                                |
+| `accuracy(..., orientation='horizontal')`                                              | `bar(df, y=e, value=a, normalized=True, remainder=True)`                                |
+| `accuracy(..., experiment_label=, accuracy_label=)`                                    | `x_axis_label=`, `y_axis_label=` (swap for horizontal)                                  |
+| `accuracy(..., color_correct=c)`                                                       | `PlotGraphs(palette={a: c})` (a = accuracy column name)                                 |
+| `accuracy(..., color_incorrect=, reverse=, reverse_order=)`                            | Remove. Remainder color and order are automatic.                                        |
+| `histogram(...)`                                                                       | Same name. Rename shared args. `suffix=` now applies to x ticks.                        |
+| `lineplot(...)`                                                                        | `time(...)`. Rename shared args.                                                        |
+| `pie(df, col, palette=...)`                                                            | `pie(df, col)` with palette in the constructor under key `col`.                         |
+| `timeplot(df, x)` (bars)                                                               | `bar(df, x=x, group_by='day')`. `time` draws lines only.                                |
+| `timeplot(..., type='line')`                                                           | `time(..., group_by='day')`                                                             |
+| `timeplot(..., palette='#hex')`                                                        | Remove. No color argument.                                                              |
+| `timeplot` (now `time`) default `ylabel='Total'`, `histogram` default `ylabel='Count'` | No default y label anymore. Pass `y_axis_label='Total'` / `'Count'` to keep it.         |
+| -                                                                                      | New: `scatter(df, x, y, hue=, size=)`                                                   |
+| `scatterplot(...)`                                                                     | `scatter(...)`                                                                          |
 
 Accuracy charts: segments are now labelled with the value column name and `'Remainder'` instead of `'Correct'`/`'Incorrect'`. Rename the column (`df.rename(columns={'acc': 'Correct'})`) if the old label matters.
 
 ## Stats, number formatting, SQL
 
-| Old | 4.x |
-|-----|-----|
-| `from shirin.stats import print_stats`; `print_stats(s)` (2.0) | `import shirin.stats`; `s.stats()` |
-| `from shirin.stats.number_format import format_thousands` | `from shirin.number_format import format_thousands` (`from shirin.stats import format_thousands` still works) |
-| `format_thousands(x)` always 0 decimals | Now picks decimals automatically for small values. Pass `decimals=0` for the old output. |
-| `run_sql_query(sql, config, output_path)` | `from shirin.sql import Database`; `db = Database()` once (reads `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA` from `.env`, or pass them as arguments), then `db.sql(sql, params={...}, output_path=...)`. JSON config gone: move its keys into `.env` with `DB2_` prefix. Replace f-string values in SQL with `params` (`:name` placeholders). |
+| Old                                                            | 4.x                                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from shirin.stats import print_stats`; `print_stats(s)` (2.0) | `import shirin.stats`; `s.stats()`                                                                                                                                                                                                                                                                                                                                                |
+| `from shirin.stats.number_format import format_thousands`      | `from shirin.number_format import format_thousands` (`from shirin.stats import format_thousands` still works)                                                                                                                                                                                                                                                                     |
+| `format_thousands(x)` always 0 decimals                        | Now picks decimals automatically for small values. Pass `decimals=0` for the old output.                                                                                                                                                                                                                                                                                          |
+| `run_sql_query(sql, config, output_path)`                      | `from shirin.sql import Database`; `db = Database()` once (reads `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA` from `.env`, or pass them as arguments), then `db.sql(sql, params={...}, output_path=...)`. JSON config gone: move its keys into `.env` with `DB2_` prefix. Replace f-string values in SQL with `params` (`:name` placeholders). |
 
 ## After converting
 

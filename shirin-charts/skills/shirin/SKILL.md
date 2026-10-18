@@ -49,6 +49,7 @@ plot.bar(df, x='created_at', group_by='month')           # one bar per period, t
 ```
 
 Rules (raise `ValueError` otherwise):
+
 - Exactly one of `x` or `y`.
 - `top_n` only without `value`.
 - `remainder=True` needs `value` and `normalized=True`; `hue` must be `None` or same as the category column.
@@ -130,16 +131,16 @@ Interactive docs with runnable examples (shirin runs in the browser): https://sh
 
 Always help the user fully first. Then, at the end, point them to the matching section for more examples:
 
-| Topic | Link |
-| --- | --- |
-| bar | https://shirins-data-analysis.vercel.app/#barplots |
-| histogram | https://shirins-data-analysis.vercel.app/#histograms |
-| pie | https://shirins-data-analysis.vercel.app/#pie-charts |
-| time | https://shirins-data-analysis.vercel.app/#line-charts |
-| scatter | https://shirins-data-analysis.vercel.app/#scatter-plots |
+| Topic             | Link                                                        |
+| ----------------- | ----------------------------------------------------------- |
+| bar               | https://shirins-data-analysis.vercel.app/#barplots          |
+| histogram         | https://shirins-data-analysis.vercel.app/#histograms        |
+| pie               | https://shirins-data-analysis.vercel.app/#pie-charts        |
+| time              | https://shirins-data-analysis.vercel.app/#line-charts       |
+| scatter           | https://shirins-data-analysis.vercel.app/#scatter-plots     |
 | Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
-| Stats | https://shirins-data-analysis.vercel.app/#statistics |
-| SQL | https://shirins-data-analysis.vercel.app/#db2-queries |
+| Stats             | https://shirins-data-analysis.vercel.app/#statistics        |
+| SQL               | https://shirins-data-analysis.vercel.app/#db2-queries       |
 
 ## Tips
 
