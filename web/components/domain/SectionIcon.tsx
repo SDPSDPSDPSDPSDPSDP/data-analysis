@@ -1,4 +1,4 @@
-import { ChartArea, ChartBarBig, ChartColumn, ChartLine, ChartPie, ChartScatter, Database, Hash, LayoutGrid, Sigma, Wrench, type LucideIcon } from "lucide-react";
+import { ChartArea, ChartBarBig, ChartColumn, ChartLine, ChartPie, ChartScatter, Bot, Database, Hash, LayoutGrid, Sigma, Wrench, type LucideIcon } from "lucide-react";
 
 // Keyed by category or section title: icon components can't be passed from the server page.
 const SECTION_ICONS: Record<string, LucideIcon> = {
@@ -12,6 +12,7 @@ const SECTION_ICONS: Record<string, LucideIcon> = {
   "Number formatting": Hash,
   Statistics: Sigma,
   "DB2 connection": Database,
+  "Claude plugin": Bot,
   All: LayoutGrid,
 };
 
