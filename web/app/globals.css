@@ -21,14 +21,14 @@
   --code-button-text-hover: rgba(0, 0, 0, 0.87);
   /* Syntax colors, applied by CodeBlock's highlight style. */
   --code-text: rgba(0, 0, 0, 0.87);
-  --code-keyword: rgba(0, 0, 0, 1);
-  --code-name: #8a2bb0;
-  --code-function: #a100d6;
-  --code-constant: #2e7d32;
-  --code-class: #3a8a00;
+  --code-keyword: #0000ff;
+  --code-name: #001080;
+  --code-function: #e36209;
+  --code-constant: #0070c1;
+  --code-class: #267f99;
   --code-operator: rgba(0, 0, 0, 0.87);
-  --code-string: #4f7a1f;
-  --code-comment: rgba(0, 0, 0, 0.45);
+  --code-string: #a31515;
+  --code-comment: #008000;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);
@@ -157,15 +157,15 @@
   --color-code-button-hover: var(--color-button-hover);
   --code-button-text: var(--text-on-dark-secondary);
   --code-button-text-hover: var(--text-on-dark);
-  --code-text: #d3d8e1;
-  --code-keyword: #ffffff;
-  --code-name: #f5c0ff;
-  --code-function: #d23cff;
-  --code-constant: #75bb75;
-  --code-class: #66ff00;
-  --code-operator: #feffff;
-  --code-string: #d6ffb9;
-  --code-comment: #7d8799;
+  --code-text: #d4d4d4;
+  --code-keyword: #569cd6;
+  --code-name: #9cdcfe;
+  --code-function: #dcdcaa;
+  --code-constant: #4fc1ff;
+  --code-class: #4ec9b0;
+  --code-operator: #d4d4d4;
+  --code-string: #ce9178;
+  --code-comment: #6a9955;
 }
 
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
