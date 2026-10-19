@@ -158,14 +158,14 @@
   --code-button-text: var(--text-on-dark-secondary);
   --code-button-text-hover: var(--text-on-dark);
   --code-text: #d4d4d4;
-  --code-keyword: #569cd6;
-  --code-name: #9cdcfe;
-  --code-function: #dcdcaa;
-  --code-constant: #569cd6;
-  --code-class: #4ec9b0;
-  --code-operator: #d4d4d4;
-  --code-string: #ce9178;
-  --code-comment: #6a9955;
+  --code-keyword: #ff7b72;
+  --code-name: #c9d1d9;
+  --code-function: #d2a8ff;
+  --code-constant: #79c0ff;
+  --code-class: #ffa657;
+  --code-operator: #ff7b72;
+  --code-string: #a5d6ff;
+  --code-comment: #8b949e;
 }
 
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
