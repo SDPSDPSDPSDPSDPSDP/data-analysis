@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { sectionId } from "@/components/domain/PlotSection";
 import SectionIcon from "@/components/domain/SectionIcon";
@@ -26,6 +26,17 @@ export default function Nav({ categories, filter }: Props) {
   // Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter.
   const pathname = usePathname();
   const dark = useDarkMode();
+  // Tab flips the theme only while nothing has focus, so focus navigation and code editor indent keep working.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Tab" || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+      if (document.activeElement !== document.body) return;
+      e.preventDefault();
+      setDarkMode(document.documentElement.dataset.theme !== "dark");
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
   // Modified clicks open a new tab, home stays as is.
   function leave(e: React.MouseEvent<HTMLAnchorElement>) {
     if (!filter || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
