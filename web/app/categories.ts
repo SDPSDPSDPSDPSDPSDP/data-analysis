@@ -123,6 +123,7 @@ export function getCategories(): Category[] {
     section("Number formatting", "number_format.py"),
     section("Statistics", "stats.py"),
     section("DB2 connection", "sql.py"),
+    section("Claude plugin", "claude_plugin.py"),
   ];
   return [
     { title: "Bar charts", sections: barCharts },

@@ -8,24 +8,26 @@ import { oneDarkTheme } from "@codemirror/theme-one-dark";
 import { tags } from "@lezer/highlight";
 import CopyButton from "@/components/ui/CopyButton";
 import { colorSwatches } from "@/components/ui/colorSwatches";
+import { useDarkMode } from "@/lib/darkMode";
 
-// oneDark editor chrome, but syntax colors come from --code-* tokens in globals.css.
+// oneDark editor chrome in dark mode, default chrome in light; syntax colors come from --code-* tokens in globals.css.
 const highlightStyle = HighlightStyle.define([
   { tag: tags.keyword, color: "var(--code-keyword)" },
   { tag: [tags.name, tags.propertyName], color: "var(--code-name)" },
   { tag: [tags.function(tags.variableName), tags.labelName], color: "var(--code-function)" },
   {
-    tag: [tags.constant(tags.name), tags.standard(tags.name), tags.atom, tags.bool, tags.special(tags.variableName)],
+    tag: [tags.constant(tags.name), tags.standard(tags.name), tags.atom, tags.bool, tags.number, tags.special(tags.variableName)],
     color: "var(--code-constant)",
   },
   { tag: [tags.definition(tags.name), tags.separator, tags.punctuation], color: "var(--code-text)" },
-  { tag: [tags.typeName, tags.className, tags.number, tags.self, tags.namespace], color: "var(--code-class)" },
+  { tag: [tags.typeName, tags.className, tags.self, tags.namespace], color: "var(--code-class)" },
   { tag: [tags.operator, tags.operatorKeyword, tags.escape, tags.special(tags.string)], color: "var(--code-operator)" },
   { tag: tags.string, color: "var(--code-string)" },
   { tag: [tags.meta, tags.comment], color: "var(--code-comment)" },
 ]);
 
-const theme = [oneDarkTheme, syntaxHighlighting(highlightStyle)];
+const lightTheme = syntaxHighlighting(highlightStyle);
+const darkTheme = [oneDarkTheme, lightTheme];
 
 // Python's smart indent re-aligns inside parens; users expect Enter to copy the line's own indent.
 const keepIndentOnEnter = Prec.high(
@@ -66,6 +68,7 @@ export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTE
   // Callbacks change every render; a ref keeps the extension list stable so CodeMirror is not reconfigured per keystroke.
   const onRunRef = useRef(onRun);
   onRunRef.current = onRun;
+  const dark = useDarkMode();
   const editable = Boolean(onChange);
   const runnable = Boolean(onRun);
   const allExtensions = useMemo(
@@ -84,7 +87,7 @@ export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTE
         onChange={onChange}
         editable={editable}
         readOnly={!editable}
-        theme={theme}
+        theme={dark ? darkTheme : lightTheme}
         extensions={allExtensions}
         height="100%"
       />

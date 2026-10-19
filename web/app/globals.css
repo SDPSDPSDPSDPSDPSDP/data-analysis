@@ -11,20 +11,24 @@
   --z-nav: 1000;
   --z-tooltip: 1100;
   --z-modal-editor: 1;
-  --color-code-bg: #1e1e1e;
+  --color-code-bg: #eef1f5;
   /* Matches the dark_mode=True chart background in shirin/plot/config/colors.py. */
   --color-chart-dark-bg: #1e1e1e;
-  --color-code-highlight: rgba(255, 255, 255, 0.05);
+  --color-code-highlight: rgba(0, 0, 0, 0.04);
+  --color-code-button: rgba(0, 0, 0, 0.06);
+  --color-code-button-hover: rgba(0, 0, 0, 0.12);
+  --code-button-text: rgba(0, 0, 0, 0.6);
+  --code-button-text-hover: rgba(0, 0, 0, 0.87);
   /* Syntax colors, applied by CodeBlock's highlight style. */
-  --code-text: #d3d8e1;
-  --code-keyword: #ffffff;
-  --code-name: #f5c0ff;
-  --code-function: #d23cff;
-  --code-constant: #75bb75;
-  --code-class: #66ff00;
-  --code-operator: #feffff;
-  --code-string: #d6ffb9;
-  --code-comment: #7d8799;
+  --code-text: rgba(0, 0, 0, 0.87);
+  --code-keyword: #0000ff;
+  --code-name: #001080;
+  --code-function: #795e26;
+  --code-constant: #0000ff;
+  --code-class: #267f99;
+  --code-operator: rgba(0, 0, 0, 0.87);
+  --code-string: #a31515;
+  --code-comment: #008000;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);
@@ -147,6 +151,21 @@
   --shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-home-chart: 0 2px 12px rgba(0, 0, 0, 0.4);
   --color-scrollbar: rgba(255, 255, 255, 0.25);
+  --color-code-bg: #1e1e1e;
+  --color-code-highlight: rgba(255, 255, 255, 0.05);
+  --color-code-button: var(--color-button);
+  --color-code-button-hover: var(--color-button-hover);
+  --code-button-text: var(--text-on-dark-secondary);
+  --code-button-text-hover: var(--text-on-dark);
+  --code-text: #d4d4d4;
+  --code-keyword: #ff7b72;
+  --code-name: #c9d1d9;
+  --code-function: #d2a8ff;
+  --code-constant: #79c0ff;
+  --code-class: #ffa657;
+  --code-operator: #ff7b72;
+  --code-string: #a5d6ff;
+  --code-comment: #8b949e;
 }
 
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
