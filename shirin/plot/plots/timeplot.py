@@ -2,12 +2,12 @@ from typing import Any
 
 import pandas as pd
 
-from ..core import renderer
-from ..core.base_plot import AbstractPlot
-from ..core.options import TimePlotOptions
 from ..common.data_conversion import COUNT_COL, fill_missing_values_in_data, to_period_start, totals_per_x
 from ..common.formatting import format_period_ticks, format_ticks
 from ..config.colors import Colors
+from ..core import renderer
+from ..core.base_plot import AbstractPlot
+from ..core.options import TimePlotOptions
 from ..svg import Chart
 from ..svg.ticks import to_days
 

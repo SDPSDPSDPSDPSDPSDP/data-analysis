@@ -42,6 +42,7 @@ class Text:
     dx: float = 0
     dy: float = 0
     short_text: Optional[str] = None  # shown instead when side-by-side labels leave too little room
+    alpha: float = 1
 
 
 @dataclass
@@ -76,6 +77,7 @@ class Axis:
     ticks: Optional[List[float]] = None
     tick_labels: Optional[List[str]] = None
     formatter: Callable[[float], str] = plain_number
+    short_formatter: Optional[Callable[[float], str]] = None  # used when formatter's tick labels overlap
     dates: bool = False
     date_format: str = ''
     sticky: Tuple[float, ...] = ()  # data limits that get no margin, like the bar baseline

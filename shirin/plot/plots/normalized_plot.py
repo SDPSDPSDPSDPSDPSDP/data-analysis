@@ -2,15 +2,15 @@ from typing import Any, List, Optional
 
 import pandas as pd
 
-from ..core import renderer
-from ..core.categorical_options import NormalizedPlotOptions
-from ..core.base_plot import AbstractPlot
-from ..common.formatting import format_ticks, format_datalabels_stacked_normalized
-from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
-from ..common.stacked_plots import sort_stacked_pivot
 from ..common.colors import blend, palette_colors
+from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
+from ..common.formatting import format_datalabels_stacked_normalized, format_ticks
+from ..common.stacked_plots import sort_stacked_pivot
 from ..config import Marks
 from ..config.colors import REMAINDER_TINT
+from ..core import renderer
+from ..core.base_plot import AbstractPlot
+from ..core.categorical_options import NormalizedPlotOptions
 from .categorical import create_sized_figure, format_period_axis
 
 
@@ -83,10 +83,10 @@ class NormalizedPlot(AbstractPlot):
         self._format_labels_and_legend(plot)
 
         if self.options.orientation == 'vertical':
-            format_ticks(plot, y_grid=True, percentage_y=True)
+            format_ticks(plot, percentage_y=True)
             format_period_axis(plot, self.options)
         else:
-            format_ticks(plot, x_grid=True, percentage_x=True)
+            format_ticks(plot, percentage_x=True)
 
         if self.options.data_labels:
             labelled = self._normalized_pivot

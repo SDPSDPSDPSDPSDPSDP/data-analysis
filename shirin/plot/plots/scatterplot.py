@@ -2,11 +2,11 @@ from typing import Any
 
 import pandas as pd
 
+from ..common.formatting import format_ticks
+from ..config import Colors
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import ScatterPlotOptions
-from ..common.formatting import format_ticks
-from ..config import Colors
 
 
 class ScatterPlot(AbstractPlot):

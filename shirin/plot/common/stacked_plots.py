@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Optional
+
+import pandas as pd
 
 from ..config import SortInput
 from .sorting import sort_pivot_table

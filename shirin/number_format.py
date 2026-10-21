@@ -1,6 +1,5 @@
 from typing import Optional, Union
 
-
 Number = Union[int, float]
 _DUTCH_SEPARATORS = str.maketrans({',': '.', '.': ','})
 

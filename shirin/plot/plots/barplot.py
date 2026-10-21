@@ -2,8 +2,8 @@ from typing import Optional
 
 import pandas as pd
 
-from ..core.categorical_options import BarPlotOptions
 from ..common.data_conversion import ensure_column_is_string
+from ..core.categorical_options import BarPlotOptions
 from .categorical import StackableCategoricalPlot
 
 

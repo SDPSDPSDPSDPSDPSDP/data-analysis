@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional
 
 from .config.colors import DARK_MODE_DEFAULT_COLOR
-from .core import AbstractPlot
 from .config.palettes import (
     DEFAULT_LABEL_MAPPING,
     DEFAULT_PALETTE,
@@ -9,6 +8,7 @@ from .config.palettes import (
     PaletteInput,
     merge_column_config,
 )
+from .core import AbstractPlot
 from .graphs.bar import BarPlotsMixin
 from .graphs.numeric import NumericPlotsMixin
 from .graphs.specialized import SpecializedPlotsMixin

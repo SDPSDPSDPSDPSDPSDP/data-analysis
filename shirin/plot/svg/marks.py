@@ -12,8 +12,12 @@ ANCHOR = {'left': 'start', 'center': 'middle', 'right': 'end'}
 Scale = Callable[[float], float]
 
 
-def text(x: float, y: float, s: str, size: float, color: str, anchor: str = 'start', bold: bool = False, rotate: float = 0) -> str:
+def text(
+    x: float, y: float, s: str, size: float, color: str, anchor: str = 'start', bold: bool = False, rotate: float = 0, alpha: float = 1,
+) -> str:
     attrs = f'x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{color}"'
+    if alpha != 1:
+        attrs += f' fill-opacity="{alpha}"'
     if anchor != 'start':
         attrs += f' text-anchor="{anchor}"'
     if bold:

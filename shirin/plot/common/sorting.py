@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Any, Optional
+
+import pandas as pd
 
 from ..config import SortInput
 

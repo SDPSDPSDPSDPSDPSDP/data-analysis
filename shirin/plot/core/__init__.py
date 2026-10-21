@@ -1,16 +1,16 @@
-from .base_plot import AbstractPlot
 from .base_options import BasePlotOptions, InvalidOptionError
+from .base_plot import AbstractPlot
 from .categorical_options import (
+    BarPlotOptions,
     CategoricalPlotOptions,
     CountPlotOptions,
-    BarPlotOptions,
     NormalizedPlotOptions,
 )
 from .options import (
     HistogramOptions,
     PiePlotOptions,
-    TimePlotOptions,
     ScatterPlotOptions,
+    TimePlotOptions,
 )
 
 __all__ = [

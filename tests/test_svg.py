@@ -29,6 +29,11 @@ def test_text_width_grows_with_text() -> None:
     assert 0 < text_width('1', 10) < text_width('1000', 10) < text_width('1000', 20)
 
 
+def test_digits_are_tabular() -> None:
+    assert text_width('11', 10) == text_width('00', 10)
+    assert text_width('11', 10, bold=True) == text_width('00', 10, bold=True)
+
+
 def test_subtitle_is_tracked_tighter_than_small_text() -> None:
     assert text_width('Share', 10) / 10 < text_width('Share', 8) / 8
     c = Chart(width=6, plot_height=3, subtitle='Share')
@@ -53,14 +58,17 @@ def test_title_gets_extra_top_gap() -> None:
     assert plot_top == Layout.PAD + Layout.TITLE_TOP_GAP + 15 + Layout.PLOT_GAP
 
 
-def test_title_is_centered_over_plot() -> None:
+def test_title_is_centered_on_image() -> None:
     def title_center(title: str) -> float:
         c = Chart(width=6, plot_height=3, title=title)
-        c.rects.append(Rect(0, 1, 0, 5, '#123456'))
+        c.y.label = 'Count'
+        c.rects.append(Rect(0, 1, 0, 50000, '#123456'))
         shift = float(to_svg(c).split('translate(')[1].split(' ')[0])
         return shift + text_width(title, 15, bold=True) / 2
 
-    assert title_center('T') == pytest.approx(title_center('A much longer title'))
+    # translate() is written with 2 decimals.
+    assert title_center('T') == pytest.approx(6 * 72 / 2, abs=0.01)
+    assert title_center('A much longer title') == pytest.approx(6 * 72 / 2, abs=0.01)
 
 
 def test_rounded_rect_is_pill_shaped() -> None:
@@ -160,3 +168,20 @@ def test_dark_mode_darkens_background_and_whitens_text_but_keeps_labels_on_bars(
     assert 'fill="#ffffff"' not in svg
     assert 'fill="#FFFFFF" class="b">Title<' in svg
     assert 'fill="#000000" text-anchor="middle" class="l">on bar<' in svg
+
+
+def test_crowded_x_ticks_get_shortened_then_thinned() -> None:
+    from shirin.number_format import format_compact, format_thousands
+
+    def chart(width: float, hi: float) -> str:
+        c = Chart(width=width, plot_height=2)
+        c.x.lim = (0, hi)
+        c.x.formatter, c.x.short_formatter = format_thousands, format_compact
+        c.rects.append(Rect(0, hi, 0, 1, '#123456'))
+        return to_svg(c)
+
+    assert '>2.000.000<' in chart(8, 2_000_000)
+    narrow = chart(3, 2_000_000)
+    assert '>500k<' in narrow and '>500.000<' not in narrow
+    tiny = chart(1.5, 2_000_000)
+    assert '>1M<' in tiny and '>500k<' not in tiny

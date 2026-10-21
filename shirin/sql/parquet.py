@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
 import pyarrow as pa
 import pyarrow.parquet as pq
 from sqlalchemy import text

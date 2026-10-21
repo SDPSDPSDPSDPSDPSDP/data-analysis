@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Optional, Union
+
+import pandas as pd
 
 from ..config import TitleInput
 from ..core import HistogramOptions, ScatterPlotOptions

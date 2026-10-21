@@ -6,14 +6,13 @@ are applied correctly to bar colors and axis tick labels.
 """
 import pandas as pd
 
-from shirin.plot.plots import BarPlot, CountPlot, NormalizedPlot
+from shirin.plot.config.colors import Colors
 from shirin.plot.core import (
-    CountPlotOptions,
     BarPlotOptions,
+    CountPlotOptions,
     NormalizedPlotOptions,
 )
-
-from shirin.plot.config.colors import Colors
+from shirin.plot.plots import BarPlot, CountPlot, NormalizedPlot
 
 
 class TestStackedCountPlotTextColors:

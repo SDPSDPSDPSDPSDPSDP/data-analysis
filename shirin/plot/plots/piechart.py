@@ -2,14 +2,14 @@ from typing import Any, List
 
 import pandas as pd
 
+from ...number_format import format_percentage, format_thousands
+from ..common.colors import default_colors, default_palette, palette_colors
+from ..common.formatting.text_contrast import get_text_color_for_background
+from ..config import FigureSize, Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import PiePlotOptions
-from ..common.formatting.text_contrast import get_text_color_for_background
-from ..common.colors import default_colors, default_palette, palette_colors
-from ..config import FigureSize, Marks
 from ..svg import Text
-from ...number_format import format_percentage, format_thousands
 
 
 class PieChart(AbstractPlot):

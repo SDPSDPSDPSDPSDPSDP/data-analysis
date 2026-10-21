@@ -4,8 +4,8 @@ from typing import ClassVar, Dict, Optional
 from ..config import Sort, SortInput
 from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
-    VALID_SORTS,
     VALID_ORIENTATIONS,
+    VALID_SORTS,
     BasePlotOptions,
     validate_str_or_enum_option,
 )

@@ -4,12 +4,12 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import pandas as pd
 
-from .base_options import BasePlotOptions
 from ..common.colors import default_palette
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend
 from ..config import Colors, FigureSize, TitleInput
 from ..svg import Chart
+from .base_options import BasePlotOptions
 
 PlotPalette = Optional[Union[Dict[Any, str], str]]
 

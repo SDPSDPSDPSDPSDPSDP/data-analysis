@@ -31,6 +31,7 @@ class Layout:
     LABEL_GAP = 14
     DATALABEL_GAP = 6
     DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened
+    TICK_LABEL_MIN_SPACE = 6  # whitespace between x tick labels before they get shortened, then thinned
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14
@@ -60,3 +61,4 @@ class Marks:
     DOT_AREA = 36.0  # square points
     DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8
+    INNER_LABEL_ALPHA = 0.7  # black/white labels on a bar segment, pure black/white reads too harsh

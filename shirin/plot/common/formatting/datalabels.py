@@ -3,9 +3,9 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from ...config import FontSizes, Layout, TextColors
-from ...svg import Chart, Rect, Text
 from ....number_format import format_compact, format_percentage, format_thousands
+from ...config import FontSizes, Layout, Marks, TextColors
+from ...svg import Chart, Rect, Text
 from .text_contrast import get_text_color_for_background
 
 
@@ -16,9 +16,9 @@ def _length(rect: Rect, orientation: str) -> float:
 def _add_text(chart: Chart, rect: Rect, text: str, orientation: str, short_text: Optional[str] = None) -> None:
     gap = Layout.DATALABEL_GAP
     if orientation == 'vertical':
-        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap, short_text=short_text)
+        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap, short_text=short_text)
     else:
-        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.LIGHT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
+        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
     chart.texts.append(label)
 
 
@@ -77,6 +77,7 @@ def _add_stacked_labels(
                 _percentage_label(value_percentage, 0, suffix),
                 get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
                 FontSizes.DATALABELS,
+                alpha=Marks.INNER_LABEL_ALPHA,
             ))
 
 

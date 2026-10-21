@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Optional
+
+import pandas as pd
 
 REMAINDER_SHARE_COL = '__share__'
 REMAINDER_LABEL = 'Remainder'

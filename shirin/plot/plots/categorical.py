@@ -2,10 +2,7 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ..core import renderer
-from ..core.base_plot import AbstractPlot
-from ..core.categorical_options import CategoricalPlotOptions
-from ..config import FigureSize, Layout, Marks
+from ..common.colors import palette_colors
 from ..common.formatting import (
     format_categorical_tick_labels,
     format_datalabels,
@@ -13,9 +10,12 @@ from ..common.formatting import (
     format_period_ticks,
     format_ticks,
 )
-from ..common.colors import palette_colors
 from ..common.sorting import get_order
 from ..common.stacked_plots import prepare_stacked_data
+from ..config import FigureSize, Layout, Marks
+from ..core import renderer
+from ..core.base_plot import AbstractPlot
+from ..core.categorical_options import CategoricalPlotOptions
 from ..svg import Chart
 
 
@@ -110,11 +110,11 @@ class StackableCategoricalPlot(AbstractPlot):
         # label_map renames hue values when there is a hue, otherwise the category ticks.
         tick_label_map = self.options.label_map if self.options.hue is None else None
         if self.options.orientation == 'vertical':
-            format_ticks(plot, y_grid=True, numeric_y=True)
+            format_ticks(plot, numeric_y=True)
             format_categorical_tick_labels(plot, tick_label_map, axis='x')
             format_period_axis(plot, self.options)
         else:
-            format_ticks(plot, x_grid=True, numeric_x=True)
+            format_ticks(plot, numeric_x=True)
             format_categorical_tick_labels(plot, tick_label_map, axis='y')
 
         if self.options.data_labels:

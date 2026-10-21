@@ -1,8 +1,9 @@
-import pandas as pd
 from typing import Optional
 
-from ..config import FillMissingValuesInput, TitleInput, TimeGroupByInput
+import pandas as pd
+
 from ..common.data_conversion import COUNT_COL
+from ..config import FillMissingValuesInput, TimeGroupByInput, TitleInput
 from ..core import PiePlotOptions, TimePlotOptions
 from ..plots import PieChart, TimePlot
 
