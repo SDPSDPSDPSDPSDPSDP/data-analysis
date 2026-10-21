@@ -27,7 +27,11 @@ def glyph_metrics(ttf_path: Path) -> dict:
     font = TTFont(ttf_path)
     units = font["head"].unitsPerEm
     hmtx = font["hmtx"]
-    widths = {str(code): hmtx[name][0] / units for code, name in font.getBestCmap().items()}
+    # Charts render digits with tnum, which swaps in the ".tf" glyphs.
+    widths = {
+        str(code): hmtx[f"{name}.tf" if f"{name}.tf" in hmtx.metrics else name][0] / units
+        for code, name in font.getBestCmap().items()
+    }
     return {
         "widths": widths,
         "cap_height": font["OS/2"].sCapHeight / units,

@@ -29,6 +29,11 @@ def test_text_width_grows_with_text() -> None:
     assert 0 < text_width('1', 10) < text_width('1000', 10) < text_width('1000', 20)
 
 
+def test_digits_are_tabular() -> None:
+    assert text_width('11', 10) == text_width('00', 10)
+    assert text_width('11', 10, bold=True) == text_width('00', 10, bold=True)
+
+
 def test_subtitle_is_tracked_tighter_than_small_text() -> None:
     assert text_width('Share', 10) / 10 < text_width('Share', 8) / 8
     c = Chart(width=6, plot_height=3, subtitle='Share')
@@ -60,7 +65,8 @@ def test_title_is_centered_over_plot() -> None:
         shift = float(to_svg(c).split('translate(')[1].split(' ')[0])
         return shift + text_width(title, 15, bold=True) / 2
 
-    assert title_center('T') == pytest.approx(title_center('A much longer title'))
+    # translate() is written with 2 decimals.
+    assert title_center('T') == pytest.approx(title_center('A much longer title'), abs=0.01)
 
 
 def test_rounded_rect_is_pill_shaped() -> None:
