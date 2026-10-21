@@ -31,6 +31,7 @@ class Layout:
     LABEL_GAP = 14
     DATALABEL_GAP = 6
     DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened
+    TICK_LABEL_MIN_SPACE = 6  # whitespace between x tick labels before they get shortened, then thinned
     SWATCH = 8
     SWATCH_GAP = 4
     LEGEND_ITEM_GAP = 14

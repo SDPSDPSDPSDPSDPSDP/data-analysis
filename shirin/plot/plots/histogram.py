@@ -65,5 +65,7 @@ class Histogram(AbstractPlot):
             numeric_y=True
         )
         if self.options.suffix:
-            plain = plot.x.formatter
+            plain, short = plot.x.formatter, plot.x.short_formatter
             plot.x.formatter = lambda val: with_suffix(plain(val), self.options.suffix)
+            if short is not None:
+                plot.x.short_formatter = lambda val: with_suffix(short(val), self.options.suffix)

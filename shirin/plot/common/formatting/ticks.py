@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 
-from ....number_format import format_percentage, format_thousands
+from ....number_format import format_compact, format_percentage, format_thousands
 from ...config import Layout
 from ...svg import Axis, Chart
 
@@ -11,7 +11,7 @@ def _set_axis_formatter(axis: Axis, numeric: bool, percentage: bool) -> None:
     if numeric and percentage:
         raise ValueError("Cannot format ticks as both 'numeric' and 'percentage'. Choose one.")
     if numeric:
-        axis.formatter = format_thousands
+        axis.formatter, axis.short_formatter = format_thousands, format_compact
     elif percentage:
         axis.formatter = lambda val: format_percentage(val * 100)
 

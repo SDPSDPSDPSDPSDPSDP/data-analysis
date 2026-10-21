@@ -60,6 +60,25 @@ def _shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Tex
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
+def _x_labels_overlap(ticks: Ticks, sx: Scale) -> bool:
+    spans = [(sx(t) - w / 2, sx(t) + w / 2) for t, w in ((t, text_width(label, FontSizes.TICKS)) for t, label in ticks if label)]
+    return any(right[0] - left[1] < Layout.TICK_LABEL_MIN_SPACE for left, right in zip(spans, spans[1:]))
+
+
+def _fit_x_ticks(axis: Axis, ticks: Ticks, sx: Scale) -> Ticks:
+    """Short labels when the full ones overlap, then only every nth label; unlabelled ticks keep their grid line."""
+    if axis.rotation or not _x_labels_overlap(ticks, sx):
+        return ticks
+    if axis.short_formatter is not None and axis.tick_labels is None and not axis.dates:
+        ticks = [(t, axis.short_formatter(t)) for t, _ in ticks]
+    step = 1
+    thinned = ticks
+    while _x_labels_overlap(thinned, sx) and step < len(ticks):
+        step += 1
+        thinned = [(t, label if i % step == 0 else '') for i, (t, label) in enumerate(ticks)]
+    return thinned
+
+
 def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
     theme = DARK_MODE_COLORS if dark_mode else {}
 
@@ -83,6 +102,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
     texts = _shorten_crowded_labels(chart.texts, sx, sy)
+    all_x_ticks, x_ticks = x_ticks, _fit_x_ticks(chart.x, x_ticks, sx)
     boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
     if x_ticks and not chart.x.rotation:
         position, label = x_ticks[-1]
@@ -94,6 +114,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     else:
         width = max([width + right_overflow] + [row_width + 2 * Layout.PAD for row_width, _ in header_rows])
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
+    x_ticks = _fit_x_ticks(chart.x, all_x_ticks, sx)
     plot_bottom = plot_top + plot_h
     header = [
         f'<g transform="translate({max(Layout.PAD, (width - w) / 2):.2f} 0)">{"".join(items)}</g>'

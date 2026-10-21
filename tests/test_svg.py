@@ -168,3 +168,20 @@ def test_dark_mode_darkens_background_and_whitens_text_but_keeps_labels_on_bars(
     assert 'fill="#ffffff"' not in svg
     assert 'fill="#FFFFFF" class="b">Title<' in svg
     assert 'fill="#000000" text-anchor="middle" class="l">on bar<' in svg
+
+
+def test_crowded_x_ticks_get_shortened_then_thinned() -> None:
+    from shirin.number_format import format_compact, format_thousands
+
+    def chart(width: float, hi: float) -> str:
+        c = Chart(width=width, plot_height=2)
+        c.x.lim = (0, hi)
+        c.x.formatter, c.x.short_formatter = format_thousands, format_compact
+        c.rects.append(Rect(0, hi, 0, 1, '#123456'))
+        return to_svg(c)
+
+    assert '>2.000.000<' in chart(8, 2_000_000)
+    narrow = chart(3, 2_000_000)
+    assert '>500k<' in narrow and '>500.000<' not in narrow
+    tiny = chart(1.5, 2_000_000)
+    assert '>1M<' in tiny and '>500k<' not in tiny
