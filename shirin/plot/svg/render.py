@@ -48,6 +48,12 @@ def _ticks(axis: Axis, lo: float, hi: float) -> Ticks:
     return [(t, label) for t, label in ticks if low <= t <= high]
 
 
+def _tick_color(axis: Axis, other: Axis) -> str:
+    """Value ticks opposite category labels are lighter, so the categories lead."""
+    is_value_axis = axis.tick_labels is None and other.tick_labels is not None
+    return TextColors.LIGHT_GREY if is_value_axis else TextColors.DARK_GREY
+
+
 def _scale(lo: float, hi: float, start: float, end: float) -> Scale:
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
@@ -164,7 +170,8 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
         )
 
     cap = cap_height(tick_size)
-    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, color(TextColors.DARK_GREY), 'end')
+    x_tick_color, y_tick_color = color(_tick_color(chart.x, chart.y)), color(_tick_color(chart.y, chart.x))
+    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, y_tick_color, 'end')
              for t, label in y_ticks if label]
     bottom = plot_bottom
     labelled_x_ticks = [(t, label) for t, label in x_ticks if label]
@@ -175,9 +182,9 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
                                 for _, label in labelled_x_ticks)
         for t, label in labelled_x_ticks:
             if chart.x.rotation:
-                body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, color(TextColors.DARK_GREY), 'end', rotate=chart.x.rotation))
+                body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, x_tick_color, 'end', rotate=chart.x.rotation))
             else:
-                body.append(marks.text(sx(t), tick_top + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle'))
+                body.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
         body += [marks.text(sx(t), bottom + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle') for t, label in chart.x.sub_labels]
