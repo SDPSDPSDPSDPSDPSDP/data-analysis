@@ -123,3 +123,11 @@ def test_bar_group_by_rejects_incompatible_options(df: pd.DataFrame) -> None:
         PlotGraphs().bar(df, x='date', group_by='month', sort='frequency')
     with pytest.raises(ValueError, match='Valid options'):
         PlotGraphs().bar(df, x='date', group_by='week')
+
+
+def test_bar_compact_labels(shown: List[str]) -> None:
+    df = pd.DataFrame({'category': ['a', 'b'], 'value': [1_228_787, 457_435]})
+    PlotGraphs().bar(df, y='category', value='value')
+    PlotGraphs().bar(df, y='category', value='value', compact_labels=False)
+    assert '1,2M' in shown[0] and '457k' in shown[0]
+    assert '1.228.787' in shown[1] and '457.435' in shown[1]
