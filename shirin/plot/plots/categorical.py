@@ -135,4 +135,5 @@ class StackableCategoricalPlot(AbstractPlot):
             formatting=self._datalabel_formatting(),
             orientation=self.options.orientation,
             suffix=self.options.suffix,
+            compact=self.options.compact_labels,
         )

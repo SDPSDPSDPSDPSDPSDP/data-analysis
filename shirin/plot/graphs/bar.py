@@ -28,6 +28,7 @@ class BarPlotsMixin:
         suffix: Optional[str] = None,
         legend: bool = False,
         data_labels: bool = True,
+        compact_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
         sort: Optional[SortInput] = None,
@@ -58,6 +59,8 @@ class BarPlotsMixin:
             suffix: Text appended to each data label (e.g. `'%'` -> `'12 %'`). *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
             data_labels: Whether to show the value on each bar. *Default: `True`*.
+            compact_labels: Shorten data labels to k/M (e.g. `1.228.787` -> `'1,2M'`). Pass `False` for
+                full numbers. *Default: `True`*.
 
         Layout:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
@@ -105,6 +108,7 @@ class BarPlotsMixin:
             suffix=suffix,
             legend=legend,
             data_labels=data_labels,
+            compact_labels=compact_labels,
             sort='frequency' if sort is None else sort,
             group_by=group_by,
         )

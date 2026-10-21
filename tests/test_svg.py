@@ -126,7 +126,17 @@ def test_legend_value_drawn_lighter_after_label() -> None:
     c.legend = [('#ff0000', 'Apple', '9.027')]
     svg = to_svg(c)
     assert 'fill="#444444">Apple<' in svg
-    assert 'fill="#aaaaaa">9.027<' in svg
+    assert 'fill="#c4c4c4">9.027<' in svg
+
+
+def test_value_ticks_lighter_than_category_ticks() -> None:
+    c = Chart(width=4, plot_height=2)
+    c.x.lim, c.y.lim = (0, 10), (-0.5, 0.5)
+    c.y.ticks, c.y.tick_labels = [0], ['Apple']
+    c.x.ticks = [5]
+    svg = to_svg(c)
+    assert 'fill="#444444"' in svg.split('>Apple<')[0][-80:]
+    assert 'fill="#777777"' in svg.split('>5<')[0][-80:]
 
 
 def test_categorical_tick_label_map_requires_tick_labels() -> None:

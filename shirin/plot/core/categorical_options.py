@@ -20,6 +20,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     stacked: bool = False
     sort: SortInput = 'frequency'
     data_labels: bool = True
+    compact_labels: bool = True
     suffix: Optional[str] = None
     group_by: Optional[str] = None  # categories are date periods; 'month' gets month ticks with a year row
 

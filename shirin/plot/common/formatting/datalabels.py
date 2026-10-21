@@ -27,6 +27,7 @@ def format_datalabels(
     formatting: str = 'totals',
     orientation: str = 'vertical',
     suffix: Optional[str] = None,
+    compact: bool = False,
 ) -> None:
     rects = chart.rects
     lengths = [_length(r, orientation) for r in rects]
@@ -37,6 +38,8 @@ def format_datalabels(
             continue
         if formatting == 'percentage':
             _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
+        elif compact:
+            _add_text(chart, rect, with_suffix(format_compact(length), suffix), orientation)
         else:
             _add_text(chart, rect, with_suffix(format_thousands(length), suffix), orientation, with_suffix(format_compact(length), suffix))
 

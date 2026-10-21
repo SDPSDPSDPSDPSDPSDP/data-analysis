@@ -55,7 +55,7 @@ Rules (raise `ValueError` otherwise):
 - `remainder=True` needs `value` and `normalized=True`; `hue` must be `None` or same as the category column.
 - `group_by='year'|'month'|'day'` needs `x` (dates); not with `sort`, `top_n` or `remainder`. `'month'` shows month ticks with a year row.
 
-Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `''` hides), `suffix` (appended to data labels), `data_labels=True`, `legend=False`, `sort='frequency'|'alphabetical'`.
+Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `''` hides), `suffix` (appended to data labels), `data_labels=True`, `compact_labels=True` (k/M data labels, `False` = full numbers), `legend=False`, `sort='frequency'|'alphabetical'`.
 
 ### histogram
 

@@ -23,7 +23,7 @@ class Colors:
 class TextColors:
     DARK_GREY = '#444444'
     LIGHT_GREY = '#777777'
-    FAINT_GREY = '#aaaaaa'
+    FAINT_GREY = '#c4c4c4'
     BLACK = '#000000'
     WHITE = '#FFFFFF'
 
@@ -36,7 +36,7 @@ DARK_MODE_COLORS = {
     TextColors.BLACK: TextColors.WHITE,
     TextColors.DARK_GREY: '#cccccc',
     TextColors.LIGHT_GREY: '#999999',
-    TextColors.FAINT_GREY: '#777777',
+    TextColors.FAINT_GREY: '#5c5c5c',
 }
 DARK_MODE_DEFAULT_COLOR = '#ffffff'  # replaces Colors.GREY for charts without hue or palette
 SHADE_BASE = '#333333'  # dark end when one color is spread over hue values
