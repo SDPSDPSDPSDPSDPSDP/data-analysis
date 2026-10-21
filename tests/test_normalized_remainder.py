@@ -4,9 +4,9 @@ import pytest
 
 from shirin.plot import PlotGraphs
 from shirin.plot.common.colors import blend
+from shirin.plot.common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
 from shirin.plot.config import FigureSize
 from shirin.plot.config.colors import REMAINDER_TINT
-from shirin.plot.common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
 from shirin.plot.core import BarPlotOptions, NormalizedPlotOptions
 from shirin.plot.plots import BarPlot, NormalizedPlot
 

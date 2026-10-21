@@ -1,7 +1,7 @@
 import pandas as pd
 
-from ..core.categorical_options import CountPlotOptions
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
+from ..core.categorical_options import CountPlotOptions
 from .categorical import StackableCategoricalPlot
 
 

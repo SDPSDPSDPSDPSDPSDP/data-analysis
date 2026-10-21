@@ -1,5 +1,6 @@
 import pandas as pd
-from shirin.stats.descriptive_statistics import StatsAccessor  # registers the accessor
+
+from shirin.stats.descriptive_statistics import StatsAccessor  # noqa: F401 - registers the accessor
 
 
 def test_stats_accessor_calculation():

@@ -1,10 +1,10 @@
 import math
 from typing import List
 
+from ....number_format import format_percentage
 from ...config import FontSizes, Marks, TextColors
 from ...config.colors import BACKGROUND_COLOR
 from ...svg import Chart, Text, Wedge
-from ....number_format import format_percentage
 
 
 def render_piechart(

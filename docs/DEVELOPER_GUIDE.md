@@ -22,6 +22,12 @@ To run the test suite locally, use:
 uv run python -m pytest
 ```
 
+Lint (rules in `pyproject.toml`, `web/examples/` excluded):
+
+```powershell
+uv run ruff check .
+```
+
 ## Architecture
 
 ```

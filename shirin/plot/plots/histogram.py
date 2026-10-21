@@ -2,12 +2,11 @@ from typing import Any
 
 import pandas as pd
 
+from ..common.formatting import format_ticks
+from ..common.formatting.datalabels import with_suffix
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.options import HistogramOptions
-from ..common.formatting import format_ticks
-from ..common.formatting.datalabels import with_suffix
-
 
 # Whole numbers in this range are treated as years: their ticks get no thousands separator.
 _YEAR_RANGE = (1600, 2300)

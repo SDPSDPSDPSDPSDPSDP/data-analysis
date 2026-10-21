@@ -132,7 +132,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
             x, baseline = marks.place(t, sx, sy)[:2]
             # Black/white labels sit on a bar or wedge and already contrast with it.
             text_color = t.color if t.color in (TextColors.BLACK, TextColors.WHITE) else color(t.color)
-            body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha]))
+            body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha))
 
     if chart.y.label:
         # Rotated a quarter turn counterclockwise, so the baseline is the right edge of the text.

@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from shirin.plot.common.data_conversion import COUNT_COL, fill_missing_values_in_data
+from shirin.plot.config import Marks, TextColors
 from shirin.plot.core import (
     BarPlotOptions,
     CountPlotOptions,
@@ -21,6 +22,21 @@ def test_countplot_data_labels_false_draws_no_labels(df: pd.DataFrame) -> None:
     rendered = CountPlot(CountPlotOptions(df=df, axis_column='category', data_labels=False))
     chart = rendered.render()
     assert len(chart.texts) == 0
+
+
+@pytest.mark.parametrize('orientation', ['vertical', 'horizontal'])
+def test_bar_charts_have_no_grid_and_soft_labels(df: pd.DataFrame, orientation: str) -> None:
+    chart = CountPlot(CountPlotOptions(df=df, axis_column='category', orientation=orientation)).render()
+    assert not chart.x.grid and not chart.y.grid
+    assert {text.color for text in chart.texts} == {TextColors.FAINT_GREY}
+
+    stacked = CountPlot(CountPlotOptions(df=df, axis_column='category', hue='group', stacked=True)).render()
+    assert stacked.texts and all(text.alpha == Marks.INNER_LABEL_ALPHA for text in stacked.texts)
+
+    normalized = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='category', hue='group', orientation=orientation))
+    chart = normalized.render()
+    assert not chart.x.grid and not chart.y.grid
+    assert 'fill-opacity' in to_svg(chart)
 
 
 def test_pie_without_palette_uses_distinct_colors(df: pd.DataFrame) -> None:

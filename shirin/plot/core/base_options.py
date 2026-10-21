@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, Optional, Union
 import pandas as pd
 
 from ..common.data_conversion import convert_dict_keys_to_string
-from ..config import TitleInput, FillMissingValues, Sort, TimeGroupBy
+from ..config import FillMissingValues, Sort, TimeGroupBy, TitleInput
 
 
 class InvalidOptionError(ValueError):

@@ -1,12 +1,13 @@
-import pandas as pd
 from typing import Optional
 
-from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS
-from ..config import TitleInput, SortInput, TimeGroupBy, TimeGroupByInput
-from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
-from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
+import pandas as pd
+
 from ..common.colors import default_palette
 from ..common.data_conversion import COUNT_COL, REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder, totals_per_x
+from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
+from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS
+from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
+from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot
 
 # ISO labels sort alphabetically in time order.

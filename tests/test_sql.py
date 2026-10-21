@@ -8,6 +8,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import StaticPool
 
 from shirin.sql import Database, engine, parquet
@@ -76,7 +77,7 @@ def test_parquet_empty_result(db, tmp_path) -> None:
 def test_parquet_failed_query_keeps_existing_file(sqlite_engine, tmp_path) -> None:
     out = tmp_path / 'out.parquet'
     out.write_bytes(b'previous')
-    with pytest.raises(Exception):
+    with pytest.raises(OperationalError):
         parquet.query_to_parquet('SELECT * FROM missing_table', sqlite_engine, out)
     assert out.read_bytes() == b'previous'
     assert list(tmp_path.iterdir()) == [out]

@@ -60,3 +60,4 @@ class Marks:
     DOT_AREA = 36.0  # square points
     DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8
+    INNER_LABEL_ALPHA = 0.7  # black/white labels on a bar segment, pure black/white reads too harsh

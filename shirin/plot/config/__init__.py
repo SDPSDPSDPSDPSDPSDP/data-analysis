@@ -1,12 +1,12 @@
 from .colors import Colors, TextColors
-from .palettes import PaletteInput, LabelMappingInput
-from .formatting import FontSizes, FigureSize, Layout, Marks
+from .formatting import FigureSize, FontSizes, Layout, Marks
+from .palettes import LabelMappingInput, PaletteInput
 from .types import (
-    Sort,
     FillMissingValues,
-    TimeGroupBy,
-    SortInput,
     FillMissingValuesInput,
+    Sort,
+    SortInput,
+    TimeGroupBy,
     TimeGroupByInput,
     TitleInput,
 )

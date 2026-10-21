@@ -14,7 +14,6 @@ from pathlib import Path
 
 from fontTools.ttLib import TTFont
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SOURCE_DIR = REPO_ROOT / "scripts" / "fonts" / "Satoshi_Complete" / "WEB" / "fonts"
 OUTPUT_DIR = REPO_ROOT / "shirin" / "assets" / "fonts"
