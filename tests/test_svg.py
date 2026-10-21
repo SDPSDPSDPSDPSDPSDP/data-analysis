@@ -58,15 +58,17 @@ def test_title_gets_extra_top_gap() -> None:
     assert plot_top == Layout.PAD + Layout.TITLE_TOP_GAP + 15 + Layout.PLOT_GAP
 
 
-def test_title_is_centered_over_plot() -> None:
+def test_title_is_centered_on_image() -> None:
     def title_center(title: str) -> float:
         c = Chart(width=6, plot_height=3, title=title)
-        c.rects.append(Rect(0, 1, 0, 5, '#123456'))
+        c.y.label = 'Count'
+        c.rects.append(Rect(0, 1, 0, 50000, '#123456'))
         shift = float(to_svg(c).split('translate(')[1].split(' ')[0])
         return shift + text_width(title, 15, bold=True) / 2
 
     # translate() is written with 2 decimals.
-    assert title_center('T') == pytest.approx(title_center('A much longer title'), abs=0.01)
+    assert title_center('T') == pytest.approx(6 * 72 / 2, abs=0.01)
+    assert title_center('A much longer title') == pytest.approx(6 * 72 / 2, abs=0.01)
 
 
 def test_rounded_rect_is_pill_shaped() -> None:

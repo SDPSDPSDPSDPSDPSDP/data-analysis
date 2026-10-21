@@ -78,7 +78,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     width = chart.width * PT_PER_INCH if fixed_width else plot_left + plot_h + Layout.PAD  # type: ignore[operator]
     plot_w = width - plot_left - Layout.PAD
 
-    header_rows, plot_top = build_header(chart, plot_w, color)
+    header_rows, plot_top = build_header(chart, width - 2 * Layout.PAD, color)
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
@@ -96,7 +96,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     sx, sy = _scale(*x_lim, plot_left, plot_left + plot_w), _scale(*y_lim, plot_top + plot_h, plot_top)
     plot_bottom = plot_top + plot_h
     header = [
-        f'<g transform="translate({max(Layout.PAD, min(plot_left + (plot_w - w) / 2, width - Layout.PAD - w)):.2f} 0)">{"".join(items)}</g>'
+        f'<g transform="translate({max(Layout.PAD, (width - w) / 2):.2f} 0)">{"".join(items)}</g>'
         for w, items in header_rows
     ]
 

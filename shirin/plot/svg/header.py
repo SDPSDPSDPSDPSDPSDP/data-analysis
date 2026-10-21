@@ -23,10 +23,10 @@ def _legend_rows(items: List[Tuple[str, str, str]], max_width: float) -> List[Li
     return [row for row in rows if row]
 
 
-def header_rows(chart: Chart, plot_w: float, color: Callable[[str], str]) -> Tuple[List[HeaderRow], float]:
+def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> Tuple[List[HeaderRow], float]:
     """(width, svg items) per row and the plot top below them.
 
-    Rows are drawn from x=0 and shifted to center over the plot once its final width is known.
+    Rows are drawn from x=0 and shifted to center on the image once its final width is known.
     """
     rows: List[HeaderRow] = []
     top = float(Layout.PAD)
@@ -46,7 +46,7 @@ def header_rows(chart: Chart, plot_w: float, color: Callable[[str], str]) -> Tup
         if text:
             row_top = header_row(size)
             rows.append((text_width(text, size, bold), [marks.text(0, row_top + cap_height(size), text, size, text_color, bold=bold)]))
-    legend_rows = _legend_rows(chart.legend, plot_w)
+    legend_rows = _legend_rows(chart.legend, max_width)
     if legend_rows and rows:
         top += Layout.LEGEND_GAP
     for row in legend_rows:
