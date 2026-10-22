@@ -41,6 +41,11 @@ class TestScatterPlotRender:
 
         assert chart.x.label == "Height"
         assert chart.y.label == "Weight"
+
+    def test_render_draws_both_grids(self) -> None:
+        chart = _render()
+
+        assert chart.x.grid and chart.y.grid
         assert len(chart.dots) > 0
 
     def test_render_with_hue_creates_legend(self) -> None:

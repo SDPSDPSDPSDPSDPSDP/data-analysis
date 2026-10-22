@@ -1,14 +1,18 @@
 import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
+import SkillViewer, { type Skill } from "@/components/ui/SkillViewer";
+import TerminalBlock from "@/components/ui/TerminalBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { exampleSetup } from "@/lib/exampleSetup";
 import { useDarkMode } from "@/lib/darkMode";
 
-export type SetupCell = {
-  explanation: string;
-  code: string;
-};
+// "code" cells run before every example; "terminal" (Claude Code transcript) and "skill" cells are only shown.
+export type SetupCell =
+  | { kind: "code"; explanation: string; code: string }
+  // chart: prerendered SVGs of the transcript's code, shown at its "[chart]" line.
+  | { kind: "terminal"; explanation: string; code: string; chart: { light: string; dark: string } | null }
+  | { kind: "skill"; explanation: string; code: string; skill: Skill };
 
 export type DataFormat = {
   description: string;
@@ -38,6 +42,15 @@ export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
+function SetupCellBody({ cell, dark }: { cell: SetupCell; dark: boolean }) {
+  if (cell.kind === "skill") return <SkillViewer skill={cell.skill} />;
+  if (cell.kind === "terminal") {
+    const chart = cell.chart && (dark ? cell.chart.dark : cell.chart.light);
+    return <TerminalBlock transcript={cell.code} chart={chart} />;
+  }
+  return <CodeBlock value={cell.code} />;
+}
+
 type Props = PlotSectionData & {
   globalSetup: string;
   // Only section of its category: takes the category's heading level instead.
@@ -63,7 +76,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           {cell.explanation && <p>{cell.explanation}</p>}
-          <CodeBlock value={cell.code} />
+          <SetupCellBody cell={cell} dark={dark} />
         </section>
       ))}
     </>

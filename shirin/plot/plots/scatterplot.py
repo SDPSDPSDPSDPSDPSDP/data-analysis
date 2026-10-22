@@ -34,6 +34,7 @@ class ScatterPlot(AbstractPlot):
         self._format_labels_and_legend(plot)
         format_ticks(
             plot,
+            x_grid=True,
             y_grid=True,
             numeric_y=True,
             numeric_x=True

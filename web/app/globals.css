@@ -29,6 +29,22 @@
   --code-operator: rgba(0, 0, 0, 0.87);
   --code-string: #a31515;
   --code-comment: #008000;
+  /* Claude Code window (transcript, skill viewer). */
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --color-terminal-bg: var(--color-code-bg);
+  --color-terminal-bar: rgba(0, 0, 0, 0.04);
+  --color-terminal-prompt: rgba(0, 0, 0, 0.06);
+  --color-terminal-dot: rgba(0, 0, 0, 0.2);
+  --color-terminal-tool: #2e9e4f;
+  --color-terminal-code: rgba(0, 0, 0, 0.05);
+  --terminal-marker-width: 2ch;
+  --terminal-chart-max-width: 520px;
+  --terminal-cursor-width: 1ch;
+  --terminal-cursor-blink: 1s;
+  --skill-files-width: 180px;
+  --skill-content-max-height: 520px;
+  --skill-icon-size: 40px;
+  --font-size-inline-code: 0.9em;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);
@@ -166,17 +182,10 @@
   --code-operator: #ff7b72;
   --code-string: #a5d6ff;
   --code-comment: #8b949e;
+  --color-terminal-bar: rgba(255, 255, 255, 0.06);
+  --color-terminal-prompt: rgba(255, 255, 255, 0.08);
+  --color-terminal-dot: rgba(255, 255, 255, 0.2);
+  --color-terminal-tool: #4eba65;
+  --color-terminal-code: rgba(255, 255, 255, 0.06);
 }
 
-/* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--theme-fade-duration);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-}

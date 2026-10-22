@@ -6,6 +6,8 @@ import "./globals.css";
 import "./base.css";
 import "./nav.css";
 import "./code.css";
+import "./terminal.css";
+import "./skill.css";
 import "./examples.css";
 import "./home.css";
 import "./chart-modal-motion.css";
