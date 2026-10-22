@@ -10,7 +10,7 @@ import pyarrow.parquet as pq
 from sqlalchemy import text
 from sqlalchemy.engine import Connection, CursorResult, Engine
 
-PARQUET_CHUNK_ROWS = 100_000
+PARQUET_CHUNK_ROWS = 20_000
 
 
 def _execute_streaming(
