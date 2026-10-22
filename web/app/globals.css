@@ -29,6 +29,14 @@
   --code-operator: rgba(0, 0, 0, 0.87);
   --code-string: #a31515;
   --code-comment: #008000;
+  /* Claude Code transcript: always a dark terminal, in both themes. */
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --color-terminal-bg: var(--color-chart-dark-bg);
+  --color-terminal-bar: rgba(255, 255, 255, 0.06);
+  --color-terminal-prompt: rgba(255, 255, 255, 0.08);
+  --color-terminal-dot: rgba(255, 255, 255, 0.2);
+  --color-terminal-tool: #4eba65;
+  --terminal-marker-width: 2ch;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);

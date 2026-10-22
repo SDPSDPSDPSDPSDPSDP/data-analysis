@@ -148,3 +148,67 @@
   border: none;
   border-radius: var(--radius-swatch);
 }
+
+.terminal {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-terminal-bg);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-small);
+  color: var(--text-on-dark);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  padding: var(--space-1) var(--space-1-5);
+  background: var(--color-terminal-bar);
+}
+
+.terminal-dot {
+  width: var(--space-1-5);
+  height: var(--space-1-5);
+  border-radius: var(--radius-pill);
+  background: var(--color-terminal-dot);
+}
+
+.terminal-title {
+  margin-left: var(--space-1);
+  color: var(--text-on-dark-secondary);
+}
+
+.terminal-body {
+  padding: var(--space-1-5) var(--space-2);
+  overflow-x: auto;
+}
+
+.terminal-line {
+  display: flex;
+  white-space: pre;
+}
+
+.terminal-marker {
+  flex: none;
+  width: var(--terminal-marker-width);
+}
+
+.terminal-gap {
+  height: var(--space-1-5);
+}
+
+.terminal-prompt {
+  padding: var(--space-0-5) var(--space-1);
+  margin: 0 calc(-1 * var(--space-1));
+  border-radius: var(--radius);
+  background: var(--color-terminal-prompt);
+}
+
+.terminal-tool > .terminal-marker {
+  color: var(--color-terminal-tool);
+}
+
+.terminal-result {
+  padding-left: var(--terminal-marker-width);
+  color: var(--text-on-dark-secondary);
+}

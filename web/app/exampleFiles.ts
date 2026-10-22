@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { Example } from "@/components/domain/PlotSection";
 
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
+// "# %% [terminal] explanation" cells show their explanation and a Claude Code transcript; they never run.
 // "# %% [hidden]" cells run before every example below them but are not shown.
 // Other "# %% label" cells are runnable examples; their labels are not shown.
 // The home gallery shows every example except the first (already on the category page).
@@ -18,8 +19,12 @@ export function parseExamples(file: string) {
       return { label: label.trim(), code: code.join("\n").trim() };
     });
   const setup = cells
-    .filter((cell) => cell.label.startsWith("[setup]"))
-    .map((cell) => ({ explanation: cell.label.replace("[setup]", "").trim(), code: cell.code }));
+    .filter((cell) => cell.label.startsWith("[setup]") || cell.label.startsWith("[terminal]"))
+    .map((cell) => ({
+      explanation: cell.label.replace(/^\[(setup|terminal)\]/, "").trim(),
+      code: cell.code,
+      terminal: cell.label.startsWith("[terminal]"),
+    }));
   const hidden: string[] = [];
   const examples: Example[] = [];
   const homeExamples: Example[] = [];

@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
+import TerminalBlock from "@/components/ui/TerminalBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { exampleSetup } from "@/lib/exampleSetup";
@@ -8,6 +9,8 @@ import { useDarkMode } from "@/lib/darkMode";
 export type SetupCell = {
   explanation: string;
   code: string;
+  // Claude Code transcript shown as a terminal, never run.
+  terminal: boolean;
 };
 
 export type DataFormat = {
@@ -63,7 +66,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           {cell.explanation && <p>{cell.explanation}</p>}
-          <CodeBlock value={cell.code} />
+          {cell.terminal ? <TerminalBlock transcript={cell.code} /> : <CodeBlock value={cell.code} />}
         </section>
       ))}
     </>
