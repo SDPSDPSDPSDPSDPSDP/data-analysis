@@ -8,7 +8,7 @@
 # %% [skill] What the skill contains. Claude reads the description to decide when to load it, then follows SKILL.md. migration.md is only read when old shirin code turns up.
 ../shirin-charts/skills/data-analysis
 
-# %% [terminal] What that looks like in Claude Code:
+# %% [terminal] What this looks like in Claude Code:
 > Make a bar chart of how many fruits are ripe per fruit
 * Skill(shirin-charts:data-analysis)
   Successfully loaded skill
