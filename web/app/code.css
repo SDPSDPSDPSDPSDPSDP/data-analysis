@@ -248,18 +248,16 @@
 }
 
 .skill {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border: var(--border-width) solid var(--color-shimmer);
-  border-radius: var(--radius);
+  /* Code blocks match the window background otherwise. */
+  --color-code-bg: var(--color-terminal-bar);
+  color: var(--text-primary);
 }
 
 .skill-header {
   display: flex;
   align-items: center;
   gap: var(--space-1-5);
+  padding: var(--space-2) var(--space-2) 0;
 }
 
 .skill-icon {
@@ -292,6 +290,10 @@
   font-family: var(--font-mono);
 }
 
+.skill-description {
+  padding: var(--space-2);
+}
+
 .skill-description p {
   margin: var(--space-0-5) 0 0;
 }
@@ -299,9 +301,6 @@
 .skill-body {
   display: grid;
   grid-template-columns: var(--skill-files-width) 1fr;
-  border: var(--border-width) solid var(--color-shimmer);
-  border-radius: var(--radius);
-  overflow: hidden;
 }
 
 .skill-files {
@@ -309,7 +308,7 @@
   flex-direction: column;
   gap: var(--space-0-25);
   padding: var(--space-1);
-  border-right: var(--border-width) solid var(--color-shimmer);
+  background: var(--color-terminal-bar);
 }
 
 .skill-file {
@@ -344,17 +343,13 @@
   padding: var(--space-1-5) var(--space-2);
 }
 
-.skill-markdown {
-  font-size: var(--font-size-doc);
-}
-
 .skill-markdown h1 {
-  font-size: var(--font-size-doc-heading);
+  font-size: var(--font-size-doc);
 }
 
 .skill-markdown h2,
 .skill-markdown h3 {
-  font-size: var(--font-size-doc);
+  font-size: inherit;
 }
 
 .skill-markdown :is(h1, h2, h3) {
@@ -394,7 +389,5 @@
 
   .skill-files {
     flex-direction: row;
-    border-right: none;
-    border-bottom: var(--border-width) solid var(--color-shimmer);
   }
 }

@@ -5,6 +5,7 @@ import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FileText, ScrollText } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
+import TerminalWindow from "@/components/ui/TerminalWindow";
 
 export type SkillFile = { name: string; content: string };
 
@@ -50,7 +51,7 @@ export default function SkillViewer({ skill }: Props) {
       ),
   };
   return (
-    <div className="skill">
+    <TerminalWindow className="skill theme-dark">
       <div className="skill-header">
         <span className="skill-icon">
           <ScrollText size="1em" aria-hidden />
@@ -90,6 +91,6 @@ export default function SkillViewer({ skill }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </TerminalWindow>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import TerminalWindow from "@/components/ui/TerminalWindow";
 import { useVisible } from "@/lib/useVisible";
 
 type Line = { kind: "prompt" | "tool" | "reply" | "result" | "chart" | "gap"; text: string; first?: boolean };
@@ -78,13 +79,7 @@ export default function TerminalBlock({ transcript, chart }: Props) {
 
   const done = step >= delays.length;
   return (
-    <div ref={root} className="terminal" role="img" aria-label={`Claude Code session:\n${transcript}`}>
-      <div className="terminal-bar" aria-hidden>
-        <span className="terminal-dot" />
-        <span className="terminal-dot" />
-        <span className="terminal-dot" />
-        <span className="terminal-title">claude</span>
-      </div>
+    <TerminalWindow ref={root} role="img" aria-label={`Claude Code session:\n${transcript}`}>
       {/* Every line is rendered from the start, unrevealed ones hidden, so the terminal never changes height. */}
       <div className="terminal-body" aria-hidden>
         {lines.map((line, i) => {
@@ -117,6 +112,6 @@ export default function TerminalBlock({ transcript, chart }: Props) {
           );
         })}
       </div>
-    </div>
+    </TerminalWindow>
   );
 }

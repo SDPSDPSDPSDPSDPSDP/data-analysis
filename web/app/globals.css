@@ -152,7 +152,9 @@
 }
 
 /* Set by lib/darkMode.ts. Cards match the dark_mode=True chart background, so charts sit flush. */
-:root[data-theme="dark"] {
+/* .theme-dark: dark tokens for one element in either theme, like the always-dark terminal. */
+:root[data-theme="dark"],
+.theme-dark {
   color-scheme: dark;
   --color-bg: var(--color-chart-dark-bg);
   --color-bg-home: #121212;
