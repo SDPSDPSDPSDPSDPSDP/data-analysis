@@ -45,6 +45,17 @@ def test_parquet_chunks_unify_schema(sqlite_engine, tmp_path) -> None:
     assert table.column('note').to_pylist() == [None, None, 'late']
 
 
+def test_parquet_spills_untyped_chunks_to_disk(sqlite_engine, tmp_path, monkeypatch) -> None:
+    spilled_rows = []
+    spill = parquet._spill
+    monkeypatch.setattr(parquet, '_spill', lambda table, *args: spilled_rows.append(table.num_rows) or spill(table, *args))
+    out = tmp_path / 'out.parquet'
+    parquet.query_to_parquet('SELECT * FROM t ORDER BY id', sqlite_engine, out, chunk_rows=1)
+    assert spilled_rows == [1, 1, 1]
+    assert [path.name for path in tmp_path.iterdir()] == ['out.parquet']
+    assert pq.read_table(out).column('note').to_pylist() == [None, None, 'late']
+
+
 def test_parquet_streams_one_row_group_per_chunk(sqlite_engine, tmp_path) -> None:
     out = tmp_path / 'typed.parquet'
     parquet.query_to_parquet('SELECT id, year FROM t ORDER BY id', sqlite_engine, out, chunk_rows=1)
