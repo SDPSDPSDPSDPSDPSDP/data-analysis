@@ -29,13 +29,14 @@
   --code-operator: rgba(0, 0, 0, 0.87);
   --code-string: #a31515;
   --code-comment: #008000;
-  /* Claude Code transcript: always a dark terminal, in both themes. */
+  /* Claude Code window (transcript, skill viewer). */
   --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
-  --color-terminal-bg: var(--color-chart-dark-bg);
-  --color-terminal-bar: rgba(255, 255, 255, 0.06);
-  --color-terminal-prompt: rgba(255, 255, 255, 0.08);
-  --color-terminal-dot: rgba(255, 255, 255, 0.2);
-  --color-terminal-tool: #4eba65;
+  --color-terminal-bg: var(--color-code-bg);
+  --color-terminal-bar: rgba(0, 0, 0, 0.04);
+  --color-terminal-prompt: rgba(0, 0, 0, 0.06);
+  --color-terminal-dot: rgba(0, 0, 0, 0.2);
+  --color-terminal-tool: #2e9e4f;
+  --color-terminal-code: rgba(0, 0, 0, 0.05);
   --terminal-marker-width: 2ch;
   --terminal-chart-max-width: 520px;
   --terminal-cursor-width: 1ch;
@@ -152,9 +153,7 @@
 }
 
 /* Set by lib/darkMode.ts. Cards match the dark_mode=True chart background, so charts sit flush. */
-/* .theme-dark: dark tokens for one element in either theme, like the always-dark terminal. */
-:root[data-theme="dark"],
-.theme-dark {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --color-bg: var(--color-chart-dark-bg);
   --color-bg-home: #121212;
@@ -183,6 +182,11 @@
   --code-operator: #ff7b72;
   --code-string: #a5d6ff;
   --code-comment: #8b949e;
+  --color-terminal-bar: rgba(255, 255, 255, 0.06);
+  --color-terminal-prompt: rgba(255, 255, 255, 0.08);
+  --color-terminal-dot: rgba(255, 255, 255, 0.2);
+  --color-terminal-tool: #4eba65;
+  --color-terminal-code: rgba(255, 255, 255, 0.06);
 }
 
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */

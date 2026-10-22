@@ -2,10 +2,14 @@
 
 import { isValidElement, useRef, useState, type ReactElement, type ReactNode } from "react";
 import Markdown, { type Components } from "react-markdown";
+import { EditorView } from "@uiw/react-codemirror";
 import remarkGfm from "remark-gfm";
 import { FileText, ScrollText } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import TerminalWindow from "@/components/ui/TerminalWindow";
+
+// Module level: a new array per render would reconfigure every CodeMirror.
+const WRAP_LINES = [EditorView.lineWrapping];
 
 export type SkillFile = { name: string; content: string };
 
@@ -35,7 +39,7 @@ export default function SkillViewer({ skill }: Props) {
     pre: ({ children }) => {
       const code = isValidElement(children) ? (children as ReactElement<{ children: ReactNode }>) : null;
       if (!code) throw new Error("Markdown <pre> without a <code> child");
-      return <CodeBlock value={String(code.props.children).replace(/\n$/, "")} />;
+      return <CodeBlock value={String(code.props.children).replace(/\n$/, "")} extensions={WRAP_LINES} />;
     },
     table: ({ children }) => <table className="data-table">{children}</table>,
     // Links to another file of the skill switch tabs, like Claude following them.
@@ -51,7 +55,7 @@ export default function SkillViewer({ skill }: Props) {
       ),
   };
   return (
-    <TerminalWindow className="skill theme-dark">
+    <TerminalWindow className="skill">
       <div className="skill-header">
         <span className="skill-icon">
           <ScrollText size="1em" aria-hidden />
@@ -82,7 +86,6 @@ export default function SkillViewer({ skill }: Props) {
           ))}
         </nav>
         <div className="skill-content" ref={contentRef}>
-          <div className="skill-path">/{file.name}</div>
           <div className="skill-markdown">
             <Markdown remarkPlugins={[remarkGfm]} components={components}>
               {file.content}

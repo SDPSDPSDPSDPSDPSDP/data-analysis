@@ -10,8 +10,8 @@ import { useDarkMode } from "@/lib/darkMode";
 // "code" cells run before every example; "terminal" (Claude Code transcript) and "skill" cells are only shown.
 export type SetupCell =
   | { kind: "code"; explanation: string; code: string }
-  // chart: dark prerendered SVG of the transcript's code, shown at its "[chart]" line.
-  | { kind: "terminal"; explanation: string; code: string; chart: string | null }
+  // chart: prerendered SVGs of the transcript's code, shown at its "[chart]" line.
+  | { kind: "terminal"; explanation: string; code: string; chart: { light: string; dark: string } | null }
   | { kind: "skill"; explanation: string; code: string; skill: Skill };
 
 export type DataFormat = {
@@ -70,7 +70,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {cell.kind === "skill" ? (
             <SkillViewer skill={cell.skill} />
           ) : cell.kind === "terminal" ? (
-            <TerminalBlock transcript={cell.code} chart={cell.chart} />
+            <TerminalBlock transcript={cell.code} chart={cell.chart && (dark ? cell.chart.dark : cell.chart.light)} />
           ) : (
             <CodeBlock value={cell.code} />
           )}

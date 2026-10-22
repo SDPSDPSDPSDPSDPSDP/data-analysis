@@ -46,18 +46,19 @@ export function parseExamples(file: string) {
   return { setup, examples, homeExamples };
 }
 
-// The terminal is always dark, so only the dark_mode=True version is drawn.
 function terminalChart(transcript: string) {
   const lines = transcript.split(/\r?\n/);
   if (!lines.includes("[chart]")) return null;
   const code = lines.filter((line) => line.startsWith("    ")).map((line) => line.slice(4));
   if (code.length === 0) throw new Error(`Transcript has a [chart] line but no code lines:\n${transcript}`);
-  return previewPath(withDarkMode(code.join("\n"), true));
+  const chart = code.join("\n");
+  return { light: previewPath(withDarkMode(chart, false)), dark: previewPath(withDarkMode(chart, true)) };
 }
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
 
 // SKILL.md first, as Claude reads it; its frontmatter is shown as the header, not as file content.
+// Folder layout is fixed by the plugin format: <plugin>/skills/<skill>/, manifest in <plugin>/.claude-plugin/.
 function readSkill(folder: string): Skill {
   const dir = join(process.cwd(), folder);
   const skillSource = readFileSync(join(dir, "SKILL.md"), "utf8");
@@ -76,10 +77,15 @@ function readSkill(folder: string): Skill {
     plugin: plugin.name,
     version: plugin.version,
     files: [
-      { name: "SKILL.md", content: skillSource.slice(frontmatter[0].length).trim() },
-      ...others.map((name) => ({ name, content: readFileSync(join(dir, name), "utf8").trim() })),
+      { name: "SKILL.md", content: withoutTitle(skillSource.slice(frontmatter[0].length)) },
+      ...others.map((name) => ({ name, content: withoutTitle(readFileSync(join(dir, name), "utf8")) })),
     ],
   };
+}
+
+// The file list already names each file, so its leading "# title" is not repeated.
+function withoutTitle(markdown: string) {
+  return markdown.trim().replace(/^# .*\r?\n/, "").trim();
 }
 
 // Code of every prerendered SVG by its path, filled as sections are built; read by scripts/build-previews.mjs.
