@@ -42,6 +42,15 @@ export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
+function SetupCellBody({ cell, dark }: { cell: SetupCell; dark: boolean }) {
+  if (cell.kind === "skill") return <SkillViewer skill={cell.skill} />;
+  if (cell.kind === "terminal") {
+    const chart = cell.chart && (dark ? cell.chart.dark : cell.chart.light);
+    return <TerminalBlock transcript={cell.code} chart={chart} />;
+  }
+  return <CodeBlock value={cell.code} />;
+}
+
 type Props = PlotSectionData & {
   globalSetup: string;
   // Only section of its category: takes the category's heading level instead.
@@ -67,13 +76,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           {cell.explanation && <p>{cell.explanation}</p>}
-          {cell.kind === "skill" ? (
-            <SkillViewer skill={cell.skill} />
-          ) : cell.kind === "terminal" ? (
-            <TerminalBlock transcript={cell.code} chart={cell.chart && (dark ? cell.chart.dark : cell.chart.light)} />
-          ) : (
-            <CodeBlock value={cell.code} />
-          )}
+          <SetupCellBody cell={cell} dark={dark} />
         </section>
       ))}
     </>

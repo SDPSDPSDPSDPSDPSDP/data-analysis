@@ -11,15 +11,13 @@ import TerminalWindow from "@/components/ui/TerminalWindow";
 // Module level: a new array per render would reconfigure every CodeMirror.
 const WRAP_LINES = [EditorView.lineWrapping];
 
-export type SkillFile = { name: string; content: string };
-
 export type Skill = {
   name: string;
   // Frontmatter description: what Claude reads to decide when to load the skill.
   description: string;
   plugin: string;
   version: string;
-  files: SkillFile[];
+  files: { name: string; content: string }[];
 };
 
 type Props = {

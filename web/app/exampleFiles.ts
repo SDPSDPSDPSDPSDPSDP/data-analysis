@@ -40,7 +40,9 @@ export function parseExamples(file: string) {
       const example = { code: cell.code, hiddenSetup: hidden.join("\n\n"), preview: null, darkPreview: null };
       const homeOnly = cell.label.endsWith("[home-only]");
       if (!homeOnly) examples.push(example);
-      if (homeOnly || (examples.length > 1 && !cell.label.endsWith("[no-home]"))) homeExamples.push(example);
+      const firstOnCategoryPage = examples.length <= 1;
+      const noHome = cell.label.endsWith("[no-home]");
+      if (homeOnly || (!firstOnCategoryPage && !noHome)) homeExamples.push(example);
     }
   }
   return { setup, examples, homeExamples };

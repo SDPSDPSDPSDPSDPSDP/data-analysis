@@ -10,9 +10,10 @@ const TOOL_CALL = /^\w+\(/;
 
 // Delay before each streaming step, in ms. The prompt types per character, replies stream in chunks of
 // characters (faster than timers can tick per character), other lines appear whole.
-const TYPE_DELAY = 35;
-const REPLY_CHUNK_DELAY = 16;
-const CHARS_PER_STEP: Partial<Record<Line["kind"], number>> = { prompt: 1, reply: 6 };
+const STREAM: Partial<Record<Line["kind"], { chars: number; delay: number }>> = {
+  prompt: { chars: 1, delay: 35 },
+  reply: { chars: 6, delay: 16 },
+};
 const LINE_DELAY: Record<Line["kind"], number> = { prompt: 400, tool: 350, reply: 250, result: 150, chart: 400, gap: 0 };
 const CODE_LINE_DELAY = 40;
 
@@ -31,14 +32,21 @@ function parse(transcript: string): Line[] {
     else if (raw.startsWith("* ")) {
       const text = raw.slice(2);
       lines.push({ kind: TOOL_CALL.test(text) ? "tool" : "reply", text });
-    } else if (raw.startsWith("  ")) lines.push({ kind: "result", text: raw.slice(2), first: previous?.kind !== "result" });
-    else throw new Error(`Terminal line must start with "> ", "* ", two spaces or be [chart]: ${raw}`);
+    } else if (raw.startsWith("  ")) {
+      lines.push({ kind: "result", text: raw.slice(2), first: previous?.kind !== "result" });
+    } else throw new Error(`Terminal line must start with "> ", "* ", two spaces or be [chart]: ${raw}`);
   }
   return lines;
 }
 
-const charsPerStep = (line: Line) => CHARS_PER_STEP[line.kind];
+const charsPerStep = (line: Line) => STREAM[line.kind]?.chars;
 const streamSteps = (line: Line, chars: number) => Math.ceil(line.text.length / chars);
+
+function marker(line: Line): string {
+  if (line.kind === "prompt") return ">";
+  if (line.kind === "result") return line.first ? "⎿" : "";
+  return "●";
+}
 
 // Delay of every step and the step each line starts at; a streamed line takes one step per chunk of characters.
 function schedule(lines: Line[]) {
@@ -47,10 +55,9 @@ function schedule(lines: Line[]) {
     const start = delays.length;
     const code = line.kind === "result" && !line.first;
     delays.push(code ? CODE_LINE_DELAY : LINE_DELAY[line.kind]);
-    const chars = charsPerStep(line);
-    if (chars) {
-      const delay = line.kind === "prompt" ? TYPE_DELAY : REPLY_CHUNK_DELAY;
-      for (let i = 1; i < streamSteps(line, chars); i++) delays.push(delay);
+    const stream = STREAM[line.kind];
+    if (stream) {
+      for (let i = 1; i < streamSteps(line, stream.chars); i++) delays.push(stream.delay);
     }
     return start;
   });
@@ -66,7 +73,8 @@ type Props = {
 export default function TerminalBlock({ transcript, chart }: Props) {
   const lines = useMemo(() => parse(transcript), [transcript]);
   const { delays, starts } = useMemo(() => schedule(lines), [lines]);
-  if (lines.some((line) => line.kind === "chart") && !chart) throw new Error("Transcript has a [chart] line but no chart");
+  const hasChartLine = lines.some((line) => line.kind === "chart");
+  if (hasChartLine && !chart) throw new Error("Transcript has a [chart] line but no chart");
   const root = useRef<HTMLDivElement>(null);
   const visible = useVisible(root, ON_SCREEN_MARGIN);
   const [step, setStep] = useState(0);
@@ -109,10 +117,9 @@ export default function TerminalBlock({ transcript, chart }: Props) {
           ) : (
             line.text
           );
-          const marker = line.kind === "prompt" ? ">" : line.kind === "result" ? (line.first ? "⎿" : "") : "●";
           return (
             <div key={i} className={`terminal-line terminal-${line.kind}${pending}`}>
-              <span className="terminal-marker">{marker}</span>
+              <span className="terminal-marker">{marker(line)}</span>
               {text}
             </div>
           );
