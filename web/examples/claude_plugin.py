@@ -9,17 +9,15 @@
 ../shirin-charts/skills/data-analysis
 
 # %% [terminal] What that looks like in Claude Code:
-> Make a bar chart of how many fruits are ripe per fruit in data/fruit.csv
+> Make a bar chart of how many fruits are ripe per fruit
 * Skill(shirin-charts:data-analysis)
   Successfully loaded skill
-* Read(data/fruit.csv)
-  Read 120 lines
 * One row per picked fruit, so plot.bar counts the rows. is_ripe goes on hue.
 * Write(fruit.py)
-  Wrote 5 lines to fruit.py
-    import pandas as pd
+  Wrote 4 lines to fruit.py
+    from shirin.assets.data import df
     from shirin.plot import PlotGraphs
-    df = pd.read_csv('data/fruit.csv')
-    plot = PlotGraphs()
-    plot.bar(df, x='fruit', hue='is_ripe', title='Ripe fruit per fruit')
-* Created fruit.py. Run it in your notebook to see the chart inline.
+    plot = PlotGraphs(label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}})
+    plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True, title='Ripe fruit per fruit')
+* Here is the chart, stacked so each bar shows its ripe and unripe share:
+[chart]

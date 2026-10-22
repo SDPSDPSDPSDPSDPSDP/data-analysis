@@ -3,9 +3,12 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Example, SetupCell } from "@/components/domain/PlotSection";
 import type { Skill } from "@/components/ui/SkillViewer";
+// Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
+import { withDarkMode } from "../lib/exampleSetup.ts";
 
 // "# %% [setup] explanation" cells show their explanation and run before every example below them.
 // "# %% [terminal] explanation" cells show their explanation and a Claude Code transcript; they never run.
+// A "[chart]" line in a transcript shows the chart drawn by its code lines (indented four spaces).
 // "# %% [skill] explanation" cells hold a skill folder path (relative to web/) and show that skill's files; they never run.
 // "# %% [hidden]" cells run before every example below them but are not shown.
 // Other "# %% label" cells are runnable examples; their labels are not shown.
@@ -25,7 +28,8 @@ export function parseExamples(file: string) {
     if (!kind) return [];
     const explanation = cell.label.replace(`[${kind}]`, "").trim();
     if (kind === "skill") return [{ kind, explanation, code: cell.code, skill: readSkill(cell.code) }];
-    return [{ kind: kind === "setup" ? "code" : "terminal", explanation, code: cell.code }];
+    if (kind === "terminal") return [{ kind, explanation, code: cell.code, chart: terminalChart(cell.code) }];
+    return [{ kind: "code", explanation, code: cell.code }];
   });
   const hidden: string[] = [];
   const examples: Example[] = [];
@@ -40,6 +44,15 @@ export function parseExamples(file: string) {
     }
   }
   return { setup, examples, homeExamples };
+}
+
+// The terminal is always dark, so only the dark_mode=True version is drawn.
+function terminalChart(transcript: string) {
+  const lines = transcript.split(/\r?\n/);
+  if (!lines.includes("[chart]")) return null;
+  const code = lines.filter((line) => line.startsWith("    ")).map((line) => line.slice(4));
+  if (code.length === 0) throw new Error(`Transcript has a [chart] line but no code lines:\n${transcript}`);
+  return previewPath(withDarkMode(code.join("\n"), true));
 }
 
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;

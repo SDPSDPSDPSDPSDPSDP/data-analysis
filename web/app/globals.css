@@ -37,6 +37,9 @@
   --color-terminal-dot: rgba(255, 255, 255, 0.2);
   --color-terminal-tool: #4eba65;
   --terminal-marker-width: 2ch;
+  --terminal-chart-max-width: 520px;
+  --terminal-cursor-width: 1ch;
+  --terminal-cursor-blink: 1s;
   --skill-files-width: 180px;
   --skill-content-max-height: 520px;
   --skill-icon-size: 40px;

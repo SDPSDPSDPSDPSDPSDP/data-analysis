@@ -5,7 +5,7 @@ const RUN_AHEAD_MARGIN = "200px";
 
 // Turns true once, when the element first comes near the viewport. Content of a closed
 // <details> never intersects, so it turns true when opened.
-export function useVisible(ref: RefObject<HTMLElement | null>): boolean {
+export function useVisible(ref: RefObject<HTMLElement | null>, rootMargin = RUN_AHEAD_MARGIN): boolean {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -14,10 +14,10 @@ export function useVisible(ref: RefObject<HTMLElement | null>): boolean {
         setVisible(true);
         observer.disconnect();
       },
-      { rootMargin: RUN_AHEAD_MARGIN },
+      { rootMargin },
     );
     observer.observe(ref.current!);
     return () => observer.disconnect();
-  }, [ref]);
+  }, [ref, rootMargin]);
   return visible;
 }

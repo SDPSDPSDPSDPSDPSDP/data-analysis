@@ -208,6 +208,40 @@
   color: var(--color-terminal-tool);
 }
 
+.terminal-pending,
+.terminal-unrevealed {
+  visibility: hidden;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: var(--terminal-cursor-width);
+  background: var(--text-on-dark);
+  animation: terminal-blink var(--terminal-cursor-blink) steps(1) infinite;
+}
+
+.terminal-cursor::before {
+  content: "\200b";
+}
+
+@keyframes terminal-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-chart {
+  margin-top: var(--space-1);
+  padding-left: var(--terminal-marker-width);
+}
+
+.terminal-chart img {
+  display: block;
+  width: 100%;
+  max-width: var(--terminal-chart-max-width);
+  border-radius: var(--radius);
+}
+
 .terminal-result {
   padding-left: var(--terminal-marker-width);
   color: var(--text-on-dark-secondary);
