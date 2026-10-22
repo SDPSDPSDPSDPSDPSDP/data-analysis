@@ -8,11 +8,13 @@ type Line = { kind: "prompt" | "tool" | "reply" | "result" | "chart" | "gap"; te
 
 const TOOL_CALL = /^\w+\(/;
 
-// Delay before each streaming step, in ms. Prompt and replies stream per character, other lines appear whole.
+// Delay before each streaming step, in ms. The prompt types per character, replies stream in chunks of
+// characters (faster than timers can tick per character), other lines appear whole.
 const TYPE_DELAY = 35;
-const REPLY_CHAR_DELAY = 12;
-const LINE_DELAY: Record<Line["kind"], number> = { prompt: 400, tool: 700, reply: 500, result: 250, chart: 900, gap: 0 };
-const CODE_LINE_DELAY = 80;
+const REPLY_CHUNK_DELAY = 16;
+const CHARS_PER_STEP: Partial<Record<Line["kind"], number>> = { prompt: 1, reply: 6 };
+const LINE_DELAY: Record<Line["kind"], number> = { prompt: 400, tool: 350, reply: 250, result: 150, chart: 400, gap: 0 };
+const CODE_LINE_DELAY = 40;
 
 // Start only once the terminal is on screen, not ahead of it, so the stream is seen from its start.
 const ON_SCREEN_MARGIN = "0px";
@@ -35,18 +37,20 @@ function parse(transcript: string): Line[] {
   return lines;
 }
 
-const streamsChars = (line: Line) => line.kind === "prompt" || line.kind === "reply";
+const charsPerStep = (line: Line) => CHARS_PER_STEP[line.kind];
+const streamSteps = (line: Line, chars: number) => Math.ceil(line.text.length / chars);
 
-// Delay of every step and the step each line starts at; a char-streamed line takes one step per character.
+// Delay of every step and the step each line starts at; a streamed line takes one step per chunk of characters.
 function schedule(lines: Line[]) {
   const delays: number[] = [];
   const starts = lines.map((line) => {
     const start = delays.length;
     const code = line.kind === "result" && !line.first;
     delays.push(code ? CODE_LINE_DELAY : LINE_DELAY[line.kind]);
-    if (streamsChars(line)) {
-      const charDelay = line.kind === "prompt" ? TYPE_DELAY : REPLY_CHAR_DELAY;
-      for (let i = 1; i < line.text.length; i++) delays.push(charDelay);
+    const chars = charsPerStep(line);
+    if (chars) {
+      const delay = line.kind === "prompt" ? TYPE_DELAY : REPLY_CHUNK_DELAY;
+      for (let i = 1; i < streamSteps(line, chars); i++) delays.push(delay);
     }
     return start;
   });
@@ -93,12 +97,14 @@ export default function TerminalBlock({ transcript, chart }: Props) {
               </div>
             );
           // The cursor stays at the end of a streamed line until the next line appears.
-          const typing = streamsChars(line) && !done && shown > 0 && shown <= line.text.length;
-          const text = streamsChars(line) ? (
+          const chars = charsPerStep(line);
+          const revealed = chars ? Math.max(shown, 0) * chars : 0;
+          const typing = chars !== undefined && !done && shown > 0 && shown <= streamSteps(line, chars);
+          const text = chars ? (
             <>
-              {line.text.slice(0, Math.max(shown, 0))}
+              {line.text.slice(0, revealed)}
               {typing && <span className="terminal-cursor" />}
-              <span className="terminal-unrevealed">{line.text.slice(Math.max(shown, 0))}</span>
+              <span className="terminal-unrevealed">{line.text.slice(revealed)}</span>
             </>
           ) : (
             line.text

@@ -173,9 +173,11 @@
   background: var(--color-terminal-dot);
 }
 
+/* Explicit: the skill viewer sets its own font on the window. */
 .terminal-title {
   margin-left: var(--space-1);
   color: var(--text-on-dark-secondary);
+  font-family: var(--font-mono);
 }
 
 .terminal-body {
@@ -251,6 +253,8 @@
   /* Code blocks match the window background otherwise. */
   --color-code-bg: var(--color-terminal-bar);
   color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-doc);
 }
 
 .skill-header {
@@ -279,13 +283,11 @@
 }
 
 .skill-meta,
-.skill-path,
-.skill-label {
+.skill-path {
   color: var(--text-secondary);
   font-size: var(--font-size-small);
 }
 
-.skill-label,
 .skill-path {
   font-family: var(--font-mono);
 }
@@ -295,7 +297,8 @@
 }
 
 .skill-description p {
-  margin: var(--space-0-5) 0 0;
+  margin: 0;
+  color: var(--text-muted);
 }
 
 .skill-body {
@@ -344,12 +347,12 @@
 }
 
 .skill-markdown h1 {
-  font-size: var(--font-size-doc);
+  font-size: var(--font-size-doc-heading);
 }
 
 .skill-markdown h2,
 .skill-markdown h3 {
-  font-size: inherit;
+  font-size: var(--font-size-doc);
 }
 
 .skill-markdown :is(h1, h2, h3) {

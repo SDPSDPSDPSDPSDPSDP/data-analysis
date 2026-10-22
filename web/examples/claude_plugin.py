@@ -14,10 +14,13 @@
   Successfully loaded skill
 * One row per picked fruit, so plot.bar counts the rows. is_ripe goes on hue.
 * Write(fruit.py)
-  Wrote 4 lines to fruit.py
+  Wrote 7 lines to fruit.py
     from shirin.assets.data import df
-    from shirin.plot import PlotGraphs
-    plot = PlotGraphs(label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}})
+    from shirin.plot import Colors, PlotGraphs
+    plot = PlotGraphs(
+        palette={'is_ripe': {True: Colors.GREEN, False: Colors.RED}},
+        label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}}
+    )
     plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True, title='Ripe fruit per fruit')
 * Here is the chart, stacked so each bar shows its ripe and unripe share:
 [chart]

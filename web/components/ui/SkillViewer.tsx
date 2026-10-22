@@ -64,7 +64,6 @@ export default function SkillViewer({ skill }: Props) {
         </div>
       </div>
       <div className="skill-description">
-        <span className="skill-label">description</span>
         <p>{skill.description}</p>
       </div>
       <div className="skill-body">
