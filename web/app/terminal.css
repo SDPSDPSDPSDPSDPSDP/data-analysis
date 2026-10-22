@@ -1,0 +1,99 @@
+.terminal {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-terminal-bg);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-small);
+  color: var(--text-primary);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  padding: var(--space-1) var(--space-1-5);
+  background: var(--color-terminal-bar);
+}
+
+.terminal-dot {
+  width: var(--space-1-5);
+  height: var(--space-1-5);
+  border-radius: var(--radius-pill);
+  background: var(--color-terminal-dot);
+}
+
+/* Explicit: the skill viewer sets its own font on the window. */
+.terminal-title {
+  margin-left: var(--space-1);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.terminal-body {
+  padding: var(--space-1-5) var(--space-2);
+  overflow-x: auto;
+}
+
+.terminal-line {
+  display: flex;
+  white-space: pre;
+}
+
+.terminal-marker {
+  flex: none;
+  width: var(--terminal-marker-width);
+}
+
+.terminal-gap {
+  height: var(--space-1-5);
+}
+
+.terminal-prompt {
+  padding: var(--space-0-5) var(--space-1);
+  margin: 0 calc(-1 * var(--space-1));
+  border-radius: var(--radius);
+  background: var(--color-terminal-prompt);
+}
+
+.terminal-tool > .terminal-marker {
+  color: var(--color-terminal-tool);
+}
+
+.terminal-pending,
+.terminal-unrevealed {
+  visibility: hidden;
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: var(--terminal-cursor-width);
+  background: var(--text-primary);
+  animation: terminal-blink var(--terminal-cursor-blink) steps(1) infinite;
+}
+
+.terminal-cursor::before {
+  content: "\200b";
+}
+
+@keyframes terminal-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-chart {
+  margin-top: var(--space-1);
+  padding-left: var(--terminal-marker-width);
+}
+
+.terminal-chart img {
+  display: block;
+  width: 100%;
+  max-width: var(--terminal-chart-max-width);
+  border-radius: var(--radius);
+}
+
+.terminal-result {
+  padding-left: var(--terminal-marker-width);
+  color: var(--text-secondary);
+}

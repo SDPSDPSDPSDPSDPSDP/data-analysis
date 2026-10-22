@@ -189,15 +189,3 @@
   --color-terminal-code: rgba(255, 255, 255, 0.06);
 }
 
-/* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--theme-fade-duration);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
-}
