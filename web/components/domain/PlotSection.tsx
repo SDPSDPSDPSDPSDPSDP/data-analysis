@@ -1,17 +1,16 @@
 import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
+import SkillViewer, { type Skill } from "@/components/ui/SkillViewer";
 import TerminalBlock from "@/components/ui/TerminalBlock";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { exampleSetup } from "@/lib/exampleSetup";
 import { useDarkMode } from "@/lib/darkMode";
 
-export type SetupCell = {
-  explanation: string;
-  code: string;
-  // Claude Code transcript shown as a terminal, never run.
-  terminal: boolean;
-};
+// "code" cells run before every example; "terminal" (Claude Code transcript) and "skill" cells are only shown.
+export type SetupCell =
+  | { kind: "code" | "terminal"; explanation: string; code: string }
+  | { kind: "skill"; explanation: string; code: string; skill: Skill };
 
 export type DataFormat = {
   description: string;
@@ -66,7 +65,13 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       {setup.map((cell, i) => (
         <section key={i} className="setup-cell">
           {cell.explanation && <p>{cell.explanation}</p>}
-          {cell.terminal ? <TerminalBlock transcript={cell.code} /> : <CodeBlock value={cell.code} />}
+          {cell.kind === "skill" ? (
+            <SkillViewer skill={cell.skill} />
+          ) : cell.kind === "terminal" ? (
+            <TerminalBlock transcript={cell.code} />
+          ) : (
+            <CodeBlock value={cell.code} />
+          )}
         </section>
       ))}
     </>

@@ -37,6 +37,10 @@
   --color-terminal-dot: rgba(255, 255, 255, 0.2);
   --color-terminal-tool: #4eba65;
   --terminal-marker-width: 2ch;
+  --skill-files-width: 180px;
+  --skill-content-max-height: 520px;
+  --skill-icon-size: 40px;
+  --font-size-inline-code: 0.9em;
   --color-button: rgba(255, 255, 255, 0.08);
   --color-button-hover: rgba(255, 255, 255, 0.16);
   --color-overlay-button: rgba(0, 0, 0, 0.5);
