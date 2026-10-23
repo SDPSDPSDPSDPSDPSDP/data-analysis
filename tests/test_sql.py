@@ -64,6 +64,11 @@ def test_parquet_streams_one_row_group_per_chunk(sqlite_engine, tmp_path) -> Non
     assert parquet_file.read().column('year').to_pylist() == [2023, 2024, 2024]
 
 
+def test_parquet_reports_progress(sqlite_engine, tmp_path, capsys) -> None:
+    parquet.query_to_parquet('SELECT * FROM t', sqlite_engine, tmp_path / 'out.parquet', chunk_rows=1)
+    assert 'Fetching: 3 rows' in capsys.readouterr().err
+
+
 def test_parquet_all_null_column(sqlite_engine, tmp_path) -> None:
     out = tmp_path / 'nulls.parquet'
     parquet.query_to_parquet('SELECT id, note FROM t WHERE note IS NULL', sqlite_engine, out, chunk_rows=1)

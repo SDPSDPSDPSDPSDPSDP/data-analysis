@@ -9,6 +9,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from sqlalchemy import text
 from sqlalchemy.engine import Connection, CursorResult, Engine
+from tqdm import tqdm
 
 PARQUET_CHUNK_ROWS = 20_000
 
@@ -68,8 +69,10 @@ def _stream_to_parquet(
         schema = pa.schema([(column, pa.null()) for column in columns])
         spilled: List[Path] = []
         writer: Optional[pq.ParquetWriter] = None
+        progress = tqdm(unit=' rows', desc='Fetching')
         try:
             for index, rows in enumerate(result.partitions()):
+                progress.update(len(rows))
                 table = _rows_to_table(columns, rows)
                 if writer is not None:
                     writer.write_table(table.cast(writer.schema))
@@ -85,6 +88,7 @@ def _stream_to_parquet(
                 writer = pq.ParquetWriter(output_path, _widen(schema))
                 _drain(writer, spilled)
         finally:
+            progress.close()
             if writer is not None:
                 writer.close()
 
