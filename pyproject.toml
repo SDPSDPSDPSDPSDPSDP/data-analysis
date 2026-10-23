@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shirin"
-version = "4.1.4"
+version = "4.1.5"
 description = "A data analysis toolkit for statistical computing, visualization, and SQL operations"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -19,6 +19,7 @@ sql = [
     "sqlalchemy>=2.0",
     "pyarrow>=14",
     "python-dotenv>=1.2.1",
+    "tqdm",
 ]
 
 [dependency-groups]
