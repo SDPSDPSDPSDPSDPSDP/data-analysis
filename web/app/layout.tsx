@@ -6,7 +6,6 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./base.css";
 import "./message-page.css";
-import "./footer.css";
 import "./nav.css";
 import "./code.css";
 import "./copy-button.css";

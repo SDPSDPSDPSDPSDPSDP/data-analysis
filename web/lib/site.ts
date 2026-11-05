@@ -2,4 +2,3 @@
 export const SITE_URL = "https://shirins-data-analysis.vercel.app";
 export const SITE_NAME = "Data Ink";
 export const SITE_DESCRIPTION = "SVG charts for pandas DataFrames in one line of Python. Edit and run every example in the browser.";
-export const REPO_URL = "https://github.com/SDPSDPSDPSDPSDPSDP/data-analysis";

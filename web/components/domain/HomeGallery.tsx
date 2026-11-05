@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/domain/Nav";
-import Footer from "@/components/ui/Footer";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
@@ -15,7 +14,7 @@ import { withDarkMode } from "@/lib/exampleSetup";
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
   charts: Chart[];
-  // Nav and footer. Off on portfolio screens: the host page frames them with its own chrome.
+  // Nav. Off on portfolio screens: the host page frames them with its own chrome.
   showNav?: boolean;
   // Fixed chart per leading slot; null slots and everything after get the shuffled rest. `limit` caps how many show.
   pinned?: (Chart | null)[];
@@ -96,7 +95,6 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
             ))}
         </div>
       </main>
-      {showNav && <Footer />}
       {open && (
         <ChartModal
           title={open.chart.title}
