@@ -13,7 +13,7 @@ export default function CopyButton({ copy }: { copy: () => Promise<void> }) {
   }
 
   return (
-    <button className="copy-button" onClick={onClick} aria-label={copied ? "Copied" : "Copy"}>
+    <button className="icon-button copy-button" onClick={onClick} aria-label={copied ? "Copied" : "Copy"}>
       {copied ? <Check size="1em" /> : <Copy size="1em" />}
     </button>
   );

@@ -99,6 +99,19 @@ pre {
   }
 }
 
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  outline: none;
+}
+
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
 ::view-transition-old(root),
 ::view-transition-new(root) {

@@ -21,19 +21,9 @@
 }
 
 .chart-modal-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--button-height);
-  height: var(--button-height);
-  padding: 0;
   font: inherit;
-  border: none;
-  border-radius: var(--radius);
   background: none;
   color: var(--text-on-dark-secondary);
-  cursor: pointer;
-  outline: none;
   transition: background var(--transition), color var(--transition);
 }
 

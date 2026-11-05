@@ -33,18 +33,8 @@
   position: absolute;
   top: var(--space-1);
   right: var(--space-1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--button-height);
-  height: var(--button-height);
-  padding: 0;
-  border: none;
-  border-radius: var(--radius);
   background: var(--color-button);
   color: var(--text-on-dark-secondary);
-  cursor: pointer;
-  outline: none;
   opacity: 0;
   transition: background var(--transition), opacity var(--transition);
 }

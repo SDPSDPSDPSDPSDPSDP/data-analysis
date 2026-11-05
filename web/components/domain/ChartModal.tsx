@@ -85,7 +85,7 @@ export default function ChartModal({ setup, code, preview, card, href, section, 
       }}
     >
       <div className="chart-modal-actions">
-        <button type="button" className="chart-modal-button" onClick={close} aria-label="Close">
+        <button type="button" className="icon-button chart-modal-button" onClick={close} aria-label="Close">
           <X size="1em" />
         </button>
       </div>
