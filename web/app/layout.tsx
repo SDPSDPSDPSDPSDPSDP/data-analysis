@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./base.css";
 import "./nav.css";
@@ -27,8 +28,12 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Shirin's Charts", template: "%s - Shirin's Charts" },
-  description: "SVG charts for pandas DataFrames in one line of Python. Edit and run every example in the browser.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s - ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "./" },
+  openGraph: { siteName: SITE_NAME, type: "website", locale: "en" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

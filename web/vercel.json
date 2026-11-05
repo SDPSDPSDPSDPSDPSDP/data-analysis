@@ -1,5 +1,11 @@
 {
   "framework": null,
   "outputDirectory": "out",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "headers": [
+    {
+      "source": "/(opengraph-image|apple-icon)",
+      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+    }
+  ]
 }

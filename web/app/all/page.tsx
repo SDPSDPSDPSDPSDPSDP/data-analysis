@@ -1,4 +1,5 @@
 import Nav from "@/components/domain/Nav";
+import Footer from "@/components/ui/Footer";
 import Playground from "@/components/domain/Playground";
 import type { Metadata } from "next";
 import { getCategories, getSetup } from "@/app/categories";
@@ -14,6 +15,7 @@ export default function All() {
     <>
       <Nav categories={categories} />
       <Playground title="All examples" setup={getSetup()} categories={categories} showSetup expanded={false} />
+      <Footer />
     </>
   );
 }

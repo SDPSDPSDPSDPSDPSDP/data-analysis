@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Nav from "@/components/domain/Nav";
+import Footer from "@/components/ui/Footer";
 import Playground from "@/components/domain/Playground";
 import { sectionId } from "@/components/domain/PlotSection";
 import { getCategories, getSetup } from "@/app/categories";
@@ -25,6 +26,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
     <>
       <Nav categories={categories} />
       <Playground title={category.title} setup={getSetup()} categories={[category]} showSetup={slug !== "tools"} expanded />
+      <Footer />
     </>
   );
 }
