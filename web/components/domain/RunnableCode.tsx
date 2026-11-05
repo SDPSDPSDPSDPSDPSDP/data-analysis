@@ -7,6 +7,7 @@ import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
 import { useVisible } from "@/lib/useVisible";
 import { useDarkMode } from "@/lib/darkMode";
+import { useHydrated } from "@/lib/useHydrated";
 
 type Props = {
   // Names the chart images for screen readers.
@@ -14,8 +15,8 @@ type Props = {
   initialCode: string;
   // Prepended to every run, not shown in the editor.
   setup: string;
-  // Prerendered SVG shown while Python loads, null shows a skeleton.
-  preview: string | null;
+  // Prerendered SVGs shown while Python loads, null shows a skeleton.
+  preview: { light: string; dark: string } | null;
 };
 
 export default function RunnableCode({ title, initialCode, setup, preview }: Props) {
@@ -24,6 +25,7 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
   const root = useRef<HTMLDivElement>(null);
   const visible = useVisible(root);
   const dark = useDarkMode();
+  const hydrated = useHydrated();
 
   // Python loads right away; the example only runs once visible.
   useEffect(() => {
@@ -40,11 +42,18 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
     setResult(await run(`${setup}\n${source}`));
   }
 
+  // The prerendered HTML cannot know the theme (set by an inline script), so it holds both previews and CSS shows one.
+  const previews = !preview
+    ? []
+    : hydrated
+      ? [{ src: dark ? preview.dark : preview.light }]
+      : [
+          { src: preview.light, theme: "light" as const },
+          { src: preview.dark, theme: "dark" as const },
+        ];
   const images = result
-    ? result.images.map((src) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}`)
-    : preview
-      ? [preview]
-      : [];
+    ? result.images.map((src) => ({ src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}` }))
+    : previews;
 
   return (
     <div className="runnable" ref={root}>
@@ -52,8 +61,8 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
       <section className="output">
         {/* Preview and result share one list so the first figure stays the same element when the result lands,
             keeping any animation running on it (the home modal flies it in). */}
-        {images.map((src, i) => (
-          <CopyableImage key={i} src={src} alt={`${title} chart`} />
+        {images.map((image, i) => (
+          <CopyableImage key={i} {...image} alt={`${title} chart`} />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}

@@ -3,6 +3,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ..config import SortInput
+from .data_conversion import aggregate
 
 
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
@@ -22,7 +23,7 @@ def get_order(
 ) -> Optional[list]:
     """Category order: by total (value sum or count), alphabetical, or None (data order)."""
     if sort == 'frequency':
-        totals = df.groupby(column)[value_column].sum() if value_column else df[column].value_counts()
+        totals = aggregate(df, column, value_column)
         return list(totals.sort_values(ascending=False).index)
     if sort == 'alphabetical':
         return sort_alphabetically(df[column].unique())

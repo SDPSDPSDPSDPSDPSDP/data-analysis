@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -31,6 +31,17 @@ def filter_top_n_categories(df: pd.DataFrame, col: str, top_n: int) -> pd.DataFr
 
 def to_period_start(dates: pd.Series, group_by: str) -> pd.Series:
     return pd.to_datetime(dates).dt.to_period(_PERIODS[group_by]).dt.to_timestamp()
+
+
+def aggregate(df: pd.DataFrame, column: str, value: Optional[str] = None, hue: Optional[str] = None) -> Any:
+    """Sum of value (or the row count when value is None) per column value.
+
+    Returns a Series, or with hue a table of categories x hue levels with NaN for missing pairs.
+    """
+    keys = [column] + ([hue] if hue else [])
+    grouped = df.groupby(keys)
+    totals = grouped[value].sum() if value else grouped.size()
+    return totals.unstack() if hue else totals
 
 
 def totals_per_x(df: pd.DataFrame, x: str, y: Optional[str], hue: Optional[str], group_by: Optional[str]) -> pd.Series:

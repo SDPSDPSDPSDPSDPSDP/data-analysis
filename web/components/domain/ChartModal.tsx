@@ -11,7 +11,7 @@ type Props = {
   title: string;
   setup: string;
   code: string;
-  preview: string;
+  preview: { light: string; dark: string };
   // Card that opened the modal, the chart flies between it and its own spot.
   card: HTMLElement;
   // Full page with this chart's examples.

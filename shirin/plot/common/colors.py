@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -37,6 +37,13 @@ def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> List[str]:
 def default_colors(n: int) -> List[str]:
     """First n colors of the default color cycle, repeating when n is larger."""
     return [DEFAULT_CYCLE[i % len(DEFAULT_CYCLE)] for i in range(n)]
+
+
+def resolve_palette(palette: Optional[Union[Dict[Any, str], str]], values: pd.Series) -> Dict[Any, str]:
+    """Color per hue value: a dict as given, one color spread into shades, None the default cycle."""
+    if isinstance(palette, dict):
+        return palette
+    return default_palette(values, palette)
 
 
 def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:

@@ -34,7 +34,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       key={key}
       title={title}
       initialCode={example.code}
-      preview={dark ? example.darkPreview : example.preview}
+      preview={example.preview && example.darkPreview ? { light: example.preview, dark: example.darkPreview } : null}
       setup={exampleSetup(globalSetup, setup, example)}
     />
   );

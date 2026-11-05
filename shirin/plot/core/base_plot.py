@@ -4,7 +4,7 @@ from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
 
 import pandas as pd
 
-from ..common.colors import default_palette
+from ..common.colors import resolve_palette
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend
 from ..config import Colors, FigureSize, TitleInput
@@ -95,8 +95,6 @@ class AbstractPlot(ABC, Generic[DataT]):
                 self._color = no_hue_color
             return df
         df = ensure_column_is_string(df, self.options.hue)
-        if self._palette is None:
-            single_color = self.options.palette if isinstance(self.options.palette, str) else None
-            self._palette = default_palette(df[self.options.hue], single_color)
-            self._color = None
+        self._palette = resolve_palette(self.options.palette, df[self.options.hue])
+        self._color = None
         return df

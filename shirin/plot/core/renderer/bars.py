@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ...common.colors import palette_colors
+from ...common.data_conversion import aggregate
 from ...config import FigureSize, Marks
 from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend
@@ -65,10 +66,10 @@ def render_barplot(
     """Bar length is the sum of value per category (and hue), or the row count when value is None."""
     order = order if order is not None else list(df[column].dropna().unique())
     if hue is None:
-        totals = df.groupby(column)[value].sum() if value else df[column].value_counts()
+        totals = aggregate(df, column, value)
         return _draw_categorical_bars(chart, totals.reindex(order).to_frame(), [color], horizontal, hue)  # type: ignore[list-item]
     levels = hue_levels(df, hue)
-    table = df.groupby([column, hue])[value].sum().unstack() if value else pd.crosstab(df[column], df[hue])
+    table = aggregate(df, column, value, hue)
     table = table.reindex(index=order, columns=levels)
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 

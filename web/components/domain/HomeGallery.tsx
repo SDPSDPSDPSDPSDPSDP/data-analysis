@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
-import ChartModal from "@/components/domain/ChartModal";
 import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
 import { sectionId } from "@/lib/sections";
 import { SITE_NAME } from "@/lib/site";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
+
+// Code editor and Python runner load on first open, not with the gallery.
+const loadChartModal = () => import("@/components/domain/ChartModal");
+const ChartModal = dynamic(loadChartModal, { ssr: false });
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -45,16 +49,20 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
     setTimeout(then, card ? parseFloat(getComputedStyle(card).transitionDuration) * 1000 : 0);
   }
 
-  // Chart flies out while the others shrink. Modal image decoded first so the modal can measure its final size on open.
+  // Chart flies out while the others shrink. Modal code loaded and image decoded first, so the modal
+  // can measure its final size on open.
   function openChart(chart: Chart, card: HTMLElement) {
     setSelected(chart);
     const image = new Image();
     image.src = dark ? chart.darkPreview : chart.preview;
-    const show = () => setOpen({ chart, card });
-    // A failed decode still opens the modal (the img retries the load) and rethrows so the failure is logged.
-    image.decode().then(show, (err) => {
-      show();
-      throw err;
+    // A failed decode still opens the modal (the img retries the load) and is rethrown after so it is logged.
+    const decoded = image.decode().then(
+      () => null,
+      (err: unknown) => err,
+    );
+    Promise.all([loadChartModal(), decoded]).then(([, decodeError]) => {
+      setOpen({ chart, card });
+      if (decodeError) throw decodeError;
     });
   }
 
@@ -105,7 +113,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
           title={open.chart.title}
           setup={withDarkMode(open.chart.setup, dark)}
           code={open.chart.code}
-          preview={dark ? open.chart.darkPreview : open.chart.preview}
+          preview={{ light: open.chart.preview, dark: open.chart.darkPreview }}
           card={open.card}
           href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
           section={open.chart.section}

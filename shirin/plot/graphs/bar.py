@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-from ..common.colors import default_palette
+from ..common.colors import resolve_palette
 from ..common.data_conversion import COUNT_COL, REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder, totals_per_x
 from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
 from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS
@@ -134,10 +134,7 @@ class BarPlotsMixin:
             if hue is not None and hue != common['axis_column']:
                 raise ValueError(f"With remainder, hue must be the category column {common['axis_column']!r} or None.")
             if hue is not None:
-                category_palette = common['palette']
-                if not isinstance(category_palette, dict):
-                    category_palette = default_palette(df[hue], category_palette)
-                common['category_palette'] = category_palette
+                common['category_palette'] = resolve_palette(common['palette'], df[hue])
             common.update(
                 df=fill_remainder(df, common['axis_column'], value, REMAINDER_LABEL),
                 value=REMAINDER_SHARE_COL,
