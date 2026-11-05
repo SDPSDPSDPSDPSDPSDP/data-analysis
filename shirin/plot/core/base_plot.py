@@ -89,7 +89,7 @@ class AbstractPlot(ABC):
         """
         self._color, self._palette = split_palette(self.options.palette)
         if self.options.hue is None:
-            if no_hue_color is not None:
+            if no_hue_color is not None and self.options.palette is None:
                 self._color = no_hue_color
             return df
         df = ensure_column_is_string(df, self.options.hue)

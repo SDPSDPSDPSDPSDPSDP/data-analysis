@@ -59,7 +59,7 @@ class Database:
         params: Optional[Dict[str, Any]] = None,
         output_path: Optional[Path] = None,
     ) -> Optional[pd.DataFrame]:
-        """Run a query.
+        """Run a read query (SELECT). Nothing is committed, so INSERT/UPDATE/DELETE are rolled back.
 
         Args:
             query: SQL string or Path to a .sql file.

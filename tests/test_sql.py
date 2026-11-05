@@ -38,6 +38,11 @@ def test_invalid_schema_rejected(schema: str) -> None:
         Database(**{**CREDENTIALS, 'schema': schema})
 
 
+def test_non_numeric_port_names_env_var() -> None:
+    with pytest.raises(ValueError, match='DB2_PORT'):
+        Database(**{**CREDENTIALS, 'port': 'abc'})
+
+
 def test_query_from_file(db, tmp_path) -> None:
     sql_path = tmp_path / 'q.sql'
     sql_path.write_text('SELECT COUNT(*) AS n FROM t')
