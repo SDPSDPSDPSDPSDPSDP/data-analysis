@@ -8,6 +8,7 @@ import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
 import { sectionId } from "@/lib/sections";
+import { SITE_NAME } from "@/lib/site";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
 
@@ -75,7 +76,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
         />
       )}
       <main className="page home">
-        <h1 className="visually-hidden">Shirin's Charts</h1>
+        <h1 className="visually-hidden">{SITE_NAME}</h1>
         {/* Keyed on filter so the entrance wave replays on every category switch. */}
         <div className="home-charts" key={active ?? ""}>
           {order
