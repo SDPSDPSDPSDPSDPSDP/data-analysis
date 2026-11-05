@@ -39,7 +39,7 @@ shirin/
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)
     config/        colors, font sizes, layout sizes, palette/label-mapping base classes
-    svg/           Chart data model, nice/date ticks, font metrics, layout + SVG writer
+    svg/           Chart data model, nice/date ticks, font metrics, axis limits/scales (axis.py), layout + SVG writer (render.py)
   number_format.py Dutch number formatting, shared by plot and stats
   stats/           descriptive statistics accessor
   sql/             DB2 query helpers (optional `sql` extra): __init__.py Database class, engine.py pooled engine, helpers.py queries, parquet.py streaming export
