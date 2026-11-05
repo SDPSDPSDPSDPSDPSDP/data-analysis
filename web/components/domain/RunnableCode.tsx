@@ -6,6 +6,7 @@ import { DOC_TOOLTIP } from "@/lib/docTooltip";
 import CodeBlock from "@/components/ui/CodeBlock";
 import CopyableImage from "@/components/ui/CopyableImage";
 import { useVisible } from "@/lib/useVisible";
+import { useDarkMode } from "@/lib/darkMode";
 
 type Props = {
   // Names the chart images for screen readers.
@@ -22,10 +23,11 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
   const [result, setResult] = useState<RunResult | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const visible = useVisible(root);
+  const dark = useDarkMode();
 
   // Python loads right away; the example only runs once visible.
   useEffect(() => {
-    load().catch((err) => setResult({ images: [], stdout: "", error: String(err) }));
+    load().catch((err: Error) => setResult({ images: [], stdout: "", error: err.message }));
   }, []);
 
   // Running a setup cell (like after picking a palette color) re-renders the chart.
@@ -46,7 +48,7 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
 
   return (
     <div className="runnable" ref={root}>
-      <CodeBlock value={code} onChange={setCode} onRun={execute} extensions={DOC_TOOLTIP} />
+      <CodeBlock value={code} dark={dark} onChange={setCode} onRun={execute} extensions={DOC_TOOLTIP} />
       <section className="output">
         {/* Preview and result share one list so the first figure stays the same element when the result lands,
             keeping any animation running on it (the home modal flies it in). */}

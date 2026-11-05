@@ -50,7 +50,12 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
     setSelected(chart);
     const image = new Image();
     image.src = dark ? chart.darkPreview : chart.preview;
-    image.decode().then(() => setOpen({ chart, card }));
+    const show = () => setOpen({ chart, card });
+    // A failed decode still opens the modal (the img retries the load) and rethrows so the failure is logged.
+    image.decode().then(show, (err) => {
+      show();
+      throw err;
+    });
   }
 
   function selectFilter(next: string | null) {

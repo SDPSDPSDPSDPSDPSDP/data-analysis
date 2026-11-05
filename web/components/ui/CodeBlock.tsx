@@ -8,7 +8,6 @@ import { oneDarkTheme } from "@codemirror/theme-one-dark";
 import { tags } from "@lezer/highlight";
 import CopyButton from "@/components/ui/CopyButton";
 import { colorSwatches } from "@/components/ui/colorSwatches";
-import { useDarkMode } from "@/lib/darkMode";
 
 // oneDark editor chrome in dark mode, default chrome in light; syntax colors come from --code-* tokens in globals.css.
 const highlightStyle = HighlightStyle.define([
@@ -61,14 +60,14 @@ type Props = {
   // Called with the editor's code on Mod-Enter.
   onRun?: (value: string) => void;
   extensions?: Extension[];
+  dark: boolean;
 };
 
 // Read-only unless onChange is given.
-export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTENSIONS }: Props) {
+export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTENSIONS, dark }: Props) {
   // Callbacks change every render; a ref keeps the extension list stable so CodeMirror is not reconfigured per keystroke.
   const onRunRef = useRef(onRun);
   onRunRef.current = onRun;
-  const dark = useDarkMode();
   const editable = Boolean(onChange);
   const runnable = Boolean(onRun);
   const allExtensions = useMemo(

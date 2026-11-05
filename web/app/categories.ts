@@ -1,5 +1,4 @@
-import type { Category } from "@/components/domain/Playground";
-import type { DataFormat, Example, PlotSectionData } from "@/lib/sections";
+import type { Category, DataFormat, Example, PlotSectionData } from "@/lib/sections";
 // Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
 import { exampleSetup, withDarkMode } from "../lib/exampleSetup.ts";
 import { parseExamples, previewPath } from "./exampleFiles.ts";

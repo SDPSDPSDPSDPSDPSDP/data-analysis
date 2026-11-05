@@ -1,4 +1,11 @@
-import type { Skill } from "@/components/ui/SkillViewer";
+export type Skill = {
+  name: string;
+  // Frontmatter description: what Claude reads to decide when to load the skill.
+  description: string;
+  plugin: string;
+  version: string;
+  files: { name: string; content: string }[];
+};
 
 // "code" cells run before every example; "terminal" (Claude Code transcript) and "skill" cells are only shown.
 export type SetupCell =
@@ -34,3 +41,8 @@ export type PlotSectionData = {
 export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
+
+export type Category = {
+  title: string;
+  sections: PlotSectionData[];
+};

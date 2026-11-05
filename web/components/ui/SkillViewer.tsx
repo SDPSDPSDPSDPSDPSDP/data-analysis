@@ -7,24 +7,17 @@ import remarkGfm from "remark-gfm";
 import { FileText, ScrollText } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import TerminalWindow from "@/components/ui/TerminalWindow";
+import type { Skill } from "@/lib/sections";
 
 // Module level: a new array per render would reconfigure every CodeMirror.
 const WRAP_LINES = [EditorView.lineWrapping];
 
-export type Skill = {
-  name: string;
-  // Frontmatter description: what Claude reads to decide when to load the skill.
-  description: string;
-  plugin: string;
-  version: string;
-  files: { name: string; content: string }[];
-};
-
 type Props = {
   skill: Skill;
+  dark: boolean;
 };
 
-export default function SkillViewer({ skill }: Props) {
+export default function SkillViewer({ skill, dark }: Props) {
   const [active, setActive] = useState(skill.files[0].name);
   const contentRef = useRef<HTMLDivElement>(null);
   const open = (name: string) => {
@@ -37,7 +30,7 @@ export default function SkillViewer({ skill }: Props) {
     pre: ({ children }) => {
       const code = isValidElement(children) ? (children as ReactElement<{ children: ReactNode }>) : null;
       if (!code) throw new Error("Markdown <pre> without a <code> child");
-      return <CodeBlock value={String(code.props.children).replace(/\n$/, "")} extensions={WRAP_LINES} />;
+      return <CodeBlock value={String(code.props.children).replace(/\n$/, "")} dark={dark} extensions={WRAP_LINES} />;
     },
     table: ({ children }) => (
       <div className="table-scroll">
@@ -51,7 +44,7 @@ export default function SkillViewer({ skill }: Props) {
           {children}
         </button>
       ) : (
-        <a href={href} target="_blank" rel="noreferrer">
+        <a href={href} target="_blank" rel="noopener noreferrer">
           {children}
         </a>
       ),
