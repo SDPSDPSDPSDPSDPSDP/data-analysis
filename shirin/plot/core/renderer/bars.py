@@ -78,7 +78,8 @@ def _stacked_bars(
 ) -> None:
     """One bar per row of values, columns stacked in order as segments cut to one rounded outline."""
     n_columns = values.shape[1]
-    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, values.sum(axis=1))]
+    totals = values.sum(axis=1)
+    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, totals)]
     base = np.zeros(len(values))
     for column, color in enumerate(colors[:n_columns]):
         for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
@@ -134,10 +135,12 @@ def render_histogram(
     groups = [df.loc[mask, x] for mask in masks]
 
     group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
-    inset = (edges[1] - edges[0]) * Marks.HISTOGRAM_GAP / 2
+    bin_width = edges[1] - edges[0]
+    inset = bin_width * Marks.HISTOGRAM_GAP / 2
     if hue is not None and stacked is not False:
         centers = list((edges[:-1] + edges[1:]) / 2)
-        _stacked_bars(chart, centers, edges[1] - edges[0] - 2 * inset, np.column_stack(group_counts), colors, horizontal=False)
+        bar_width = bin_width - 2 * inset
+        _stacked_bars(chart, centers, bar_width, np.column_stack(group_counts), colors, horizontal=False)
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
         for left, right, count in zip(edges[:-1] + inset, edges[1:] - inset, counts):

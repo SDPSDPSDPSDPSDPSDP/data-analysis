@@ -35,7 +35,8 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
 
     y_tick_width = max((text_width(label, tick_size) for _, label in y_ticks), default=0)
     y_label_width = cap_height(FontSizes.XYLABEL) + Layout.LABEL_GAP if chart.y.label else 0
-    plot_left = Layout.PAD + y_label_width + (y_tick_width + Layout.TICK_GAP if y_tick_width else 0)
+    y_ticks_space = y_tick_width + Layout.TICK_GAP if y_tick_width else 0
+    plot_left = Layout.PAD + y_label_width + y_ticks_space
     plot_h = chart.plot_height * PT_PER_INCH
     fixed_width = chart.width is not None
     width = chart.width * PT_PER_INCH if fixed_width else plot_left + plot_h + Layout.PAD  # type: ignore[operator]

@@ -42,8 +42,9 @@ def rect(r: Rect, sx: Scale, sy: Scale) -> str:
     xa, xb = sorted((sx(r.x0), sx(r.x1)))
     ya, yb = sorted((sy(r.y0), sy(r.y1)))
     stroke = f' stroke="{r.stroke}" stroke-width="{Layout.HAIRLINE}"' if r.stroke else ''
-    radius = f' rx="{min(xb - xa, yb - ya) / 2:.2f}"' if r.rounded else ''
-    return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{xb - xa:.2f}" height="{yb - ya:.2f}"{radius} fill="{r.color}"{stroke}/>'
+    width, height = xb - xa, yb - ya
+    radius = f' rx="{min(width, height) / 2:.2f}"' if r.rounded else ''
+    return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{width:.2f}" height="{height:.2f}"{radius} fill="{r.color}"{stroke}/>'
 
 
 def fade(r: Rect, sx: Scale, sy: Scale, gradient_id: str) -> str:

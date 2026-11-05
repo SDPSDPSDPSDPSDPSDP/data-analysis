@@ -15,7 +15,8 @@ _CLIP_IDS = itertools.count()
 def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
     """Copies with short_text swapped in when side-by-side labels overlap; the chart stays untouched."""
     spans = sorted(marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
-    if not any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
+    gaps = (right[0] - left[1] for left, right in zip(spans, spans[1:]))
+    if not any(gap < Layout.DATALABEL_MIN_SPACE for gap in gaps):
         return texts
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 

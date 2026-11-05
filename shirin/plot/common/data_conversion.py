@@ -88,7 +88,8 @@ def fill_remainder(df: pd.DataFrame, category_col: str, value_col: str, remainde
     fractions = per_category.first().astype(float)
     if not fractions.between(0, 1).all():
         raise ValueError(f"{value_col!r} must hold fractions in [0, 1] when remainder is set")
+    shares = fractions.to_numpy()
     return pd.concat([
-        pd.DataFrame({category_col: fractions.index, value_col: value_col, REMAINDER_SHARE_COL: fractions.to_numpy()}),
-        pd.DataFrame({category_col: fractions.index, value_col: remainder, REMAINDER_SHARE_COL: 1 - fractions.to_numpy()}),
+        pd.DataFrame({category_col: fractions.index, value_col: value_col, REMAINDER_SHARE_COL: shares}),
+        pd.DataFrame({category_col: fractions.index, value_col: remainder, REMAINDER_SHARE_COL: 1 - shares}),
     ], ignore_index=True)

@@ -5,15 +5,11 @@ import pandas as pd
 from ..config import SortInput
 
 
-def _as_float(value: Any) -> float:
-    return float(str(value))
-
-
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
     """Sort numerically when every value parses as a number, otherwise as plain values."""
     values_list = list(values)
     try:
-        return sorted(values_list, key=_as_float, reverse=not ascending)
+        return sorted(values_list, key=lambda value: float(str(value)), reverse=not ascending)
     except (ValueError, TypeError):
         return sorted(values_list, reverse=not ascending)
 

@@ -52,8 +52,9 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
       onReturn();
     }
     modal.classList.add("closing", kind);
-    const last = getComputedStyle(kind === "to-card" ? figure() : modal.querySelector(".output")!);
-    setTimeout(then, (parseFloat(last.animationDelay) + parseFloat(last.animationDuration)) * 1000);
+    const slowest = kind === "to-card" ? figure() : modal.querySelector(".output")!;
+    const { animationDelay, animationDuration } = getComputedStyle(slowest);
+    setTimeout(then, (parseFloat(animationDelay) + parseFloat(animationDuration)) * 1000);
   }
 
   const close = () => leave("to-card", () => dialog.current!.close());
@@ -96,7 +97,8 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
         className="chart-modal-docs"
         onClick={(event) => {
           // Modified clicks open a new tab, the modal stays.
-          if (event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0) return;
+          const isModifiedClick = event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0;
+          if (isModifiedClick) return;
           event.preventDefault();
           leave("to-docs", () => router.push(href));
         }}
