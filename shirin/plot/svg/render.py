@@ -3,17 +3,24 @@ import math
 from typing import List, Optional
 from xml.sax.saxutils import escape
 
-from ..config import FontSizes, Layout, TextColors
+from ..config import FigureSize, FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
 from . import marks
 from .axis import fit_x_ticks, limits, scale, tick_color, ticks
 from .chart import Chart
-from .fonts import cap_height, font_css, text_width
+from .fonts import TTF_FILES, cap_height, font_css, text_width
 from .header import header_rows as build_header
 from .plot_body import draw_marks, shorten_crowded_labels
 
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
+
+
+def to_png(svg: str) -> bytes:
+    """Rasterize a chart SVG. Satoshi is passed as TTF since the rasterizer cannot read the embedded woff2."""
+    import resvg_py
+
+    return resvg_py.svg_to_bytes(svg_string=svg, font_files=TTF_FILES, zoom=FigureSize.PNG_SCALE)
 
 
 def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:

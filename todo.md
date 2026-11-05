@@ -1,3 +1,1 @@
-- png in notebooks: make sure when this library is run, the images in notebooks are not svg, but png, so they can be copied
-- [ ] Emit PNG alongside SVG in notebook output, so charts can be copied in VS Code. Copy-image button only shows for `image/png` outputs; 4.x charts display as `image/svg+xml` only (save button only). Display one mime bundle with both `image/svg+xml` and `image/png` (VS Code renders SVG, copy uses PNG). Needs SVG-to-PNG renderer: `resvg-py` (no native deps) or `cairosvg` (needs cairo lib). Check embedded Satoshi font survives rasterization.
 - og image

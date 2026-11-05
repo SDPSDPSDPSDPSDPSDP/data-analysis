@@ -8,6 +8,7 @@ from ..config import FontSizes
 
 FONTS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "fonts"
 FONT_FILES = {500: "Satoshi-Medium.woff2", 700: "Satoshi-Bold.woff2"}
+TTF_FILES = [str(FONTS_DIR / name.replace(".woff2", ".ttf")) for name in FONT_FILES.values()]
 
 
 @functools.lru_cache(maxsize=None)

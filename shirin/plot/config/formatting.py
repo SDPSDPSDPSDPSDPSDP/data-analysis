@@ -22,6 +22,7 @@ class FigureSize:
     BAR_GROUP_WIDTH = 0.65  # share of a category slot covered by its bars (dodged bars split it)
     DODGE_GAP = 0.06  # share of a category slot left between dodged bars
     PIE = 3.2
+    PNG_SCALE = 2  # PNG copy pixels per SVG pixel, sharp on high-DPI screens
 
 
 class Layout:
