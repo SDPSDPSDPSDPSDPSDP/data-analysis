@@ -5,9 +5,8 @@
   "scripts": {
     "predev": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "dev": "node scripts/dev.mjs",
-    "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs && npm run portfolio:loc",
+    "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "build": "next build",
-    "portfolio:loc": "node scripts/loc/count_loc.mjs",
     "portfolio:stills": "node scripts/portfolio/stills.mjs",
     "portfolio:upload": "node scripts/portfolio/upload.mjs",
     "portfolio:compare": "node scripts/portfolio/upload.mjs --compare"
