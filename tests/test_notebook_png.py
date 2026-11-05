@@ -4,6 +4,7 @@ from typing import List
 import pytest
 
 import shirin.plot.all_plots as all_plots
+from shirin.plot.config import FigureSize
 from shirin.plot.svg import to_png
 
 
@@ -27,10 +28,10 @@ def test_show_sends_svg_and_png_in_one_bundle(monkeypatch: pytest.MonkeyPatch, d
     _png_size(bundle['image/png'])
 
 
-def test_png_is_double_the_svg_size(df, shown: List[str]) -> None:
+def test_png_is_scaled_svg_size(df, shown: List[str]) -> None:
     all_plots.PlotGraphs().bar(df, x='category')
     svg = shown[0]
     width = int(svg.split('width="', 1)[1].split('"', 1)[0])
     height = int(svg.split('height="', 1)[1].split('"', 1)[0])
 
-    assert _png_size(to_png(svg)) == (width * 2, height * 2)
+    assert _png_size(to_png(svg)) == (width * FigureSize.PNG_SCALE, height * FigureSize.PNG_SCALE)

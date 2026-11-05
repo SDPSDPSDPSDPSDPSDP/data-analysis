@@ -2546,7 +2546,7 @@ wheels = [
 
 [[package]]
 name = "shirin"
-version = "4.1.5"
+version = "4.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
