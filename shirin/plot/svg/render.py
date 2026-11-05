@@ -68,9 +68,16 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     body: List[str] = []
     grid = f'stroke="{color(GRID_COLOR)}" stroke-width="{Layout.HAIRLINE}"'
     if chart.y.grid:
-        body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
+        plot_right = plot_left + plot_w
+        body += [
+            f'<line x1="{plot_left:.2f}" x2="{plot_right:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>'
+            for t, _ in y_ticks
+        ]
     if chart.x.grid:
-        body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
+        body += [
+            f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>'
+            for t, _ in x_ticks
+        ]
     body += draw_marks(chart, texts, sx, sy, plot_bottom, color)
 
     if chart.y.label:
@@ -99,7 +106,9 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
                 body.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
-        body += [marks.text(sx(t), bottom + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle') for t, label in chart.x.sub_labels]
+        sub_label_color = color(TextColors.DARK_GREY)
+        body += [marks.text(sx(t), bottom + cap, label, tick_size, sub_label_color, 'middle')
+                 for t, label in chart.x.sub_labels]
         bottom += tick_size
     if chart.x.label:
         bottom += Layout.LABEL_GAP

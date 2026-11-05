@@ -1,4 +1,4 @@
-export const FILTER = "Bar charts";
+const FILTER = "Bar charts";
 export const CARD_SELECTOR = ".home-charts .chart-preview-card";
 
 // Synthetic events never trigger CSS :hover, so the hovered card and nav item get this attribute instead.
