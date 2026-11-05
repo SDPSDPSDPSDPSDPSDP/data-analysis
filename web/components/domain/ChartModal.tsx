@@ -55,7 +55,6 @@ export default function ChartModal({ setup, code, preview, card, href, section, 
     setTimeout(then, (parseFloat(last.animationDelay) + parseFloat(last.animationDuration)) * 1000);
   }
 
-  // Reverse of opening: chart flies back into its card.
   const close = () => leave("to-card", () => dialog.current!.close());
 
   // Layout effect: figure must start at the card's spot before first paint.
