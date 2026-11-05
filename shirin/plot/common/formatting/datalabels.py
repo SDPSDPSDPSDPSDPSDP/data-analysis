@@ -38,11 +38,14 @@ def format_datalabels(
         if length == 0:
             continue
         if formatting == 'percentage':
-            _add_text(chart, rect, percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)
+            share = length / total * 100 if total > 0 else 0
+            _add_text(chart, rect, percentage_label(share, 1, suffix), orientation)
         elif compact:
             _add_text(chart, rect, with_suffix(format_compact(length), suffix), orientation)
         else:
-            _add_text(chart, rect, with_suffix(format_thousands(length), suffix), orientation, with_suffix(format_compact(length), suffix))
+            full = with_suffix(format_thousands(length), suffix)
+            short = with_suffix(format_compact(length), suffix)
+            _add_text(chart, rect, full, orientation, short)
 
 
 def with_suffix(text: str, suffix: Optional[str]) -> str:

@@ -3,6 +3,8 @@ from typing import List, Tuple
 
 import pandas as pd
 
+from ..config import Layout
+
 _EPOCH = pd.Timestamp(0)
 _DAY = pd.Timedelta(days=1)
 
@@ -23,7 +25,7 @@ def from_days(days: float) -> pd.Timestamp:
     return _EPOCH + days * _DAY
 
 
-def nice_ticks(lo: float, hi: float, count: int = 5) -> List[float]:
+def nice_ticks(lo: float, hi: float, count: int = Layout.NUMERIC_TICKS) -> List[float]:
     """Round tick values (steps of 1, 2, 2.5 or 5 times a power of ten) inside [lo, hi]."""
     lo, hi = min(lo, hi), max(lo, hi)
     if hi == lo:
@@ -35,7 +37,7 @@ def nice_ticks(lo: float, hi: float, count: int = 5) -> List[float]:
     return [round(i * step, 12) for i in range(first, last + 1)]
 
 
-def date_ticks(lo: float, hi: float, max_ticks: int = 8, fmt: str = '') -> Tuple[List[float], List[str]]:
+def date_ticks(lo: float, hi: float, max_ticks: int = Layout.MAX_DATE_TICKS, fmt: str = '') -> Tuple[List[float], List[str]]:
     """Day/month/year ticks between two day numbers; fmt overrides the step's own format."""
     lo, hi = min(lo, hi), max(lo, hi)
     start, end = from_days(lo).ceil('D'), from_days(hi)

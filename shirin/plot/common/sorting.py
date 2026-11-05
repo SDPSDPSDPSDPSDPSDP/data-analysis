@@ -3,17 +3,14 @@ from typing import Any, Optional
 import pandas as pd
 
 from ..config import SortInput
-
-
-def _as_float(value: Any) -> float:
-    return float(str(value))
+from .data_conversion import aggregate
 
 
 def sort_alphabetically(values: Any, ascending: bool = True) -> list:
     """Sort numerically when every value parses as a number, otherwise as plain values."""
     values_list = list(values)
     try:
-        return sorted(values_list, key=_as_float, reverse=not ascending)
+        return sorted(values_list, key=lambda value: float(str(value)), reverse=not ascending)
     except (ValueError, TypeError):
         return sorted(values_list, reverse=not ascending)
 
@@ -26,7 +23,7 @@ def get_order(
 ) -> Optional[list]:
     """Category order: by total (value sum or count), alphabetical, or None (data order)."""
     if sort == 'frequency':
-        totals = df.groupby(column)[value_column].sum() if value_column else df[column].value_counts()
+        totals = aggregate(df, column, value_column)
         return list(totals.sort_values(ascending=False).index)
     if sort == 'alphabetical':
         return sort_alphabetically(df[column].unique())

@@ -78,6 +78,12 @@ body {
   white-space: nowrap;
 }
 
+/* Markup prerendered for both themes; data-theme is set by the inline script in layout.tsx before first paint. */
+:root[data-theme="dark"] .light-only,
+:root:not([data-theme="dark"]) .dark-only {
+  display: none;
+}
+
 pre {
   margin: 0;
   white-space: pre-wrap;

@@ -8,10 +8,6 @@ export function exampleSetup(globalSetup: string, setup: SetupCell[], example: E
 const CALL = "PlotGraphs(";
 const DARK_MODE_ARG = /\s*\bdark_mode=(True|False)\s*,?/g;
 
-// Palette grey too dark to read on the dark background, swapped for white in dark mode.
-const LIGHT_GREY = '"#d6dde6"';
-const WHITE = '"#ffffff"';
-
 // Rewrites the arguments of every PlotGraphs(...) call; matches nested parens, e.g. palette=dict(...).
 function mapPlotGraphsArgs(code: string, map: (args: string) => string): string {
   let out = "";
@@ -39,6 +35,6 @@ function withoutDarkMode(args: string): string {
 export function withDarkMode(code: string, dark: boolean): string {
   if (!code.includes(CALL)) throw new Error(`No PlotGraphs(...) call to toggle dark mode on:\n${code}`);
   const stripped = mapPlotGraphsArgs(code, withoutDarkMode);
-  if (!dark) return stripped.replaceAll(WHITE, LIGHT_GREY);
-  return mapPlotGraphsArgs(stripped.replaceAll(LIGHT_GREY, WHITE), (args) => (args ? `${args}, dark_mode=True` : "dark_mode=True"));
+  if (!dark) return stripped;
+  return mapPlotGraphsArgs(stripped, (args) => (args ? `${args}, dark_mode=True` : "dark_mode=True"));
 }

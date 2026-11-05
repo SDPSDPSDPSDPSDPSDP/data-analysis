@@ -3,14 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection from "@/components/domain/PlotSection";
-import { sectionId, type PlotSectionData, type SetupCell } from "@/lib/sections";
+import { sectionId, type Category, type SetupCell } from "@/lib/sections";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
-
-export type Category = {
-  title: string;
-  sections: PlotSectionData[];
-};
 
 type Props = {
   // Page heading for screen readers and outlines; the nav already shows it visually.
@@ -60,6 +55,7 @@ export default function Playground({ title, setup, categories, showSetup, expand
               {cell.explanation && <p>{cell.explanation}</p>}
               <CodeBlock
                 value={setupCodes[i]}
+                dark={dark}
                 onChange={(code) => setSetupCodes((codes) => codes.map((c, j) => (j === i ? code : c)))}
                 onRun={(code) => setSetupCode(setupCodes.map((c, j) => (j === i ? code : c)).join("\n\n"))}
               />

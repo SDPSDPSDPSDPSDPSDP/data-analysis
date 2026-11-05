@@ -48,12 +48,16 @@ def _get_engine(url: URL, schema: str) -> Engine:
 def get_engine(user: str, password: str, host: str, port: int, db_name: str, schema: str) -> Engine:
     """Return the cached DB2 engine for these credentials (schema set on every new connection)."""
     _validate_schema(schema)
+    try:
+        port_number = int(port)
+    except ValueError:
+        raise ValueError(f"DB2 port (DB2_PORT) must be an integer, got {port!r}") from None
     url = URL.create(
         "ibm_db_sa",
         username=user,
         password=password,
         host=host,
-        port=int(port),
+        port=port_number,
         database=db_name,
     )
     return _get_engine(url, schema)

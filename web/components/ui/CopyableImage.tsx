@@ -21,9 +21,16 @@ async function toPng(src: string): Promise<Blob> {
 }
 
 // Rasterized only on copy; the promise keeps the clipboard write inside the click's user gesture (Safari).
-export default function CopyableImage({ src, alt }: { src: string; alt: string }) {
+type Props = {
+  src: string;
+  alt: string;
+  // Shown only in this theme, for markup rendered before the theme is known.
+  theme?: "light" | "dark";
+};
+
+export default function CopyableImage({ src, alt, theme }: Props) {
   return (
-    <figure className="chart copyable">
+    <figure className={theme ? `chart copyable ${theme}-only` : "chart copyable"}>
       <img
         src={src}
         alt={alt}

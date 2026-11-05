@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ...common.colors import palette_colors
+from ...common.data_conversion import aggregate
 from ...config import FigureSize, Marks
 from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend
@@ -65,10 +66,10 @@ def render_barplot(
     """Bar length is the sum of value per category (and hue), or the row count when value is None."""
     order = order if order is not None else list(df[column].dropna().unique())
     if hue is None:
-        totals = df.groupby(column)[value].sum() if value else df[column].value_counts()
+        totals = aggregate(df, column, value)
         return _draw_categorical_bars(chart, totals.reindex(order).to_frame(), [color], horizontal, hue)  # type: ignore[list-item]
     levels = hue_levels(df, hue)
-    table = df.groupby([column, hue])[value].sum().unstack() if value else pd.crosstab(df[column], df[hue])
+    table = aggregate(df, column, value, hue)
     table = table.reindex(index=order, columns=levels)
     return _draw_categorical_bars(chart, table, palette_colors(palette, levels), horizontal, hue)  # type: ignore[arg-type]
 
@@ -78,7 +79,8 @@ def _stacked_bars(
 ) -> None:
     """One bar per row of values, columns stacked in order as segments cut to one rounded outline."""
     n_columns = values.shape[1]
-    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, values.sum(axis=1))]
+    totals = values.sum(axis=1)
+    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, totals)]
     base = np.zeros(len(values))
     for column, color in enumerate(colors[:n_columns]):
         for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
@@ -134,10 +136,12 @@ def render_histogram(
     groups = [df.loc[mask, x] for mask in masks]
 
     group_counts = [np.histogram(values, bins=edges)[0].astype(float) for values in groups]
-    inset = (edges[1] - edges[0]) * Marks.HISTOGRAM_GAP / 2
+    bin_width = edges[1] - edges[0]
+    inset = bin_width * Marks.HISTOGRAM_GAP / 2
     if hue is not None and stacked is not False:
         centers = list((edges[:-1] + edges[1:]) / 2)
-        _stacked_bars(chart, centers, edges[1] - edges[0] - 2 * inset, np.column_stack(group_counts), colors, horizontal=False)
+        bar_width = bin_width - 2 * inset
+        _stacked_bars(chart, centers, bar_width, np.column_stack(group_counts), colors, horizontal=False)
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
         for left, right, count in zip(edges[:-1] + inset, edges[1:] - inset, counts):

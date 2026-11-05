@@ -3,7 +3,7 @@ from typing import Any, List
 import pandas as pd
 
 from ...number_format import format_percentage, format_thousands
-from ..common.colors import default_colors, default_palette, palette_colors
+from ..common.colors import default_colors, palette_colors, resolve_palette
 from ..common.formatting.text_contrast import get_text_color_for_background
 from ..config import FigureSize, Marks
 from ..core import renderer
@@ -12,7 +12,7 @@ from ..core.options import PiePlotOptions
 from ..svg import Text
 
 
-class PieChart(AbstractPlot):
+class PieChart(AbstractPlot[pd.DataFrame]):
     options: PiePlotOptions
 
     def __init__(self, options: PiePlotOptions):
@@ -34,9 +34,11 @@ class PieChart(AbstractPlot):
         self._labels = [label_map.get(key, key) for key in keys] if label_map else keys
 
         palette = self.options.palette
-        if isinstance(palette, str):
-            palette = default_palette(pd.Series(keys), palette)
-        self._colors = default_colors(len(keys)) if palette is None else palette_colors(palette, keys)
+        if palette is None:
+            # Slices keep data order, so the default cycle follows it instead of sorted keys.
+            self._colors = default_colors(len(keys))
+        else:
+            self._colors = palette_colors(resolve_palette(palette, pd.Series(keys)), keys)
         return df
 
     def draw(self, data: pd.DataFrame) -> Any:
@@ -53,7 +55,7 @@ class PieChart(AbstractPlot):
         )
         return chart
 
-    def format_plot(self, plot: Any) -> None:
+    def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         total = sum(self._values)
         plot.legend = [
             (color, label, format_percentage(val / total * 100, self.options.n_after_comma)

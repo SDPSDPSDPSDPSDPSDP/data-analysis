@@ -3,6 +3,7 @@ from typing import Optional
 import pandas as pd
 
 from ..config import SortInput
+from .data_conversion import aggregate
 from .sorting import sort_pivot_table
 
 
@@ -22,9 +23,4 @@ def prepare_stacked_data(
     value_col: Optional[str] = None,
     orientation: str = 'vertical'
 ) -> pd.DataFrame:
-    if value_col:
-        df_pivot = df.pivot_table(index=category_col, columns=hue, values=value_col, aggfunc='sum', fill_value=0)
-    else:
-        df_pivot = pd.crosstab(df[category_col], df[hue])
-    df_pivot.columns.name = hue
-    return sort_stacked_pivot(df_pivot, sort, orientation)
+    return sort_stacked_pivot(aggregate(df, category_col, value_col, hue).fillna(0), sort, orientation)

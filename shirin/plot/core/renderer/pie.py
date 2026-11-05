@@ -33,6 +33,7 @@ def render_piechart(
             format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else '',
             TextColors.BLACK,
             FontSizes.TEXT,
+            on_mark=True,
         ))
         start = end
     if donut:

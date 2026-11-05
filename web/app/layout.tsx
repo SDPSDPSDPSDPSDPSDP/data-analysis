@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   title: { default: SITE_NAME, template: `%s - ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "./" },
-  openGraph: { siteName: SITE_NAME, type: "website", locale: "en" },
+  openGraph: { url: "./", siteName: SITE_NAME, type: "website", locale: "en" },
   twitter: { card: "summary_large_image" },
 };
 

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Example, SetupCell } from "@/lib/sections";
-import type { Skill } from "@/components/ui/SkillViewer";
+import type { Skill } from "@/lib/sections";
 // Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
 import { withDarkMode } from "../lib/exampleSetup.ts";
 

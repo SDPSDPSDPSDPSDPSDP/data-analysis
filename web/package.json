@@ -7,6 +7,7 @@
     "dev": "node scripts/dev.mjs",
     "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "build": "next build",
+    "og": "node scripts/build-og.mjs",
     "portfolio:stills": "node scripts/portfolio/stills.mjs",
     "portfolio:upload": "node scripts/portfolio/upload.mjs",
     "portfolio:compare": "node scripts/portfolio/upload.mjs --compare"

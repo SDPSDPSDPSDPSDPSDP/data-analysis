@@ -10,23 +10,6 @@ from ..config import FillMissingValues, Sort, TimeGroupBy, TitleInput
 class InvalidOptionError(ValueError):
     """Raised when an unsupported option value/type is provided."""
 
-    def __init__(
-        self,
-        option_name: str,
-        received: Any,
-        valid_options: tuple[str, ...],
-        expected: str,
-        type_error: bool = False,
-    ) -> None:
-        if type_error:
-            message = (
-                f"Invalid {option_name} type '{type(received).__name__}'. "
-                f"Valid options are {expected}: {valid_options}."
-            )
-        else:
-            message = f"Invalid {option_name} '{received}'. Valid options are: {valid_options}."
-        super().__init__(message)
-
 
 VALID_SORTS = tuple(sort.value for sort in Sort)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
@@ -50,13 +33,13 @@ def validate_str_or_enum_option(
 
     if isinstance(value, str):
         if value not in valid_options:
-            raise InvalidOptionError(option_name, value, valid_options, 'strings')
+            raise InvalidOptionError(f"Invalid {option_name} '{value}'. Valid options are: {valid_options}.")
         return
 
-    expected = 'strings'
-    if enum_type is not None:
-        expected = f'strings or {enum_type.__name__} enum values'
-    raise InvalidOptionError(option_name, value, valid_options, expected, type_error=True)
+    expected = 'strings' if enum_type is None else f'strings or {enum_type.__name__} enum values'
+    raise InvalidOptionError(
+        f"Invalid {option_name} type '{type(value).__name__}'. Valid options are {expected}: {valid_options}."
+    )
 
 
 @dataclass

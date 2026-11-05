@@ -1,6 +1,6 @@
+import dynamic from "next/dynamic";
 import CodeBlock from "@/components/ui/CodeBlock";
 import DataFormatTable from "@/components/ui/DataFormatTable";
-import SkillViewer from "@/components/ui/SkillViewer";
 import TerminalBlock from "@/components/ui/TerminalBlock";
 import MoreExamples from "@/components/domain/MoreExamples";
 import RunnableCode from "@/components/domain/RunnableCode";
@@ -8,13 +8,16 @@ import { exampleSetup } from "@/lib/exampleSetup";
 import { useDarkMode } from "@/lib/darkMode";
 import { sectionId, type Example, type PlotSectionData, type SetupCell } from "@/lib/sections";
 
+// Only the Tools page shows a skill; keeps react-markdown out of every other page bundle.
+const SkillViewer = dynamic(() => import("@/components/ui/SkillViewer"));
+
 function SetupCellBody({ cell, dark }: { cell: SetupCell; dark: boolean }) {
-  if (cell.kind === "skill") return <SkillViewer skill={cell.skill} />;
+  if (cell.kind === "skill") return <SkillViewer skill={cell.skill} dark={dark} />;
   if (cell.kind === "terminal") {
     const chart = cell.chart && (dark ? cell.chart.dark : cell.chart.light);
     return <TerminalBlock transcript={cell.code} chart={chart} />;
   }
-  return <CodeBlock value={cell.code} />;
+  return <CodeBlock value={cell.code} dark={dark} />;
 }
 
 type Props = PlotSectionData & {
@@ -31,7 +34,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       key={key}
       title={title}
       initialCode={example.code}
-      preview={dark ? example.darkPreview : example.preview}
+      preview={example.preview && example.darkPreview ? { light: example.preview, dark: example.darkPreview } : null}
       setup={exampleSetup(globalSetup, setup, example)}
     />
   );

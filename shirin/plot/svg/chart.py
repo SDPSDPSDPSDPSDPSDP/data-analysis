@@ -43,6 +43,8 @@ class Text:
     dy: float = 0
     short_text: Optional[str] = None  # shown instead when side-by-side labels leave too little room
     alpha: float = 1
+    # Sits on a filled bar or wedge: color already contrasts with that fill, so the dark theme leaves it alone.
+    on_mark: bool = False
 
 
 @dataclass

@@ -5,9 +5,9 @@ export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
 // Three bars in the example palette. Mirrors app/icon.svg; next/og renders plain inline styles, not CSS tokens.
-const BRAND_BG = "#1e1e1e";
+const BRAND_BG = "#ffffff";
 const BARS = [
-  { color: "#e9d0ff", height: 0.45 },
+  { color: "#723746", height: 0.45 },
   { color: "#c7ff0f", height: 0.8 },
   { color: "#ffb752", height: 0.6 },
 ];

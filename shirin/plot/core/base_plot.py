@@ -1,10 +1,10 @@
 import dataclasses
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
 
 import pandas as pd
 
-from ..common.colors import default_palette
+from ..common.colors import resolve_palette
 from ..common.data_conversion import ensure_column_is_string
 from ..common.formatting import format_optional_legend
 from ..config import Colors, FigureSize, TitleInput
@@ -12,6 +12,8 @@ from ..svg import Chart
 from .base_options import BasePlotOptions
 
 PlotPalette = Optional[Union[Dict[Any, str], str]]
+# What transform() hands to draw() and format_plot(): a DataFrame, or a plot's own dataclass.
+DataT = TypeVar('DataT')
 
 
 def split_title(title: Optional[TitleInput]) -> Tuple[str, str]:
@@ -34,7 +36,7 @@ def split_palette(palette: PlotPalette) -> Tuple[Optional[str], Optional[Dict[An
     return Colors.GREY, None
 
 
-class AbstractPlot(ABC):
+class AbstractPlot(ABC, Generic[DataT]):
     def __init__(self, options: BasePlotOptions):
         self.options = options
         self.chart: Optional[Chart] = None
@@ -46,9 +48,9 @@ class AbstractPlot(ABC):
         self.options = dataclasses.replace(self.options)
         self.options.validate()
 
-        transformed_data = self.transform(self.preprocess())
-        chart = self.draw(transformed_data)
-        self.format_plot(chart)
+        data = self.transform(self.preprocess())
+        chart = self.draw(data)
+        self.format_plot(chart, data)
         return chart
 
     @abstractmethod
@@ -56,15 +58,15 @@ class AbstractPlot(ABC):
         pass
 
     @abstractmethod
-    def transform(self, df: pd.DataFrame) -> Any:
+    def transform(self, df: pd.DataFrame) -> DataT:
         pass
 
     @abstractmethod
-    def draw(self, data: Any) -> Chart:
+    def draw(self, data: DataT) -> Chart:
         pass
 
     @abstractmethod
-    def format_plot(self, plot: Chart) -> None:
+    def format_plot(self, plot: Chart, data: DataT) -> None:
         pass
 
     def _new_chart(self, width: Optional[float], plot_height: float) -> Chart:
@@ -89,12 +91,10 @@ class AbstractPlot(ABC):
         """
         self._color, self._palette = split_palette(self.options.palette)
         if self.options.hue is None:
-            if no_hue_color is not None:
+            if no_hue_color is not None and self.options.palette is None:
                 self._color = no_hue_color
             return df
         df = ensure_column_is_string(df, self.options.hue)
-        if self._palette is None:
-            single_color = self.options.palette if isinstance(self.options.palette, str) else None
-            self._palette = default_palette(df[self.options.hue], single_color)
-            self._color = None
+        self._palette = resolve_palette(self.options.palette, df[self.options.hue])
+        self._color = None
         return df

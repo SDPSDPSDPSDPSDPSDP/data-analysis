@@ -45,17 +45,20 @@ def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> 
     ):
         if text:
             row_top = header_row(size)
-            rows.append((text_width(text, size, bold), [marks.text(0, row_top + cap_height(size), text, size, text_color, bold=bold)]))
+            title = marks.text(0, row_top + cap_height(size), text, size, text_color, bold=bold)
+            rows.append((text_width(text, size, bold), [title]))
     legend_rows = _legend_rows(chart.legend, max_width)
     if legend_rows and rows:
         top += Layout.LEGEND_GAP
+    radius = Layout.SWATCH / 2
     for row in legend_rows:
         row_top = header_row(Layout.SWATCH)
+        center_y = row_top + radius
         x = 0.0
         items: List[str] = []
         for swatch, label, value, item_width in row:
-            items.append(f'<circle cx="{x + Layout.SWATCH / 2:.2f}" cy="{row_top + Layout.SWATCH / 2:.2f}" r="{Layout.SWATCH / 2}" fill="{swatch}"/>')
-            baseline = row_top + Layout.SWATCH / 2 + cap_height(FontSizes.LEGEND) / 2
+            items.append(f'<circle cx="{x + radius:.2f}" cy="{center_y:.2f}" r="{radius}" fill="{swatch}"/>')
+            baseline = center_y + cap_height(FontSizes.LEGEND) / 2
             label_x = x + Layout.SWATCH + Layout.SWATCH_GAP
             items.append(marks.text(label_x, baseline, label, FontSizes.LEGEND, color(TextColors.DARK_GREY)))
             if value:

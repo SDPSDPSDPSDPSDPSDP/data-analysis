@@ -3,7 +3,7 @@ import dataclasses
 import itertools
 from typing import Callable, Dict, List
 
-from ..config import Layout, TextColors
+from ..config import Layout
 from ..config.colors import BACKGROUND_COLOR
 from . import marks
 from .chart import Chart, Text, Wedge
@@ -15,7 +15,8 @@ _CLIP_IDS = itertools.count()
 def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
     """Copies with short_text swapped in when side-by-side labels overlap; the chart stays untouched."""
     spans = sorted(marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
-    if not any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
+    gaps = (right[0] - left[1] for left, right in zip(spans, spans[1:]))
+    if not any(gap < Layout.DATALABEL_MIN_SPACE for gap in gaps):
         return texts
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
@@ -49,7 +50,6 @@ def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_botto
     for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
-            # Black/white labels sit on a bar or wedge and already contrast with it.
-            text_color = t.color if t.color in (TextColors.BLACK, TextColors.WHITE) else color(t.color)
+            text_color = t.color if t.on_mark else color(t.color)
             body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha))
     return body
