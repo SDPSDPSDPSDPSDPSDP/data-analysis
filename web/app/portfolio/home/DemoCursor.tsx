@@ -40,14 +40,15 @@ export default function DemoCursor() {
       });
 
     // Time spent paused does not count, so a reader taking over never skips a step.
-    async function wait(ms: number) {
-      let left = ms;
+    async function wait(ms: number, onFrame?: (progress: number) => void) {
+      let elapsed = 0;
       let last = performance.now();
-      while (left > 0) {
+      while (elapsed < ms) {
         await frame();
         const now = performance.now();
-        if (!paused) left -= now - last;
+        if (!paused) elapsed += now - last;
         last = now;
+        onFrame?.(Math.min(1, elapsed / ms));
       }
     }
 
@@ -66,17 +67,10 @@ export default function DemoCursor() {
       const rect = el.getBoundingClientRect();
       const from = current;
       const to = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-      let elapsed = 0;
-      let last = performance.now();
-      while (elapsed < TRAVEL_MS) {
-        await frame();
-        const now = performance.now();
-        if (!paused) elapsed += now - last;
-        last = now;
-        const t = Math.min(1, elapsed / TRAVEL_MS);
+      await wait(TRAVEL_MS, (t) => {
         const eased = t * t * (3 - 2 * t);
         moveTo({ x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased });
-      }
+      });
       hover(el);
     }
 

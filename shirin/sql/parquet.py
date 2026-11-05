@@ -17,7 +17,7 @@ PARQUET_CHUNK_ROWS = 20_000
 def _execute_streaming(
     connection: Connection, sql_query: str, params: Optional[Dict[str, Any]], chunk_rows: int
 ) -> CursorResult:
-    """Same parsing rules as helpers._read_sql, but rows are fetched chunk_rows at a time."""
+    """Same parsing rules as helpers.execute_query, but rows are fetched chunk_rows at a time."""
     streaming = connection.execution_options(yield_per=chunk_rows)
     if params:
         return streaming.execute(text(sql_query), params)
