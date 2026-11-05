@@ -44,7 +44,7 @@ export default function ChartPreview({ src, title, subtitle, index, shrunk, hidd
     <button
       ref={button}
       type="button"
-      className={`chart-preview${shrunk ? " shrunk" : ""}${hidden ? " hidden" : ""}${returning ? " returning" : ""}`}
+      className={["chart-preview", shrunk && "shrunk", hidden && "hidden", returning && "returning"].filter(Boolean).join(" ")}
       style={{ "--i": index } as CSSProperties}
       onClick={() => onOpen(card.current!)}
     >

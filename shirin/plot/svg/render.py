@@ -31,7 +31,11 @@ def _limits(axis: Axis, values: List[float]) -> Tuple[float, float]:
     if lo == hi:
         lo, hi = lo - 0.5, hi + 0.5
     pad = (hi - lo) * Layout.AXIS_MARGIN
-    return (lo if lo in axis.sticky else lo - pad, hi if hi in axis.sticky else hi + pad)
+    if lo not in axis.sticky:
+        lo -= pad
+    if hi not in axis.sticky:
+        hi += pad
+    return (lo, hi)
 
 
 def _ticks(axis: Axis, lo: float, hi: float) -> Ticks:
@@ -67,7 +71,8 @@ def _shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Tex
 
 
 def _x_labels_overlap(ticks: Ticks, sx: Scale) -> bool:
-    spans = [(sx(t) - w / 2, sx(t) + w / 2) for t, w in ((t, text_width(label, FontSizes.TICKS)) for t, label in ticks if label)]
+    widths = [(t, text_width(label, FontSizes.TICKS)) for t, label in ticks if label]
+    spans = [(sx(t) - w / 2, sx(t) + w / 2) for t, w in widths]
     return any(right[0] - left[1] < Layout.TICK_LABEL_MIN_SPACE for left, right in zip(spans, spans[1:]))
 
 
@@ -191,7 +196,9 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
         bottom += tick_size
     if chart.x.label:
         bottom += Layout.LABEL_GAP
-        body.append(marks.text(plot_left + plot_w / 2, bottom + cap_height(FontSizes.XYLABEL), chart.x.label, FontSizes.XYLABEL, color(TextColors.BLACK), 'middle'))
+        label_baseline = bottom + cap_height(FontSizes.XYLABEL)
+        label_color = color(TextColors.BLACK)
+        body.append(marks.text(plot_left + plot_w / 2, label_baseline, chart.x.label, FontSizes.XYLABEL, label_color, 'middle'))
         bottom += FontSizes.XYLABEL
     height = bottom + Layout.PAD
 

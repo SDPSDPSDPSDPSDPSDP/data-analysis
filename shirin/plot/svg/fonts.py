@@ -57,4 +57,9 @@ def font_css(font: Optional[str], bold_used: bool) -> str:
     if font is None:
         return "text{font-family:Helvetica,Arial,sans-serif;font-feature-settings:'tnum'}.b{font-weight:700}"
     faces = _font_face(500) + (_font_face(700) if bold_used else '')
-    return f"{faces}text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{LETTER_SPACING}em}}.l{{letter-spacing:{LARGE_LETTER_SPACING}em}}.b{{font-weight:700;letter-spacing:{BOLD_LETTER_SPACING}em}}"
+    return ''.join([
+        faces,
+        f"text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{LETTER_SPACING}em}}",
+        f".l{{letter-spacing:{LARGE_LETTER_SPACING}em}}",
+        f".b{{font-weight:700;letter-spacing:{BOLD_LETTER_SPACING}em}}",
+    ])
