@@ -185,7 +185,8 @@ export function getHomeCharts() {
   );
 }
 
-// Every prerendered SVG with the code that draws it.
+// Every prerendered SVG with the code that draws it. previewPath registers each path as a side effect,
+// so building the home charts (which builds every category) is what fills previewCodes.
 export function getPreviews() {
   getHomeCharts();
   return [...previewCodes].map(([path, code]) => ({ path, code }));

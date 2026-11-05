@@ -90,7 +90,7 @@ Slices are value counts of `col`. Slices below `value_datalabel` percent get no 
 
 ### Colors
 
-`Colors.GREY`, `DARK_GREY`, `BLACK`, `BROWN`, `PINK`, `LIGHT_BLUE`, `DARK_BLUE`, `GREEN`, `RED`, `GOOD_GREEN`, `BAD_RED` and more. Any hex string works too.
+`Colors.GREY`, `DARK_GREY`, `BLACK`, `BROWN`, `PINK`, `LIGHT_BLUE`, `DARK_BLUE`, `GREEN`, `RED`, `GOOD_GREEN`, `BAD_RED` and more. Any hex string works too; named colors (`'red'`) raise.
 
 ## Stats
 

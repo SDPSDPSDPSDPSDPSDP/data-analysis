@@ -32,6 +32,8 @@ def ticks(axis: Axis, lo: float, hi: float) -> Ticks:
         return []
     if axis.ticks is not None:
         labels = axis.tick_labels if axis.tick_labels is not None else [axis.formatter(t) for t in axis.ticks]
+        if len(labels) != len(axis.ticks):
+            raise ValueError(f"Axis has {len(axis.ticks)} ticks but {len(labels)} tick labels")
         ticks = list(zip(axis.ticks, labels))
     elif axis.dates:
         ticks = list(zip(*date_ticks(lo, hi, fmt=axis.date_format)))
@@ -48,6 +50,8 @@ def tick_color(axis: Axis, other: Axis) -> str:
 
 
 def scale(lo: float, hi: float, start: float, end: float) -> Scale:
+    if lo == hi:
+        raise ValueError(f"Axis limits are equal ({lo}), so there is no range to scale on")
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
 

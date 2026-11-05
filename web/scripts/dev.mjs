@@ -4,7 +4,7 @@ import { execSync, spawn } from "node:child_process";
 import { watch } from "node:fs";
 
 const PREVIEWS = "node scripts/build-previews.mjs";
-const REBUILD = `node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && ${PREVIEWS}`;
+const REBUILD = "npm run prebuild";
 
 function watchPython(dir, command, label) {
   let timer;

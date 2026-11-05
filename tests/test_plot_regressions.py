@@ -175,3 +175,10 @@ def test_time_lines_have_no_point_markers() -> None:
     chart = TimePlot(TimePlotOptions(df=df, x='year', y='n')).render()
     assert chart.lines and not chart.dots
     assert '<circle' not in to_svg(chart)
+
+
+def test_negative_bars_get_labels_below_the_bar() -> None:
+    df = pd.DataFrame({'team': ['a', 'b'], 'delta': [5.0, -3.0]})
+    chart = BarPlot(BarPlotOptions(df=df, axis_column='team', value='delta')).render()
+    labels = {t.text: t for t in chart.texts}
+    assert labels['5'].va == 'bottom' and labels['-3'].va == 'top' and labels['-3'].dy < 0

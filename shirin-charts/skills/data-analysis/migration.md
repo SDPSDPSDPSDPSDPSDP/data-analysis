@@ -22,6 +22,7 @@ How to spot the version of old code:
 | `configure_matplotlib()`                                                                      | Remove.                                                                        |
 | `pd.set_option('display.max_colwidth' / 'display.width')` side effect of `import shirin.plot` | Gone. Set it yourself if the notebook relied on it.                            |
 | seaborn palette names (`palette='viridis'`)                                                   | Not supported. A string palette is now one hex color, values get shades of it. |
+| named colors in a palette (`'red'`)                                                           | Raises in `PlotGraphs(...)`. Use hex (`'#ff0000'`) or `Colors.*`.              |
 
 Saving to a file was the point of `export=True`. 4.x has no API for it; tell the user. Workaround, same hook the web playground uses:
 

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
+    "predev": "npm run prebuild",
     "dev": "node scripts/dev.mjs",
     "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "build": "next build",

@@ -5,6 +5,10 @@ class FontSizes:
     DATALABELS = 8
     XYLABEL = 10
     LEGEND = 8
+    # em; Satoshi reads cramped at small chart sizes without extra tracking, larger text needs less.
+    LETTER_SPACING = 0.05
+    LARGE_LETTER_SPACING = 0.01
+    BOLD_LETTER_SPACING = 0.02
 
 
 class FigureSize:

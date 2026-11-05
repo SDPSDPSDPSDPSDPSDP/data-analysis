@@ -14,11 +14,16 @@ def _length(rect: Rect, orientation: str) -> float:
 
 
 def _add_text(chart: Chart, rect: Rect, text: str, orientation: str, short_text: Optional[str] = None) -> None:
-    gap = Layout.DATALABEL_GAP
+    """Label just past the bar's end: above/right of positive bars, below/left of negative ones."""
+    sign = 1 if _length(rect, orientation) >= 0 else -1
+    gap = Layout.DATALABEL_GAP * sign
     if orientation == 'vertical':
-        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'center', 'bottom', dy=gap, short_text=short_text)
+        va = 'bottom' if sign > 0 else 'top'
+        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'center', va, dy=gap, short_text=short_text)
     else:
-        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'left', 'center', dx=gap)
+        # No short_text: crowding is only checked between side-by-side (vertical) labels.
+        ha = 'left' if sign > 0 else 'right'
+        label = Text(rect.x1, (rect.y0 + rect.y1) / 2, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, ha, 'center', dx=gap)
     chart.texts.append(label)
 
 
@@ -34,7 +39,7 @@ def format_datalabels(
     total = sum(lengths)
 
     for rect, length in zip(rects, lengths):
-        if length <= 0:
+        if length == 0:
             continue
         if formatting == 'percentage':
             _add_text(chart, rect, _percentage_label(length / total * 100 if total > 0 else 0, 1, suffix), orientation)

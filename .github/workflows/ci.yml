@@ -31,6 +31,9 @@ jobs:
       - name: Check interpreter
         run: uv run python -c "import sys; assert sys.version.startswith('${{ matrix.python-version }}.'), sys.version"
 
+      - name: Lint
+        run: uv run ruff check
+
       - name: Run tests
         run: uv run python -m pytest tests/ -v
 

@@ -131,3 +131,13 @@ def test_bar_compact_labels(shown: List[str]) -> None:
     PlotGraphs().bar(df, y='category', value='value', compact_labels=False)
     assert '1,2M' in shown[0] and '457k' in shown[0]
     assert '1.228.787' in shown[1] and '457.435' in shown[1]
+
+
+def test_named_palette_color_raises_up_front() -> None:
+    with pytest.raises(ValueError, match=r"palette\['fruit'\]"):
+        PlotGraphs(palette={'fruit': {'Apple': 'red'}})
+
+
+def test_pie_unknown_column_raises_clear_error(df: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match="col='nope' is not a column"):
+        PlotGraphs().pie(df, col='nope')

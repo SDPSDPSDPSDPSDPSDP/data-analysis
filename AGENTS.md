@@ -9,7 +9,7 @@ Hard rules for AI assistant. Obey always. Use caveman: terse fragments, no artic
 Two parts:
 
 - `shirin/` - Python package (SVG charts, stats, SQL helpers). Managed with `uv`. Tests in `tests/` (pytest). CI runs Python 3.9-3.13.
-- `web/` - Next.js static site (`output: "export"`). Python playground: runs `shirin` in browser via Pyodide web worker. No backend, no database.
+- `web/` - Next.js static site (`output: "export"`). Python playground: runs `shirin` in browser via Pyodide web worker. No backend, no database. Only server code: `web/middleware.js`, a Vercel edge gate hiding `/portfolio` (not security).
 
 ---
 
