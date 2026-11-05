@@ -1,4 +1,4 @@
-import type { Example, SetupCell } from "@/components/domain/PlotSection";
+import type { Example, SetupCell } from "@/lib/sections";
 
 export function exampleSetup(globalSetup: string, setup: SetupCell[], example: Example): string {
   const sectionCode = setup.filter((cell) => cell.kind === "code").map((cell) => cell.code);

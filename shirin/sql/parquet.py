@@ -11,10 +11,9 @@ from sqlalchemy import text
 from sqlalchemy.engine import Connection, CursorResult, Engine
 from tqdm import tqdm
 
+from .row_groups import RowGroupWriter, drain
+
 PARQUET_CHUNK_ROWS = 20_000
-# Fetch chunks are buffered up to this many rows per row group: one group per 20k-row chunk bloats
-# the footer and slows readers, while this still keeps memory bounded.
-PARQUET_ROW_GROUP_ROWS = 250_000
 
 
 def _execute_streaming(
@@ -45,37 +44,6 @@ def _spill(table: pa.Table, spill_dir: Path, index: int) -> Path:
     return path
 
 
-class _RowGroupWriter:
-    """Buffers chunks into row groups of at least PARQUET_ROW_GROUP_ROWS rows."""
-
-    def __init__(self, path: Path, schema: pa.Schema) -> None:
-        self._writer = pq.ParquetWriter(path, schema)
-        self._pending: List[pa.Table] = []
-        self._rows = 0
-
-    def write(self, table: pa.Table) -> None:
-        self._pending.append(table.cast(self._writer.schema))
-        self._rows += table.num_rows
-        if self._rows >= PARQUET_ROW_GROUP_ROWS:
-            self.flush()
-
-    def flush(self) -> None:
-        if self._pending:
-            self._writer.write_table(pa.concat_tables(self._pending))
-        self._pending, self._rows = [], 0
-
-    def close(self) -> None:
-        self._writer.close()
-
-
-def _drain(writer: _RowGroupWriter, spilled: List[Path]) -> None:
-    """Copy spilled chunks into writer one at a time, deleting each once read."""
-    for path in spilled:
-        writer.write(pq.read_table(path))
-        path.unlink()
-    spilled.clear()
-
-
 def _stream_to_parquet(
     sql_query: str,
     engine: Engine,
@@ -94,7 +62,7 @@ def _stream_to_parquet(
         columns = list(result.keys())
         schema = pa.schema([(column, pa.null()) for column in columns])
         spilled: List[Path] = []
-        writer: Optional[_RowGroupWriter] = None
+        writer: Optional[RowGroupWriter] = None
         progress = tqdm(unit=' rows', desc='Fetching')
         try:
             for index, rows in enumerate(result.partitions()):
@@ -107,12 +75,12 @@ def _stream_to_parquet(
                 schema = pa.unify_schemas([schema, table.schema], promote_options='permissive')
                 if any(pa.types.is_null(field.type) for field in schema):
                     continue
-                writer = _RowGroupWriter(output_path, _widen(schema))
-                _drain(writer, spilled)
+                writer = RowGroupWriter(output_path, _widen(schema))
+                drain(writer, spilled)
             if writer is None:
                 # Result ended while some column was still all-NULL (or the result was empty).
-                writer = _RowGroupWriter(output_path, _widen(schema))
-                _drain(writer, spilled)
+                writer = RowGroupWriter(output_path, _widen(schema))
+                drain(writer, spilled)
             writer.flush()
         finally:
             progress.close()

@@ -1,0 +1,48 @@
+/* Divider line through the middle, button sits on top of it. */
+.more-examples > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+  cursor: pointer;
+}
+
+.more-examples > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-examples > summary::before,
+.more-examples > summary::after {
+  content: "";
+  flex: 1;
+  border-top: var(--border-width) solid var(--color-shimmer);
+}
+
+.more-examples-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-shimmer);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-nav);
+  transition: background var(--transition);
+}
+
+.more-examples > summary:hover .more-examples-button {
+  background: var(--color-surface);
+}
+
+.more-examples-chevron {
+  transition: transform var(--transition);
+}
+
+.more-examples[open] .more-examples-chevron {
+  transform: rotate(180deg);
+}
+
+.more-examples:not([open]) .more-examples-open,
+.more-examples[open] .more-examples-closed {
+  display: none;
+}

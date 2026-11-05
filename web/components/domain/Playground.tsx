@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
-import PlotSection, { sectionId, type PlotSectionData, type SetupCell } from "@/components/domain/PlotSection";
+import PlotSection from "@/components/domain/PlotSection";
+import { sectionId, type PlotSectionData, type SetupCell } from "@/lib/sections";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
 

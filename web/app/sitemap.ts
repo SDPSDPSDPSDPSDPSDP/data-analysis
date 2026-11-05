@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getCategories } from "@/app/categories";
-import { sectionId } from "@/components/domain/PlotSection";
+import { sectionId } from "@/lib/sections";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";

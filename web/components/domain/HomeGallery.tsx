@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/domain/Nav";
 import Footer from "@/components/ui/Footer";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
-import { sectionId } from "@/components/domain/PlotSection";
-import type { getHomeCharts } from "@/app/categories";
+import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
+import { sectionId } from "@/lib/sections";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
-
-type Chart = ReturnType<typeof getHomeCharts>[number];
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -35,19 +33,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
   // Card is the clicked one, the modal chart flies out of it.
   // Returning: modal chart is flying back, its card shows again.
   const [open, setOpen] = useState<{ chart: Chart; card: HTMLElement; returning?: boolean } | null>(null);
-  const [order, setOrder] = useState<Chart[] | null>(null);
-  // Shuffled after mount: static export prerenders HTML, shuffling during render would mismatch hydration.
-  // Grid stays empty until then, else the entrance wave starts on the unshuffled order and cards jump mid-animation.
-  useEffect(() => {
-    // Matched by preview path: props arrive as separate copies, and titles repeat.
-    const shuffled = charts.filter((chart) => !pinned.some((slot) => slot?.preview === chart.preview));
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    const slotted = pinned.map((chart) => chart ?? shuffled.shift()!);
-    setOrder([...slotted, ...shuffled].slice(0, limit));
-  }, [charts, pinned, limit]);
+  const order = useGalleryOrder(charts, pinned, limit);
 
   // Set while switching filter: every card shrinks away before the new ones fade in.
   const [leaving, setLeaving] = useState(false);

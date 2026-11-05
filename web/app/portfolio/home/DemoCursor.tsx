@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createDemoClock } from "./demoClock";
+import { CARD_SELECTOR, card, filterButton, hover } from "./demoTargets";
 
 type Point = { x: number; y: number };
 
-const FILTER = "Bar charts";
 // Grid positions to hover, before and after filtering: spread out so the arrow crosses the page.
 const HOVERS_ALL = [0, 6, 9];
 const HOVERS_FILTERED = [1, 4, 2];
@@ -16,9 +17,6 @@ const SETTLE_MS = 1800;
 // Reader's own pointer pauses the script until it rests this long.
 const IDLE_RESUME_MS = 3000;
 
-// Synthetic events never trigger CSS :hover, so the hovered card and nav item get this attribute instead.
-const HOVER_ATTR = "data-demo-hover";
-
 /** Scripted arrow for portfolio recordings: hovers charts, filters to bar charts, hovers, clears the filter, repeats. */
 export default function DemoCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -29,38 +27,15 @@ export default function DemoCursor() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const controller = new AbortController();
     const { signal } = controller;
-    let paused = false;
+    const clock = createDemoClock(signal);
+    const { frame, wait } = clock;
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
     let current: Point = { x: innerWidth / 2, y: innerHeight };
-
-    const frame = () =>
-      new Promise<void>((resolve, reject) => {
-        if (signal.aborted) return reject(signal.reason);
-        requestAnimationFrame(() => resolve());
-      });
-
-    // Time spent paused does not count, so a reader taking over never skips a step.
-    async function wait(ms: number, onFrame?: (progress: number) => void) {
-      let elapsed = 0;
-      let last = performance.now();
-      while (elapsed < ms) {
-        await frame();
-        const now = performance.now();
-        if (!paused) elapsed += now - last;
-        last = now;
-        onFrame?.(Math.min(1, elapsed / ms));
-      }
-    }
 
     function moveTo(point: Point) {
       current = point;
       cursorRef.current!.style.transform =
         `translate(calc(${point.x}px - var(--demo-cursor-tip-x)), calc(${point.y}px - var(--demo-cursor-tip-y)))`;
-    }
-
-    function hover(el: Element | null) {
-      document.querySelectorAll(`[${HOVER_ATTR}]`).forEach((other) => other.removeAttribute(HOVER_ATTR));
-      el?.setAttribute(HOVER_ATTR, "");
     }
 
     async function travel(el: Element) {
@@ -72,18 +47,6 @@ export default function DemoCursor() {
         moveTo({ x: from.x + (to.x - from.x) * eased, y: from.y + (to.y - from.y) * eased });
       });
       hover(el);
-    }
-
-    function card(index: number) {
-      const card = document.querySelectorAll(".home-charts .chart-preview-card")[index];
-      if (!card) throw new Error(`DemoCursor: no chart card at index ${index}`);
-      return card;
-    }
-
-    function filterButton() {
-      const button = [...document.querySelectorAll(".nav-menu button")].find((el) => el.textContent === FILTER);
-      if (!button) throw new Error(`DemoCursor: no "${FILTER}" filter in nav`);
-      return button as HTMLButtonElement;
     }
 
     async function hoverCards(indexes: number[]) {
@@ -107,7 +70,7 @@ export default function DemoCursor() {
 
     async function run() {
       // Grid shuffles after mount, cards appear once it has.
-      while (!document.querySelector(".home-charts .chart-preview-card")) await frame();
+      while (!document.querySelector(CARD_SELECTOR)) await frame();
       await wait(SETTLE_MS);
       moveTo(current);
       setVisible(true);
@@ -121,12 +84,12 @@ export default function DemoCursor() {
 
     function onRealPointer(event: PointerEvent) {
       if (!event.isTrusted) return;
-      paused = true;
+      clock.paused = true;
       setVisible(false);
       hover(null);
       clearTimeout(idleTimer);
       idleTimer = setTimeout(() => {
-        paused = false;
+        clock.paused = false;
         setVisible(true);
       }, IDLE_RESUME_MS);
     }

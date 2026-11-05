@@ -1,30 +1,19 @@
 """Lays out a Chart and writes it as an SVG string."""
-import dataclasses
-import itertools
 import math
-from typing import Dict, List, Optional
+from typing import List, Optional
 from xml.sax.saxutils import escape
 
 from ..config import FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
 from . import marks
 from .axis import fit_x_ticks, limits, scale, tick_color, ticks
-from .chart import Chart, Text, Wedge
+from .chart import Chart
 from .fonts import cap_height, font_css, text_width
 from .header import header_rows as build_header
-from .marks import Scale
+from .plot_body import draw_marks, shorten_crowded_labels
 
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
-_CLIP_IDS = itertools.count()
-
-
-def _shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
-    """Copies with short_text swapped in when side-by-side labels overlap; the chart stays untouched."""
-    spans = sorted(marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
-    if not any(right[0] - left[1] < Layout.DATALABEL_MIN_SPACE for left, right in zip(spans, spans[1:])):
-        return texts
-    return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
 def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
@@ -49,7 +38,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
 
     # Data labels and the last x tick label may stick out of the plot area: make room for them.
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
-    texts = _shorten_crowded_labels(chart.texts, sx, sy)
+    texts = shorten_crowded_labels(chart.texts, sx, sy)
     all_x_ticks, x_ticks = x_ticks, fit_x_ticks(chart.x, x_ticks, sx)
     boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
     if x_ticks and not chart.x.rotation:
@@ -75,36 +64,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
         body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
     if chart.x.grid:
         body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
-    # Data colors are never themed: a user's white slice must stay white, not turn into the background.
-    body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
-    if chart.donut_hole:
-        body.append(marks.wedge(Wedge(0, 1, color(BACKGROUND_COLOR), radius=chart.donut_hole), sx, sy))
-    clip_ids: Dict[int, str] = {}
-    fades: List[str] = []  # drawn after every segment, else the next segment covers them
-    for r in chart.rects:
-        if not (r.width and r.height):
-            continue
-        rect = marks.rect(r, sx, sy)
-        # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
-        fade = marks.fade(r, sx, sy, f'fade{next(_CLIP_IDS)}') if r.fade_to is not None else ''
-        if r.clip is not None:
-            if id(r.clip) not in clip_ids:
-                clip_ids[id(r.clip)] = f'clip{next(_CLIP_IDS)}'
-                body.append(f'<clipPath id="{clip_ids[id(r.clip)]}">{marks.rect(r.clip, sx, sy)}</clipPath>')
-            clip = f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" '
-            rect, fade = rect.replace('<rect ', clip, 1), fade.replace('<rect ', clip, 1)
-        body.append(rect)
-        fades.append(fade)
-    body += fades
-    body += [marks.area(line, sx, sy, plot_bottom, f'area{next(_CLIP_IDS)}') for line in chart.lines if line.fill]
-    body += [marks.line(line, sx, sy) for line in chart.lines]
-    body += [marks.dots(dots, sx, sy) for dots in chart.dots]
-    for t in texts:
-        if t.text:
-            x, baseline = marks.place(t, sx, sy)[:2]
-            # Black/white labels sit on a bar or wedge and already contrast with it.
-            text_color = t.color if t.color in (TextColors.BLACK, TextColors.WHITE) else color(t.color)
-            body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha))
+    body += draw_marks(chart, texts, sx, sy, plot_bottom, color)
 
     if chart.y.label:
         # Rotated a quarter turn counterclockwise, so the baseline is the right edge of the text.

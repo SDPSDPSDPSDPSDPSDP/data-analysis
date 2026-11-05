@@ -1,46 +1,12 @@
-import { ChevronDown } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
-import SkillViewer, { type Skill } from "@/components/ui/SkillViewer";
+import DataFormatTable from "@/components/ui/DataFormatTable";
+import SkillViewer from "@/components/ui/SkillViewer";
 import TerminalBlock from "@/components/ui/TerminalBlock";
+import MoreExamples from "@/components/domain/MoreExamples";
 import RunnableCode from "@/components/domain/RunnableCode";
-import SectionIcon from "@/components/domain/SectionIcon";
 import { exampleSetup } from "@/lib/exampleSetup";
 import { useDarkMode } from "@/lib/darkMode";
-
-// "code" cells run before every example; "terminal" (Claude Code transcript) and "skill" cells are only shown.
-export type SetupCell =
-  | { kind: "code"; explanation: string; code: string }
-  // chart: prerendered SVGs of the transcript's code, shown at its "[chart]" line.
-  | { kind: "terminal"; explanation: string; code: string; chart: { light: string; dark: string } | null }
-  | { kind: "skill"; explanation: string; code: string; skill: Skill };
-
-export type DataFormat = {
-  description: string;
-  columns: { name: string; role: string }[];
-  rows: string[][];
-};
-
-export type Example = {
-  code: string;
-  // Runs after the section setup, not shown.
-  hiddenSetup: string;
-  // Prerendered SVG shown until Python has run, null for examples that draw no chart.
-  preview: string | null;
-  darkPreview: string | null;
-};
-
-export type PlotSectionData = {
-  title: string;
-  dataFormats: DataFormat[];
-  // Shown in the section and run before each of its examples, after the global setup.
-  setup: SetupCell[];
-  examples: Example[];
-  homeExamples: Example[];
-};
-
-export function sectionId(title: string): string {
-  return title.toLowerCase().replace(/\s+/g, "-");
-}
+import { sectionId, type Example, type PlotSectionData, type SetupCell } from "@/lib/sections";
 
 function SetupCellBody({ cell, dark }: { cell: SetupCell; dark: boolean }) {
   if (cell.kind === "skill") return <SkillViewer skill={cell.skill} />;
@@ -101,28 +67,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {dataFormats.map((dataFormat, k) => (
             <div key={k} className="setup-cell">
               <p>{dataFormat.description}</p>
-              <div className="table-scroll">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      {dataFormat.columns.map((col) => (
-                        <th key={col.name}>
-                          {col.name} <span className="data-table-role">{col.role}</span>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dataFormat.rows.map((row, i) => (
-                      <tr key={i}>
-                        {row.map((cell, j) => (
-                          <td key={j}>{cell}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <DataFormatTable columns={dataFormat.columns} rows={dataFormat.rows} />
             </div>
           ))}
         </div>
@@ -131,21 +76,9 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
           {runnable(examples[0])}
         </div>
       </section>
-      {expanded ? (
-        <div className="more-examples">{moreExamples}</div>
-      ) : (
-        <details className="more-examples">
-          <summary>
-            <span className="more-examples-button">
-              <SectionIcon title={title} />
-              <span className="more-examples-closed">{examples.length - 1} more examples</span>
-              <span className="more-examples-open">Hide examples</span>
-              <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
-            </span>
-          </summary>
-          {moreExamples}
-        </details>
-      )}
+      <MoreExamples title={title} count={examples.length - 1} expanded={expanded}>
+        {moreExamples}
+      </MoreExamples>
     </>
   );
 }

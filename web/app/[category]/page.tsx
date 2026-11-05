@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Nav from "@/components/domain/Nav";
 import Footer from "@/components/ui/Footer";
 import Playground from "@/components/domain/Playground";
-import { sectionId } from "@/components/domain/PlotSection";
+import { sectionId } from "@/lib/sections";
 import { getCategories, getSetup } from "@/app/categories";
 
 export function generateStaticParams() {

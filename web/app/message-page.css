@@ -1,0 +1,29 @@
+/* 404 and error pages. */
+.message-page {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.message-page h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-heading);
+}
+
+.message-page p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.message-page a,
+.message-page-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--text-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
