@@ -10,6 +10,7 @@ import "./code.css";
 import "./terminal.css";
 import "./skill.css";
 import "./examples.css";
+import "./data-table.css";
 import "./home.css";
 import "./chart-modal-motion.css";
 import "./chart-modal.css";

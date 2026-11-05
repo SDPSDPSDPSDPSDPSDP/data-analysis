@@ -1,0 +1,36 @@
+/* Wide tables scroll sideways on narrow screens instead of clipping columns. */
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* separate, not collapse: border-radius is ignored on collapsed tables. */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: var(--border-width) solid var(--color-shimmer);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: var(--font-size-code);
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+}
+
+.data-table td {
+  border-top: var(--border-width) solid var(--color-shimmer);
+}
+
+.data-table th {
+  background: var(--color-surface);
+  font-weight: var(--font-weight-doc-heading);
+}
+
+.data-table-role {
+  margin-left: var(--space-0-5);
+  color: var(--text-secondary);
+  font-weight: normal;
+}
