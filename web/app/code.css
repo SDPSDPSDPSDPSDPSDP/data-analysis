@@ -96,7 +96,7 @@
   margin: 0;
   padding: var(--space-1-5) var(--space-2);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: var(--line-height-tooltip);
   max-width: var(--tooltip-max-width);
   max-height: var(--tooltip-max-height);
   overflow: auto;

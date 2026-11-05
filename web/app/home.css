@@ -53,7 +53,7 @@
   max-width: var(--home-chart-scale);
   margin: 0 auto;
   padding-top: var(--space-1);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-heading);
   display: flex;
   flex-direction: column;
@@ -94,7 +94,7 @@
 .chart-preview-title {
   color: var(--text-primary);
   font-size: var(--font-size-tiny);
-  font-weight: 600;
+  font-weight: var(--font-weight-card-title);
 }
 
 .chart-preview-subtitle {

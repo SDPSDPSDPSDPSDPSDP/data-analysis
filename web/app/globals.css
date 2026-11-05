@@ -75,6 +75,9 @@
   --font-weight-heading: 500;
   --font-weight-nav: 500;
   --font-weight-doc-heading: 700;
+  --font-weight-card-title: 600;
+  --line-height-tight: 1.2;
+  --line-height-tooltip: 1.5;
   --letter-spacing-heading: 0.015em;
   --letter-spacing-eyebrow: 0.08em;
 
@@ -173,7 +176,7 @@
   --color-code-button-hover: var(--color-button-hover);
   --code-button-text: var(--text-on-dark-secondary);
   --code-button-text-hover: var(--text-on-dark);
-  --code-text: #d4d4d4;
+  --code-text: rgba(255, 255, 255, 0.82);
   --code-keyword: #ff7b72;
   --code-name: #c9d1d9;
   --code-function: #d2a8ff;

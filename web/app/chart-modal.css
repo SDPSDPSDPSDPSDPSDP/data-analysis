@@ -57,7 +57,7 @@
   backdrop-filter: blur(var(--glass-blur));
   color: var(--text-on-dark);
   font-weight: var(--font-weight-nav);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
   text-decoration: none;
   white-space: nowrap;
   outline: none;
