@@ -95,9 +95,9 @@ class TestNormalizedPlotPaletteKeys:
 
         plot = NormalizedPlot(options)
         plot.render()
+        plot.options.validate()
 
-        assert plot._normalized_pivot is not None
-        assert list(plot._normalized_pivot.columns) == ['False', 'True']
+        assert list(plot.transform(plot.preprocess()).shares.columns) == ['False', 'True']
 
 
 class TestAxisLabelMapping:

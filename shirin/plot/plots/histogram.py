@@ -16,7 +16,7 @@ def _is_whole_numbers(values: pd.Series) -> bool:
     return pd.api.types.is_numeric_dtype(values) and bool((values % 1 == 0).all())
 
 
-class Histogram(AbstractPlot):
+class Histogram(AbstractPlot[pd.DataFrame]):
     options: HistogramOptions
 
     def __init__(self, options: HistogramOptions):
@@ -56,7 +56,7 @@ class Histogram(AbstractPlot):
             stacked=self.options.stacked
         )
 
-    def format_plot(self, plot: Any) -> None:
+    def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         self._format_labels_and_legend(plot)
         format_ticks(
             plot,

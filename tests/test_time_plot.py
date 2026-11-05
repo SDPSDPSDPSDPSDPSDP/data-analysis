@@ -23,7 +23,7 @@ def test_time_counts_per_period_with_zero_gaps_and_cumulative() -> None:
     })
     plot = TimePlot(TimePlotOptions(df=df, x='date', hue='shop', group_by='month', cumulative=True))
     plot.options.validate()
-    data = plot.transform(plot.preprocess()).set_index(['date', 'shop'])[COUNT_COL]
+    data = plot.transform(plot.preprocess()).df.set_index(['date', 'shop'])[COUNT_COL]
     assert data['2024-01-01', 'a'] == 1
     assert data['2024-02-01', 'a'] == 1  # empty February counts as zero
     assert data['2024-03-01', 'a'] == 3

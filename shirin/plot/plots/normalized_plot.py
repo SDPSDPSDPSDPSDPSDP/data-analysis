@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, List, Optional
 
 import pandas as pd
@@ -14,13 +15,17 @@ from ..core.categorical_options import NormalizedPlotOptions
 from .categorical import create_sized_figure, format_period_axis
 
 
-class NormalizedPlot(AbstractPlot):
-    options: NormalizedPlotOptions
+@dataclass
+class NormalizedData:
+    df: pd.DataFrame
+    # Share per hue level (columns) for each category (rows); every row sums to 1.
+    shares: pd.DataFrame
+    # Fill color per bar when bars are colored by category, else None.
+    row_colors: Optional[List[str]]
 
-    def __init__(self, options: NormalizedPlotOptions):
-        super().__init__(options)
-        self._normalized_pivot: Optional[pd.DataFrame] = None
-        self._row_colors: Optional[List[str]] = None
+
+class NormalizedPlot(AbstractPlot[NormalizedData]):
+    options: NormalizedPlotOptions
 
     def preprocess(self) -> pd.DataFrame:
         # crosstab aligns columns on the index, which fails on duplicate labels (e.g. after pd.concat).
@@ -36,7 +41,7 @@ class NormalizedPlot(AbstractPlot):
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df
 
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+    def transform(self, df: pd.DataFrame) -> NormalizedData:
         values = df[self.options.value] if self.options.value else None
         shares = pd.crosstab(
             df[self.options.axis_column], df[self.options.hue],
@@ -47,40 +52,37 @@ class NormalizedPlot(AbstractPlot):
             shares = shares[filled_levels + [self.options.remainder]]
         if self.options.sort == 'frequency':
             # Every row sums to 1, so rank by the first segment's share instead.
-            self._normalized_pivot = shares.sort_values(
-                shares.columns[0], ascending=self.options.orientation == 'horizontal',
-            )
+            shares = shares.sort_values(shares.columns[0], ascending=self.options.orientation == 'horizontal')
         else:
-            self._normalized_pivot = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
-        return df
+            shares = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
+        return NormalizedData(df, shares, self._category_colors(shares))
 
-    def _category_colors(self) -> Optional[List[str]]:
-        """Fill color per bar when bars are colored by category, else None."""
+    def _category_colors(self, shares: pd.DataFrame) -> Optional[List[str]]:
         if self.options.category_palette is None:
             return None
         palette = {str(key): color for key, color in self.options.category_palette.items()}
-        return palette_colors(palette, self._normalized_pivot.index)  # type: ignore[union-attr]
+        return palette_colors(palette, shares.index)
 
-    def draw(self, data: pd.DataFrame) -> Any:
+    def draw(self, data: NormalizedData) -> Any:
         vertical = self.options.orientation == 'vertical'
-        category_colors = self._row_colors = self._category_colors()
+        category_colors = data.row_colors
         return renderer.render_stacked_barplot(
-            create_sized_figure(self, data),
-            df=self._normalized_pivot,  # type: ignore[arg-type]
+            create_sized_figure(self, data.df),
+            df=data.shares,
             horizontal=not vertical,
-            colors=palette_colors(self._palette, self._normalized_pivot.columns),  # type: ignore[arg-type, union-attr]
+            colors=palette_colors(self._palette, data.shares.columns),  # type: ignore[arg-type]
             width=Marks.BAR_WIDTH if vertical else Marks.HORIZONTAL_BAR_WIDTH,
-            overlap=len(self._normalized_pivot.columns) == 2,  # type: ignore[union-attr]
+            overlap=len(data.shares.columns) == 2,
             row_colors=None if category_colors is None else [
                 (color, blend(color, self.options.background, REMAINDER_TINT)) for color in category_colors
             ],
         )
 
-    def format_plot(self, plot: Any) -> None:
+    def format_plot(self, plot: Any, data: NormalizedData) -> None:
         if self.options.remainder is not None:
             # Legend entries follow the pivot columns; match on level, not on the shown text.
             plot.legend = [
-                item for item, level in zip(plot.legend, self._normalized_pivot.columns)  # type: ignore[union-attr]
+                item for item, level in zip(plot.legend, data.shares.columns)
                 if level != self.options.remainder
             ]
         self._format_labels_and_legend(plot)
@@ -92,15 +94,15 @@ class NormalizedPlot(AbstractPlot):
             format_ticks(plot, percentage_x=True)
 
         if self.options.data_labels:
-            labelled = self._normalized_pivot
+            labelled = data.shares
             if self.options.remainder is not None:
                 # The remainder is stacked last, so dropping it leaves the other labels in place.
-                labelled = labelled.drop(columns=self.options.remainder)  # type: ignore[union-attr]
+                labelled = labelled.drop(columns=self.options.remainder)
             format_datalabels_stacked_normalized(
                 plot,
-                labelled,  # type: ignore[arg-type]
+                labelled,
                 self._palette,  # type: ignore[arg-type]
                 orientation=self.options.orientation,
                 suffix=self.options.suffix,
-                row_colors=self._row_colors,
+                row_colors=data.row_colors,
             )

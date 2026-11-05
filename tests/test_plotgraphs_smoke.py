@@ -44,6 +44,15 @@ def test_dark_mode_draws_scatter_and_time_without_hue_white(df: pd.DataFrame, sh
         assert '"#ffffff"' in svg
 
 
+def test_dark_mode_draws_grey_palette_entries_white(df: pd.DataFrame, shown: List[str]) -> None:
+    palette = {'group': {'x': '#D6DDE6', 'y': '#111111'}}
+    PlotGraphs(palette=palette).bar(df, x='category', hue='group')
+    PlotGraphs(palette=palette, dark_mode=True).bar(df, x='category', hue='group')
+    light, dark = (svg.lower() for svg in shown)
+    assert '"#d6dde6"' in light and '"#d6dde6"' not in dark
+    assert '"#111111"' in dark
+
+
 def test_title_and_mapped_legend_render(df: pd.DataFrame, shown: List[str]) -> None:
     PlotGraphs(font='satoshi', label_mapping=GROUP_LABELS).bar(
         df, x='category', hue='group', title='Totals', legend=True

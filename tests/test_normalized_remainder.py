@@ -14,15 +14,15 @@ from shirin.plot.plots import BarPlot, NormalizedPlot
 def test_normalized_barplot_shares_summed_value_per_hue() -> None:
     df = pd.DataFrame({'cat': ['A', 'A', 'A'], 'hue': ['x', 'x', 'y'], 'v': [1, 2, 1]})
     plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='cat', hue='hue', value='v'))
-    plot.render()
-    assert plot._normalized_pivot.loc['A'].tolist() == [0.75, 0.25]
+    plot.options.validate()
+    assert plot.transform(plot.preprocess()).shares.loc['A'].tolist() == [0.75, 0.25]
 
 
 def test_normalized_barplot_accepts_duplicate_index() -> None:
     df = pd.DataFrame({'cat': ['A', 'A'], 'hue': ['x', 'y'], 'v': [3, 1]}, index=[0, 0])
     plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='cat', hue='hue', value='v'))
-    plot.render()
-    assert plot._normalized_pivot.loc['A'].tolist() == [0.75, 0.25]
+    plot.options.validate()
+    assert plot.transform(plot.preprocess()).shares.loc['A'].tolist() == [0.75, 0.25]
 
 
 def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> None:
@@ -30,9 +30,10 @@ def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> 
     plot.bar(df, x='run', value='acc', normalized=True, remainder=True)
     shares = fill_remainder(df, 'run', 'acc', 'Incorrect')
     plot_obj = NormalizedPlot(NormalizedPlotOptions(df=shares, axis_column='run', hue='acc', value=REMAINDER_SHARE_COL, remainder='Incorrect'))
-    plot_obj.render()
-    assert plot_obj._normalized_pivot.columns.tolist() == ['acc', 'Incorrect']
-    assert plot_obj._normalized_pivot.index.tolist() == ['b', 'a']
+    plot_obj.options.validate()
+    pivot = plot_obj.transform(plot_obj.preprocess()).shares
+    assert pivot.columns.tolist() == ['acc', 'Incorrect']
+    assert pivot.index.tolist() == ['b', 'a']
 
 
 def test_barplot_remainder_rejects_non_fractions(plot: PlotGraphs) -> None:
@@ -64,8 +65,9 @@ def test_fill_remainder_collapses_repeated_fraction() -> None:
 def test_remainder_segment_has_no_data_label() -> None:
     df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
     plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect'))
-    chart = plot.draw(plot.transform(plot.preprocess()))
-    plot.format_plot(chart)
+    data = plot.transform(plot.preprocess())
+    chart = plot.draw(data)
+    plot.format_plot(chart, data)
     assert [text.text for text in chart.texts] == ['70%']
 
 

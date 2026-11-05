@@ -35,6 +35,7 @@ def _add_stacked_labels(
                 get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
                 FontSizes.DATALABELS,
                 alpha=Marks.INNER_LABEL_ALPHA,
+                on_mark=True,
             ))
 
 

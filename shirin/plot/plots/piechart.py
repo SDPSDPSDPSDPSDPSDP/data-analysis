@@ -12,7 +12,7 @@ from ..core.options import PiePlotOptions
 from ..svg import Text
 
 
-class PieChart(AbstractPlot):
+class PieChart(AbstractPlot[pd.DataFrame]):
     options: PiePlotOptions
 
     def __init__(self, options: PiePlotOptions):
@@ -53,7 +53,7 @@ class PieChart(AbstractPlot):
         )
         return chart
 
-    def format_plot(self, plot: Any) -> None:
+    def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         total = sum(self._values)
         plot.legend = [
             (color, label, format_percentage(val / total * 100, self.options.n_after_comma)

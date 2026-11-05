@@ -9,7 +9,7 @@ from ..core.base_plot import AbstractPlot
 from ..core.options import ScatterPlotOptions
 
 
-class ScatterPlot(AbstractPlot):
+class ScatterPlot(AbstractPlot[pd.DataFrame]):
     options: ScatterPlotOptions
 
     def preprocess(self) -> pd.DataFrame:
@@ -30,7 +30,7 @@ class ScatterPlot(AbstractPlot):
             palette=self._palette
         )
 
-    def format_plot(self, plot: Any) -> None:
+    def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         self._format_labels_and_legend(plot)
         format_ticks(
             plot,
