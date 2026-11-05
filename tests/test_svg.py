@@ -195,3 +195,15 @@ def test_crowded_x_ticks_get_shortened_then_thinned() -> None:
     assert '>500k<' in narrow and '>500.000<' not in narrow
     tiny = chart(1.5, 2_000_000)
     assert '>1M<' in tiny and '>500k<' not in tiny
+
+
+def test_dark_mode_keeps_user_data_colors() -> None:
+    c = Chart(width=None, plot_height=3)
+    c.x.lim = c.y.lim = (-1.2, 1.2)
+    c.x.visible = c.y.visible = False
+    c.wedges = [Wedge(0, 0.5, '#ffffff'), Wedge(0.5, 1, '#000000')]
+    c.lines.append(Line([0, 1], [0, 1], '#ffffff'))
+    c.donut_hole = 0.6
+    svg = to_svg(c, dark_mode=True)
+    assert 'fill="#ffffff"' in svg and 'fill="#000000"' in svg and 'stroke="#ffffff"' in svg
+    assert svg.count('fill="#1e1e1e"') == 2  # background and donut hole

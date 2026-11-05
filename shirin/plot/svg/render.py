@@ -9,7 +9,7 @@ from ..config import FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
 from . import marks
 from .axis import fit_x_ticks, limits, scale, tick_color, ticks
-from .chart import Chart, Text
+from .chart import Chart, Text, Wedge
 from .fonts import cap_height, font_css, text_width
 from .header import header_rows as build_header
 from .marks import Scale
@@ -75,7 +75,10 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
         body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
     if chart.x.grid:
         body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
-    body += [marks.wedge(dataclasses.replace(w, color=color(w.color)), sx, sy) for w in chart.wedges if w.end > w.start]
+    # Data colors are never themed: a user's white slice must stay white, not turn into the background.
+    body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
+    if chart.donut_hole:
+        body.append(marks.wedge(Wedge(0, 1, color(BACKGROUND_COLOR), radius=chart.donut_hole), sx, sy))
     clip_ids: Dict[int, str] = {}
     fades: List[str] = []  # drawn after every segment, else the next segment covers them
     for r in chart.rects:
@@ -94,8 +97,8 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
         fades.append(fade)
     body += fades
     body += [marks.area(line, sx, sy, plot_bottom, f'area{next(_CLIP_IDS)}') for line in chart.lines if line.fill]
-    body += [marks.line(dataclasses.replace(line, color=color(line.color)), sx, sy) for line in chart.lines]
-    body += [marks.dots(dataclasses.replace(dots, color=color(dots.color)), sx, sy) for dots in chart.dots]
+    body += [marks.line(line, sx, sy) for line in chart.lines]
+    body += [marks.dots(dots, sx, sy) for dots in chart.dots]
     for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
