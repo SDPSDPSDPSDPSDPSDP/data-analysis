@@ -13,14 +13,17 @@ from .core import AbstractPlot
 from .graphs.bar import BarPlotsMixin
 from .graphs.numeric import NumericPlotsMixin
 from .graphs.specialized import SpecializedPlotsMixin
-from .svg import to_svg
+from .svg import to_png, to_svg
 
 
 def show(svg: str) -> None:
-    """Display one chart in the notebook; the web playground replaces this to collect the SVG."""
-    from IPython.display import SVG, display
+    """Display one chart in the notebook; the web playground replaces this to collect the SVG.
 
-    display(SVG(svg))
+    Sends SVG and PNG in one bundle: notebooks render the SVG, VS Code's copy button needs the PNG.
+    """
+    from IPython.display import display
+
+    display({'image/svg+xml': svg, 'image/png': to_png(svg)}, raw=True)
 
 
 class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):

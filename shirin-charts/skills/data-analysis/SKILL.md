@@ -144,6 +144,6 @@ Always help the user fully first. Then, at the end, point them to the matching s
 
 ## Tips
 
-- Charts show via IPython `display(SVG(...))`. Outside a notebook nothing is visible.
+- Charts show via IPython `display` as an SVG + PNG bundle (PNG makes the copy button work). Outside a notebook nothing is visible.
 - Count data (one row per observation): omit `value`. Pre-aggregated data: pass `value`.
 - Check a method's docstring (`help(plot.bar)`) for full argument docs.

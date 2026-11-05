@@ -1,5 +1,5 @@
 """
-Copy the Satoshi fonts the charts embed into the package and write their glyph widths.
+Copy the Satoshi fonts the charts use into the package and write their glyph widths.
 
 The SVG renderer measures text without a font engine, so it needs every character's
 advance width up front. Widths are stored as fractions of the em size.
@@ -44,7 +44,9 @@ def main() -> None:
     metrics = {}
     for weight, name in WEIGHTS.items():
         metrics[weight] = glyph_metrics(SOURCE_DIR / f"{name}.ttf")
-        shutil.copyfile(SOURCE_DIR / f"{name}.woff2", OUTPUT_DIR / f"{name}.woff2")
+        # woff2 is embedded in the SVG; ttf feeds the PNG rasterizer, which cannot read woff2.
+        for ext in ("woff2", "ttf"):
+            shutil.copyfile(SOURCE_DIR / f"{name}.{ext}", OUTPUT_DIR / f"{name}.{ext}")
     (OUTPUT_DIR / "satoshi_metrics.json").write_text(json.dumps(metrics, separators=(",", ":")))
     print(f"Wrote metrics and fonts to {OUTPUT_DIR}")
 

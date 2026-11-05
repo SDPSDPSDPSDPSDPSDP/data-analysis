@@ -1,1 +1,0 @@
-- png in notebooks: make sure when this library is run, the images in notebooks are not svg, but png, so they can be copied

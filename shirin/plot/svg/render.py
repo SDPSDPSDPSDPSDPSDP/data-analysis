@@ -3,17 +3,24 @@ import math
 from typing import List, Optional
 from xml.sax.saxutils import escape
 
-from ..config import FontSizes, Layout, TextColors
+from ..config import FigureSize, FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
 from . import marks
 from .axis import fit_x_ticks, limits, scale, tick_color, ticks
 from .chart import Chart
-from .fonts import cap_height, font_css, text_width
+from .fonts import TTF_FILES, cap_height, font_css, text_width
 from .header import header_rows as build_header
 from .plot_body import draw_marks, shorten_crowded_labels
 
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
+
+
+def to_png(svg: str) -> bytes:
+    """Rasterize a chart SVG. Satoshi is passed as TTF since the rasterizer cannot read the embedded woff2."""
+    import resvg_py
+
+    return resvg_py.svg_to_bytes(svg_string=svg, font_files=TTF_FILES, zoom=FigureSize.PNG_SCALE)
 
 
 def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
@@ -61,9 +68,16 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     body: List[str] = []
     grid = f'stroke="{color(GRID_COLOR)}" stroke-width="{Layout.HAIRLINE}"'
     if chart.y.grid:
-        body += [f'<line x1="{plot_left:.2f}" x2="{plot_left + plot_w:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>' for t, _ in y_ticks]
+        plot_right = plot_left + plot_w
+        body += [
+            f'<line x1="{plot_left:.2f}" x2="{plot_right:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>'
+            for t, _ in y_ticks
+        ]
     if chart.x.grid:
-        body += [f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>' for t, _ in x_ticks]
+        body += [
+            f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>'
+            for t, _ in x_ticks
+        ]
     body += draw_marks(chart, texts, sx, sy, plot_bottom, color)
 
     if chart.y.label:
@@ -92,7 +106,9 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
                 body.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
-        body += [marks.text(sx(t), bottom + cap, label, tick_size, color(TextColors.DARK_GREY), 'middle') for t, label in chart.x.sub_labels]
+        sub_label_color = color(TextColors.DARK_GREY)
+        body += [marks.text(sx(t), bottom + cap, label, tick_size, sub_label_color, 'middle')
+                 for t, label in chart.x.sub_labels]
         bottom += tick_size
     if chart.x.label:
         bottom += Layout.LABEL_GAP

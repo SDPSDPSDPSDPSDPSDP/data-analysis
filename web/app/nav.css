@@ -26,9 +26,9 @@
 
 .nav-brand {
   font-size: var(--font-size-brand);
-  font-family: var(--font-heading);
-  font-weight: var(--font-weight-heading);
-  letter-spacing: var(--letter-spacing-heading);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-brand);
+  letter-spacing: var(--letter-spacing-brand);
   display: inline-block;
   transition: transform var(--transition);
 }

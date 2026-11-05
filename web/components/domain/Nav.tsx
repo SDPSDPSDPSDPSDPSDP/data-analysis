@@ -55,7 +55,7 @@ export default function Nav({ categories, filter }: Props) {
           filter.onSelect(filter.active);
         }}
       >
-        shirin
+        data ink
       </Link>
       <div className="nav-menus">
         {categories.map((category) =>

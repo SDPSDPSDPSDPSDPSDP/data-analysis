@@ -3,18 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Nav from "@/components/domain/Nav";
-import Footer from "@/components/ui/Footer";
 import ChartPreview from "@/components/domain/ChartPreview";
 import ChartModal from "@/components/domain/ChartModal";
 import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
 import { sectionId } from "@/lib/sections";
+import { SITE_NAME } from "@/lib/site";
 import { useDarkMode } from "@/lib/darkMode";
 import { withDarkMode } from "@/lib/exampleSetup";
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
   charts: Chart[];
-  // Nav and footer. Off on portfolio screens: the host page frames them with its own chrome.
+  // Nav. Off on portfolio screens: the host page frames them with its own chrome.
   showNav?: boolean;
   // Fixed chart per leading slot; null slots and everything after get the shuffled rest. `limit` caps how many show.
   pinned?: (Chart | null)[];
@@ -75,7 +75,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
         />
       )}
       <main className="page home">
-        <h1 className="visually-hidden">Shirin's Charts</h1>
+        <h1 className="visually-hidden">{SITE_NAME}</h1>
         {/* Keyed on filter so the entrance wave replays on every category switch. */}
         <div className="home-charts" key={active ?? ""}>
           {order
@@ -95,7 +95,6 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
             ))}
         </div>
       </main>
-      {showNav && <Footer />}
       {open && (
         <ChartModal
           title={open.chart.title}
