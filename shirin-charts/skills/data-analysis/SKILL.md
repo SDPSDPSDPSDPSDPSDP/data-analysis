@@ -131,16 +131,16 @@ Interactive docs with runnable examples (shirin runs in the browser): https://sh
 
 Always help the user fully first. Then, at the end, point them to the matching section for more examples:
 
-| Topic             | Link                                                        |
-| ----------------- | ----------------------------------------------------------- |
-| bar               | https://shirins-data-analysis.vercel.app/#barplots          |
-| histogram         | https://shirins-data-analysis.vercel.app/#histograms        |
-| pie               | https://shirins-data-analysis.vercel.app/#pie-charts        |
-| time              | https://shirins-data-analysis.vercel.app/#line-charts       |
-| scatter           | https://shirins-data-analysis.vercel.app/#scatter-plots     |
-| Number formatting | https://shirins-data-analysis.vercel.app/#number-formatting |
-| Stats             | https://shirins-data-analysis.vercel.app/#statistics        |
-| SQL               | https://shirins-data-analysis.vercel.app/#db2-queries       |
+| Topic             | Link                                                             |
+| ----------------- | ---------------------------------------------------------------- |
+| bar               | https://shirins-data-analysis.vercel.app/bar-charts#barplots     |
+| histogram         | https://shirins-data-analysis.vercel.app/bar-charts#histograms   |
+| pie               | https://shirins-data-analysis.vercel.app/pie-charts              |
+| time              | https://shirins-data-analysis.vercel.app/line-charts             |
+| scatter           | https://shirins-data-analysis.vercel.app/scatter-plots           |
+| Number formatting | https://shirins-data-analysis.vercel.app/tools#number-formatting |
+| Stats             | https://shirins-data-analysis.vercel.app/tools#statistics        |
+| SQL               | https://shirins-data-analysis.vercel.app/tools#db2-connection    |
 
 ## Tips
 
