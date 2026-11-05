@@ -1,6 +1,4 @@
-import { getHomeCharts } from "@/app/categories";
-
-type Chart = ReturnType<typeof getHomeCharts>[number];
+import type { Chart } from "@/components/domain/useGalleryOrder";
 
 // Fixed chart per slot, row by row, as [category, title]: titles repeat across categories.
 // null slots and the rest are shuffled.

@@ -2,13 +2,20 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./base.css";
+import "./message-page.css";
+import "./footer.css";
 import "./nav.css";
 import "./code.css";
+import "./copy-button.css";
+import "./doc-tooltip.css";
 import "./terminal.css";
 import "./skill.css";
 import "./examples.css";
+import "./data-table.css";
+import "./more-examples.css";
 import "./home.css";
 import "./chart-modal-motion.css";
 import "./chart-modal.css";
@@ -27,8 +34,12 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Shirin's Charts",
-  description: "Write Python on the left, see the shirin chart on the right.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s - ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "./" },
+  openGraph: { siteName: SITE_NAME, type: "website", locale: "en" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +49,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (localStorage.getItem("${STORAGE_KEY}") !== "0") document.documentElement.dataset.theme = "dark";`,
+            // Blocked storage (Safari private mode, sandboxed iframes) throws; dark stays the default then.
+            __html: `let saved = null; try { saved = localStorage.getItem("${STORAGE_KEY}"); } catch {} if (saved !== "0") document.documentElement.dataset.theme = "dark";`,
           }}
         />
       </head>

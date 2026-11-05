@@ -23,7 +23,7 @@ body {
 }
 
 .page {
-  min-height: calc(100vh - var(--nav-height));
+  min-height: calc(100dvh - var(--nav-height));
   background: var(--color-bg-home);
   display: flex;
   flex-direction: column;
@@ -69,6 +69,15 @@ body {
   animation-delay: calc(min(var(--i), var(--docs-enter-max-index)) * var(--docs-enter-stagger));
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 pre {
   margin: 0;
   white-space: pre-wrap;
@@ -96,6 +105,31 @@ pre {
   }
   to {
     background-position: -100% 0;
+  }
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-height);
+  height: var(--button-height);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  outline: none;
+}
+
+.icon-button:focus-visible {
+  background: var(--color-button-hover);
+}
+
+/* Fingers need bigger targets than a mouse pointer. */
+@media (pointer: coarse) {
+  .icon-button {
+    width: var(--button-height-touch);
+    height: var(--button-height-touch);
   }
 }
 

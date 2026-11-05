@@ -17,6 +17,8 @@ export default function ForwardWheel() {
     }
 
     window.addEventListener("wheel", handleWheel, { passive: false });
+    // Portfolio shows its error placeholder when no ready arrives after load.
+    window.parent.postMessage({ type: "demo:ready" }, "*");
     return () => window.removeEventListener("wheel", handleWheel);
   }, []);
 

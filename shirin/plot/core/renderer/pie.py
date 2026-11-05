@@ -3,7 +3,6 @@ from typing import List
 
 from ....number_format import format_percentage
 from ...config import FontSizes, Marks, TextColors
-from ...config.colors import BACKGROUND_COLOR
 from ...svg import Chart, Text, Wedge
 
 
@@ -37,7 +36,7 @@ def render_piechart(
         ))
         start = end
     if donut:
-        chart.wedges.append(Wedge(0, 1, BACKGROUND_COLOR, radius=Marks.DONUT_HOLE_RADIUS))
+        chart.donut_hole = Marks.DONUT_HOLE_RADIUS
     if datalabels:
         chart.texts += texts
     return texts

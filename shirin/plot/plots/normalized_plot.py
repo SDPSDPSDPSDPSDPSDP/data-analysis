@@ -27,9 +27,11 @@ class NormalizedPlot(AbstractPlot):
         df = ensure_column_is_string(self.options.df, self.options.axis_column).reset_index(drop=True)
         df = self._resolve_hue_palette(df)
         remainder = self.options.remainder
-        if remainder is not None and not (isinstance(self.options.palette, dict) and remainder in self.options.palette):
+        user_colored_remainder = isinstance(self.options.palette, dict) and remainder in self.options.palette
+        if remainder is not None and not user_colored_remainder:
             filled = next(level for level in df[self.options.hue].unique() if level != remainder)
-            self._palette = {**self._palette, remainder: blend(self._palette[filled], self.options.background, REMAINDER_TINT)}  # type: ignore[dict-item]
+            remainder_color = blend(self._palette[filled], self.options.background, REMAINDER_TINT)
+            self._palette = {**self._palette, remainder: remainder_color}  # type: ignore[dict-item]
         if self.options.top_n is not None:
             df = filter_top_n_categories(df, self.options.axis_column, self.options.top_n)
         return df
@@ -41,7 +43,8 @@ class NormalizedPlot(AbstractPlot):
             values=values, aggfunc='sum' if values is not None else None, normalize='index',
         )
         if self.options.remainder is not None:
-            shares = shares[[level for level in shares.columns if level != self.options.remainder] + [self.options.remainder]]
+            filled_levels = [level for level in shares.columns if level != self.options.remainder]
+            shares = shares[filled_levels + [self.options.remainder]]
         if self.options.sort == 'frequency':
             # Every row sums to 1, so rank by the first segment's share instead.
             self._normalized_pivot = shares.sort_values(

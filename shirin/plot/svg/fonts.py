@@ -7,10 +7,6 @@ from typing import Any, Dict, Optional
 from ..config import FontSizes
 
 FONTS_DIR = Path(__file__).resolve().parent.parent.parent / "assets" / "fonts"
-# em; Satoshi reads cramped at small chart sizes without extra tracking, larger text needs less.
-LETTER_SPACING = 0.05
-LARGE_LETTER_SPACING = 0.01
-BOLD_LETTER_SPACING = 0.02
 FONT_FILES = {500: "Satoshi-Medium.woff2", 700: "Satoshi-Bold.woff2"}
 
 
@@ -28,8 +24,8 @@ def is_large(size: float) -> bool:
 
 def letter_spacing(size: float, bold: bool) -> float:
     if bold:
-        return BOLD_LETTER_SPACING
-    return LARGE_LETTER_SPACING if is_large(size) else LETTER_SPACING
+        return FontSizes.BOLD_LETTER_SPACING
+    return FontSizes.LARGE_LETTER_SPACING if is_large(size) else FontSizes.LETTER_SPACING
 
 
 def text_width(text: str, size: float, bold: bool = False) -> float:
@@ -57,4 +53,9 @@ def font_css(font: Optional[str], bold_used: bool) -> str:
     if font is None:
         return "text{font-family:Helvetica,Arial,sans-serif;font-feature-settings:'tnum'}.b{font-weight:700}"
     faces = _font_face(500) + (_font_face(700) if bold_used else '')
-    return f"{faces}text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{LETTER_SPACING}em}}.l{{letter-spacing:{LARGE_LETTER_SPACING}em}}.b{{font-weight:700;letter-spacing:{BOLD_LETTER_SPACING}em}}"
+    return ''.join([
+        faces,
+        f"text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{FontSizes.LETTER_SPACING}em}}",
+        f".l{{letter-spacing:{FontSizes.LARGE_LETTER_SPACING}em}}",
+        f".b{{font-weight:700;letter-spacing:{FontSizes.BOLD_LETTER_SPACING}em}}",
+    ])

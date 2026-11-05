@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --color-bg: #fff;
   --color-bg-home: #f8fafc;
   --color-surface: rgba(0, 0, 0, 0.04);
@@ -53,7 +54,8 @@
 
   --text-primary: rgba(0, 0, 0, 0.93);
   --text-muted: rgba(0, 0, 0, 0.7);
-  --text-secondary: rgba(0, 0, 0, 0.53);
+  /* 0.6, not lower: stays above WCAG AA contrast on --color-bg-home. */
+  --text-secondary: rgba(0, 0, 0, 0.6);
   --text-on-dark: rgba(255, 255, 255, 0.93);
   --text-on-dark-secondary: rgba(255, 255, 255, 0.6);
   --text-on-dark-pure: rgba(255, 255, 255, 1);
@@ -61,8 +63,8 @@
   --font-body: var(--font-satoshi), sans-serif;
   --font-heading: var(--font-futura), "Futura", sans-serif;
   --font-size-brand: 28px;
-  --font-size-h2: 48px;
-  --font-size-h3: 32px;
+  --font-size-h2: clamp(32px, 8vw, 48px);
+  --font-size-h3: clamp(24px, 6vw, 32px);
   --font-size-small: 13px;
   --font-size-tiny: 10px;
   --font-size-micro: 7px;
@@ -75,6 +77,9 @@
   --font-weight-heading: 500;
   --font-weight-nav: 500;
   --font-weight-doc-heading: 700;
+  --font-weight-card-title: 600;
+  --line-height-tight: 1.2;
+  --line-height-tooltip: 1.5;
   --letter-spacing-heading: 0.015em;
   --letter-spacing-eyebrow: 0.08em;
 
@@ -131,12 +136,14 @@
   --radius-pill: 999px;
   --radius-swatch: 2px;
   --button-height: 28px;
+  --button-height-touch: 44px;
   --transition: 120ms ease;
   --theme-fade-duration: 400ms;
 
-  --runnable-height: 75vh;
-  --data-format-chart-height: 50vh;
-  --modal-chart-height: 55vh;
+  /* svh: stays put while the mobile address bar slides in and out. */
+  --runnable-height: 75svh;
+  --data-format-chart-height: 50svh;
+  --modal-chart-height: 55svh;
   --chart-aspect-ratio: 4 / 3;
   --shimmer-duration: 1.4s;
   --tooltip-max-width: 560px;
@@ -173,7 +180,7 @@
   --color-code-button-hover: var(--color-button-hover);
   --code-button-text: var(--text-on-dark-secondary);
   --code-button-text-hover: var(--text-on-dark);
-  --code-text: #d4d4d4;
+  --code-text: rgba(255, 255, 255, 0.82);
   --code-keyword: #ff7b72;
   --code-name: #c9d1d9;
   --code-function: #d2a8ff;

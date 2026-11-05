@@ -21,19 +21,9 @@
 }
 
 .chart-modal-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--button-height);
-  height: var(--button-height);
-  padding: 0;
   font: inherit;
-  border: none;
-  border-radius: var(--radius);
   background: none;
   color: var(--text-on-dark-secondary);
-  cursor: pointer;
-  outline: none;
   transition: background var(--transition), color var(--transition);
 }
 
@@ -57,7 +47,7 @@
   backdrop-filter: blur(var(--glass-blur));
   color: var(--text-on-dark);
   font-weight: var(--font-weight-nav);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
   text-decoration: none;
   white-space: nowrap;
   outline: none;

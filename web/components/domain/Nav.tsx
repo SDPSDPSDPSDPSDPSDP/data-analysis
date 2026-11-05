@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { sectionId } from "@/components/domain/PlotSection";
+import { sectionId } from "@/lib/sections";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { setDarkMode, useDarkMode } from "@/lib/darkMode";
 

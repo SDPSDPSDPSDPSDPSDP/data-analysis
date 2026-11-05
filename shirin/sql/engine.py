@@ -32,9 +32,7 @@ def _add_db2_dll_directory() -> None:
 @functools.lru_cache(maxsize=None)
 def _get_engine(url: URL, schema: str) -> Engine:
     _add_db2_dll_directory()
-    # pool_recycle replaces a pre-ping round trip per query: connections older than 15 min
-    # are reopened, which stays under typical DB2/firewall idle timeouts. One connection is
-    # kept idle; up to 4 extra for concurrent callers are closed when returned.
+    # pool_recycle (15 min, under typical DB2/firewall idle timeouts) replaces a pre-ping round trip per query.
     engine = create_engine(url, pool_recycle=900, pool_size=1, max_overflow=4)
 
     @event.listens_for(engine, "connect")

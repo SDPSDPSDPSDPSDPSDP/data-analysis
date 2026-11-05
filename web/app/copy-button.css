@@ -1,0 +1,48 @@
+.copyable > .copy-button {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  background: var(--color-button);
+  color: var(--text-on-dark-secondary);
+  opacity: 0;
+  transition: background var(--transition), opacity var(--transition);
+}
+
+.copyable:hover > .copy-button,
+.copy-button:focus-visible {
+  opacity: 1;
+}
+
+/* No hover on touch screens, so the button would never show. */
+@media (hover: none) {
+  .copyable > .copy-button {
+    opacity: 1;
+  }
+}
+
+.copy-button:hover,
+.copy-button:focus-visible {
+  background: var(--color-button-hover);
+  color: var(--text-on-dark);
+}
+
+.code-block > .copy-button {
+  background: var(--color-code-button);
+  color: var(--code-button-text);
+}
+
+.code-block > .copy-button:hover,
+.code-block > .copy-button:focus-visible {
+  background: var(--color-code-button-hover);
+  color: var(--code-button-text-hover);
+}
+
+.chart > .copy-button {
+  background: var(--color-overlay-button);
+  color: var(--text-on-dark-pure);
+}
+
+.chart > .copy-button:hover,
+.chart > .copy-button:focus-visible {
+  background: var(--color-overlay-button-hover);
+}

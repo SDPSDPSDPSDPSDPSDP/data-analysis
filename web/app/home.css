@@ -27,7 +27,8 @@
 }
 
 /* Grown card overlaps neighbours; later grid items would paint over it. */
-.chart-preview:has(> .chart-preview-card:hover, > .chart-preview-card[data-demo-hover]) {
+.chart-preview:has(> .chart-preview-card:hover, > .chart-preview-card[data-demo-hover]),
+.chart-preview:focus-visible {
   z-index: 1;
 }
 
@@ -53,7 +54,7 @@
   max-width: var(--home-chart-scale);
   margin: 0 auto;
   padding-top: var(--space-1);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
   letter-spacing: var(--letter-spacing-heading);
   display: flex;
   flex-direction: column;
@@ -69,7 +70,8 @@
 }
 
 .chart-preview-card:hover,
-.chart-preview-card[data-demo-hover] {
+.chart-preview-card[data-demo-hover],
+.chart-preview:focus-visible > .chart-preview-card {
   scale: min(var(--home-chart-hover-scale), var(--home-chart-fit-scale));
 }
 
@@ -94,7 +96,7 @@
 .chart-preview-title {
   color: var(--text-primary);
   font-size: var(--font-size-tiny);
-  font-weight: 600;
+  font-weight: var(--font-weight-card-title);
 }
 
 .chart-preview-subtitle {

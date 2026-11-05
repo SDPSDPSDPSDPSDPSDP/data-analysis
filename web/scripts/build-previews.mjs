@@ -2,7 +2,7 @@
 // for Pyodide. Python replaces them in the browser once it has run the example.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync } from "node:fs";
-import { getPreviews } from "../app/categories.ts";
+import { getPreviews } from "../app/homeCharts.ts";
 
 // Names are content hashes: clear old ones so edited examples leave no stale files.
 // Empties the folder instead of removing it: on Windows a file watcher holding it open makes rmdir fail with EBUSY.

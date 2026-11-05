@@ -13,8 +13,10 @@ section.setup-cell + section.setup-cell {
   color: var(--text-muted);
 }
 
-.setup-cell h4 {
+/* h3 or h4 by section depth; .page scope outranks the big centered `.page h3` style. */
+.page .setup-cell :is(h3, h4) {
   margin: 0;
+  text-align: start;
   font-size: var(--font-size-doc-heading);
 }
 
@@ -63,38 +65,6 @@ section.setup-cell + section.setup-cell {
   margin-top: var(--space-2);
 }
 
-/* separate, not collapse: border-radius is ignored on collapsed tables. */
-.data-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: var(--border-width) solid var(--color-shimmer);
-  border-radius: var(--radius);
-  overflow: hidden;
-  font-size: var(--font-size-code);
-}
-
-.data-table th,
-.data-table td {
-  padding: var(--space-1) var(--space-2);
-  text-align: left;
-}
-
-.data-table td {
-  border-top: var(--border-width) solid var(--color-shimmer);
-}
-
-.data-table th {
-  background: var(--color-surface);
-  font-weight: var(--font-weight-doc-heading);
-}
-
-.data-table-role {
-  margin-left: var(--space-0-5);
-  color: var(--text-secondary);
-  font-weight: normal;
-}
-
 .runnable {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -105,55 +75,6 @@ section.setup-cell + section.setup-cell {
 .runnable + .runnable,
 .more-examples > .runnable {
   margin-top: var(--space-6);
-}
-
-/* Divider line through the middle, button sits on top of it. */
-.more-examples > summary {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  list-style: none;
-  cursor: pointer;
-}
-
-.more-examples > summary::-webkit-details-marker {
-  display: none;
-}
-
-.more-examples > summary::before,
-.more-examples > summary::after {
-  content: "";
-  flex: 1;
-  border-top: var(--border-width) solid var(--color-shimmer);
-}
-
-.more-examples-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-shimmer);
-  border-radius: var(--radius-pill);
-  color: var(--text-primary);
-  font-weight: var(--font-weight-nav);
-  transition: background var(--transition);
-}
-
-.more-examples > summary:hover .more-examples-button {
-  background: var(--color-surface);
-}
-
-.more-examples-chevron {
-  transition: transform var(--transition);
-}
-
-.more-examples[open] .more-examples-chevron {
-  transform: rotate(180deg);
-}
-
-.more-examples:not([open]) .more-examples-open,
-.more-examples[open] .more-examples-closed {
-  display: none;
 }
 
 .runnable > * {

@@ -44,14 +44,15 @@ export default function ChartPreview({ src, title, subtitle, index, shrunk, hidd
     <button
       ref={button}
       type="button"
-      className={`chart-preview${shrunk ? " shrunk" : ""}${hidden ? " hidden" : ""}${returning ? " returning" : ""}`}
+      className={["chart-preview", shrunk && "shrunk", hidden && "hidden", returning && "returning"].filter(Boolean).join(" ")}
       style={{ "--i": index } as CSSProperties}
       onClick={() => onOpen(card.current!)}
     >
       <span ref={card} className="chart-preview-card">
         <span className="chart-preview-title">{title}</span>
         {subtitle && <span className="chart-preview-subtitle">{subtitle}</span>}
-        <img src={src} alt={title} loading="lazy" />
+        {/* The title above already names the chart; repeating it as alt makes screen readers say it twice. */}
+        <img src={src} alt="" loading="lazy" />
       </span>
     </button>
   );

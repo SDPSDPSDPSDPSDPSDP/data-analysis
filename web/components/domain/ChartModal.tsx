@@ -8,6 +8,7 @@ import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
 
 type Props = {
+  title: string;
   setup: string;
   code: string;
   preview: string;
@@ -22,7 +23,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ChartModal({ setup, code, preview, card, href, section, onReturn, onClose }: Props) {
+export default function ChartModal({ title, setup, code, preview, card, href, section, onReturn, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
@@ -55,7 +56,6 @@ export default function ChartModal({ setup, code, preview, card, href, section, 
     setTimeout(then, (parseFloat(last.animationDelay) + parseFloat(last.animationDuration)) * 1000);
   }
 
-  // Reverse of opening: chart flies back into its card.
   const close = () => leave("to-card", () => dialog.current!.close());
 
   // Layout effect: figure must start at the card's spot before first paint.
@@ -86,11 +86,11 @@ export default function ChartModal({ setup, code, preview, card, href, section, 
       }}
     >
       <div className="chart-modal-actions">
-        <button type="button" className="chart-modal-button" onClick={close} aria-label="Close">
+        <button type="button" className="icon-button chart-modal-button" onClick={close} aria-label="Close">
           <X size="1em" />
         </button>
       </div>
-      <RunnableCode initialCode={code} setup={setup} preview={preview} />
+      <RunnableCode title={title} initialCode={code} setup={setup} preview={preview} />
       <Link
         href={href}
         className="chart-modal-docs"

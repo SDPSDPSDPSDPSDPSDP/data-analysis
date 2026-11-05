@@ -118,6 +118,11 @@
   transition: color var(--transition), background var(--transition);
 }
 
+.nav button.nav-link:focus-visible,
+.nav a.nav-link:focus-visible {
+  background: var(--color-surface);
+}
+
 .nav button.nav-link:not(.nav-theme)[aria-pressed="true"] {
   background: var(--color-bg);
 }
@@ -129,4 +134,16 @@
 
 .nav .nav-link-inactive {
   color: var(--text-secondary);
+}
+
+/* Custom properties are not allowed in media queries. Centered menus would overlap the brand,
+   so they scroll sideways between brand and theme button instead. */
+@media (max-width: 800px) {
+  .nav-menus {
+    position: static;
+    transform: none;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+  }
 }

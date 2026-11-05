@@ -19,6 +19,8 @@ def _echo(value):
 # Notebook-style: every top-level expression prints its value, so examples need no print().
 # Fresh namespace per run: examples cannot leak state into each other or shadow _out.
 async def _run(code):
+    # User code may have replaced the hook; every run must still collect its charts.
+    _all_plots.show = _out.append
     runner = _CodeRunner(code, return_mode="none")
     for node in runner.ast.body:
         if isinstance(node, _ast.Expr):

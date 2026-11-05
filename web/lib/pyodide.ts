@@ -44,7 +44,7 @@ export function load(): Promise<void> {
   worker = current;
   ready = new Promise((resolve, reject) => {
     current.onerror = (e) => {
-      const error = `Python worker crashed: ${e.message}`;
+      const error = `Python worker crashed: ${e.message}. Run again, or reload the page if it keeps failing.`;
       reject(new Error(error));
       if (worker === current) restart(error);
     };
@@ -54,7 +54,7 @@ export function load(): Promise<void> {
         if (!msg.error) return resolve();
         reject(new Error(msg.error));
         // Drop the broken worker so the next run retries the load instead of failing until reload.
-        if (worker === current) restart(`Python failed to load: ${msg.error}`);
+        if (worker === current) restart(`Python failed to load: ${msg.error}. Run again, or reload the page if it keeps failing.`);
       } else if (msg.type === "result") {
         const resolveRun = pending.get(msg.id);
         if (!resolveRun) return restart(`Result for unknown run id ${msg.id}. Python was restarted.`);

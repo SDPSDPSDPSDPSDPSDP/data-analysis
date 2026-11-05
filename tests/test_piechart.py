@@ -31,7 +31,8 @@ class TestPieChartRender:
         plot = PieChart(options)
         chart = plot.render()
 
-        assert len(chart.wedges) == 3  # two slices plus the white center
+        assert len(chart.wedges) == 2
+        assert chart.donut_hole > 0
 
     def test_render_sets_autotext_colors_for_all_slices(self) -> None:
         df = pd.DataFrame({"count": [70, 30]}, index=["Decided", "Undecided"])

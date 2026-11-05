@@ -45,7 +45,8 @@ def totals_per_x(df: pd.DataFrame, x: str, y: Optional[str], hue: Optional[str],
     values = grouped.size() if y is None else grouped[y].sum()
     if group_by is None:
         return values
-    periods = pd.date_range(values.index.get_level_values(0).min(), values.index.get_level_values(0).max(), freq=_PERIOD_STARTS[group_by])
+    dates = values.index.get_level_values(0)
+    periods = pd.date_range(dates.min(), dates.max(), freq=_PERIOD_STARTS[group_by])
     if hue:
         index = pd.MultiIndex.from_product([periods, values.index.levels[1]], names=keys)
     else:

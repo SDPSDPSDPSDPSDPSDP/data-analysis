@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HomeGallery from "@/components/domain/HomeGallery";
-import { getCategories, getHomeCharts } from "@/app/categories";
+import { getCategories } from "@/app/categories";
+import { getHomeCharts } from "@/app/homeCharts";
 import { STILL_PINNED, getPinnedCharts } from "../pinned";
 import "../portfolio.css";
 

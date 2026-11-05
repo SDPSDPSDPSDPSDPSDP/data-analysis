@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from .common.colors import to_rgb
 from .config.colors import DARK_MODE_DEFAULT_COLOR
 from .config.palettes import (
     DEFAULT_LABEL_MAPPING,
@@ -58,6 +59,13 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         self._font = font
         self._dark_mode = dark_mode
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
+        # Hex only: contrast, blending and shades all need RGB, so a named color would fail on some charts only.
+        for column, mapping in self._palette.items():
+            for color in mapping.values() if isinstance(mapping, dict) else [mapping]:
+                try:
+                    to_rgb(color)
+                except (ValueError, AttributeError) as e:
+                    raise ValueError(f"palette[{column!r}]: color {color!r} must be a hex string like '#1a2b3c'") from e
         self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
 
     def _column_config(self, column: Optional[str]) -> Dict[str, Any]:

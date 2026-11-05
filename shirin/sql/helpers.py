@@ -36,12 +36,6 @@ def load_sql_query(sql_query: Union[str, Path]) -> str:
     )
 
 
-def _read_sql(sql_query: str, connection: Any, params: Optional[Dict[str, Any]]) -> pd.DataFrame:
-    # Bind parameters use SQLAlchemy's :name style; plain strings go through untouched.
-    query = text(sql_query) if params else sql_query
-    return pd.read_sql(query, con=connection, params=params)
-
-
 def execute_query(
     sql_query: str,
     engine: Engine,
@@ -51,5 +45,7 @@ def execute_query(
 
     For large results use ``query_to_parquet`` (``output_path`` in ``Database.sql``).
     """
+    # Bind parameters use SQLAlchemy's :name style; plain strings go through untouched.
+    query = text(sql_query) if params else sql_query
     with engine.connect() as connection:
-        return _read_sql(sql_query, connection, params)
+        return pd.read_sql(query, con=connection, params=params)

@@ -38,6 +38,8 @@ class SpecializedPlotsMixin:
         Layout:
             donut: Whether to draw a donut instead of a full pie. *Default: `False`*.
         """
+        if col not in df.columns:
+            raise ValueError(f"col={col!r} is not a column. Available columns: {list(df.columns)}")
         options = PiePlotOptions(
             df=df[col].value_counts().rename(COUNT_COL).to_frame(),
             col=COUNT_COL,
