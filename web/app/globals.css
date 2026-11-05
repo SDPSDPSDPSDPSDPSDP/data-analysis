@@ -184,13 +184,13 @@
   --code-button-text-hover: var(--text-on-dark);
   --code-text: rgba(255, 255, 255, 0.82);
   --code-keyword: #ff7b72;
-  --code-name: #c9d1d9;
+  --code-name: var(--code-text);
   --code-function: #d2a8ff;
   --code-constant: #79c0ff;
   --code-class: #ffa657;
   --code-operator: #ff7b72;
   --code-string: #a5d6ff;
-  --code-comment: #8b949e;
+  --code-comment: var(--text-secondary);
   --color-terminal-bar: rgba(255, 255, 255, 0.06);
   --color-terminal-prompt: rgba(255, 255, 255, 0.08);
   --color-terminal-dot: rgba(255, 255, 255, 0.2);
