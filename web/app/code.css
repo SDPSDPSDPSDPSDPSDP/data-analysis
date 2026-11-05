@@ -44,6 +44,13 @@
   opacity: 1;
 }
 
+/* No hover on touch screens, so the button would never show. */
+@media (hover: none) {
+  .copyable > .copy-button {
+    opacity: 1;
+  }
+}
+
 .copy-button:hover,
 .copy-button:focus-visible {
   background: var(--color-button-hover);

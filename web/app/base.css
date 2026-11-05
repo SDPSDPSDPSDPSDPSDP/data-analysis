@@ -23,7 +23,7 @@ body {
 }
 
 .page {
-  min-height: calc(100vh - var(--nav-height));
+  min-height: calc(100dvh - var(--nav-height));
   background: var(--color-bg-home);
   display: flex;
   flex-direction: column;
@@ -69,6 +69,15 @@ body {
   animation-delay: calc(min(var(--i), var(--docs-enter-max-index)) * var(--docs-enter-stagger));
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 pre {
   margin: 0;
   white-space: pre-wrap;
@@ -112,6 +121,18 @@ pre {
   outline: none;
 }
 
+.icon-button:focus-visible {
+  background: var(--color-button-hover);
+}
+
+/* Fingers need bigger targets than a mouse pointer. */
+@media (pointer: coarse) {
+  .icon-button {
+    width: var(--button-height-touch);
+    height: var(--button-height-touch);
+  }
+}
+
 /* Light/dark switch cross-fades the whole page, started in lib/darkMode.ts. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -126,4 +147,34 @@ pre {
   .page:not(.home) > div > .seen {
     animation: none;
   }
+}
+
+/* 404 and error pages. */
+.message-page {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.message-page h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-heading);
+}
+
+.message-page p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.message-page a,
+.message-page-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--text-primary);
+  text-decoration: underline;
+  cursor: pointer;
 }

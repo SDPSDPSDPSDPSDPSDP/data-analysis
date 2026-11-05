@@ -13,7 +13,11 @@ function subscribe(listener: () => void) {
 
 export function setDarkMode(dark: boolean) {
   const apply = () => {
-    localStorage.setItem(STORAGE_KEY, dark ? "1" : "0");
+    try {
+      localStorage.setItem(STORAGE_KEY, dark ? "1" : "0");
+    } catch {
+      // Blocked storage: the theme still switches for this visit, it is just not remembered.
+    }
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     // Sync so the view transition snapshots the re-rendered charts, not the old ones.
     flushSync(() => listeners.forEach((listener) => listener()));

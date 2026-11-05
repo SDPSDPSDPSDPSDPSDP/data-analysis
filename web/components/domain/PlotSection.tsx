@@ -63,6 +63,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
   const runnable = (example: Example, key?: number) => (
     <RunnableCode
       key={key}
+      title={title}
       initialCode={example.code}
       preview={dark ? example.darkPreview : example.preview}
       setup={exampleSetup(globalSetup, setup, example)}
@@ -70,6 +71,7 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
   );
   const moreExamples = examples.slice(1).map((example, i) => runnable(example, i));
   const Heading = standalone ? "h2" : "h3";
+  const SubHeading = standalone ? "h3" : "h4";
   const heading = (
     <>
       <Heading id={sectionId(title)}>{title}</Heading>
@@ -95,35 +97,37 @@ export default function PlotSection({ title, dataFormats, setup, examples, globa
       {heading}
       <section className="data-format">
         <div className="setup-cell">
-          <h4>{dataFormats.length > 1 ? "Data formats" : "Data format"}</h4>
+          <SubHeading>{dataFormats.length > 1 ? "Data formats" : "Data format"}</SubHeading>
           {dataFormats.map((dataFormat, k) => (
             <div key={k} className="setup-cell">
               <p>{dataFormat.description}</p>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    {dataFormat.columns.map((col) => (
-                      <th key={col.name}>
-                        {col.name} <span className="data-table-role">{col.role}</span>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataFormat.rows.map((row, i) => (
-                    <tr key={i}>
-                      {row.map((cell, j) => (
-                        <td key={j}>{cell}</td>
+              <div className="table-scroll">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      {dataFormat.columns.map((col) => (
+                        <th key={col.name}>
+                          {col.name} <span className="data-table-role">{col.role}</span>
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {dataFormat.rows.map((row, i) => (
+                      <tr key={i}>
+                        {row.map((cell, j) => (
+                          <td key={j}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ))}
         </div>
         <div className="setup-cell">
-          <h4>Example</h4>
+          <SubHeading>Example</SubHeading>
           {runnable(examples[0])}
         </div>
       </section>

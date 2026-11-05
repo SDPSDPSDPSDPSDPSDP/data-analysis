@@ -12,6 +12,8 @@ export type Category = {
 };
 
 type Props = {
+  // Page heading for screen readers and outlines; the nav already shows it visually.
+  title: string;
   setup: SetupCell[];
   categories: Category[];
   showSetup: boolean;
@@ -19,7 +21,7 @@ type Props = {
   expanded: boolean;
 };
 
-export default function Playground({ setup, categories, showSetup, expanded }: Props) {
+export default function Playground({ title, setup, categories, showSetup, expanded }: Props) {
   const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
   // Edits apply to the examples only once a setup cell is run.
   const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
@@ -48,6 +50,7 @@ export default function Playground({ setup, categories, showSetup, expanded }: P
   }, []);
   return (
     <main className="page" ref={main}>
+      <h1 className="visually-hidden">{title}</h1>
       {showSetup && (
         <>
           <h2>Setup</h2>

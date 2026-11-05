@@ -27,7 +27,8 @@
 }
 
 /* Grown card overlaps neighbours; later grid items would paint over it. */
-.chart-preview:has(> .chart-preview-card:hover, > .chart-preview-card[data-demo-hover]) {
+.chart-preview:has(> .chart-preview-card:hover, > .chart-preview-card[data-demo-hover]),
+.chart-preview:focus-visible {
   z-index: 1;
 }
 
@@ -69,7 +70,8 @@
 }
 
 .chart-preview-card:hover,
-.chart-preview-card[data-demo-hover] {
+.chart-preview-card[data-demo-hover],
+.chart-preview:focus-visible > .chart-preview-card {
   scale: min(var(--home-chart-hover-scale), var(--home-chart-fit-scale));
 }
 

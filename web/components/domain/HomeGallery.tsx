@@ -88,6 +88,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
         />
       )}
       <main className="page home">
+        <h1 className="visually-hidden">Shirin's Charts</h1>
         {/* Keyed on filter so the entrance wave replays on every category switch. */}
         <div className="home-charts" key={active ?? ""}>
           {order
@@ -109,6 +110,7 @@ export default function HomeGallery({ categories, charts, showNav = true, pinned
       </main>
       {open && (
         <ChartModal
+          title={open.chart.title}
           setup={withDarkMode(open.chart.setup, dark)}
           code={open.chart.code}
           preview={dark ? open.chart.darkPreview : open.chart.preview}

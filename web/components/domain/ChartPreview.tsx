@@ -51,7 +51,8 @@ export default function ChartPreview({ src, title, subtitle, index, shrunk, hidd
       <span ref={card} className="chart-preview-card">
         <span className="chart-preview-title">{title}</span>
         {subtitle && <span className="chart-preview-subtitle">{subtitle}</span>}
-        <img src={src} alt={title} loading="lazy" />
+        {/* The title above already names the chart; repeating it as alt makes screen readers say it twice. */}
+        <img src={src} alt="" loading="lazy" />
       </span>
     </button>
   );

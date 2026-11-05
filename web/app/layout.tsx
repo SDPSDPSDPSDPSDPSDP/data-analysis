@@ -27,8 +27,8 @@ const satoshi = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Shirin's Charts",
-  description: "Write Python on the left, see the shirin chart on the right.",
+  title: { default: "Shirin's Charts", template: "%s - Shirin's Charts" },
+  description: "SVG charts for pandas DataFrames in one line of Python. Edit and run every example in the browser.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -38,7 +38,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (localStorage.getItem("${STORAGE_KEY}") !== "0") document.documentElement.dataset.theme = "dark";`,
+            // Blocked storage (Safari private mode, sandboxed iframes) throws; dark stays the default then.
+            __html: `let saved = null; try { saved = localStorage.getItem("${STORAGE_KEY}"); } catch {} if (saved !== "0") document.documentElement.dataset.theme = "dark";`,
           }}
         />
       </head>

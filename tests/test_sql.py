@@ -56,11 +56,12 @@ def test_parquet_spills_untyped_chunks_to_disk(sqlite_engine, tmp_path, monkeypa
     assert pq.read_table(out).column('note').to_pylist() == [None, None, 'late']
 
 
-def test_parquet_streams_one_row_group_per_chunk(sqlite_engine, tmp_path) -> None:
+def test_parquet_buffers_chunks_into_row_groups(sqlite_engine, tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(parquet, 'PARQUET_ROW_GROUP_ROWS', 2)
     out = tmp_path / 'typed.parquet'
     parquet.query_to_parquet('SELECT id, year FROM t ORDER BY id', sqlite_engine, out, chunk_rows=1)
     parquet_file = pq.ParquetFile(out)
-    assert parquet_file.metadata.num_row_groups == 3
+    assert [parquet_file.metadata.row_group(i).num_rows for i in range(parquet_file.metadata.num_row_groups)] == [2, 1]
     assert parquet_file.read().column('year').to_pylist() == [2023, 2024, 2024]
 
 

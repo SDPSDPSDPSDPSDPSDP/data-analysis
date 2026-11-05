@@ -59,6 +59,8 @@ const docTooltip = hoverTooltip((view, pos) => {
 const DOC_TOOLTIP = [docTooltip];
 
 type Props = {
+  // Names the chart images for screen readers.
+  title: string;
   initialCode: string;
   // Prepended to every run, not shown in the editor.
   setup: string;
@@ -66,7 +68,7 @@ type Props = {
   preview: string | null;
 };
 
-export default function RunnableCode({ initialCode, setup, preview }: Props) {
+export default function RunnableCode({ title, initialCode, setup, preview }: Props) {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<RunResult | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -100,7 +102,7 @@ export default function RunnableCode({ initialCode, setup, preview }: Props) {
         {/* Preview and result share one list so the first figure stays the same element when the result lands,
             keeping any animation running on it (the home modal flies it in). */}
         {images.map((src, i) => (
-          <CopyableImage key={i} src={src} alt="Rendered chart" />
+          <CopyableImage key={i} src={src} alt={`${title} chart`} />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
         {result?.error && <pre className="error">{result.error}</pre>}

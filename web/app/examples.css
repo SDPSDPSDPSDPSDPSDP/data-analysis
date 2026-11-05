@@ -13,8 +13,10 @@ section.setup-cell + section.setup-cell {
   color: var(--text-muted);
 }
 
-.setup-cell h4 {
+/* h3 or h4 by section depth; .page scope outranks the big centered `.page h3` style. */
+.page .setup-cell :is(h3, h4) {
   margin: 0;
+  text-align: start;
   font-size: var(--font-size-doc-heading);
 }
 
@@ -61,6 +63,11 @@ section.setup-cell + section.setup-cell {
 
 .data-format .data-table {
   margin-top: var(--space-2);
+}
+
+/* Wide tables scroll sideways on narrow screens instead of clipping columns. */
+.table-scroll {
+  overflow-x: auto;
 }
 
 /* separate, not collapse: border-radius is ignored on collapsed tables. */

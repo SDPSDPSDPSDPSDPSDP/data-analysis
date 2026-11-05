@@ -39,7 +39,11 @@ export default function SkillViewer({ skill }: Props) {
       if (!code) throw new Error("Markdown <pre> without a <code> child");
       return <CodeBlock value={String(code.props.children).replace(/\n$/, "")} extensions={WRAP_LINES} />;
     },
-    table: ({ children }) => <table className="data-table">{children}</table>,
+    table: ({ children }) => (
+      <div className="table-scroll">
+        <table className="data-table">{children}</table>
+      </div>
+    ),
     // Links to another file of the skill switch tabs, like Claude following them.
     a: ({ href, children }) =>
       skill.files.some((f) => f.name === href) ? (
