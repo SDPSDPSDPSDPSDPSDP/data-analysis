@@ -1,7 +1,6 @@
 from typing import Any, Dict, Optional
 
 from .common.colors import to_rgb
-from .config.colors import DARK_MODE_DEFAULT_COLOR, Colors
 from .config.palettes import (
     DEFAULT_LABEL_MAPPING,
     DEFAULT_PALETTE,
@@ -9,6 +8,7 @@ from .config.palettes import (
     PaletteInput,
     merge_column_config,
 )
+from .config.theme import Theme
 from .core import AbstractPlot
 from .graphs.bar import BarPlotsMixin
 from .graphs.numeric import NumericPlotsMixin
@@ -24,16 +24,6 @@ def show(svg: str) -> None:
     from IPython.display import display
 
     display({'image/svg+xml': svg, 'image/png': to_png(svg)}, raw=True)
-
-
-def _grey_to_white(palette: Any) -> Any:
-    # Colors.GREY is the light-mode "no emphasis" color; on the dark background it reads as muddy.
-    def swap(color: str) -> str:
-        return DARK_MODE_DEFAULT_COLOR if color.lower() == Colors.GREY else color
-
-    if isinstance(palette, dict):
-        return {value: swap(color) for value, color in palette.items()}
-    return swap(palette) if isinstance(palette, str) else palette
 
 
 class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
@@ -71,7 +61,7 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         if font is not None and font.lower() != 'satoshi':
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         self._font = font
-        self._dark_mode = dark_mode
+        self._theme = Theme(dark_mode)
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
         # Hex only: contrast, blending and shades all need RGB, so a named color would fail on some charts only.
         for column, mapping in self._palette.items():
@@ -85,11 +75,8 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
     def _column_config(self, column: Optional[str]) -> Dict[str, Any]:
         """palette and label_map configured for a hue (or pie col) column."""
         if column is None:
-            return {'palette': DARK_MODE_DEFAULT_COLOR if self._dark_mode else None, 'label_map': None}
-        palette = self._palette.get(column)
-        if self._dark_mode:
-            palette = _grey_to_white(palette)
-        return {'palette': palette, 'label_map': self._label_mapping.get(column)}
+            return {'palette': self._theme.no_hue_palette, 'label_map': None}
+        return {'palette': self._theme.palette(self._palette.get(column)), 'label_map': self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:
-        show(to_svg(plot.render(), font=self._font, dark_mode=self._dark_mode))
+        show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark))

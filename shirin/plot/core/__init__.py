@@ -5,6 +5,7 @@ from .categorical_options import (
     CategoricalPlotOptions,
     CountPlotOptions,
     NormalizedPlotOptions,
+    RemainderPlotOptions,
 )
 from .options import (
     HistogramOptions,
@@ -21,6 +22,7 @@ __all__ = [
     'CountPlotOptions',
     'BarPlotOptions',
     'NormalizedPlotOptions',
+    'RemainderPlotOptions',
     'HistogramOptions',
     'PiePlotOptions',
     'TimePlotOptions',

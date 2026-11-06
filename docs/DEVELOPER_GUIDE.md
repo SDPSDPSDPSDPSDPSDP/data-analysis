@@ -38,16 +38,17 @@ shirin/
     core/          Options dataclasses + validation, AbstractPlot, renderer/ (fills a Chart with marks)
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)
-    config/        colors, font sizes, layout sizes, palette/label-mapping base classes
-    svg/           Chart data model, nice/date ticks, font metrics, axis limits/scales (axis.py), layout + SVG writer (render.py), data marks (plot_body.py)
+    config/        colors, font sizes, layout sizes, palette/label-mapping base classes, Theme (every dark mode difference)
+    svg/           Chart data model, nice/date ticks, font metrics, axis limits/scales (axis.py), layout (render.py `layout` -> `Frame`) + SVG writer (render.py), data marks (plot_body.py)
   number_format.py Dutch number formatting, shared by plot and stats
   stats/           descriptive statistics accessor
   sql/             DB2 query helpers (optional `sql` extra): __init__.py Database class, engine.py pooled engine, helpers.py queries, parquet.py streaming export, row_groups.py row group writer
   assets/          bundled fonts and demo data
 ```
 
-Flow of one call: `PlotGraphs.bar(...)` -> `CountPlotOptions` (no `value`), `BarPlotOptions`, or `NormalizedPlotOptions`
-(`normalized=True` with `hue`, or `remainder=True`) -> `CountPlot` / `BarPlot` / `NormalizedPlot(options).render()`
+Flow of one call: `PlotGraphs.bar(...)` -> `CountPlotOptions` (no `value`), `BarPlotOptions`, `NormalizedPlotOptions`
+(`normalized=True` with `hue`) or `RemainderPlotOptions` (`remainder=True`) -> `CountPlot` / `BarPlot` /
+`NormalizedPlot` / `RemainderPlot(options).render()`
 (validates a copy of the options, fills a `Chart` in data coordinates) -> `svg.to_svg` lays it out and writes
 the SVG -> `all_plots.show` displays it with IPython (the web worker replaces `show` to collect the SVG).
 

@@ -2,16 +2,11 @@ from typing import Optional
 
 import pandas as pd
 
-from ..common.colors import resolve_palette
-from ..common.data_conversion import COUNT_COL, REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder, totals_per_x
+from ..common.data_conversion import COUNT_COL, period_totals
 from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
-from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS
-from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions
+from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
-from ..plots import BarPlot, CountPlot, NormalizedPlot
-
-# ISO labels sort alphabetically in time order.
-_PERIOD_LABELS = {'year': '%Y', 'month': '%Y-%m', 'day': '%Y-%m-%d'}
+from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
 
 
 class BarPlotsMixin:
@@ -80,6 +75,12 @@ class BarPlotsMixin:
         if (x is None) == (y is None):
             raise ValueError('bar needs exactly one of x or y.')
         vertical = x is not None
+        if value is None:
+            # Without value bars count rows, so the count axis gets a label unless the user passed one ('' hides it).
+            if vertical and y_axis_label is None:
+                y_axis_label = 'Count'
+            if not vertical and x_axis_label is None:
+                x_axis_label = 'Count'
         if group_by is not None:
             validate_str_or_enum_option(
                 option_name='group_by', value=group_by, valid_options=VALID_TIME_GROUP_BY, enum_type=TimeGroupBy,
@@ -89,12 +90,9 @@ class BarPlotsMixin:
             if sort is not None or top_n is not None or remainder:
                 raise ValueError('group_by does not work with sort, top_n or remainder.')
             group_by = TimeGroupBy(group_by).value
-            if value is None and y_axis_label is None:
-                y_axis_label = 'Count'
-            totals = totals_per_x(df, x, value, hue, group_by)  # type: ignore[arg-type]
+            df = period_totals(df, x, value, hue, group_by)  # type: ignore[arg-type]
+            # Counted per period up front, so the bars below sum COUNT_COL like any value column.
             value = value or COUNT_COL
-            df = totals.rename(value).reset_index()
-            df[x] = df[x].dt.strftime(_PERIOD_LABELS[group_by])
             sort = 'alphabetical'
         common = dict(
             df=df,
@@ -115,10 +113,6 @@ class BarPlotsMixin:
         if value is None:
             if remainder:
                 raise ValueError('remainder needs value.')
-            if vertical and y_axis_label is None:
-                common['y_axis_label'] = 'Count'
-            if not vertical and x_axis_label is None:
-                common['x_axis_label'] = 'Count'
             common['top_n'] = top_n
             if normalized and hue is not None:
                 self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
@@ -131,21 +125,13 @@ class BarPlotsMixin:
         if remainder:
             if not normalized:
                 raise ValueError('remainder needs normalized=True.')
-            if hue is not None and hue != common['axis_column']:
-                raise ValueError(f"With remainder, hue must be the category column {common['axis_column']!r} or None.")
-            if hue is not None:
-                common['category_palette'] = resolve_palette(common['palette'], df[hue])
-            common.update(
-                df=fill_remainder(df, common['axis_column'], value, REMAINDER_LABEL),
-                value=REMAINDER_SHARE_COL,
-                hue=value,
-                remainder=REMAINDER_LABEL,
-                background=DARK_MODE_COLORS[BACKGROUND_COLOR] if self._dark_mode else BACKGROUND_COLOR,
-                **self._column_config(value),
-            )
-            if isinstance(common['palette'], str):
-                common['palette'] = {value: common['palette']}
-        hue_splits_bars = common['hue'] is not None and common['hue'] != common['axis_column']
+            self._render(RemainderPlot(RemainderPlotOptions(
+                **{**common, **self._column_config(value)},
+                category_palette=self._column_config(hue)['palette'] if hue is not None else None,
+                background=self._theme.background,
+            )))
+            return
+        hue_splits_bars = hue is not None and hue != common['axis_column']
         if normalized and hue_splits_bars:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
