@@ -40,8 +40,11 @@ class SpecializedPlotsMixin:
         """
         if col not in df.columns:
             raise ValueError(f"col={col!r} is not a column. Available columns: {list(df.columns)}")
+        counts = df[col].value_counts()
+        if counts.empty:
+            raise ValueError(f"col={col!r} has no non-null values to count.")
         options = PiePlotOptions(
-            df=df[col].value_counts().rename(COUNT_COL).to_frame(),
+            df=counts.rename(COUNT_COL).to_frame(),
             col=COUNT_COL,
             **self._column_config(col),
             title=title,

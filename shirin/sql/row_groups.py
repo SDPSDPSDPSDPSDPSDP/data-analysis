@@ -19,6 +19,10 @@ class RowGroupWriter:
         self._pending: List[pa.Table] = []
         self._rows = 0
 
+    @property
+    def schema(self) -> pa.Schema:
+        return self._writer.schema
+
     def write(self, table: pa.Table) -> None:
         self._pending.append(table.cast(self._writer.schema))
         self._rows += table.num_rows

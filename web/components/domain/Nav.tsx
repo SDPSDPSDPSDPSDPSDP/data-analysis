@@ -122,7 +122,9 @@ export default function Nav({ categories, filter }: Props) {
         title="Dark mode"
         onClick={() => setDarkMode(!dark)}
       >
-        {dark ? <Moon size="1em" aria-hidden /> : <Sun size="1em" aria-hidden />}
+        {/* CSS picks the icon from data-theme, so the prerendered button already matches before hydration. */}
+        <Moon size="1em" className="dark-only" aria-hidden />
+        <Sun size="1em" className="light-only" aria-hidden />
       </button>
     </nav>
   );

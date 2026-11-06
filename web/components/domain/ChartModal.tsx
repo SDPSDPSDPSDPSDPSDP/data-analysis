@@ -77,6 +77,7 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
     <dialog
       ref={dialog}
       className="chart-modal"
+      aria-label={title}
       onClose={onClose}
       // Clicks on the backdrop land on the dialog itself.
       onClick={(event) => event.target === dialog.current && close()}

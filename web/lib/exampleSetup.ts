@@ -17,8 +17,14 @@ function mapPlotGraphsArgs(code: string, map: (args: string) => string): string 
     let depth = 1;
     let end = open;
     for (; end < code.length && depth > 0; end++) {
-      if (code[end] === "(") depth++;
-      else if (code[end] === ")") depth--;
+      const char = code[end];
+      // Parens inside strings and comments, e.g. title="(n)", must not end the call.
+      if (char === '"' || char === "'") {
+        for (end++; end < code.length && code[end] !== char; end++) if (code[end] === "\\") end++;
+      } else if (char === "#") {
+        while (end < code.length && code[end] !== "\n") end++;
+      } else if (char === "(") depth++;
+      else if (char === ")") depth--;
     }
     if (depth > 0) throw new Error(`Unclosed PlotGraphs( call:\n${code}`);
     out += code.slice(from, open) + map(code.slice(open, end - 1)) + ")";
