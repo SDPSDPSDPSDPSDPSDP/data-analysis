@@ -52,8 +52,8 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     if x_ticks and not chart.x.rotation:
         position, label = x_ticks[-1]
         boxes.append((0, sx(position) + text_width(label, tick_size) / 2, plot_top))
-    right_overflow = max([0.0] + [box[1] - (plot_left + plot_w) for box in boxes])
-    plot_top += max([0.0] + [plot_top - box[2] for box in boxes])
+    right_overflow = max([0.0] + [right - (plot_left + plot_w) for _, right, _ in boxes])
+    plot_top += max([0.0] + [plot_top - top for _, _, top in boxes])
     if fixed_width:
         plot_w -= right_overflow
     else:
@@ -98,8 +98,11 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
     if labelled_x_ticks:
         tick_top = plot_bottom + Layout.TICK_GAP
         rotation = math.radians(chart.x.rotation)
-        bottom = tick_top + max(text_width(label, tick_size) * math.sin(rotation) + cap * math.cos(rotation)
-                                for _, label in labelled_x_ticks)
+
+        def rotated_height(label: str) -> float:
+            return text_width(label, tick_size) * math.sin(rotation) + cap * math.cos(rotation)
+
+        bottom = tick_top + max(rotated_height(label) for _, label in labelled_x_ticks)
         for t, label in labelled_x_ticks:
             if chart.x.rotation:
                 body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, x_tick_color, 'end', rotate=chart.x.rotation))

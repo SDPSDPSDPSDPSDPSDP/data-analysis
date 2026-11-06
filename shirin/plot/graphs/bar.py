@@ -145,7 +145,8 @@ class BarPlotsMixin:
             )
             if isinstance(common['palette'], str):
                 common['palette'] = {value: common['palette']}
-        if normalized and common['hue'] is not None and common['hue'] != common['axis_column']:
+        hue_splits_bars = common['hue'] is not None and common['hue'] != common['axis_column']
+        if normalized and hue_splits_bars:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
             self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))

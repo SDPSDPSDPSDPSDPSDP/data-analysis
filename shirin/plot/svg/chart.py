@@ -14,7 +14,6 @@ class Rect:
     y0: float
     y1: float
     color: str
-    stroke: Optional[str] = None
     rounded: bool = False  # pill shape; off for stacked/adjacent rects where round ends leave gaps
     clip: Optional['Rect'] = None  # shared outline, e.g. a rounded stack that its segments are cut to
     fade_to: Optional[str] = None  # color the end (y1, or x1 when horizontal) blends into, e.g. the next stack segment

@@ -40,15 +40,11 @@ def default_colors(n: int) -> List[str]:
 
 
 def resolve_palette(palette: Optional[Union[Dict[Any, str], str]], values: pd.Series) -> Dict[Any, str]:
-    """Color per hue value: a dict as given, one color spread into shades, None the default cycle."""
+    """Color per hue value: a dict as given, else per sorted value shades of one color, or the default cycle for None."""
     if isinstance(palette, dict):
         return palette
-    return default_palette(values, palette)
-
-
-def default_palette(values: pd.Series, color: Optional[str] = None) -> Dict[str, str]:
-    """Color per sorted value: shades of color when given, else the default color cycle."""
     keys = sorted(values.astype(str).unique())
-    if color is None:
+    if palette is None:
         return dict(zip(keys, default_colors(len(keys))))
-    return {key: blend(SHADE_BASE, color, t) for key, t in zip(keys, np.linspace(1, SHADE_DARKEST_MIX, len(keys)))}
+    mixes = np.linspace(1, SHADE_DARKEST_MIX, len(keys))
+    return {key: blend(SHADE_BASE, palette, t) for key, t in zip(keys, mixes)}

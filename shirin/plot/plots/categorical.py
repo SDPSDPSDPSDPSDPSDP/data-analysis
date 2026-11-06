@@ -4,6 +4,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ..common.colors import palette_colors
+from ..common.data_conversion import aggregate
 from ..common.formatting import (
     format_categorical_tick_labels,
     format_datalabels,
@@ -12,7 +13,7 @@ from ..common.formatting import (
     format_ticks,
 )
 from ..common.sorting import get_order
-from ..common.stacked_plots import prepare_stacked_data
+from ..common.stacked_plots import sort_stacked_pivot
 from ..config import FigureSize, Layout, Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
@@ -63,14 +64,8 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
         df = self._resolve_hue_palette(df)
         stacked = None
         if self.options.stacked:
-            stacked = prepare_stacked_data(
-                df,
-                self.options.hue,  # type: ignore[arg-type]
-                self.options.axis_column,
-                self.options.sort,
-                value_col=self._value_column(),
-                orientation=self.options.orientation,
-            )
+            pivot = aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0)
+            stacked = sort_stacked_pivot(pivot, self.options.sort, self.options.orientation)
         return CategoricalData(df, order, stacked)
 
     def _draw_unstacked(self, chart: Chart, data: CategoricalData) -> Any:

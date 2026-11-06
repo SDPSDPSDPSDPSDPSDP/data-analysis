@@ -23,9 +23,6 @@ def format_categorical_tick_labels(
 ) -> None:
     if not label_map:
         return
-    if axis not in ('x', 'y'):
-        raise ValueError("axis must be either 'x' or 'y'")
-
     target = chart.x if axis == 'x' else chart.y
     if target.tick_labels is None:
         raise ValueError(f"Categorical {axis}-axis has no tick labels to map")
