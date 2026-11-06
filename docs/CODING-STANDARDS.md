@@ -33,7 +33,7 @@ Code structure, design tokens and conventions for the `shirin` Python package an
 
 ## 3. CSS Design Tokens & Typography
 
-- **Stylesheets:** Global CSS in `web/app/`: `globals.css` (tokens), `base.css` (reset, page, skeleton), `nav.css`, `code.css`, `terminal.css`, `skill.css`, `examples.css`, `home.css`, `chart-modal-motion.css`, `chart-modal.css`, imported in that order by `layout.tsx`. `portfolio/portfolio.css` is imported by the portfolio page only. No CSS modules.
+- **Stylesheets:** Global CSS in `web/app/`: `globals.css` (tokens), `base.css` (reset, page, skeleton), `message-page.css`, `nav.css`, `code.css`, `copy-button.css`, `doc-tooltip.css`, `terminal.css`, `skill.css`, `examples.css`, `data-table.css`, `more-examples.css`, `home.css`, `chart-modal-motion.css`, `chart-modal.css`, imported in that order by `layout.tsx`. `portfolio/portfolio.css` is imported by the portfolio pages only. No CSS modules.
 - **Central Tokens:** Define all visual values as custom properties in `:root` of `web/app/globals.css`. Fonts load via `next/font/local` in `web/app/layout.tsx` (exposed as `--font-futura`).
 - **Zero Hardcoded Values:** Never use raw hex colors, pixel sizes, margins, or padding outside the token definitions. Reference tokens via `var(--token-name)`.
 - **Text Opacity Rule:** Never use solid hex greys for text. Use alpha transparent black/white (e.g. `rgba(0, 0, 0, 0.87)`, `rgba(0, 0, 0, 0.5)`).
