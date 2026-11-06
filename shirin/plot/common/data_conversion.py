@@ -8,6 +8,8 @@ REMAINDER_LABEL = 'Remainder'
 COUNT_COL = '__count__'
 _PERIODS = {'year': 'Y', 'month': 'M', 'day': 'D'}
 _PERIOD_STARTS = {'year': 'YS', 'month': 'MS', 'day': 'D'}
+# ISO labels sort alphabetically in time order.
+_PERIOD_LABELS = {'year': '%Y', 'month': '%Y-%m', 'day': '%Y-%m-%d'}
 
 
 def convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
@@ -63,6 +65,13 @@ def totals_per_x(df: pd.DataFrame, x: str, y: Optional[str], hue: Optional[str],
     else:
         index = pd.Index(periods, name=x)
     return values.reindex(index, fill_value=0)
+
+
+def period_totals(df: pd.DataFrame, x: str, y: Optional[str], hue: Optional[str], group_by: str) -> pd.DataFrame:
+    """One row per period (and hue): the period's ISO label in x, its total in y (COUNT_COL when y is None)."""
+    totals = totals_per_x(df, x, y, hue, group_by).rename(y or COUNT_COL).reset_index()
+    totals[x] = totals[x].dt.strftime(_PERIOD_LABELS[group_by])
+    return totals
 
 
 def fill_missing_values_in_data(

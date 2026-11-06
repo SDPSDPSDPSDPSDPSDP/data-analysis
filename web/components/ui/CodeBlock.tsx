@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, type RefObject } from "react";
-import CodeMirror, { EditorSelection, keymap, Prec, type Extension } from "@uiw/react-codemirror";
+import CodeMirror, { EditorSelection, keymap, Prec, type EditorView, type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { oneDarkTheme } from "@codemirror/theme-one-dark";
@@ -51,7 +51,11 @@ const keepIndentOnEnter = Prec.high(
 const NO_EXTENSIONS: Extension[] = [];
 
 function runKey(onRun: RefObject<((value: string) => void) | undefined>) {
-  return Prec.highest(keymap.of([{ key: "Mod-Enter", run: (view) => (onRun.current!(view.state.doc.toString()), true) }]));
+  const run = (view: EditorView) => {
+    onRun.current!(view.state.doc.toString());
+    return true;
+  };
+  return Prec.highest(keymap.of([{ key: "Mod-Enter", run }]));
 }
 
 type Props = {

@@ -57,9 +57,10 @@ body {
 }
 
 /* Docs blocks wait hidden until Playground sees them scroll into view, then fade in fully.
-   Blocks seen together (the first screen on load) stagger by the --i it sets. */
-.page:not(.home) > :not(div):not(.seen),
-.page:not(.home) > div > :not(.seen) {
+   Blocks seen together (the first screen on load) stagger by the --i it sets.
+   Hidden only when JS runs (data-js from layout.tsx), so pages stay readable without it. */
+:root[data-js] .page:not(.home) > :not(div):not(.seen),
+:root[data-js] .page:not(.home) > div > :not(.seen) {
   opacity: 0;
 }
 

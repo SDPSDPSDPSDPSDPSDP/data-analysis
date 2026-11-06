@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Optional
 
-from ..config import Sort, SortInput
+from ..config import PaletteInput, Sort, SortInput
 from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
     VALID_ORIENTATIONS,
@@ -78,9 +78,6 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
 
     top_n: Optional[int] = None
     value: Optional[str] = None
-    remainder: Optional[str] = None  # hue level drawn last, tinted from the other level unless the palette sets it
-    category_palette: Optional[Dict[str, str]] = None  # with remainder: one color per bar instead of per hue level
-    background: str = BACKGROUND_COLOR  # remainder tint blends toward this, so it matches the dark mode background
 
     def validate(self) -> None:
         super().validate()
@@ -88,7 +85,27 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
             raise ValueError("hue must be specified for normalized plots")
         if self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) for normalized plots")
-        if self.category_palette is not None and self.remainder is None:
-            raise ValueError("category_palette needs remainder")
-        if self.category_palette is not None and self.legend:
+
+
+@dataclass
+class RemainderPlotOptions(NormalizedPlotOptions):
+    """Bars of the fractions in `value`, each filled up to 100% with a lighter remainder segment.
+
+    `palette` and `label_map` belong to the `value` column (a color, or {value or remainder level: color}).
+    With `hue` equal to `axis_column`, each bar gets its own color from `category_palette` instead.
+    """
+
+    value: str = ''  # type: ignore[assignment]
+    category_palette: Optional[PaletteInput] = None
+    background: str = BACKGROUND_COLOR  # remainder tint blends toward this, so it matches the dark mode background
+
+    def validate(self) -> None:
+        # Skips NormalizedPlotOptions.validate: hue and palette describe the user's columns here,
+        # RemainderPlot turns them into the normalized hue split.
+        CategoricalPlotOptions.validate(self)
+        if not self.value:
+            raise ValueError("value column must be specified")
+        if self.hue is not None and self.hue != self.axis_column:
+            raise ValueError(f"With remainder, hue must be the category column {self.axis_column!r} or None.")
+        if self.hue is not None and self.legend:
             raise ValueError("legend is not supported when bars are colored by category")

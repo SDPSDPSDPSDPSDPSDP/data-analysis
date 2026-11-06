@@ -67,15 +67,17 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
     // StrictMode runs this twice in dev, aim drops the first flight.
     aim(chart);
     // A close mid-flight reuses the class for the way back, it must stay on.
-    chart.addEventListener("animationend", () => modal.classList.contains("closing") || chart.classList.remove("flying"), {
-      once: true,
-    });
+    const land = () => {
+      if (!modal.classList.contains("closing")) chart.classList.remove("flying");
+    };
+    chart.addEventListener("animationend", land, { once: true });
   }, []);
 
   return (
     <dialog
       ref={dialog}
       className="chart-modal"
+      aria-label={title}
       onClose={onClose}
       // Clicks on the backdrop land on the dialog itself.
       onClick={(event) => event.target === dialog.current && close()}

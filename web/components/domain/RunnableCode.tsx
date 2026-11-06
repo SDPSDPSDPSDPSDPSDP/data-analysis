@@ -19,6 +19,16 @@ type Props = {
   preview: { light: string; dark: string } | null;
 };
 
+// The prerendered HTML cannot know the theme (set by an inline script), so it holds both previews and CSS shows one.
+function previewImages(preview: Props["preview"], hydrated: boolean, dark: boolean) {
+  if (!preview) return [];
+  if (hydrated) return [{ src: dark ? preview.dark : preview.light }];
+  return [
+    { src: preview.light, theme: "light" as const },
+    { src: preview.dark, theme: "dark" as const },
+  ];
+}
+
 export default function RunnableCode({ title, initialCode, setup, preview }: Props) {
   const [code, setCode] = useState(initialCode);
   const [result, setResult] = useState<RunResult | null>(null);
@@ -42,18 +52,9 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
     setResult(await run(`${setup}\n${source}`));
   }
 
-  // The prerendered HTML cannot know the theme (set by an inline script), so it holds both previews and CSS shows one.
-  const previews = !preview
-    ? []
-    : hydrated
-      ? [{ src: dark ? preview.dark : preview.light }]
-      : [
-          { src: preview.light, theme: "light" as const },
-          { src: preview.dark, theme: "dark" as const },
-        ];
   const images = result
     ? result.images.map((src) => ({ src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(src)}` }))
-    : previews;
+    : previewImages(preview, hydrated, dark);
 
   return (
     <div className="runnable" ref={root}>

@@ -29,7 +29,6 @@
   background: var(--color-code-highlight);
 }
 
-/* Native color picker shown as a small swatch in front of "#rrggbb" in editable code. */
 .color-swatch {
   width: 1em;
   height: 1em;

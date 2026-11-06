@@ -47,3 +47,9 @@ def test_timeplot_group_by_invalid_value_shows_valid_options() -> None:
 
     with pytest.raises(ValueError, match="Valid options"):
         options.validate()
+
+
+def test_pie_all_null_column_names_the_column(plot) -> None:
+    df = pd.DataFrame({'group': [None, None]})
+    with pytest.raises(ValueError, match="col='group' has no non-null values"):
+        plot.pie(df, col='group')

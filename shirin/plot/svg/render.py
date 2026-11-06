@@ -1,19 +1,25 @@
 """Lays out a Chart and writes it as an SVG string."""
 import math
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Callable, List, Optional, Tuple
 from xml.sax.saxutils import escape
 
 from ..config import FigureSize, FontSizes, Layout, TextColors
-from ..config.colors import BACKGROUND_COLOR, DARK_MODE_COLORS, GRID_COLOR
+from ..config.colors import BACKGROUND_COLOR, GRID_COLOR
+from ..config.theme import Theme
 from . import marks
-from .axis import fit_x_ticks, limits, scale, tick_color, ticks
-from .chart import Chart
+from .axis import Ticks, fit_x_ticks, limits, scale, tick_color, ticks
+from .chart import Chart, Text
 from .fonts import TTF_FILES, cap_height, font_css, text_width
+from .header import HeaderRow
 from .header import header_rows as build_header
+from .marks import Scale
 from .plot_body import draw_marks, shorten_crowded_labels
 
 PT_PER_INCH = 72
 PX_PER_PT = 4 / 3
+
+Color = Callable[[str], str]
 
 
 def to_png(svg: str) -> bytes:
@@ -23,17 +29,37 @@ def to_png(svg: str) -> bytes:
     return resvg_py.svg_to_bytes(svg_string=svg, font_files=TTF_FILES, zoom=FigureSize.PNG_SCALE)
 
 
-def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
-    theme = DARK_MODE_COLORS if dark_mode else {}
+@dataclass(frozen=True)
+class Frame:
+    """Where the plot area sits in the SVG, in points, and how data coordinates map onto it."""
 
-    def color(c: str) -> str:
-        return theme.get(c, c)
+    width: float
+    left: float
+    top: float
+    plot_w: float
+    plot_h: float
+    sx: Scale
+    sy: Scale
+    x_ticks: Ticks
+    y_ticks: Ticks
+    texts: List[Text]  # data labels, shortened where they would overlap
+    header_rows: List[HeaderRow]
 
+    @property
+    def right(self) -> float:
+        return self.left + self.plot_w
+
+    @property
+    def bottom(self) -> float:
+        return self.top + self.plot_h
+
+
+def layout(chart: Chart, color: Color) -> Frame:
+    """Size the plot area so ticks, header and data labels sticking out of it all fit in the SVG."""
     x_lim, y_lim = limits(chart.x, chart.data_values('x')), limits(chart.y, chart.data_values('y'))
     x_ticks, y_ticks = ticks(chart.x, *x_lim), ticks(chart.y, *y_lim)
-    tick_size = FontSizes.TICKS
 
-    y_tick_width = max((text_width(label, tick_size) for _, label in y_ticks), default=0)
+    y_tick_width = max((text_width(label, FontSizes.TICKS) for _, label in y_ticks), default=0)
     y_label_width = cap_height(FontSizes.XYLABEL) + Layout.LABEL_GAP if chart.y.label else 0
     y_ticks_space = y_tick_width + Layout.TICK_GAP if y_tick_width else 0
     plot_left = Layout.PAD + y_label_width + y_ticks_space
@@ -44,87 +70,117 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) ->
 
     header_rows, plot_top = build_header(chart, width - 2 * Layout.PAD, color)
 
-    # Data labels and the last x tick label may stick out of the plot area: make room for them.
+    # First pass at this size: measure what sticks out of the plot area, then shrink or grow to fit it.
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
     texts = shorten_crowded_labels(chart.texts, sx, sy)
-    all_x_ticks, x_ticks = x_ticks, fit_x_ticks(chart.x, x_ticks, sx)
     boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
-    if x_ticks and not chart.x.rotation:
-        position, label = x_ticks[-1]
-        boxes.append((0, sx(position) + text_width(label, tick_size) / 2, plot_top))
-    right_overflow = max([0.0] + [box[1] - (plot_left + plot_w) for box in boxes])
-    plot_top += max([0.0] + [plot_top - box[2] for box in boxes])
+    shown_x_ticks = fit_x_ticks(chart.x, x_ticks, sx)
+    if shown_x_ticks and not chart.x.rotation:
+        position, label = shown_x_ticks[-1]
+        boxes.append((0, sx(position) + text_width(label, FontSizes.TICKS) / 2, plot_top))
+    right_overflow = max([0.0] + [right - (plot_left + plot_w) for _, right, _ in boxes])
+    plot_top += max([0.0] + [plot_top - top for _, _, top in boxes])
     if fixed_width:
         plot_w -= right_overflow
     else:
         width = max([width + right_overflow] + [row_width + 2 * Layout.PAD for row_width, _ in header_rows])
+
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
-    x_ticks = fit_x_ticks(chart.x, all_x_ticks, sx)
-    plot_bottom = plot_top + plot_h
-    header = [
-        f'<g transform="translate({max(Layout.PAD, (width - w) / 2):.2f} 0)">{"".join(items)}</g>'
-        for w, items in header_rows
+    return Frame(
+        width=width, left=plot_left, top=plot_top, plot_w=plot_w, plot_h=plot_h, sx=sx, sy=sy,
+        x_ticks=fit_x_ticks(chart.x, x_ticks, sx), y_ticks=y_ticks, texts=texts, header_rows=header_rows,
+    )
+
+
+def _header(frame: Frame) -> List[str]:
+    return [
+        f'<g transform="translate({max(Layout.PAD, (frame.width - w) / 2):.2f} 0)">{"".join(items)}</g>'
+        for w, items in frame.header_rows
     ]
 
-    body: List[str] = []
+
+def _grid(chart: Chart, frame: Frame, color: Color) -> List[str]:
     grid = f'stroke="{color(GRID_COLOR)}" stroke-width="{Layout.HAIRLINE}"'
+    sx, sy = frame.sx, frame.sy
+    lines: List[str] = []
     if chart.y.grid:
-        plot_right = plot_left + plot_w
-        body += [
-            f'<line x1="{plot_left:.2f}" x2="{plot_right:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>'
-            for t, _ in y_ticks
+        lines += [
+            f'<line x1="{frame.left:.2f}" x2="{frame.right:.2f}" y1="{sy(t):.2f}" y2="{sy(t):.2f}" {grid}/>'
+            for t, _ in frame.y_ticks
         ]
     if chart.x.grid:
-        body += [
-            f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{plot_top:.2f}" y2="{plot_bottom:.2f}" {grid}/>'
-            for t, _ in x_ticks
+        lines += [
+            f'<line x1="{sx(t):.2f}" x2="{sx(t):.2f}" y1="{frame.top:.2f}" y2="{frame.bottom:.2f}" {grid}/>'
+            for t, _ in frame.x_ticks
         ]
-    body += draw_marks(chart, texts, sx, sy, plot_bottom, color)
+    return lines
 
+
+def _y_axis(chart: Chart, frame: Frame, color: Color) -> List[str]:
+    items: List[str] = []
     if chart.y.label:
         # Rotated a quarter turn counterclockwise, so the baseline is the right edge of the text.
-        x, y = Layout.PAD + cap_height(FontSizes.XYLABEL), plot_top + plot_h / 2
-        body.append(
+        x, y = Layout.PAD + cap_height(FontSizes.XYLABEL), frame.top + frame.plot_h / 2
+        items.append(
             f'<text x="{x:.2f}" y="{y:.2f}" font-size="{FontSizes.XYLABEL}" fill="{color(TextColors.BLACK)}" '
             f'text-anchor="middle" transform="rotate(-90 {x:.2f} {y:.2f})">{escape(chart.y.label)}</text>'
         )
+    cap = cap_height(FontSizes.TICKS)
+    y_tick_color = color(tick_color(chart.y, chart.x))
+    items += [marks.text(frame.left - Layout.TICK_GAP, frame.sy(t) + cap / 2, label, FontSizes.TICKS, y_tick_color, 'end')
+              for t, label in frame.y_ticks if label]
+    return items
 
-    cap = cap_height(tick_size)
-    x_tick_color, y_tick_color = color(tick_color(chart.x, chart.y)), color(tick_color(chart.y, chart.x))
-    body += [marks.text(plot_left - Layout.TICK_GAP, sy(t) + cap / 2, label, tick_size, y_tick_color, 'end')
-             for t, label in y_ticks if label]
-    bottom = plot_bottom
-    labelled_x_ticks = [(t, label) for t, label in x_ticks if label]
-    if labelled_x_ticks:
-        tick_top = plot_bottom + Layout.TICK_GAP
+
+def _x_axis(chart: Chart, frame: Frame, color: Color) -> Tuple[List[str], float]:
+    """Tick labels, sub labels (e.g. years under months) and axis label below the plot, plus their bottom edge."""
+    tick_size, cap, sx = FontSizes.TICKS, cap_height(FontSizes.TICKS), frame.sx
+    items: List[str] = []
+    bottom = frame.bottom
+    labelled_ticks = [(t, label) for t, label in frame.x_ticks if label]
+    if labelled_ticks:
+        tick_top = frame.bottom + Layout.TICK_GAP
         rotation = math.radians(chart.x.rotation)
-        bottom = tick_top + max(text_width(label, tick_size) * math.sin(rotation) + cap * math.cos(rotation)
-                                for _, label in labelled_x_ticks)
-        for t, label in labelled_x_ticks:
+
+        def rotated_height(label: str) -> float:
+            return text_width(label, tick_size) * math.sin(rotation) + cap * math.cos(rotation)
+
+        bottom = tick_top + max(rotated_height(label) for _, label in labelled_ticks)
+        x_tick_color = color(tick_color(chart.x, chart.y))
+        for t, label in labelled_ticks:
             if chart.x.rotation:
-                body.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, x_tick_color, 'end', rotate=chart.x.rotation))
+                items.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, x_tick_color, 'end', rotate=chart.x.rotation))
             else:
-                body.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
+                items.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
         sub_label_color = color(TextColors.DARK_GREY)
-        body += [marks.text(sx(t), bottom + cap, label, tick_size, sub_label_color, 'middle')
-                 for t, label in chart.x.sub_labels]
+        items += [marks.text(sx(t), bottom + cap, label, tick_size, sub_label_color, 'middle')
+                  for t, label in chart.x.sub_labels]
         bottom += tick_size
     if chart.x.label:
         bottom += Layout.LABEL_GAP
         label_baseline = bottom + cap_height(FontSizes.XYLABEL)
         label_color = color(TextColors.BLACK)
-        body.append(marks.text(plot_left + plot_w / 2, label_baseline, chart.x.label, FontSizes.XYLABEL, label_color, 'middle'))
+        items.append(marks.text(frame.left + frame.plot_w / 2, label_baseline, chart.x.label, FontSizes.XYLABEL, label_color, 'middle'))
         bottom += FontSizes.XYLABEL
-    height = bottom + Layout.PAD
+    return items, bottom
 
+
+def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
+    color = Theme(dark_mode).color
+    frame = layout(chart, color)
+    x_axis, bottom = _x_axis(chart, frame, color)
+    height = bottom + Layout.PAD
     return ''.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width * PX_PER_PT:.0f}" height="{height * PX_PER_PT:.0f}" '
-        f'viewBox="0 0 {width:.2f} {height:.2f}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{frame.width * PX_PER_PT:.0f}" height="{height * PX_PER_PT:.0f}" '
+        f'viewBox="0 0 {frame.width:.2f} {height:.2f}">',
         f'<style>{font_css(font, bool(chart.title))}</style>',
         f'<rect width="100%" height="100%" rx="{Layout.CORNER_RADIUS}" fill="{color(BACKGROUND_COLOR)}"/>',
-        *header,
-        *body,
+        *_header(frame),
+        *_grid(chart, frame, color),
+        *draw_marks(chart, frame.texts, frame.sx, frame.sy, frame.bottom, color),
+        *_y_axis(chart, frame, color),
+        *x_axis,
         '</svg>',
     ])

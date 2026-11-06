@@ -30,6 +30,12 @@ def _rows_to_table(columns: List[str], rows: List[Any]) -> pa.Table:
     return pa.Table.from_arrays([pa.array(values) for values in zip(*rows)], names=columns)
 
 
+def _rows_to_typed_table(schema: pa.Schema, rows: List[Any]) -> pa.Table:
+    """Build arrays with the fixed schema's types, skipping per-chunk type inference."""
+    arrays = [pa.array(values, type=field.type) for field, values in zip(schema, zip(*rows))]
+    return pa.Table.from_arrays(arrays, schema=schema)
+
+
 def _widen(schema: pa.Schema) -> pa.Schema:
     """Arrow infers decimal precision per chunk; widen to the max so later chunks still fit."""
     return pa.schema([
@@ -67,10 +73,10 @@ def _stream_to_parquet(
         try:
             for index, rows in enumerate(result.partitions()):
                 progress.update(len(rows))
-                table = _rows_to_table(columns, rows)
                 if writer is not None:
-                    writer.write(table)
+                    writer.write(_rows_to_typed_table(writer.schema, rows))
                     continue
+                table = _rows_to_table(columns, rows)
                 spilled.append(_spill(table, Path(spill_dir), index))
                 schema = pa.unify_schemas([schema, table.schema], promote_options='permissive')
                 if any(pa.types.is_null(field.type) for field in schema):

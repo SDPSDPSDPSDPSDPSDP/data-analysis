@@ -4,11 +4,11 @@ import pytest
 
 from shirin.plot import PlotGraphs
 from shirin.plot.common.colors import blend
-from shirin.plot.common.data_conversion import REMAINDER_SHARE_COL, fill_remainder
+from shirin.plot.common.data_conversion import REMAINDER_LABEL, REMAINDER_SHARE_COL, fill_remainder
 from shirin.plot.config import FigureSize
 from shirin.plot.config.colors import REMAINDER_TINT
-from shirin.plot.core import BarPlotOptions, NormalizedPlotOptions
-from shirin.plot.plots import BarPlot, NormalizedPlot
+from shirin.plot.core import BarPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
+from shirin.plot.plots import BarPlot, NormalizedPlot, RemainderPlot
 
 
 def test_normalized_barplot_shares_summed_value_per_hue() -> None:
@@ -28,11 +28,10 @@ def test_normalized_barplot_accepts_duplicate_index() -> None:
 def test_barplot_remainder_fills_to_one_sorted_by_fraction(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
     plot.bar(df, x='run', value='acc', normalized=True, remainder=True)
-    shares = fill_remainder(df, 'run', 'acc', 'Incorrect')
-    plot_obj = NormalizedPlot(NormalizedPlotOptions(df=shares, axis_column='run', hue='acc', value=REMAINDER_SHARE_COL, remainder='Incorrect'))
+    plot_obj = RemainderPlot(RemainderPlotOptions(df=df, axis_column='run', value='acc'))
     plot_obj.options.validate()
     pivot = plot_obj.transform(plot_obj.preprocess()).shares
-    assert pivot.columns.tolist() == ['acc', 'Incorrect']
+    assert pivot.columns.tolist() == ['acc', REMAINDER_LABEL]
     assert pivot.index.tolist() == ['b', 'a']
 
 
@@ -42,8 +41,8 @@ def test_barplot_remainder_rejects_non_fractions(plot: PlotGraphs) -> None:
 
 
 def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
-    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
-    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect'))
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7]})
+    plot = RemainderPlot(RemainderPlotOptions(df=df, axis_column='run', value='acc'))
     chart = plot.draw(plot.transform(plot.preprocess()))
     back, front = chart.rects
     assert (back.y0, back.y1, front.y0, front.y1) == (0, 1, 0, 0.7)
@@ -63,8 +62,8 @@ def test_fill_remainder_collapses_repeated_fraction() -> None:
 
 
 def test_remainder_segment_has_no_data_label() -> None:
-    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
-    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect'))
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7]})
+    plot = RemainderPlot(RemainderPlotOptions(df=df, axis_column='run', value='acc'))
     data = plot.transform(plot.preprocess())
     chart = plot.draw(data)
     plot.format_plot(chart, data)
@@ -73,11 +72,10 @@ def test_remainder_segment_has_no_data_label() -> None:
 
 def test_barplot_remainder_with_category_hue_colors_each_bar(plot: PlotGraphs) -> None:
     df = pd.DataFrame({'run': ['a', 'b'], 'acc': [0.7, 0.9]})
-    options = NormalizedPlotOptions(
-        df=fill_remainder(df, 'run', 'acc', 'Incorrect'), axis_column='run', hue='acc', value=REMAINDER_SHARE_COL,
-        remainder='Incorrect', category_palette={'a': '#ff0000', 'b': '#0000ff'},
+    options = RemainderPlotOptions(
+        df=df, axis_column='run', hue='run', value='acc', category_palette={'a': '#ff0000', 'b': '#0000ff'},
     )
-    nplot = NormalizedPlot(options)
+    nplot = RemainderPlot(options)
     chart = nplot.draw(nplot.transform(nplot.preprocess()))
     fronts = [rect.color for rect in chart.rects[1::2]]
     assert fronts == ['#0000ff', '#ff0000']
@@ -91,19 +89,19 @@ def test_barplot_remainder_rejects_other_hue(plot: PlotGraphs) -> None:
 
 
 def test_remainder_not_in_legend() -> None:
-    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
-    plot = NormalizedPlot(NormalizedPlotOptions(df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect', legend=True))
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7]})
+    plot = RemainderPlot(RemainderPlotOptions(df=df, axis_column='run', value='acc', legend=True))
     plot.render()
     assert [label for _, label, _ in plot.chart.legend] == ['acc']
 
 
 def test_remainder_legend_keeps_level_labelled_like_remainder() -> None:
-    df = pd.DataFrame({'run': ['a', 'a'], 'acc': ['acc', 'Incorrect'], 'v': [0.7, 0.3]})
-    plot = NormalizedPlot(NormalizedPlotOptions(
-        df=df, axis_column='run', hue='acc', value='v', remainder='Incorrect', legend=True, label_map={'acc': 'Incorrect'},
+    df = pd.DataFrame({'run': ['a'], 'acc': [0.7]})
+    plot = RemainderPlot(RemainderPlotOptions(
+        df=df, axis_column='run', value='acc', legend=True, label_map={'acc': REMAINDER_LABEL},
     ))
     plot.render()
-    assert [label for _, label, _ in plot.chart.legend] == ['Incorrect']
+    assert [label for _, label, _ in plot.chart.legend] == [REMAINDER_LABEL]
 
 
 def test_normalized_barplot_hue_equal_to_axis_draws_full_width_share_bars() -> None:

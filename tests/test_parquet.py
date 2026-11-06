@@ -1,7 +1,6 @@
 """query_to_parquet, run against an in-memory SQLite engine in place of DB2."""
 from decimal import Decimal
 
-import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from sqlalchemy.exc import OperationalError
@@ -51,8 +50,11 @@ def test_parquet_all_null_column(sqlite_engine, tmp_path) -> None:
 
 def test_parquet_widens_decimals_across_chunks(sqlite_engine, tmp_path, monkeypatch) -> None:
     # SQLite has no DECIMAL type; turn its text into Decimals the way ibm_db returns them.
-    monkeypatch.setattr(parquet, '_rows_to_table', lambda columns, rows: pa.Table.from_arrays(
-        [pa.array([Decimal(value) for (value,) in rows])], names=columns))
+    to_table, to_typed_table = parquet._rows_to_table, parquet._rows_to_typed_table
+    monkeypatch.setattr(parquet, '_rows_to_table', lambda columns, rows: to_table(
+        columns, [(Decimal(value),) for (value,) in rows]))
+    monkeypatch.setattr(parquet, '_rows_to_typed_table', lambda schema, rows: to_typed_table(
+        schema, [(Decimal(value),) for (value,) in rows]))
     out = tmp_path / 'decimal.parquet'
     parquet.query_to_parquet("SELECT '1.50' AS v UNION ALL SELECT '12345.75'", sqlite_engine, out, chunk_rows=1)
     assert pq.read_table(out).column('v').to_pylist() == [Decimal('1.50'), Decimal('12345.75')]

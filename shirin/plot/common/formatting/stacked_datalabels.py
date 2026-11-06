@@ -28,11 +28,12 @@ def _add_stacked_labels(
                 continue
             center = cumulative_sum - value / 2
             x, y = (center, index) if orientation == 'horizontal' else (index, center)
+            background = row_colors[index] if row_colors is not None else palette[str(category)]
             chart.texts.append(Text(
                 x,
                 y,
                 percentage_label(value_percentage, 0, suffix),
-                get_text_color_for_background(row_colors[index] if row_colors is not None else palette[str(category)]),
+                get_text_color_for_background(background),
                 FontSizes.DATALABELS,
                 alpha=Marks.INNER_LABEL_ALPHA,
                 on_mark=True,
