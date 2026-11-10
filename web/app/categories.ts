@@ -74,7 +74,7 @@ export function getCategories(): Category[] {
     }),
   ];
   const lineCharts = [
-    section("Line charts", "time.py", {
+    section("Time plots", "time.py", {
       description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
       columns: [
         { name: "year", role: "x" },

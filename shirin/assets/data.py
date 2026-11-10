@@ -54,13 +54,14 @@ def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int 
     marked holds the threshold on a few highlighted rows and is missing elsewhere.
     """
     probability = rng.beta(5, 1.5, num_fruits)
-    is_correct = rng.random(num_fruits) < probability ** 0.5
+    # Expected correctness instead of a random draw keeps the curve smooth where few fruits remain
+    chance_correct = probability ** 0.5
     thresholds = np.round(np.arange(0, 1, 0.01), 2)
     above = probability[None, :] >= thresholds[:, None]
     df = pd.DataFrame({
         'threshold': thresholds,
         'coverage': above.mean(axis=1),
-        'accuracy': (above & is_correct).sum(axis=1) / above.sum(axis=1),
+        'accuracy': (above * chance_correct).sum(axis=1) / above.sum(axis=1),
     })
     df['marked'] = df['threshold'].where(df['threshold'].isin([0.5, 0.8, 0.9, 0.95]))
     return df

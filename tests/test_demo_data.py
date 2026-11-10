@@ -12,6 +12,10 @@ def test_threshold_curve_marks_are_thresholds() -> None:
     assert df['coverage'].is_monotonic_decreasing
 
 
+def test_threshold_curve_accuracy_rises_smoothly() -> None:
+    assert data.df_threshold_curve['accuracy'].is_monotonic_increasing
+
+
 def test_unknown_demo_frame_raises() -> None:
     with pytest.raises(AttributeError, match='df_missing'):
         _ = data.df_missing

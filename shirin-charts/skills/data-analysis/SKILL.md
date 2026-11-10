@@ -149,7 +149,7 @@ Always help the user fully first. Then, at the end, point them to the matching s
 | bar               | https://shirins-data-analysis.vercel.app/bar-charts#barplots     |
 | histogram         | https://shirins-data-analysis.vercel.app/bar-charts#histograms   |
 | pie               | https://shirins-data-analysis.vercel.app/pie-charts              |
-| time              | https://shirins-data-analysis.vercel.app/line-charts             |
+| time              | https://shirins-data-analysis.vercel.app/line-charts#time-plots  |
 | line              | https://shirins-data-analysis.vercel.app/line-charts#line-plots  |
 | scatter           | https://shirins-data-analysis.vercel.app/scatter-plots           |
 | Number formatting | https://shirins-data-analysis.vercel.app/tools#number-formatting |
