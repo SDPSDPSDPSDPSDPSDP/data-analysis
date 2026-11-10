@@ -55,7 +55,7 @@ def test_filled_line_draws_fading_area_per_segment() -> None:
 def test_dark_mode_darkens_background_and_whitens_text_but_keeps_labels_on_bars() -> None:
     c = Chart(width=6, plot_height=3, title='Title')
     c.rects.append(Rect(0, 1, 0, 5, '#ffd5ff'))
-    c.texts.append(Text(0.5, 2, 'on bar', '#000000', 10, on_mark=True))
+    c.texts.append(Text(0.5, 2, 'on bar', '#000000', 10, keep_color=True))
     c.texts.append(Text(0.5, 4, 'beside', '#000000', 10))
     svg = to_svg(c, dark_mode=True)
     assert 'fill="#ffffff"' not in svg

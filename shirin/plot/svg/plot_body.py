@@ -63,6 +63,6 @@ def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_botto
     for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
-            text_color = t.color if t.on_mark else color(t.color)
+            text_color = t.color if t.keep_color else color(t.color)
             body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha))
     return body

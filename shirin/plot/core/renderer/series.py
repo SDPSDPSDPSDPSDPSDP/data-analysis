@@ -79,6 +79,7 @@ def _add_point_labels(
     for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
         chart.texts.append(Text(
             px, py, text, color, FontSizes.POINT_LABELS, 'left', 'top', dx=gap, dy=-gap, slope=float(slopes[px]),
+            keep_color=True,
         ))
 
 

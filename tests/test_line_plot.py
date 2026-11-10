@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -6,6 +8,7 @@ from shirin.plot.config import FontSizes
 from shirin.plot.config.theme import Theme
 from shirin.plot.core import LinePlotOptions
 from shirin.plot.plots import LinePlot
+from shirin.plot.svg import to_svg
 from shirin.plot.svg.frame import layout
 
 
@@ -137,3 +140,9 @@ def test_point_label_above_falling_line() -> None:
 
 def test_point_label_below_line_rising_on_flipped_axis() -> None:
     assert _placed_label_va(x_limits=(1, 0)) == 'top'
+
+
+def test_point_labels_keep_line_color_in_dark_mode() -> None:
+    chart = _render(_curve(), labels='threshold', palette='#ffffff')
+
+    assert re.search(r'fill="#ffffff"[^>]*>0,9</text>', to_svg(chart, dark_mode=True))

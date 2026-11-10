@@ -36,7 +36,7 @@ def _add_stacked_labels(
                 get_text_color_for_background(background),
                 FontSizes.DATALABELS,
                 alpha=Marks.INNER_LABEL_ALPHA,
-                on_mark=True,
+                keep_color=True,
             ))
 
 
