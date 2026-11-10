@@ -3,6 +3,7 @@ class FontSizes:
     TITLE = 15
     TICKS = 8
     DATALABELS = 8
+    POINT_LABELS = 9.5  # labelled line points; stand alone on the plot, so larger than bar data labels
     XYLABEL = 10
     XYSUBLABEL = 8  # grey second line of an axis label
     LEGEND = 8

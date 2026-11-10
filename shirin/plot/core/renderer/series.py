@@ -67,7 +67,7 @@ def _add_point_labels(
     chart.dots.append(Dots(list(rows[x]), list(rows[y]), [Marks.POINT_LABEL_DOT_RADIUS] * len(rows), color))
     gap = Layout.POINT_LABEL_GAP
     for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
-        chart.texts.append(Text(px, py, text, color, FontSizes.DATALABELS, 'left', 'top', dx=gap, dy=-gap))
+        chart.texts.append(Text(px, py, text, color, FontSizes.POINT_LABELS, 'left', 'top', dx=gap, dy=-gap))
 
 
 def render_scatterplot(

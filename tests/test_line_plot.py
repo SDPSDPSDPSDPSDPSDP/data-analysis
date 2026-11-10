@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from shirin.plot.config import FontSizes
 from shirin.plot.config.theme import Theme
 from shirin.plot.core import LinePlotOptions
 from shirin.plot.plots import LinePlot
@@ -117,3 +118,9 @@ def test_axis_label_list_adds_sublabel(plot, shown) -> None:
 def test_axis_label_list_of_three_raises() -> None:
     with pytest.raises(ValueError, match='x_axis_label must be a str'):
         _render(_curve(), x_axis_label=['a', 'b', 'c'])
+
+
+def test_point_labels_larger_than_bar_data_labels() -> None:
+    chart = _render(_curve(), labels='threshold')
+
+    assert all(t.size == FontSizes.POINT_LABELS > FontSizes.DATALABELS for t in chart.texts)
