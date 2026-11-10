@@ -2,7 +2,7 @@ import base64
 import functools
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from ..config import FontSizes
 
@@ -34,6 +34,18 @@ def text_width(text: str, size: float, bold: bool = False) -> float:
     metrics = _metrics()['bold' if bold else 'regular']
     widths, default = metrics['widths'], metrics['default']
     return size * (sum(widths.get(str(ord(char)), default) for char in text) + letter_spacing(size, bold) * len(text))
+
+
+def wrap_text(text: str, size: float, max_width: float) -> List[str]:
+    """Split text on spaces into lines no wider than max_width; a single longer word gets its own line."""
+    lines: List[str] = []
+    for word in text.split():
+        candidate = f'{lines[-1]} {word}' if lines else word
+        if lines and text_width(candidate, size) <= max_width:
+            lines[-1] = candidate
+        else:
+            lines.append(word)
+    return lines
 
 
 def cap_height(size: float) -> float:

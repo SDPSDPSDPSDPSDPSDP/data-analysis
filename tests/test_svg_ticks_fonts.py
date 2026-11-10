@@ -1,6 +1,6 @@
 import pandas as pd
 
-from shirin.plot.svg.fonts import text_width
+from shirin.plot.svg.fonts import text_width, wrap_text
 from shirin.plot.svg.ticks import date_ticks, nice_ticks, to_days
 
 
@@ -26,3 +26,13 @@ def test_text_width_grows_with_text() -> None:
 def test_digits_are_tabular() -> None:
     assert text_width('11', 10) == text_width('00', 10)
     assert text_width('11', 10, bold=True) == text_width('00', 10, bold=True)
+
+
+def test_wrap_text_keeps_lines_within_width() -> None:
+    text = 'Baseline model trained on the original feature set'
+    lines = wrap_text(text, 7, 60)
+    assert len(lines) > 1
+    assert ' '.join(lines) == text
+    assert all(text_width(line, 7) <= 60 for line in lines)
+    assert wrap_text('Supercalifragilistic word', 7, 10) == ['Supercalifragilistic', 'word']
+    assert wrap_text('', 7, 60) == []

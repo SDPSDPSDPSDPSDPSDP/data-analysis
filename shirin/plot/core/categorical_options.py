@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional
+from typing import ClassVar, Dict, Optional
 
 from ..config import PaletteInput, Sort, SortInput
 from ..config.colors import BACKGROUND_COLOR
@@ -23,6 +23,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     compact_labels: bool = True
     suffix: Optional[str] = None
     group_by: Optional[str] = None  # categories are date periods; 'month' gets month ticks with a year row
+    descriptions: Optional[Dict[str, str]] = None  # {category: grey line under its tick label}
 
     def validate(self) -> None:
         super().validate()
@@ -42,6 +43,8 @@ class CategoricalPlotOptions(BasePlotOptions):
             enum_type=Sort,
         )
 
+        if self.descriptions and self.group_by is not None:
+            raise ValueError("descriptions do not work with group_by")
         if self.stacked and self.hue is None:
             raise ValueError("hue must be provided when stacked=True")
         if self.stacked and self.palette is not None and not isinstance(self.palette, dict):

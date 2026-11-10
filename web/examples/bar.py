@@ -28,12 +28,13 @@ plot.bar(
     title='Fruits A to Z',
 )
 
-# %% Percentage labels
+# %% Percentage labels, description per category
 plot.bar(
     df,
     y='fruit',
     value='count',
     normalized=True,
+    description='description',
     title='Share of all fruit',
 )
 

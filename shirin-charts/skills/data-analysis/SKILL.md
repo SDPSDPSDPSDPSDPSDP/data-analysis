@@ -44,6 +44,7 @@ plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True)
 plot.bar(df, x='fruit', hue='is_ripe', normalized=True)   # 100% stacked hue shares
 plot.bar(df, x='fruit', normalized=True)                  # labels show share of total
 plot.bar(df, x='model', value='accuracy', normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
+plot.bar(df, y='model', value='accuracy', description='description')  # grey second line under each category label
 plot.bar(df, x='fruit', top_n=5, sort='alphabetical')
 plot.bar(df, x='created_at', group_by='month')           # one bar per period, time order, empty periods 0
 ```
@@ -54,6 +55,7 @@ Rules (raise `ValueError` otherwise):
 - `top_n` only without `value`.
 - `remainder=True` needs `value` and `normalized=True`; `hue` must be `None` or same as the category column.
 - `group_by='year'|'month'|'day'` needs `x` (dates); not with `sort`, `top_n` or `remainder`. `'month'` shows month ticks with a year row.
+- `description` column: one text per category (same on every row of it, empty = no line); not with `group_by`.
 
 Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `''` hides), `suffix` (appended to data labels), `data_labels=True`, `compact_labels=True` (k/M data labels, `False` = full numbers), `legend=False`, `sort='frequency'|'alphabetical'`.
 

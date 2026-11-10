@@ -10,6 +10,7 @@ from ..common.formatting import (
     format_datalabels,
     format_datalabels_stacked,
     format_period_ticks,
+    format_tick_descriptions,
     format_ticks,
 )
 from ..common.sorting import get_order
@@ -108,6 +109,8 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
         self._format_labels_and_legend(plot)
         # label_map renames hue values when there is a hue, otherwise the category ticks.
         tick_label_map = self.options.label_map if self.options.hue is None else None
+        category_axis = 'x' if self.options.orientation == 'vertical' else 'y'
+        format_tick_descriptions(plot, self.options.descriptions, category_axis)
         if self.options.orientation == 'vertical':
             format_ticks(plot, numeric_y=True)
             format_categorical_tick_labels(plot, tick_label_map, axis='x')

@@ -1,6 +1,7 @@
 """Stream a query result into a parquet file without pandas."""
 
 import os
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -69,7 +70,9 @@ def _stream_to_parquet(
         schema = pa.schema([(column, pa.null()) for column in columns])
         spilled: List[Path] = []
         writer: Optional[RowGroupWriter] = None
-        progress = tqdm(unit=' rows', desc='Fetching')
+        # Piped to a log file, every redraw becomes a line; update once a minute there instead.
+        interactive = sys.stderr.isatty()
+        progress = tqdm(unit=' rows', desc='Fetching', mininterval=0.1 if interactive else 60, ascii=not interactive)
         try:
             for index, rows in enumerate(result.partitions()):
                 progress.update(len(rows))

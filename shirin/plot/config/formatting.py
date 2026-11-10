@@ -5,6 +5,7 @@ class FontSizes:
     DATALABELS = 8
     XYLABEL = 10
     LEGEND = 8
+    DESCRIPTION = 7  # grey second line under a category tick label
     # em; Satoshi reads cramped at small chart sizes without extra tracking, larger text needs less.
     LETTER_SPACING = 0.05
     LARGE_LETTER_SPACING = 0.01
@@ -33,6 +34,9 @@ class Layout:
     ROW_GAP = 6
     PLOT_GAP = 12
     TICK_GAP = 6
+    DESCRIPTION_GAP = 5  # between a category tick label and its description
+    DESCRIPTION_LINE_GAP = 2  # between wrapped lines of a description
+    DESCRIPTION_MAX_WIDTH = 90  # descriptions wrap onto more lines past this width
     LABEL_GAP = 14
     DATALABEL_GAP = 6
     DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened

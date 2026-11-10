@@ -1,9 +1,9 @@
 """Axis limits, scales and tick selection for the SVG layout."""
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from ..config import FontSizes, Layout, TextColors
 from .chart import Axis
-from .fonts import text_width
+from .fonts import text_width, wrap_text
 from .marks import Scale
 from .ticks import date_ticks, nice_ticks
 
@@ -49,27 +49,45 @@ def tick_color(axis: Axis, other: Axis) -> str:
     return TextColors.LIGHT_GREY if is_value_axis else TextColors.DARK_GREY
 
 
+def description_lines(axis: Axis, position: float, sx: Optional[Scale] = None) -> List[str]:
+    """The description under the tick at position, wrapped; empty when it has none.
+
+    Pass the x scale for an x-axis: its descriptions also wrap to the space between ticks, so neighbours do not overlap.
+    """
+    max_width = float(Layout.DESCRIPTION_MAX_WIDTH)
+    if sx is not None and axis.ticks is not None and len(axis.ticks) > 1:
+        tick_spacing = abs(sx(axis.ticks[1]) - sx(axis.ticks[0]))
+        max_width = min(max_width, tick_spacing - Layout.TICK_LABEL_MIN_SPACE)
+    return wrap_text(dict(axis.descriptions).get(position, ''), FontSizes.DESCRIPTION, max_width)
+
+
+def tick_label_width(axis: Axis, position: float, label: str, sx: Optional[Scale] = None) -> float:
+    """Widest of the tick label and its description lines; sx as in description_lines."""
+    lines = description_lines(axis, position, sx)
+    return max([text_width(label, FontSizes.TICKS)] + [text_width(line, FontSizes.DESCRIPTION) for line in lines])
+
+
 def scale(lo: float, hi: float, start: float, end: float) -> Scale:
     if lo == hi:
         raise ValueError(f"Axis limits are equal ({lo}), so there is no range to scale on")
     return lambda v: start + (v - lo) / (hi - lo) * (end - start)
 
 
-def _x_labels_overlap(ticks: Ticks, sx: Scale) -> bool:
-    widths = [(t, text_width(label, FontSizes.TICKS)) for t, label in ticks if label]
+def _x_labels_overlap(axis: Axis, ticks: Ticks, sx: Scale) -> bool:
+    widths = [(t, tick_label_width(axis, t, label, sx)) for t, label in ticks if label]
     spans = [(sx(t) - w / 2, sx(t) + w / 2) for t, w in widths]
     return any(right[0] - left[1] < Layout.TICK_LABEL_MIN_SPACE for left, right in zip(spans, spans[1:]))
 
 
 def fit_x_ticks(axis: Axis, ticks: Ticks, sx: Scale) -> Ticks:
     """Short labels when the full ones overlap, then only every nth label; unlabelled ticks keep their grid line."""
-    if axis.rotation or not _x_labels_overlap(ticks, sx):
+    if axis.rotation or not _x_labels_overlap(axis, ticks, sx):
         return ticks
     if axis.short_formatter is not None and axis.tick_labels is None and not axis.dates:
         ticks = [(t, axis.short_formatter(t)) for t, _ in ticks]
     step = 1
     thinned = ticks
-    while _x_labels_overlap(thinned, sx) and step < len(ticks):
+    while _x_labels_overlap(axis, thinned, sx) and step < len(ticks):
         step += 1
         thinned = [(t, label if i % step == 0 else '') for i, (t, label) in enumerate(ticks)]
     return thinned

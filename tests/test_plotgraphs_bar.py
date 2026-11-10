@@ -1,4 +1,5 @@
 """Smoke tests: every public PlotGraphs method renders without raising, plus argument validation."""
+import re
 from typing import List
 
 import pandas as pd
@@ -60,3 +61,51 @@ def test_bar_compact_labels(shown: List[str]) -> None:
     PlotGraphs().bar(df, y='category', value='value', compact_labels=False)
     assert '1,2M' in shown[0] and '457k' in shown[0]
     assert '1.228.787' in shown[1] and '457.435' in shown[1]
+
+
+DESCRIBED = pd.DataFrame({
+    'name': ['v1', 'v2', 'v3'],
+    'accuracy': [0.8, 0.86, 0.7],
+    'description': ['Baseline', 'Route features', None],
+})
+
+
+def _text_y(svg: str, text: str) -> float:
+    match = re.search(rf'<text x="[\d.]+" y="([\d.]+)"[^>]*>{re.escape(text)}</text>', svg)
+    assert match, f'{text!r} not in SVG'
+    return float(match.group(1))
+
+
+def test_bar_description_line_under_each_category_label(shown: List[str]) -> None:
+    PlotGraphs().bar(DESCRIBED, y='name', value='accuracy', description='description')
+    PlotGraphs().bar(DESCRIBED, x='name', value='accuracy', description='description')
+    PlotGraphs().bar(DESCRIBED, y='name', value='accuracy', normalized=True, remainder=True, description='description')
+    for svg in shown:
+        assert _text_y(svg, 'v1') < _text_y(svg, 'Baseline')
+        assert _text_y(svg, 'v2') < _text_y(svg, 'Route features')
+        assert '>None</text>' not in svg and '>nan</text>' not in svg
+
+
+def test_bar_description_rejects_bad_input() -> None:
+    with pytest.raises(ValueError, match="description='notes' is not a column"):
+        PlotGraphs().bar(DESCRIBED, y='name', description='notes')
+    conflicting = pd.DataFrame({'name': ['a', 'a'], 'description': ['one', 'two']})
+    with pytest.raises(ValueError, match=r"differs for \['a'\]"):
+        PlotGraphs().bar(conflicting, y='name', description='description')
+    dates = pd.DataFrame({'date': pd.to_datetime(['2024-01-01']), 'description': ['x']})
+    with pytest.raises(ValueError, match='descriptions do not work with group_by'):
+        PlotGraphs().bar(dates, x='date', group_by='month', description='description')
+
+
+def test_bar_long_description_wraps_onto_more_lines(shown: List[str]) -> None:
+    long = 'Baseline model trained on the original feature set'
+    df = pd.DataFrame({'name': ['v1', 'v2'], 'accuracy': [0.8, 0.9], 'description': [long, 'Short']})
+    PlotGraphs().bar(df, y='name', value='accuracy', description='description')
+    PlotGraphs().bar(df, x='name', value='accuracy', description='description')
+    for svg in shown:
+        assert long not in svg
+        lines = re.findall(r'<text x="[\d.]+" y="([\d.]+)"[^>]*>([^<]*)</text>', svg)
+        long_lines = [(float(y), text) for y, text in lines if text and text in long]
+        assert len(long_lines) > 1
+        assert ' '.join(text for _, text in sorted(long_lines)) == long
+        assert _text_y(svg, 'v1') < min(y for y, _ in long_lines)
