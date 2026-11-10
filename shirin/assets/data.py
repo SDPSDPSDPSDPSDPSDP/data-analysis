@@ -148,6 +148,7 @@ def _build_lazy_frames() -> dict:
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    if name not in _build_lazy_frames():
+    frames = _build_lazy_frames()
+    if name not in frames:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    return _build_lazy_frames()[name].copy()
+    return frames[name].copy()

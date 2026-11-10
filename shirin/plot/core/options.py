@@ -81,7 +81,9 @@ class LinePlotOptions(BasePlotOptions):
         if self.marks is not None:
             marks = self.df[self.marks]
             if not pd.api.types.is_bool_dtype(marks) or marks.isna().any():
-                raise ValueError(f"marks={self.marks!r} must be a boolean column without missing values, got dtype {marks.dtype}")
+                raise ValueError(
+                    f"marks={self.marks!r} must be a boolean column without missing values, got dtype {marks.dtype}"
+                )
         if self.mark_labels not in MARK_LABELS:
             raise ValueError(f"mark_labels must be one of {MARK_LABELS}, got {self.mark_labels!r}")
 

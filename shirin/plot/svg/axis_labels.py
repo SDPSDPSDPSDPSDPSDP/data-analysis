@@ -43,7 +43,8 @@ def y_axis(chart: Chart, frame: Frame, color: Color) -> List[str]:
         items.append(_rotated_label(x, y, chart.y.label, FontSizes.XYLABEL, color(TextColors.BLACK)))
     if chart.y.sublabel:
         x += (Layout.SUBLABEL_GAP if chart.y.label else 0) + cap_height(FontSizes.XYSUBLABEL)
-        items.append(_rotated_label(x, y, chart.y.sublabel, FontSizes.XYSUBLABEL, color(TextColors.LIGHT_GREY), SUBLABEL_CLASS))
+        sublabel_color = color(TextColors.LIGHT_GREY)
+        items.append(_rotated_label(x, y, chart.y.sublabel, FontSizes.XYSUBLABEL, sublabel_color, SUBLABEL_CLASS))
     cap = cap_height(FontSizes.TICKS)
     x = frame.left - Layout.TICK_GAP
     y_tick_color = color(tick_color(chart.y, chart.x))

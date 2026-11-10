@@ -33,7 +33,8 @@ def text(
     prefix = ''
     if title:
         title_alpha = Marks.POINT_LABEL_TITLE_ALPHA * alpha
-        prefix = f'<tspan font-size="{FontSizes.POINT_LABEL_TITLES}" fill-opacity="{title_alpha}">{escape(title)} </tspan>'
+        title_attrs = f'font-size="{FontSizes.POINT_LABEL_TITLES}" fill-opacity="{title_alpha}"'
+        prefix = f'<tspan {title_attrs}>{escape(title)} </tspan>'
     return f'<text {attrs}>{prefix}{escape(s)}</text>'
 
 

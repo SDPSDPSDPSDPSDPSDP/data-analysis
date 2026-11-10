@@ -59,10 +59,13 @@ def render_lineplot(
 def _slopes(line: pd.Series) -> pd.Series:
     if len(line) < 2:
         return pd.Series(0.0, index=line.index)
-    return pd.Series(np.gradient(line.values.astype(float), line.index.values.astype(float)), index=line.index)
+    xs, ys = line.index.values.astype(float), line.values.astype(float)
+    return pd.Series(np.gradient(ys, xs), index=line.index)
 
 
-def _mark_texts(xs: pd.Series, ys: pd.Series, mark_labels: Optional[str], percentage_x: bool, percentage_y: bool) -> pd.Series:
+def _mark_texts(
+    xs: pd.Series, ys: pd.Series, mark_labels: Optional[str], percentage_x: bool, percentage_y: bool,
+) -> pd.Series:
     x_text = xs.map(format_fraction_percentage if percentage_x else format_thousands)
     y_text = ys.map(format_fraction_percentage if percentage_y else format_thousands)
     if mark_labels == 'x':
