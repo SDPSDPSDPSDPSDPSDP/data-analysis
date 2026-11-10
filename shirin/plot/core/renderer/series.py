@@ -1,5 +1,5 @@
 """Point marks: lines and dots on a numeric, date or categorical x axis."""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -33,15 +33,19 @@ def render_lineplot(
     palette: Optional[Dict[Any, str]] = None,
     fill: bool = False,
     labels: Optional[str] = None,
+    label_values: Optional[List[Any]] = None,
 ) -> Chart:
-    """One line per hue value; duplicate x values are averaged. labels: column with point labels, see _add_point_labels."""
+    """One line per hue value; duplicate x values are averaged. labels: column with point labels, see _add_point_labels.
+
+    label_values: only label the points whose labels value is in this list.
+    """
     df = df.assign(**{x: _numeric_x(chart, df[x])})
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
         if labels is not None:
-            _add_point_labels(chart, group, x, y, labels, group_color)
+            _add_point_labels(chart, group, x, y, labels, group_color, label_values)
     return chart
 
 
@@ -51,9 +55,12 @@ def _label_text(value: Any) -> str:
     return str(value)
 
 
-def _add_point_labels(chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str) -> None:
-    """Dot plus text below right of every row whose label is not missing or empty."""
-    texts = df[labels].map(_label_text, na_action='ignore')
+def _add_point_labels(
+    chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str, label_values: Optional[List[Any]] = None,
+) -> None:
+    """Dot plus text below right of every row whose label is not missing or empty (and in label_values, if given)."""
+    values = df[labels] if label_values is None else df[labels].where(df[labels].isin(label_values))
+    texts = values.map(_label_text, na_action='ignore')
     rows = df[texts.notna() & (texts != '')]
     if rows.empty:
         return

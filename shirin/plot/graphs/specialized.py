@@ -62,8 +62,8 @@ class SpecializedPlotsMixin:
         y: Optional[str] = None,
         hue: Optional[str] = None,
         title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
+        x_axis_label: Optional[TitleInput] = None,
+        y_axis_label: Optional[TitleInput] = None,
         rotation: int = 0,
         legend: bool = False,
         group_by: Optional[TimeGroupByInput] = None,
@@ -84,8 +84,8 @@ class SpecializedPlotsMixin:
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
                 subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. *Optional*.
-            y_axis_label: Label for the y-axis. *Optional*.
+            x_axis_label: Label for the x-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
+            y_axis_label: Label for the y-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
             rotation: Rotation angle for x-axis tick labels. *Default: `0`*.
             legend: Whether to show the legend. *Default: `False`*.
             display_month: Show month ticks (with year labels below) when grouping by month;

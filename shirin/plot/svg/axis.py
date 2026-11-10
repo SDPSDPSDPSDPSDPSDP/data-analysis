@@ -75,7 +75,8 @@ def scale(lo: float, hi: float, start: float, end: float) -> Scale:
 
 def _x_labels_overlap(axis: Axis, ticks: Ticks, sx: Scale) -> bool:
     widths = [(t, tick_label_width(axis, t, label, sx)) for t, label in ticks if label]
-    spans = [(sx(t) - w / 2, sx(t) + w / 2) for t, w in widths]
+    # Sorted on screen position: a flipped axis (x_limits=(1, 0)) lists its ticks right to left.
+    spans = sorted((sx(t) - w / 2, sx(t) + w / 2) for t, w in widths)
     return any(right[0] - left[1] < Layout.TICK_LABEL_MIN_SPACE for left, right in zip(spans, spans[1:]))
 
 

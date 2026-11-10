@@ -19,8 +19,8 @@ class BarPlotsMixin:
         hue: Optional[str] = None,
         description: Optional[str] = None,
         title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
+        x_axis_label: Optional[TitleInput] = None,
+        y_axis_label: Optional[TitleInput] = None,
         suffix: Optional[str] = None,
         legend: bool = False,
         data_labels: bool = True,
@@ -52,10 +52,10 @@ class BarPlotsMixin:
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
                 subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. When counting, the count axis defaults to `'Count'`;
-                pass `''` to hide it. *Optional*.
-            y_axis_label: Label for the y-axis. When counting, the count axis defaults to `'Count'`;
-                pass `''` to hide it. *Optional*.
+            x_axis_label: Label for the x-axis. Pass `['label', 'sublabel']` to add a grey second line.
+                When counting, the count axis defaults to `'Count'`; pass `''` to hide it. *Optional*.
+            y_axis_label: Label for the y-axis. Pass `['label', 'sublabel']` to add a grey second line.
+                When counting, the count axis defaults to `'Count'`; pass `''` to hide it. *Optional*.
             suffix: Text appended to each data label (e.g. `'%'` -> `'12 %'`). *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
             data_labels: Whether to show the value on each bar. *Default: `True`*.

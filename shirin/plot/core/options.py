@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional, Tuple, Union
+from typing import Any, ClassVar, List, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -60,6 +60,7 @@ class LinePlotOptions(BasePlotOptions):
     x: str = ''
     y: str = ''
     labels: Optional[str] = None
+    label_values: Optional[List[Any]] = None
     percentage_x: bool = False
     percentage_y: bool = False
     x_limits: Optional[Tuple[float, float]] = None
@@ -75,6 +76,12 @@ class LinePlotOptions(BasePlotOptions):
                 raise ValueError(f"{name}={column!r} must be numeric, got dtype {self.df[column].dtype}; use time() for dates")
         _validate_limits('x_limits', self.x_limits)
         _validate_limits('y_limits', self.y_limits)
+        if self.label_values is not None:
+            if self.labels is None:
+                raise ValueError("label_values needs labels: the column the values are looked up in")
+            missing = [v for v in self.label_values if not self.df[self.labels].isin([v]).any()]
+            if missing:
+                raise ValueError(f"label_values {missing} not found in labels={self.labels!r}")
 
 
 @dataclass

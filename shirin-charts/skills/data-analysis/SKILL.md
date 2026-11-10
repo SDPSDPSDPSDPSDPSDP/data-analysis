@@ -32,7 +32,7 @@ plot = PlotGraphs(
 
 Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey. Stacked and normalized bars put the largest hue level first (first segment, first legend entry).
 
-Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
+Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`; `x_axis_label`/`y_axis_label` likewise accept `['label', 'sublabel']` (grey second line).
 
 ### bar
 
@@ -86,11 +86,12 @@ plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ### line
 
 ```python
-plot.line(df, x='coverage', y='accuracy', hue='model', labels='threshold',
+plot.line(df, x='coverage', y='accuracy', hue='model', labels='threshold', label_values=[0.5, 0.9, 0.95],
+          x_axis_label=['Coverage', 'share of docs at or above the threshold'],
           percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
 ```
 
-Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `labels`: column with a label per point; rows with a label get a dot plus label, missing/empty = nothing (numbers Dutch formatted). `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
+Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `labels`: column with a label per point; rows with a label get a dot plus label, missing/empty = nothing (numbers Dutch formatted). `label_values`: only label rows whose `labels` value is in this list; each value must occur, else `ValueError`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
 
 ### pie
 

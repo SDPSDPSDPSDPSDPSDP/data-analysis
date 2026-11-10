@@ -22,7 +22,7 @@ class LinePlot(AbstractPlot[pd.DataFrame]):
         options = self.options
         return renderer.render_lineplot(
             self._standard_chart(), df=data, x=options.x, y=options.y, hue=options.hue,
-            color=self._color, palette=self._palette, labels=options.labels,
+            color=self._color, palette=self._palette, labels=options.labels, label_values=options.label_values,
         )
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:

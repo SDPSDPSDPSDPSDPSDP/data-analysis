@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from shirin.plot.config.theme import Theme
 from shirin.plot.core import LinePlotOptions
 from shirin.plot.plots import LinePlot
+from shirin.plot.svg.frame import layout
 
 
 def _curve() -> pd.DataFrame:
@@ -68,3 +70,50 @@ def test_plotgraphs_line_renders_svg(plot, shown) -> None:
 
     assert len(shown) == 1
     assert '0,9' in shown[0]
+
+
+def test_flipped_x_axis_keeps_tick_labels() -> None:
+    chart = _render(_curve(), x_limits=(1, 0), percentage_x=True)
+
+    labels = [label for _, label in layout(chart, Theme(False).color).x_ticks if label]
+
+    assert labels == ['0%', '20%', '40%', '60%', '80%', '100%']
+
+
+def test_label_values_keep_only_listed_labels() -> None:
+    df = pd.DataFrame({
+        'coverage': [1.0, 0.8, 0.6, 0.4],
+        'accuracy': [0.86, 0.93, 0.98, 0.99],
+        'threshold': [0.5, 0.8, 0.9, 0.95],
+    })
+
+    chart = _render(df, labels='threshold', label_values=[0.5, 0.9])
+
+    assert [t.text for t in chart.texts] == ['0,5', '0,9']
+    assert chart.dots[0].xs == [1.0, 0.6]
+
+
+def test_label_values_not_in_labels_raise() -> None:
+    with pytest.raises(ValueError, match=r'label_values \[0.42\] not found'):
+        _render(_curve(), labels='threshold', label_values=[0.9, 0.42])
+
+
+def test_label_values_without_labels_raise() -> None:
+    with pytest.raises(ValueError, match='label_values needs labels'):
+        _render(_curve(), label_values=[0.9])
+
+
+def test_axis_label_list_adds_sublabel(plot, shown) -> None:
+    plot.line(
+        _curve(), x='coverage', y='accuracy',
+        x_axis_label=['Coverage', 'share of docs at or above the threshold'], y_axis_label=['Accuracy', 'above it'],
+    )
+
+    assert 'Coverage' in shown[0]
+    assert 'share of docs at or above the threshold' in shown[0]
+    assert 'above it' in shown[0]
+
+
+def test_axis_label_list_of_three_raises() -> None:
+    with pytest.raises(ValueError, match='x_axis_label must be a str'):
+        _render(_curve(), x_axis_label=['a', 'b', 'c'])
