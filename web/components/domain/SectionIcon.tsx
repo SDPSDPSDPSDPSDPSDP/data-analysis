@@ -6,6 +6,7 @@ const SECTION_ICONS: Record<string, LucideIcon> = {
   Barplots: ChartBarBig,
   Histograms: ChartArea,
   "Pie charts": ChartPie,
+  "Line charts": ChartLine,
   "Time plots": ChartLine,
   "Line plots": ChartSpline,
   "Scatter plots": ChartScatter,
