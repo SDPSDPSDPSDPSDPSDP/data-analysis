@@ -4,7 +4,7 @@ plot.bar(
     x='fruit',
 )
 
-# %% Title, axis label, top n, suffix, description [no-home]
+# %% Title, axis label, top n, suffix [no-home]
 plot.bar(
     df,
     y='fruit',
@@ -12,7 +12,6 @@ plot.bar(
     y_axis_label='Fruit',
     top_n=4,
     suffix='pcs',
-    description='description',
 )
 
 # %% [hidden]
@@ -29,12 +28,13 @@ plot.bar(
     title='Fruits A to Z',
 )
 
-# %% Percentage labels
+# %% Percentage labels, description per category
 plot.bar(
     df,
     y='fruit',
     value='count',
     normalized=True,
+    description='description',
     title='Share of all fruit',
 )
 
