@@ -4,7 +4,7 @@ class FontSizes:
     TICKS = 8
     DATALABELS = 8
     POINT_LABEL_TITLES = 8.5  # axis title before a mark's value
-    POINT_LABELS = 11# labelled line points; stand alone on the plot, so larger than bar data labels
+    POINT_LABELS = 11  # labelled line points; stand alone on the plot, so larger than bar data labels
     XYLABEL = 10
     XYSUBLABEL = 8  # grey second line of an axis label
     LEGEND = 8
@@ -40,7 +40,7 @@ class Layout:
     TICK_GAP = 6
     DESCRIPTION_GAP = 5  # between a category tick label and its description
     DESCRIPTION_LINE_GAP = 2  # between wrapped lines of a description
-    DATA_TEXT_LINE_GAP = 6 # between the lines of a multi-line data text, e.g. a mark's x and y
+    DATA_TEXT_LINE_GAP = 6  # between the lines of a multi-line data text, e.g. a mark's x and y
     DESCRIPTION_MAX_WIDTH = 90  # descriptions wrap onto more lines past this width
     LABEL_GAP = 14
     SUBLABEL_GAP = 4  # between an axis label and its grey second line
