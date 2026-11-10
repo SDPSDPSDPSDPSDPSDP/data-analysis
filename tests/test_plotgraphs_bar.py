@@ -95,3 +95,17 @@ def test_bar_description_rejects_bad_input() -> None:
     dates = pd.DataFrame({'date': pd.to_datetime(['2024-01-01']), 'description': ['x']})
     with pytest.raises(ValueError, match='descriptions do not work with group_by'):
         PlotGraphs().bar(dates, x='date', group_by='month', description='description')
+
+
+def test_bar_long_description_wraps_onto_more_lines(shown: List[str]) -> None:
+    long = 'Baseline model trained on the original feature set'
+    df = pd.DataFrame({'name': ['v1', 'v2'], 'accuracy': [0.8, 0.9], 'description': [long, 'Short']})
+    PlotGraphs().bar(df, y='name', value='accuracy', description='description')
+    PlotGraphs().bar(df, x='name', value='accuracy', description='description')
+    for svg in shown:
+        assert long not in svg
+        lines = re.findall(r'<text x="[\d.]+" y="([\d.]+)"[^>]*>([^<]*)</text>', svg)
+        long_lines = [(float(y), text) for y, text in lines if text and text in long]
+        assert len(long_lines) > 1
+        assert ' '.join(text for _, text in sorted(long_lines)) == long
+        assert _text_y(svg, 'v1') < min(y for y, _ in long_lines)

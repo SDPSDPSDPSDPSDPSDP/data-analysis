@@ -34,7 +34,9 @@ class Layout:
     ROW_GAP = 6
     PLOT_GAP = 12
     TICK_GAP = 6
-    DESCRIPTION_GAP = 3  # between a category tick label and its description line
+    DESCRIPTION_GAP = 5  # between a category tick label and its description
+    DESCRIPTION_LINE_GAP = 2  # between wrapped lines of a description
+    DESCRIPTION_MAX_WIDTH = 90  # descriptions wrap onto more lines past this width
     LABEL_GAP = 14
     DATALABEL_GAP = 6
     DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened
