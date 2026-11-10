@@ -48,6 +48,24 @@ def _create_harvest_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
     return pd.DataFrame(rows)
 
 
+def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int = 5000) -> DataFrame:
+    """Ripeness detector: per probability threshold, the share of fruits it is that sure about and its accuracy on them.
+
+    marked holds the threshold on a few highlighted rows and is missing elsewhere.
+    """
+    probability = rng.beta(5, 1.5, num_fruits)
+    is_correct = rng.random(num_fruits) < probability ** 0.5
+    thresholds = np.round(np.arange(0, 1, 0.01), 2)
+    above = probability[None, :] >= thresholds[:, None]
+    df = pd.DataFrame({
+        'threshold': thresholds,
+        'coverage': above.mean(axis=1),
+        'accuracy': (above & is_correct).sum(axis=1) / above.sum(axis=1),
+    })
+    df['marked'] = df['threshold'].where(df['threshold'].isin([0.5, 0.8, 0.9, 0.95]))
+    return df
+
+
 def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
     rng = np.random.default_rng(seed)
     return _create_fruit_dataframe(rng), _create_harvest_by_year_dataframe(rng)
@@ -107,11 +125,12 @@ def _build_lazy_frames() -> dict:
         'df_harvest_by_year': df_harvest_by_year,
         'df_fruit_counts': _count_fruit(df),
         'df_time': generate_time_series(),
+        'df_threshold_curve': _create_threshold_curve_dataframe(np.random.default_rng(0)),
     }
 
 
 def __getattr__(name: str) -> DataFrame:
     """Build the demo frames on first access; each access gets its own copy."""
-    if name not in ('df', 'df_harvest_by_year', 'df_fruit_counts', 'df_time'):
+    if name not in _build_lazy_frames():
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
     return _build_lazy_frames()[name].copy()

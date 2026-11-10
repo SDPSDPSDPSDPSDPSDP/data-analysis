@@ -100,6 +100,21 @@ export function getCategories(): Category[] {
         ["2018-01-04", "False"],
       ],
     }),
+    section("Line plots", "line.py", {
+      description: "One row per point with two numeric values. The plot draws a line through them; labels marks single points.",
+      columns: [
+        { name: "threshold", role: "labels" },
+        { name: "coverage", role: "x" },
+        { name: "accuracy", role: "y" },
+        { name: "marked", role: "labels" },
+      ],
+      rows: [
+        ["0.5", "0.932", "0.891", "0.5"],
+        ["0.51", "0.926", "0.892", ""],
+        ["0.52", "0.920", "0.893", ""],
+        ["0.8", "0.490", "0.951", "0.8"],
+      ],
+    }),
   ];
   const scatterCharts = [
     section("Scatter plots", "scatter.py", {
