@@ -18,6 +18,8 @@ class Rect:
     clip: Optional['Rect'] = None  # shared outline, e.g. a rounded stack that its segments are cut to
     fade_to: Optional[str] = None  # color the end (y1, or x1 when horizontal) blends into, e.g. the next stack segment
     horizontal: bool = False
+    # Rounded pill drawn behind another pill from the same base that ends at this value: starts under that pill's cap.
+    tuck: Optional[float] = None
 
     @property
     def width(self) -> float:

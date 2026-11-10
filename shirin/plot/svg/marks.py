@@ -71,7 +71,35 @@ def place(t: Text, sx: Scale, sy: Scale) -> Tuple[float, float, float, float, fl
     return x, top + first_line, x0, x0 + width, top
 
 
+def _tucked_pill(r: Rect, sx: Scale, sy: Scale) -> str:
+    """Pill r cut to start just inside the front pill (same base, ends at r.tuck): flat start, rounded end.
+
+    The cut sits where the front pill still covers the full bar thickness, so no edge of r lines up with its edges.
+    """
+    along, across = (sx, sy) if r.horizontal else (sy, sx)
+    base, end = (r.x0, r.x1) if r.horizontal else (r.y0, r.y1)
+    side0, side1 = sorted(across(v) for v in ((r.y0, r.y1) if r.horizontal else (r.x0, r.x1)))
+    p0, front_end, p1 = along(base), along(r.tuck), along(end)  # type: ignore[arg-type]
+    thickness = side1 - side0
+    direction = 1 if p1 > p0 else -1
+    front_radius = min(abs(front_end - p0), thickness) / 2
+    radius = min(abs(p1 - p0), thickness) / 2
+    cut = p1 - direction * max(direction * (p1 - (front_end - direction * front_radius)), radius)
+
+    def point(a: float, c: float) -> str:
+        x, y = (a, c) if r.horizontal else (c, a)
+        return f'{x:.2f} {y:.2f}'
+
+    sweep = int((direction > 0) == r.horizontal)
+    arc = f'A{radius:.2f} {radius:.2f} 0 0 {sweep} '
+    d = (f'M{point(cut, side0)} L{point(p1 - direction * radius, side0)} {arc}{point(p1, side0 + radius)} '
+         f'L{point(p1, side1 - radius)} {arc}{point(p1 - direction * radius, side1)} L{point(cut, side1)} Z')
+    return f'<path d="{d}" fill="{r.color}"/>'
+
+
 def rect(r: Rect, sx: Scale, sy: Scale) -> str:
+    if r.tuck is not None:
+        return _tucked_pill(r, sx, sy)
     xa, xb = sorted((sx(r.x0), sx(r.x1)))
     ya, yb = sorted((sy(r.y0), sy(r.y1)))
     width, height = xb - xa, yb - ya

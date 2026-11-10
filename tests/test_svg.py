@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from shirin.plot.svg import Chart, Line, Rect, Text, Wedge, to_svg
@@ -10,6 +12,36 @@ def test_rounded_rect_is_pill_shaped() -> None:
     c.rects.append(Rect(0, 1, 0, 5, '#123456', rounded=True))
     rect = to_svg(c).split('<rect x=')[1]
     assert svg_attr(rect, 'rx') == pytest.approx(min(svg_attr(rect, 'width'), svg_attr(rect, 'height')) / 2)
+
+
+def _path_xs(svg: str) -> list:
+    d = svg.split('<path d="')[1].split('"')[0]
+    return [float(x) for x in re.findall(r'[ML]([\d.]+) ', d)]
+
+
+def test_tucked_pill_starts_inside_front_pill_not_at_base() -> None:
+    # A back pill sharing the front pill's edges bleeds through its anti-aliasing as a colored rim.
+    c = Chart(width=6, plot_height=3)
+    front = Rect(0, 10, 0, 1, '#111111', rounded=True, horizontal=True)
+    c.rects += [Rect(0, 20, 0, 1, '#222222', rounded=True, horizontal=True, tuck=10), front]
+    svg = to_svg(c)
+    front_rect = svg.split('<rect x=')[-1]
+    front_x0 = float(front_rect.split('"')[1])
+    front_x1 = front_x0 + svg_attr(front_rect, 'width')
+    radius = svg_attr(front_rect, 'rx')
+    cut = min(_path_xs(svg))
+    assert cut == pytest.approx(front_x1 - radius, abs=0.01)
+    assert cut > front_x0
+
+
+def test_tucked_pill_behind_short_front_pill_still_starts_inside_it() -> None:
+    c = Chart(width=6, plot_height=3)
+    c.rects += [Rect(0, 20, 0, 1, '#222222', rounded=True, horizontal=True, tuck=0.1),
+                Rect(0, 0.1, 0, 1, '#111111', rounded=True, horizontal=True)]
+    svg = to_svg(c)
+    front_rect = svg.split('<rect x=')[-1]
+    front_x0 = float(front_rect.split('"')[1])
+    assert front_x0 < min(_path_xs(svg)) < front_x0 + svg_attr(front_rect, 'width')
 
 
 def test_stacked_segments_share_one_clip_path() -> None:
