@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Dict, Optional, Union
 import pandas as pd
 
 from ..common.data_conversion import convert_dict_keys_to_string
-from ..config import FillMissingValues, Sort, TimeGroupBy, TitleInput
+from ..config import FillMissingValues, Sort, StackSplit, TimeGroupBy, TitleInput
 
 
 class InvalidOptionError(ValueError):
@@ -12,6 +12,7 @@ class InvalidOptionError(ValueError):
 
 
 VALID_SORTS = tuple(sort.value for sort in Sort)
+VALID_STACK_SPLITS = tuple(split.value for split in StackSplit)
 VALID_ORIENTATIONS = ('vertical', 'horizontal')
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
 VALID_FILL_MISSING_VALUES = tuple(fill_option.value for fill_option in FillMissingValues)

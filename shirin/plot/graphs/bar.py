@@ -3,7 +3,7 @@ from typing import Optional
 import pandas as pd
 
 from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
-from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
+from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, TitleInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
@@ -27,7 +27,7 @@ class BarPlotsMixin:
         compact_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
-        gradient: bool = True,
+        split: StackSplitInput = 'rounded',
         sort: Optional[SortInput] = None,
         top_n: Optional[int] = None,
         remainder: bool = False,
@@ -66,8 +66,9 @@ class BarPlotsMixin:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
-            gradient: Blend stacked segments into each other where they meet. Pass `False` for hard
-                edges between segments. *Default: `True`*.
+            split: How segments of stacked and normalized bars meet. **Options:** `'rounded'` (each
+                segment ends in a rounded cap over the next), `'gradient'` (segments blend into each other),
+                `'flat'` (hard straight edge). *Default: `'rounded'`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.
@@ -120,6 +121,7 @@ class BarPlotsMixin:
             data_labels=data_labels,
             compact_labels=compact_labels,
             sort='frequency' if sort is None else sort,
+            split=split,
             group_by=group_by,
             descriptions=descriptions,
         )
@@ -128,9 +130,9 @@ class BarPlotsMixin:
                 raise ValueError('remainder needs value.')
             common['top_n'] = top_n
             if normalized and hue is not None:
-                self._render(NormalizedPlot(NormalizedPlotOptions(**common)), gradient)
+                self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
             else:
-                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)), gradient)
+                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
             return
         if top_n is not None:
             raise ValueError('top_n only works without value.')
@@ -142,10 +144,10 @@ class BarPlotsMixin:
                 **{**common, **self._column_config(value)},
                 category_palette=self._column_config(hue)['palette'] if hue is not None else None,
                 background=self._theme.background,
-            )), gradient)
+            )))
             return
         hue_splits_bars = hue is not None and hue != axis_column
         if normalized and hue_splits_bars:
-            self._render(NormalizedPlot(NormalizedPlotOptions(**common)), gradient)
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:
-            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)), gradient)
+            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))

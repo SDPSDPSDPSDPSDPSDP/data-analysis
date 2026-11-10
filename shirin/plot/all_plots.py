@@ -78,5 +78,5 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
             return {'palette': self._theme.no_hue_palette, 'label_map': None}
         return {'palette': self._theme.palette(self._palette.get(column)), 'label_map': self._label_mapping.get(column)}
 
-    def _render(self, plot: AbstractPlot, gradient: bool = True) -> None:
-        show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark, gradient=gradient))
+    def _render(self, plot: AbstractPlot) -> None:
+        show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark))

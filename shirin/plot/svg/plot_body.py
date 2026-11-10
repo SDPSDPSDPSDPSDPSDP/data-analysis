@@ -21,9 +21,7 @@ def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
-def draw_marks(
-    chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str], gradient: bool = True,
-) -> List[str]:
+def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]) -> List[str]:
     body: List[str] = []
     # Data colors are never themed: a user's white slice must stay white, not turn into the background.
     body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
@@ -36,7 +34,7 @@ def draw_marks(
             continue
         rect = marks.rect(r, sx, sy)
         # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
-        fade = marks.fade(r, sx, sy, f'fade{next(_CLIP_IDS)}') if gradient and r.fade_to is not None else ''
+        fade = marks.fade(r, sx, sy, f'fade{next(_CLIP_IDS)}') if r.fade_to is not None else ''
         if r.clip is not None:
             if id(r.clip) not in clip_ids:
                 clip_ids[id(r.clip)] = f'clip{next(_CLIP_IDS)}'

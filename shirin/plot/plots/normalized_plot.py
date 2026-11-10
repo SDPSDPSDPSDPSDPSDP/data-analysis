@@ -59,7 +59,7 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
             horizontal=not vertical,
             colors=palette_colors(self._palette, data.shares.columns),  # type: ignore[arg-type]
             width=Marks.BAR_WIDTH if vertical else Marks.HORIZONTAL_BAR_WIDTH,
-            overlap=len(data.shares.columns) == 2,
+            split=self.options.split,
             row_colors=data.row_colors,
         )
 

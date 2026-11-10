@@ -103,6 +103,7 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
             horizontal=horizontal,
             colors=palette_colors(self._palette, stacked.columns),  # type: ignore[arg-type]
             width=Marks.HORIZONTAL_BAR_WIDTH if horizontal else Marks.BAR_WIDTH,
+            split=self.options.split,
         )
 
     def format_plot(self, plot: Any, data: CategoricalData) -> None:

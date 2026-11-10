@@ -44,8 +44,7 @@ def _grid(chart: Chart, frame: Frame, color: Color) -> List[str]:
     return lines
 
 
-def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False, gradient: bool = True) -> str:
-    """gradient: blend stacked bar segments into each other at their boundary; False gives hard edges."""
+def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False) -> str:
     color = Theme(dark_mode).color
     frame = layout(chart, color)
     x_axis_items, bottom = x_axis(chart, frame, color)
@@ -57,7 +56,7 @@ def to_svg(chart: Chart, font: Optional[str] = None, dark_mode: bool = False, gr
         f'<rect width="100%" height="100%" rx="{Layout.CORNER_RADIUS}" fill="{color(BACKGROUND_COLOR)}"/>',
         *_header(frame),
         *_grid(chart, frame, color),
-        *draw_marks(chart, frame.texts, frame.sx, frame.sy, frame.bottom, color, gradient),
+        *draw_marks(chart, frame.texts, frame.sx, frame.sy, frame.bottom, color),
         *y_axis(chart, frame, color),
         *x_axis_items,
         '</svg>',

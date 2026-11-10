@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from typing import ClassVar, Dict, Optional
 
-from ..config import PaletteInput, Sort, SortInput
+from ..config import PaletteInput, Sort, SortInput, StackSplit, StackSplitInput
 from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
     VALID_ORIENTATIONS,
     VALID_SORTS,
+    VALID_STACK_SPLITS,
     BasePlotOptions,
     validate_str_or_enum_option,
 )
@@ -18,6 +19,7 @@ class CategoricalPlotOptions(BasePlotOptions):
     axis_column: str = ''
     orientation: str = 'vertical'
     stacked: bool = False
+    split: StackSplitInput = 'rounded'  # how stacked segments meet
     sort: SortInput = 'frequency'
     data_labels: bool = True
     compact_labels: bool = True
@@ -41,6 +43,13 @@ class CategoricalPlotOptions(BasePlotOptions):
             value=self.sort,
             valid_options=VALID_SORTS,
             enum_type=Sort,
+        )
+
+        validate_str_or_enum_option(
+            option_name='split',
+            value=self.split,
+            valid_options=VALID_STACK_SPLITS,
+            enum_type=StackSplit,
         )
 
         if self.descriptions and self.group_by is not None:
