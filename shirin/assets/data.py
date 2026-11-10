@@ -55,7 +55,8 @@ def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int 
     """
     probability = rng.beta(5, 1.5, num_fruits)
     # Expected correctness instead of a random draw keeps the curve smooth where few fruits remain
-    chance_correct = probability ** 0.5
+    # High power makes accuracy stay flat until only the surest fruits remain: a clearly bent curve
+    chance_correct = 0.5 + 0.5 * probability ** 20
     thresholds = np.round(np.arange(0, 1, 0.01), 2)
     above = probability[None, :] >= thresholds[:, None]
     df = pd.DataFrame({

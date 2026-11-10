@@ -7,16 +7,9 @@ plot.line(
     x='coverage',
     y='accuracy',
     labels='marked',
-    percentage_x=True,
-    percentage_y=True,
-    x_limits=(1, 0),
-    y_limits=(0.85, 1),
-    title='Ripeness detector: coverage vs accuracy per threshold',
-    x_axis_label=['Coverage', 'share of fruits at or above the threshold'],
-    y_axis_label='Accuracy above the threshold',
 )
 
-# %% Marks from a list: only these thresholds get a dot and label
+# %% Marks from a list, percentages, reversed x axis, axis labels
 plot.line(
     df,
     x='coverage',
@@ -26,7 +19,7 @@ plot.line(
     percentage_x=True,
     percentage_y=True,
     x_limits=(1, 0),
-    y_limits=(0.85, 1),
+    y_limits=(0.5, 1),
     title=['Ripeness detector', 'Pick a threshold: higher means fewer fruits, but more of them right'],
     x_axis_label=['Coverage', 'share of fruits at or above the threshold'],
     y_axis_label='Accuracy above the threshold',
