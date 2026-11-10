@@ -120,8 +120,9 @@ def test_stacked_bar_puts_largest_hue_first(shown: List[str]) -> None:
         assert svg.index('>True<') < svg.index('>False<')
 
 
-def test_plotgraphs_gradient_option(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().bar(df, y='category', hue='group', stacked=True)
-    PlotGraphs(gradient=False).bar(df, y='category', hue='group', stacked=True)
+def test_bar_gradient_option(df: pd.DataFrame, shown: List[str]) -> None:
+    plot = PlotGraphs()
+    plot.bar(df, y='category', hue='group', stacked=True)
+    plot.bar(df, y='category', hue='group', stacked=True, gradient=False)
     assert '<linearGradient' in shown[0]
     assert '<linearGradient' not in shown[1]

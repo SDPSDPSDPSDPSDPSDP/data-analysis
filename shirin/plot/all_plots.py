@@ -42,8 +42,6 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         label_mapping: Dict of `{column: {value: label}}`. Same resolution logic as `palette`.
         dark_mode: Dark grey background with white text. Charts without hue, and palette entries
             set to `Colors.GREY`, are drawn white instead of grey. *Default: `False`*.
-        gradient: Blend stacked bar segments into each other where they meet. Pass `False` for hard
-            edges between segments. *Default: `True`*.
 
     Example:
         >>> plot = PlotGraphs(
@@ -59,13 +57,11 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
         palette: Optional[PaletteInput] = None,
         label_mapping: Optional[LabelMappingInput] = None,
         dark_mode: bool = False,
-        gradient: bool = True,
     ) -> None:
         if font is not None and font.lower() != 'satoshi':
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         self._font = font
         self._theme = Theme(dark_mode)
-        self._gradient = gradient
         self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
         # Hex only: contrast, blending and shades all need RGB, so a named color would fail on some charts only.
         for column, mapping in self._palette.items():
@@ -82,5 +78,5 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
             return {'palette': self._theme.no_hue_palette, 'label_map': None}
         return {'palette': self._theme.palette(self._palette.get(column)), 'label_map': self._label_mapping.get(column)}
 
-    def _render(self, plot: AbstractPlot) -> None:
-        show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark, gradient=self._gradient))
+    def _render(self, plot: AbstractPlot, gradient: bool = True) -> None:
+        show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark, gradient=gradient))

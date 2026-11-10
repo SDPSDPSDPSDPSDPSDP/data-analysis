@@ -30,7 +30,7 @@ plot = PlotGraphs(
 )
 ```
 
-Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey. `gradient=False`: hard edges between stacked bar segments instead of a blend. Stacked and normalized bars put the largest hue level first (first segment, first legend entry).
+Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey. Stacked and normalized bars put the largest hue level first (first segment, first legend entry).
 
 Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
 
@@ -42,6 +42,7 @@ plot.bar(df, y='fruit')                                   # horizontal
 plot.bar(df, x='fruit', value='sales')                    # sum pre-aggregated column
 plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True)
 plot.bar(df, x='fruit', hue='is_ripe', normalized=True)   # 100% stacked hue shares
+plot.bar(df, y='fruit', hue='is_ripe', stacked=True, gradient=False)   # hard edges between stack segments (default: blend)
 plot.bar(df, x='fruit', normalized=True)                  # labels show share of total
 plot.bar(df, x='model', value='accuracy', normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
 plot.bar(df, y='model', value='accuracy', description='description')  # grey second line under each category label

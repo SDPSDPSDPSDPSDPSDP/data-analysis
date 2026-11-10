@@ -27,6 +27,7 @@ class BarPlotsMixin:
         compact_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
+        gradient: bool = True,
         sort: Optional[SortInput] = None,
         top_n: Optional[int] = None,
         remainder: bool = False,
@@ -65,6 +66,8 @@ class BarPlotsMixin:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            gradient: Blend stacked segments into each other where they meet. Pass `False` for hard
+                edges between segments. *Default: `True`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.
@@ -125,9 +128,9 @@ class BarPlotsMixin:
                 raise ValueError('remainder needs value.')
             common['top_n'] = top_n
             if normalized and hue is not None:
-                self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
+                self._render(NormalizedPlot(NormalizedPlotOptions(**common)), gradient)
             else:
-                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
+                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)), gradient)
             return
         if top_n is not None:
             raise ValueError('top_n only works without value.')
@@ -139,10 +142,10 @@ class BarPlotsMixin:
                 **{**common, **self._column_config(value)},
                 category_palette=self._column_config(hue)['palette'] if hue is not None else None,
                 background=self._theme.background,
-            )))
+            )), gradient)
             return
         hue_splits_bars = hue is not None and hue != axis_column
         if normalized and hue_splits_bars:
-            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common)), gradient)
         else:
-            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))
+            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)), gradient)
