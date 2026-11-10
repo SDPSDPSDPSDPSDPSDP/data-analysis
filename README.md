@@ -1,6 +1,6 @@
 A reusable package to create data visualizations quickly, efficiently and uniformly, plus helpers for repetitive data tasks:
 
-- `shirin.plot`: SVG charts (bar, histogram, time, scatter, pie) with its own renderer.
+- `shirin.plot`: SVG charts (bar, histogram, time, line, scatter, pie) with its own renderer.
 - `shirin.stats`: descriptive statistics on a pandas Series.
 - `shirin.number_format`: Dutch number formatting.
 - `shirin.sql`: DB2 query helpers (optional `sql` extra).

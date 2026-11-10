@@ -83,6 +83,15 @@ Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`:
 plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ```
 
+### line
+
+```python
+plot.line(df, x='coverage', y='accuracy', hue='model', labels='threshold',
+          percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
+```
+
+Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `labels`: column with a label per point; rows with a label get a dot plus label, missing/empty = nothing (numbers Dutch formatted). `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
+
 ### pie
 
 ```python
