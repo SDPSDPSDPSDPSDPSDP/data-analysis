@@ -71,4 +71,5 @@ def font_css(font: Optional[str], bold_used: bool) -> str:
         f"text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{FontSizes.LETTER_SPACING}em}}",
         f".l{{letter-spacing:{FontSizes.LARGE_LETTER_SPACING}em}}",
         f".b{{font-weight:700;letter-spacing:{FontSizes.BOLD_LETTER_SPACING}em}}",
+        f".s{{letter-spacing:{FontSizes.SUBLABEL_LETTER_SPACING}em}}",
     ])

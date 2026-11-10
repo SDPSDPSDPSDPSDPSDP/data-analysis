@@ -100,12 +100,19 @@ def _stacked_bars(
 def _rounded_split_bars(
     chart: Chart, centers: List[float], width: float, values: np.ndarray, colors: List[Sequence[str]], horizontal: bool
 ) -> None:
-    """Each segment a pill from 0 to its stack end, drawn back to front: segments meet in rounded caps."""
+    """Each segment a pill to its stack end, drawn back to front: segments meet in rounded caps.
+
+    A segment starts under the cap of the one before it, not at 0: pills sharing an edge bleed through anti-aliasing.
+    """
     ends = values.cumsum(axis=1)
     for center, row_values, row_ends, row_colors in zip(centers, values, ends, colors):
         for column in reversed(range(len(row_values))):
             if row_values[column]:
-                _bar(chart, center, width, 0, row_ends[column], row_colors[column], horizontal, rounded=True)
+                before = row_ends[column] - row_values[column]
+                chart.rects.append(_bar_rect(
+                    center, width, 0, row_ends[column], row_colors[column], horizontal,
+                    rounded=True, tuck=float(before) if before else None,
+                ))
 
 
 def render_stacked_barplot(

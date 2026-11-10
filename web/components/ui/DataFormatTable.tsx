@@ -1,5 +1,7 @@
 import type { DataFormat } from "@/lib/sections";
 
+const NUMERIC_CELL = /^[-+]?[\d.,]*\d%?$/;
+
 export default function DataFormatTable({ columns, rows }: Pick<DataFormat, "columns" | "rows">) {
   return (
     <div className="table-scroll">
@@ -17,7 +19,9 @@ export default function DataFormatTable({ columns, rows }: Pick<DataFormat, "col
           {rows.map((row, i) => (
             <tr key={i}>
               {row.map((cell, j) => (
-                <td key={j}>{cell}</td>
+                <td key={j} className={NUMERIC_CELL.test(cell) ? "data-table-num" : undefined}>
+                  {cell}
+                </td>
               ))}
             </tr>
           ))}

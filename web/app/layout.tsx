@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
@@ -46,12 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // The inline script sets data-theme before hydration, React would otherwise flag the mismatch.
     <html lang="en" className={`${futura.variable} ${satoshi.variable}`} suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            // Blocked storage (Safari private mode, sandboxed iframes) throws; dark stays the default then.
-            __html: `let saved = null; try { saved = localStorage.getItem("${STORAGE_KEY}"); } catch {} if (saved !== "0") document.documentElement.dataset.theme = "dark"; document.documentElement.dataset.js = "";`,
-          }}
-        />
+        {/* Blocked storage (Safari private mode, sandboxed iframes) throws; dark stays the default then. */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`let saved = null; try { saved = localStorage.getItem("${STORAGE_KEY}"); } catch {} if (saved !== "0") document.documentElement.dataset.theme = "dark"; document.documentElement.dataset.js = "";`}
+        </Script>
       </head>
       <body>
         {children}

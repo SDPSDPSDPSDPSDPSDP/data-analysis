@@ -74,7 +74,7 @@ export function getCategories(): Category[] {
     }),
   ];
   const lineCharts = [
-    section("Line charts", "time.py", {
+    section("Time plots", "time.py", {
       description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
       columns: [
         { name: "year", role: "x" },
@@ -98,6 +98,21 @@ export function getCategories(): Category[] {
         ["2018-01-01", "False"],
         ["2018-01-02", "True"],
         ["2018-01-04", "False"],
+      ],
+    }),
+    section("Line plots", "line.py", {
+      description: "One row per point with two numeric values. The plot draws a line through them, one per hue; marks puts a dot on rows where it is True.",
+      columns: [
+        { name: "detector", role: "hue" },
+        { name: "coverage", role: "x" },
+        { name: "accuracy", role: "y" },
+        { name: "marked", role: "marks" },
+      ],
+      rows: [
+        ["Old detector", "0.932", "0.548", "True"],
+        ["Old detector", "0.490", "0.590", "True"],
+        ["New detector", "0.932", "0.666", "True"],
+        ["New detector", "0.490", "0.762", "True"],
       ],
     }),
   ];

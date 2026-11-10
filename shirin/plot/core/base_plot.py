@@ -16,15 +16,15 @@ PlotPalette = Optional[Union[Dict[Any, str], str]]
 DataT = TypeVar('DataT')
 
 
-def split_title(title: Optional[TitleInput]) -> Tuple[str, str]:
-    """A str is the title alone; a [title, subtitle] list adds the grey subtitle line."""
+def split_title(title: Optional[TitleInput], name: str = 'title') -> Tuple[str, str]:
+    """A str is the text alone; a [text, subtext] list adds a grey second line. name is the argument, for errors."""
     if title is None:
         return '', ''
     if isinstance(title, str):
         return title, ''
     if isinstance(title, (list, tuple)) and len(title) == 2 and all(isinstance(t, str) for t in title):
         return title[0], title[1]
-    raise ValueError(f"title must be a str or a [title, subtitle] list of two str, got {title!r}")
+    raise ValueError(f"{name} must be a str or a [text, subtext] list of two str, got {title!r}")
 
 
 def split_palette(palette: PlotPalette) -> Tuple[Optional[str], Optional[Dict[Any, str]]]:
@@ -80,7 +80,8 @@ class AbstractPlot(ABC, Generic[DataT]):
 
     def _format_labels_and_legend(self, plot: Any) -> None:
         options = self.options
-        plot.x.label, plot.y.label = options.x_axis_label, options.y_axis_label
+        plot.x.label, plot.x.sublabel = split_title(options.x_axis_label, 'x_axis_label')
+        plot.y.label, plot.y.sublabel = split_title(options.y_axis_label, 'y_axis_label')
         format_optional_legend(plot, options.hue, options.legend, options.label_map)
 
     def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:

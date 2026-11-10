@@ -21,6 +21,19 @@ def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text
     return [dataclasses.replace(t, text=t.short_text) if t.short_text else t for t in texts]
 
 
+def place_point_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
+    """Copies of below-right point labels moved above-right where their line falls to the right on screen.
+
+    Decided on screen, not in data, because a flipped axis (x_limits=(1, 0)) turns a rising line into a falling one.
+    """
+    placed = []
+    for t in texts:
+        # Screen y grows downward: both deltas sharing a sign means the line runs down and right.
+        falls = t.slope is not None and (sx(t.x + 1) - sx(t.x)) * (sy(t.y + t.slope) - sy(t.y)) > 0
+        placed.append(dataclasses.replace(t, va='bottom', dy=-t.dy) if falls else t)
+    return placed
+
+
 def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]) -> List[str]:
     body: List[str] = []
     # Data colors are never themed: a user's white slice must stay white, not turn into the background.
@@ -50,6 +63,10 @@ def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_botto
     for t in texts:
         if t.text:
             x, baseline = marks.place(t, sx, sy)[:2]
-            text_color = t.color if t.on_mark else color(t.color)
-            body.append(marks.text(x, baseline, t.text, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha))
+            text_color = t.color if t.keep_color else color(t.color)
+            for i, (title, line) in enumerate(zip(marks.line_titles(t), t.text.split('\n'))):
+                line_baseline = baseline + i * marks.line_step(t.size)
+                body.append(marks.text(
+                    x, line_baseline, line, t.size, text_color, marks.ANCHOR[t.ha], alpha=t.alpha, title=title,
+                ))
     return body

@@ -117,6 +117,13 @@ Accuracy charts: segments are now labelled with the value column name and `'Rema
 | `format_thousands(x)` always 0 decimals                        | Now picks decimals automatically for small values. Pass `decimals=0` for the old output.                                                                                                                                                                                                                                                                                          |
 | `run_sql_query(sql, config, output_path)`                      | `from shirin.sql import Database`; `db = Database()` once (reads `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA` from `.env`, or pass them as arguments), then `db.sql(sql, params={...}, output_path=...)`. JSON config gone: move its keys into `.env` with `DB2_` prefix. Replace f-string values in SQL with `params` (`:name` placeholders). |
 
+## 4.x to 5.0
+
+| Old (4.6)                                  | 5.0                                                                                                                    |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `line(..., labels='threshold')`            | `line(..., marks='marked', mark_labels='y')` with a boolean column, e.g. `df.assign(marked=df['threshold'].notna())`. |
+| Label text = the `labels` column's value   | Label text = the point's y (or x, or both) value, formatted like the axis. No free-text labels.                        |
+
 ## After converting
 
 1. Grep the result for leftover old names: `countplot_|barplot_|accuracy|xlabel|ylabel|plot_legend|show_labels|order_type|output_name|figsize|legend_offset|ncol|stacked_labels|percentage_labels|export=|Palette|LabelMapping|plt\.`.

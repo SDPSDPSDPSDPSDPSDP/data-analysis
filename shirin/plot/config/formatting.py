@@ -3,13 +3,17 @@ class FontSizes:
     TITLE = 15
     TICKS = 8
     DATALABELS = 8
+    POINT_LABEL_TITLES = 8.5  # axis title before a mark's value
+    POINT_LABELS = 11  # labelled line points; stand alone on the plot, so larger than bar data labels
     XYLABEL = 10
+    XYSUBLABEL = 8  # grey second line of an axis label
     LEGEND = 8
     DESCRIPTION = 7  # grey second line under a category tick label
     # em; Satoshi reads cramped at small chart sizes without extra tracking, larger text needs less.
     LETTER_SPACING = 0.05
     LARGE_LETTER_SPACING = 0.01
     BOLD_LETTER_SPACING = 0.02
+    SUBLABEL_LETTER_SPACING = 0.025  # grey axis sublabel: a full sentence reads airy at the small-text spacing
 
 
 class FigureSize:
@@ -36,8 +40,10 @@ class Layout:
     TICK_GAP = 6
     DESCRIPTION_GAP = 5  # between a category tick label and its description
     DESCRIPTION_LINE_GAP = 2  # between wrapped lines of a description
+    DATA_TEXT_LINE_GAP = 6  # between the lines of a multi-line data text, e.g. a mark's x and y
     DESCRIPTION_MAX_WIDTH = 90  # descriptions wrap onto more lines past this width
     LABEL_GAP = 14
+    SUBLABEL_GAP = 4  # between an axis label and its grey second line
     DATALABEL_GAP = 6
     DATALABEL_MIN_SPACE = 4  # whitespace between side-by-side data labels before they get shortened
     TICK_LABEL_MIN_SPACE = 6  # whitespace between x tick labels before they get shortened, then thinned
@@ -56,7 +62,7 @@ class Layout:
     MONTH_TICK_STEPS = (1, 2, 3, 6)  # divide a year evenly so the labelled months repeat each year
     MONTH_TICK_ROTATION = 90
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
-    POINT_LABEL_GAP = 4  # right of and below a labelled line point
+    POINT_LABEL_GAP = 4  # right of and below (above, where the line falls) a labelled line point
 
 
 class Marks:
@@ -74,4 +80,5 @@ class Marks:
     DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8
     POINT_LABEL_DOT_RADIUS = 2.5  # marks a labelled point on a line
+    POINT_LABEL_TITLE_ALPHA = 0.6  # axis title before a mark's value, faded so the value stands out
     INNER_LABEL_ALPHA = 0.7  # black/white labels on a bar segment, pure black/white reads too harsh

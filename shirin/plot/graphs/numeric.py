@@ -14,8 +14,8 @@ class NumericPlotsMixin:
         x: str,
         hue: Optional[str] = None,
         title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
+        x_axis_label: Optional[TitleInput] = None,
+        y_axis_label: Optional[TitleInput] = None,
         legend: bool = False,
         bins: int = 100,
         xlimit: Optional[Union[float, int]] = None,
@@ -32,8 +32,8 @@ class NumericPlotsMixin:
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
                 subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. *Optional*.
-            y_axis_label: Label for the y-axis. *Optional*.
+            x_axis_label: Label for the x-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
+            y_axis_label: Label for the y-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
             suffix: Text appended to each x tick label (e.g. `'%'` -> `'12 %'`). *Optional*.
 
@@ -67,8 +67,8 @@ class NumericPlotsMixin:
         hue: Optional[str] = None,
         size: Optional[str] = None,
         title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
+        x_axis_label: Optional[TitleInput] = None,
+        y_axis_label: Optional[TitleInput] = None,
         legend: bool = False,
     ) -> None:
         """Create a **scatter plot** showing the relationship between two numeric columns.
@@ -83,8 +83,8 @@ class NumericPlotsMixin:
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
                 subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. *Optional*.
-            y_axis_label: Label for the y-axis. *Optional*.
+            x_axis_label: Label for the x-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
+            y_axis_label: Label for the y-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
         """
         options = ScatterPlotOptions(
@@ -107,10 +107,11 @@ class NumericPlotsMixin:
         x: str,
         y: str,
         hue: Optional[str] = None,
-        labels: Optional[str] = None,
+        marks: Optional[str] = None,
+        mark_labels: Optional[str] = 'y',
         title: Optional[TitleInput] = None,
-        x_axis_label: Optional[str] = None,
-        y_axis_label: Optional[str] = None,
+        x_axis_label: Optional[TitleInput] = None,
+        y_axis_label: Optional[TitleInput] = None,
         legend: bool = False,
         percentage_x: bool = False,
         percentage_y: bool = False,
@@ -124,14 +125,16 @@ class NumericPlotsMixin:
             x: Numeric column for the x-axis. Duplicate x values (per hue) are averaged.
             y: Numeric column for the y-axis.
             hue: Column name for grouping data by color. *Optional*.
-            labels: Column with a label per point. Rows with a label get a dot and the label
-                next to it; missing or empty labels get nothing. Numbers are Dutch formatted. *Optional*.
+            marks: Boolean column; rows with `True` get a dot on the line. *Optional*.
+            mark_labels: Text next to each mark: `'y'`, `'x'`, `'both'` or `None` for dots only. `'both'`
+                writes x above y, each after its axis title in smaller, faded text; a title is the axis label,
+                else the column name. Formatted like the axis, so `%` when `percentage_x`/`percentage_y`. *Default: `'y'`*.
 
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
                 subtitle line. *Optional*.
-            x_axis_label: Label for the x-axis. *Optional*.
-            y_axis_label: Label for the y-axis. *Optional*.
+            x_axis_label: Label for the x-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
+            y_axis_label: Label for the y-axis. Pass `['label', 'sublabel']` to add a grey second line. *Optional*.
             legend: Whether to show the legend. *Default: `False`*.
             percentage_x: Show x ticks as percentages of fractions (`0.25` -> `'25%'`). *Default: `False`*.
             percentage_y: Same for the y ticks. *Default: `False`*.
@@ -142,14 +145,16 @@ class NumericPlotsMixin:
 
         Example:
             >>> plot = PlotGraphs()
-            >>> plot.line(df, x='coverage', y='accuracy', labels='threshold', x_limits=(1, 0))
+            >>> plot.line(df, x='coverage', y='accuracy', marks='marked', mark_labels='both', percentage_x=True,
+            ...           x_axis_label=['Coverage', 'share of docs at or above the threshold'], x_limits=(1, 0))
         """
         options = LinePlotOptions(
             df=df,
             x=x,
             y=y,
             hue=hue,
-            labels=labels,
+            marks=marks,
+            mark_labels=mark_labels,
             **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,

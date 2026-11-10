@@ -47,6 +47,7 @@ def test_two_level_normalized_draws_first_pill_over_full_second() -> None:
     back, front = chart.rects
     assert (back.y0, back.y1, front.y0, front.y1) == (0, 1, 0, 0.7)
     assert back.rounded and front.rounded and back.fade_to is None
+    assert back.tuck == 0.7 and front.tuck is None
     assert back.color == blend(front.color, '#FFFFFF', REMAINDER_TINT)
 
 

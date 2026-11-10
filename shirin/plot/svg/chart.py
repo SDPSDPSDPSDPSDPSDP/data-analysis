@@ -18,6 +18,8 @@ class Rect:
     clip: Optional['Rect'] = None  # shared outline, e.g. a rounded stack that its segments are cut to
     fade_to: Optional[str] = None  # color the end (y1, or x1 when horizontal) blends into, e.g. the next stack segment
     horizontal: bool = False
+    # Rounded pill drawn behind another pill from the same base that ends at this value: starts under that pill's cap.
+    tuck: Optional[float] = None
 
     @property
     def width(self) -> float:
@@ -41,9 +43,14 @@ class Text:
     dx: float = 0
     dy: float = 0
     short_text: Optional[str] = None  # shown instead when side-by-side labels leave too little room
+    # Data slope of the line at a point label: layout moves the label above the line where it falls to the right.
+    slope: Optional[float] = None
     alpha: float = 1
-    # Sits on a filled bar or wedge: color already contrasts with that fill, so the dark theme leaves it alone.
-    on_mark: bool = False
+    # Dark theme leaves the color alone: text on a bar or wedge already contrasts with that fill, and a point
+    # label shares its line's data color, which theming would turn into the background.
+    keep_color: bool = False
+    # Smaller, faded text before each line of text (one per line), e.g. the axis name before a mark's value.
+    line_titles: Tuple[str, ...] = ()
 
 
 @dataclass
@@ -86,6 +93,7 @@ class Axis:
     visible: bool = True
     rotation: float = 0
     label: Optional[str] = None
+    sublabel: str = ''  # grey second line under (x) or beside (y) the axis label
     sub_labels: List[Tuple[float, str]] = field(default_factory=list)  # a second tick row, e.g. years
     descriptions: List[Tuple[float, str]] = field(default_factory=list)  # grey line under the tick label at that position
 

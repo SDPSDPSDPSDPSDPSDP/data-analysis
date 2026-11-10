@@ -23,6 +23,11 @@ def format_percentage(value: Number, decimals: int = 0) -> str:
     return f"{format_thousands(value, decimals)}%"
 
 
+def format_fraction_percentage(value: Number) -> str:
+    """Fraction as a whole percentage, e.g. 0.125 -> "13%"."""
+    return format_percentage(value * 100)
+
+
 def format_compact(value: Number) -> str:
     """Short form for tight labels, e.g. 10915 -> "11k", 1517 -> "1,5k"."""
     for divisor, unit in ((1e6, 'M'), (1e3, 'k')):

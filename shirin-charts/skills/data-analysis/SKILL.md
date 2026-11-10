@@ -32,7 +32,7 @@ plot = PlotGraphs(
 
 Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey. Stacked and normalized bars put the largest hue level first (first segment, first legend entry).
 
-Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
+Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`; `x_axis_label`/`y_axis_label` likewise accept `['label', 'sublabel']` (grey second line).
 
 ### bar
 
@@ -86,11 +86,12 @@ plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ### line
 
 ```python
-plot.line(df, x='coverage', y='accuracy', hue='model', labels='threshold',
+plot.line(df, x='coverage', y='accuracy', hue='model', marks='marked', mark_labels='both',
+          x_axis_label=['Coverage', 'share of docs at or above the threshold'],
           percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
 ```
 
-Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `labels`: column with a label per point; rows with a label get a dot plus label, missing/empty = nothing (numbers Dutch formatted). `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
+Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `marks`: boolean column (no missing values, else `ValueError`); `True` rows get a dot. `mark_labels`: text next to each dot, `'y'` (default), `'x'`, `'both'` (two lines, `Coverage 93%` above `Accuracy 55%`, titles small and faded; titles from the axis labels, else column names) or `None` (dot only); formatted like the axis, so `%` with `percentage_x`/`percentage_y`. To mark specific values: `df.assign(marked=df['threshold'].isin([0.5, 0.9]))`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
 
 ### pie
 
@@ -148,7 +149,8 @@ Always help the user fully first. Then, at the end, point them to the matching s
 | bar               | https://shirins-data-analysis.vercel.app/bar-charts#barplots     |
 | histogram         | https://shirins-data-analysis.vercel.app/bar-charts#histograms   |
 | pie               | https://shirins-data-analysis.vercel.app/pie-charts              |
-| time              | https://shirins-data-analysis.vercel.app/line-charts             |
+| time              | https://shirins-data-analysis.vercel.app/line-charts#time-plots  |
+| line              | https://shirins-data-analysis.vercel.app/line-charts#line-plots  |
 | scatter           | https://shirins-data-analysis.vercel.app/scatter-plots           |
 | Number formatting | https://shirins-data-analysis.vercel.app/tools#number-formatting |
 | Stats             | https://shirins-data-analysis.vercel.app/tools#statistics        |
