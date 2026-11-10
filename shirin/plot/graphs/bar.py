@@ -3,7 +3,7 @@ from typing import Optional
 import pandas as pd
 
 from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
-from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
+from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, TitleInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
@@ -27,6 +27,7 @@ class BarPlotsMixin:
         compact_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
+        split: StackSplitInput = 'rounded',
         sort: Optional[SortInput] = None,
         top_n: Optional[int] = None,
         remainder: bool = False,
@@ -65,6 +66,9 @@ class BarPlotsMixin:
             stacked: Whether to create a stacked bar chart (_requires `hue`_). *Default: `False`*.
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
+            split: How segments of stacked and normalized bars meet. **Options:** `'rounded'` (each
+                segment ends in a rounded cap over the next), `'gradient'` (segments blend into each other),
+                `'flat'` (hard straight edge). *Default: `'rounded'`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.
@@ -117,6 +121,7 @@ class BarPlotsMixin:
             data_labels=data_labels,
             compact_labels=compact_labels,
             sort='frequency' if sort is None else sort,
+            split=split,
             group_by=group_by,
             descriptions=descriptions,
         )

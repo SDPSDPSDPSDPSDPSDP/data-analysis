@@ -14,7 +14,7 @@ from ..common.formatting import (
     format_ticks,
 )
 from ..common.sorting import get_order
-from ..common.stacked_plots import sort_stacked_pivot
+from ..common.stacked_plots import largest_hue_first, sort_stacked_pivot
 from ..config import FigureSize, Layout, Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
@@ -65,7 +65,8 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
         df = self._resolve_hue_palette(df)
         stacked = None
         if self.options.stacked:
-            pivot = aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0)
+            totals = aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0)
+            pivot = largest_hue_first(totals)
             stacked = sort_stacked_pivot(pivot, self.options.sort, self.options.orientation)
         return CategoricalData(df, order, stacked)
 
@@ -103,6 +104,7 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
             horizontal=horizontal,
             colors=palette_colors(self._palette, stacked.columns),  # type: ignore[arg-type]
             width=Marks.HORIZONTAL_BAR_WIDTH if horizontal else Marks.BAR_WIDTH,
+            split=self.options.split,
         )
 
     def format_plot(self, plot: Any, data: CategoricalData) -> None:

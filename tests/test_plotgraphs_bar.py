@@ -109,3 +109,27 @@ def test_bar_long_description_wraps_onto_more_lines(shown: List[str]) -> None:
         assert len(long_lines) > 1
         assert ' '.join(text for _, text in sorted(long_lines)) == long
         assert _text_y(svg, 'v1') < min(y for y, _ in long_lines)
+
+
+def test_stacked_bar_puts_largest_hue_first(shown: List[str]) -> None:
+    df = pd.DataFrame({'category': ['a'] * 4 + ['b'] * 3, 'ok': [False, True, True, True, True, True, True]})
+    palette = {'ok': {True: '#111111', False: '#eeeeee'}}
+    PlotGraphs(palette=palette).bar(df, y='category', hue='ok', stacked=True, legend=True)
+    PlotGraphs(palette=palette).bar(df, y='category', hue='ok', normalized=True, legend=True)
+    for svg in shown:
+        assert svg.index('>True<') < svg.index('>False<')
+
+
+def test_bar_split_option(df: pd.DataFrame, shown: List[str]) -> None:
+    plot = PlotGraphs()
+    for split in ('rounded', 'gradient', 'flat'):
+        plot.bar(df, y='category', hue='group', stacked=True, split=split)
+    rounded, gradient, flat = shown
+    assert '<linearGradient' not in rounded and '<clipPath' not in rounded
+    assert '<linearGradient' in gradient and '<clipPath' in gradient
+    assert '<linearGradient' not in flat and '<clipPath' in flat
+
+
+def test_bar_rejects_unknown_split(df: pd.DataFrame) -> None:
+    with pytest.raises(ValueError, match='split'):
+        PlotGraphs().bar(df, y='category', hue='group', stacked=True, split='wavy')

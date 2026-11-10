@@ -18,7 +18,14 @@ class TimeGroupBy(str, Enum):
     DAY = 'day'
 
 
+class StackSplit(str, Enum):
+    ROUNDED = 'rounded'
+    GRADIENT = 'gradient'
+    FLAT = 'flat'
+
+
 SortInput = Union[Sort, str]
+StackSplitInput = Union[StackSplit, str]
 FillMissingValuesInput = Optional[Union[FillMissingValues, str]]
 TimeGroupByInput = Union[TimeGroupBy, str]
 TitleInput = Union[str, List[str]]
