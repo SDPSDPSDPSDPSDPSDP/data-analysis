@@ -87,6 +87,7 @@ class Axis:
     rotation: float = 0
     label: Optional[str] = None
     sub_labels: List[Tuple[float, str]] = field(default_factory=list)  # a second tick row, e.g. years
+    descriptions: List[Tuple[float, str]] = field(default_factory=list)  # grey line under the tick label at that position
 
 
 @dataclass

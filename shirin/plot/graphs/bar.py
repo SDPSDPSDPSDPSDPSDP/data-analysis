@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-from ..common.data_conversion import COUNT_COL, period_totals
+from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
 from ..config import SortInput, TimeGroupBy, TimeGroupByInput, TitleInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
@@ -17,6 +17,7 @@ class BarPlotsMixin:
         y: Optional[str] = None,
         value: Optional[str] = None,
         hue: Optional[str] = None,
+        description: Optional[str] = None,
         title: Optional[TitleInput] = None,
         x_axis_label: Optional[str] = None,
         y_axis_label: Optional[str] = None,
@@ -43,6 +44,9 @@ class BarPlotsMixin:
             y: Column name for categories on the y-axis (horizontal bars).
             value: Column name containing pre-calculated values. Without it, rows are counted. *Optional*.
             hue: Column name for grouping data by color. *Optional*.
+            description: Column with a short text per category, shown as a grey line under its axis
+                label (e.g. `'description'`). Must be the same on every row of a category; empty cells
+                show no line. Not with `group_by`. *Optional*.
 
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
@@ -81,6 +85,9 @@ class BarPlotsMixin:
                 y_axis_label = 'Count'
             if not vertical and x_axis_label is None:
                 x_axis_label = 'Count'
+        axis_column = x if vertical else y
+        # Read before group_by or remainder reshape df, which drop the description column.
+        descriptions = category_descriptions(df, axis_column, description) if description is not None else None  # type: ignore[arg-type]
         if group_by is not None:
             validate_str_or_enum_option(
                 option_name='group_by', value=group_by, valid_options=VALID_TIME_GROUP_BY, enum_type=TimeGroupBy,
@@ -96,7 +103,7 @@ class BarPlotsMixin:
             sort = 'alphabetical'
         common = dict(
             df=df,
-            axis_column=x if vertical else y,
+            axis_column=axis_column,
             orientation='vertical' if vertical else 'horizontal',
             hue=hue,
             **self._column_config(hue),
@@ -109,6 +116,7 @@ class BarPlotsMixin:
             compact_labels=compact_labels,
             sort='frequency' if sort is None else sort,
             group_by=group_by,
+            descriptions=descriptions,
         )
         if value is None:
             if remainder:
@@ -131,7 +139,7 @@ class BarPlotsMixin:
                 background=self._theme.background,
             )))
             return
-        hue_splits_bars = hue is not None and hue != common['axis_column']
+        hue_splits_bars = hue is not None and hue != axis_column
         if normalized and hue_splits_bars:
             self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
         else:

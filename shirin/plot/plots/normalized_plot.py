@@ -5,7 +5,7 @@ import pandas as pd
 
 from ..common.colors import palette_colors
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
-from ..common.formatting import format_datalabels_stacked_normalized, format_ticks
+from ..common.formatting import format_datalabels_stacked_normalized, format_tick_descriptions, format_ticks
 from ..common.stacked_plots import sort_stacked_pivot
 from ..config import Marks
 from ..core import renderer
@@ -64,8 +64,10 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
 
     def format_plot(self, plot: Any, data: NormalizedData) -> None:
         self._format_labels_and_legend(plot)
+        vertical = self.options.orientation == 'vertical'
+        format_tick_descriptions(plot, self.options.descriptions, 'x' if vertical else 'y')
 
-        if self.options.orientation == 'vertical':
+        if vertical:
             format_ticks(plot, percentage_y=True)
             format_period_axis(plot, self.options)
         else:

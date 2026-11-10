@@ -8,7 +8,7 @@ from ..config import FigureSize, FontSizes, Layout, TextColors
 from ..config.colors import BACKGROUND_COLOR, GRID_COLOR
 from ..config.theme import Theme
 from . import marks
-from .axis import Ticks, fit_x_ticks, limits, scale, tick_color, ticks
+from .axis import Ticks, fit_x_ticks, limits, scale, tick_color, tick_label_width, ticks
 from .chart import Chart, Text
 from .fonts import TTF_FILES, cap_height, font_css, text_width
 from .header import HeaderRow
@@ -59,7 +59,7 @@ def layout(chart: Chart, color: Color) -> Frame:
     x_lim, y_lim = limits(chart.x, chart.data_values('x')), limits(chart.y, chart.data_values('y'))
     x_ticks, y_ticks = ticks(chart.x, *x_lim), ticks(chart.y, *y_lim)
 
-    y_tick_width = max((text_width(label, FontSizes.TICKS) for _, label in y_ticks), default=0)
+    y_tick_width = max((tick_label_width(chart.y, t, label) for t, label in y_ticks), default=0)
     y_label_width = cap_height(FontSizes.XYLABEL) + Layout.LABEL_GAP if chart.y.label else 0
     y_ticks_space = y_tick_width + Layout.TICK_GAP if y_tick_width else 0
     plot_left = Layout.PAD + y_label_width + y_ticks_space
@@ -77,7 +77,7 @@ def layout(chart: Chart, color: Color) -> Frame:
     shown_x_ticks = fit_x_ticks(chart.x, x_ticks, sx)
     if shown_x_ticks and not chart.x.rotation:
         position, label = shown_x_ticks[-1]
-        boxes.append((0, sx(position) + text_width(label, FontSizes.TICKS) / 2, plot_top))
+        boxes.append((0, sx(position) + tick_label_width(chart.x, position, label) / 2, plot_top))
     right_overflow = max([0.0] + [right - (plot_left + plot_w) for _, right, _ in boxes])
     plot_top += max([0.0] + [plot_top - top for _, _, top in boxes])
     if fixed_width:
@@ -125,10 +125,22 @@ def _y_axis(chart: Chart, frame: Frame, color: Color) -> List[str]:
             f'<text x="{x:.2f}" y="{y:.2f}" font-size="{FontSizes.XYLABEL}" fill="{color(TextColors.BLACK)}" '
             f'text-anchor="middle" transform="rotate(-90 {x:.2f} {y:.2f})">{escape(chart.y.label)}</text>'
         )
-    cap = cap_height(FontSizes.TICKS)
-    y_tick_color = color(tick_color(chart.y, chart.x))
-    items += [marks.text(frame.left - Layout.TICK_GAP, frame.sy(t) + cap / 2, label, FontSizes.TICKS, y_tick_color, 'end')
-              for t, label in frame.y_ticks if label]
+    cap, description_cap = cap_height(FontSizes.TICKS), cap_height(FontSizes.DESCRIPTION)
+    x = frame.left - Layout.TICK_GAP
+    y_tick_color, description_color = color(tick_color(chart.y, chart.x)), color(TextColors.LIGHT_GREY)
+    descriptions = dict(chart.y.descriptions)
+    for t, label in frame.y_ticks:
+        if not label:
+            continue
+        description = descriptions.get(t)
+        if description is None:
+            items.append(marks.text(x, frame.sy(t) + cap / 2, label, FontSizes.TICKS, y_tick_color, 'end'))
+            continue
+        # Label and description together are centered on the tick.
+        top = frame.sy(t) - (cap + Layout.DESCRIPTION_GAP + description_cap) / 2
+        items.append(marks.text(x, top + cap, label, FontSizes.TICKS, y_tick_color, 'end'))
+        description_baseline = top + cap + Layout.DESCRIPTION_GAP + description_cap
+        items.append(marks.text(x, description_baseline, description, FontSizes.DESCRIPTION, description_color, 'end'))
     return items
 
 
@@ -152,6 +164,16 @@ def _x_axis(chart: Chart, frame: Frame, color: Color) -> Tuple[List[str], float]
                 items.append(marks.text(sx(t), tick_top + cap / 2, label, tick_size, x_tick_color, 'end', rotate=chart.x.rotation))
             else:
                 items.append(marks.text(sx(t), tick_top + cap, label, tick_size, x_tick_color, 'middle'))
+    if chart.x.descriptions:
+        if chart.x.rotation:
+            raise ValueError("Tick descriptions do not work with rotated x tick labels")
+        shown = {t for t, _ in labelled_ticks}
+        description_cap = cap_height(FontSizes.DESCRIPTION)
+        bottom += Layout.DESCRIPTION_GAP
+        description_color = color(TextColors.LIGHT_GREY)
+        items += [marks.text(sx(t), bottom + description_cap, description, FontSizes.DESCRIPTION, description_color, 'middle')
+                  for t, description in chart.x.descriptions if t in shown]
+        bottom += description_cap
     if chart.x.sub_labels:
         bottom += Layout.ROW_GAP
         sub_label_color = color(TextColors.DARK_GREY)

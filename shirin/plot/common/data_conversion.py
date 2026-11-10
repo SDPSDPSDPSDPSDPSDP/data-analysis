@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 import pandas as pd
 
@@ -22,6 +22,23 @@ def ensure_column_is_string(df: pd.DataFrame, col: str) -> pd.DataFrame:
     df = df.copy()
     df[col] = df[col].astype(str)
     return df
+
+
+def category_descriptions(df: pd.DataFrame, category_col: str, description_col: str) -> Dict[str, str]:
+    """{category: description}, keyed by str(category) like the tick labels. Categories without one are left out.
+
+    Raises when a category has more than one distinct description.
+    """
+    if description_col not in df.columns:
+        raise ValueError(f"description={description_col!r} is not a column. Available columns: {list(df.columns)}")
+    described = df[[category_col, description_col]].dropna()
+    conflicting = described.groupby(category_col)[description_col].nunique() > 1
+    if conflicting.any():
+        raise ValueError(
+            f"{description_col!r} must be the same on every row of a category; "
+            f"differs for {list(conflicting[conflicting].index)}"
+        )
+    return {str(category): str(text) for category, text in described.drop_duplicates(category_col).to_numpy()}
 
 
 def filter_top_n_categories(df: pd.DataFrame, col: str, top_n: int) -> pd.DataFrame:

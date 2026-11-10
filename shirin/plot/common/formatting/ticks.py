@@ -29,6 +29,18 @@ def format_categorical_tick_labels(
     target.tick_labels = [label_map.get(label, label) for label in target.tick_labels]
 
 
+def format_tick_descriptions(chart: Chart, descriptions: Optional[Dict[str, str]], axis: str) -> None:
+    """Grey line under each category tick label; call before label_map renames the labels."""
+    if not descriptions:
+        return
+    target = chart.x if axis == 'x' else chart.y
+    if target.ticks is None or target.tick_labels is None:
+        raise ValueError(f"Categorical {axis}-axis has no tick labels to describe")
+    target.descriptions = [
+        (tick, descriptions[label]) for tick, label in zip(target.ticks, target.tick_labels) if label in descriptions
+    ]
+
+
 def format_ticks(
     chart: Chart,
     x_grid: bool = False,
