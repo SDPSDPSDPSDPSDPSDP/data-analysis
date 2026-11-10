@@ -124,3 +124,16 @@ def test_point_labels_larger_than_bar_data_labels() -> None:
     chart = _render(_curve(), labels='threshold')
 
     assert all(t.size == FontSizes.POINT_LABELS > FontSizes.DATALABELS for t in chart.texts)
+
+
+def _placed_label_va(**options) -> str:
+    chart = _render(_curve(), labels='threshold', label_values=[0.9], **options)
+    return layout(chart, Theme(False).color).texts[0].va
+
+
+def test_point_label_above_falling_line() -> None:
+    assert _placed_label_va() == 'bottom'
+
+
+def test_point_label_below_line_rising_on_flipped_axis() -> None:
+    assert _placed_label_va(x_limits=(1, 0)) == 'top'

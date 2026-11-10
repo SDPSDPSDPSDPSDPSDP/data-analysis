@@ -45,8 +45,14 @@ def render_lineplot(
         line = group.groupby(x)[y].mean()
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
         if labels is not None:
-            _add_point_labels(chart, group, x, y, labels, group_color, label_values)
+            _add_point_labels(chart, group, x, y, labels, group_color, _slopes(line), label_values)
     return chart
+
+
+def _slopes(line: pd.Series) -> pd.Series:
+    if len(line) < 2:
+        return pd.Series(0.0, index=line.index)
+    return pd.Series(np.gradient(line.values.astype(float), line.index.values.astype(float)), index=line.index)
 
 
 def _label_text(value: Any) -> str:
@@ -56,9 +62,13 @@ def _label_text(value: Any) -> str:
 
 
 def _add_point_labels(
-    chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str, label_values: Optional[List[Any]] = None,
+    chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str, slopes: pd.Series,
+    label_values: Optional[List[Any]] = None,
 ) -> None:
-    """Dot plus text below right of every row whose label is not missing or empty (and in label_values, if given)."""
+    """Dot plus text right of every row whose label is not missing or empty (and in label_values, if given).
+
+    The text sits below the line, or above it where the line falls to the right (see place_point_labels).
+    """
     values = df[labels] if label_values is None else df[labels].where(df[labels].isin(label_values))
     texts = values.map(_label_text, na_action='ignore')
     rows = df[texts.notna() & (texts != '')]
@@ -67,7 +77,9 @@ def _add_point_labels(
     chart.dots.append(Dots(list(rows[x]), list(rows[y]), [Marks.POINT_LABEL_DOT_RADIUS] * len(rows), color))
     gap = Layout.POINT_LABEL_GAP
     for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
-        chart.texts.append(Text(px, py, text, color, FontSizes.POINT_LABELS, 'left', 'top', dx=gap, dy=-gap))
+        chart.texts.append(Text(
+            px, py, text, color, FontSizes.POINT_LABELS, 'left', 'top', dx=gap, dy=-gap, slope=float(slopes[px]),
+        ))
 
 
 def render_scatterplot(

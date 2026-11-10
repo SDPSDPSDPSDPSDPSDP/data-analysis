@@ -10,7 +10,7 @@ from .fonts import cap_height
 from .header import HeaderRow
 from .header import header_rows as build_header
 from .marks import Scale
-from .plot_body import shorten_crowded_labels
+from .plot_body import place_point_labels, shorten_crowded_labels
 
 PT_PER_INCH = 72
 
@@ -64,7 +64,7 @@ def layout(chart: Chart, color: Color) -> Frame:
 
     # First pass at this size: measure what sticks out of the plot area, then shrink or grow to fit it.
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
-    texts = shorten_crowded_labels(chart.texts, sx, sy)
+    texts = shorten_crowded_labels(place_point_labels(chart.texts, sx, sy), sx, sy)
     boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
     shown_x_ticks = fit_x_ticks(chart.x, x_ticks, sx)
     if shown_x_ticks and not chart.x.rotation:

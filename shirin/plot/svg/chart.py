@@ -41,6 +41,8 @@ class Text:
     dx: float = 0
     dy: float = 0
     short_text: Optional[str] = None  # shown instead when side-by-side labels leave too little room
+    # Data slope of the line at a point label: layout moves the label above the line where it falls to the right.
+    slope: Optional[float] = None
     alpha: float = 1
     # Sits on a filled bar or wedge: color already contrasts with that fill, so the dark theme leaves it alone.
     on_mark: bool = False

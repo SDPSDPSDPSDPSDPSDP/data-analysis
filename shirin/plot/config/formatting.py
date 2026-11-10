@@ -59,7 +59,7 @@ class Layout:
     MONTH_TICK_STEPS = (1, 2, 3, 6)  # divide a year evenly so the labelled months repeat each year
     MONTH_TICK_ROTATION = 90
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
-    POINT_LABEL_GAP = 4  # right of and below a labelled line point
+    POINT_LABEL_GAP = 4  # right of and below (above, where the line falls) a labelled line point
 
 
 class Marks:
