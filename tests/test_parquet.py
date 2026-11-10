@@ -42,6 +42,14 @@ def test_parquet_reports_progress(sqlite_engine, tmp_path, capsys) -> None:
     assert 'Fetching: 3 rows' in capsys.readouterr().err
 
 
+def test_parquet_progress_is_quiet_when_piped(sqlite_engine, tmp_path, monkeypatch) -> None:
+    created = []
+    real_tqdm = parquet.tqdm
+    monkeypatch.setattr(parquet, 'tqdm', lambda **kwargs: created.append(kwargs) or real_tqdm(**kwargs))
+    parquet.query_to_parquet('SELECT * FROM t', sqlite_engine, tmp_path / 'out.parquet', chunk_rows=1)
+    assert created[0]['mininterval'] == 60
+
+
 def test_parquet_all_null_column(sqlite_engine, tmp_path) -> None:
     out = tmp_path / 'nulls.parquet'
     parquet.query_to_parquet('SELECT id, note FROM t WHERE note IS NULL', sqlite_engine, out, chunk_rows=1)
