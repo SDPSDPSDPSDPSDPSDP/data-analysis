@@ -87,7 +87,9 @@ class BarPlotsMixin:
                 x_axis_label = 'Count'
         axis_column = x if vertical else y
         # Read before group_by or remainder reshape df, which drop the description column.
-        descriptions = category_descriptions(df, axis_column, description) if description is not None else None  # type: ignore[arg-type]
+        descriptions = None
+        if description is not None:
+            descriptions = category_descriptions(df, axis_column, description)  # type: ignore[arg-type]
         if group_by is not None:
             validate_str_or_enum_option(
                 option_name='group_by', value=group_by, valid_options=VALID_TIME_GROUP_BY, enum_type=TimeGroupBy,
