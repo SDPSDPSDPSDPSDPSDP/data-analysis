@@ -29,6 +29,11 @@
   font-weight: var(--font-weight-doc-heading);
 }
 
+/* Satoshi's tabular figures: aligned digit widths and the 1 with a base. */
+.data-table-num {
+  font-variant-numeric: tabular-nums;
+}
+
 .data-table-role {
   margin-left: var(--space-0-5);
   color: var(--text-secondary);

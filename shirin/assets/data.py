@@ -48,15 +48,17 @@ def _create_harvest_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
     return pd.DataFrame(rows)
 
 
-def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int = 5000) -> DataFrame:
+def _create_threshold_curve_dataframe(
+    rng: np.random.Generator, num_fruits: int = 5000, sharpness: float = 20,
+) -> DataFrame:
     """Ripeness detector: per probability threshold, the share of fruits it is that sure about and its accuracy on them.
 
-    marked is True on a few highlighted thresholds.
+    marked is True on a few highlighted thresholds. Lower sharpness = better detector: accuracy climbs sooner.
     """
     probability = rng.beta(5, 1.5, num_fruits)
     # Expected correctness instead of a random draw keeps the curve smooth where few fruits remain
     # High power makes accuracy stay flat until only the surest fruits remain: a clearly bent curve
-    chance_correct = 0.5 + 0.5 * probability ** 20
+    chance_correct = 0.5 + 0.5 * probability ** sharpness
     thresholds = np.round(np.arange(0, 1, 0.01), 2)
     above = probability[None, :] >= thresholds[:, None]
     df = pd.DataFrame({
@@ -66,6 +68,18 @@ def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int 
     })
     df['marked'] = df['threshold'].isin([0.5, 0.8, 0.9, 0.95])
     return df
+
+
+def _create_threshold_curves_dataframe() -> DataFrame:
+    """Threshold curves of two ripeness detectors stacked, told apart by the detector column."""
+    detectors = {'Old detector': 20, 'New detector': 6}
+    return pd.concat(
+        [
+            _create_threshold_curve_dataframe(np.random.default_rng(0), sharpness=sharpness).assign(detector=name)
+            for name, sharpness in detectors.items()
+        ],
+        ignore_index=True,
+    )
 
 
 def generate_demo_data(seed: int = 0) -> tuple[DataFrame, DataFrame]:
@@ -128,6 +142,7 @@ def _build_lazy_frames() -> dict:
         'df_fruit_counts': _count_fruit(df),
         'df_time': generate_time_series(),
         'df_threshold_curve': _create_threshold_curve_dataframe(np.random.default_rng(0)),
+        'df_threshold_curves': _create_threshold_curves_dataframe(),
     }
 
 

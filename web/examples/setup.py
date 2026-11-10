@@ -15,6 +15,7 @@ palette = {
         'Orange': "#ffb752",
     },
     'sold_share': "#d6dde6",
+    'detector': {'Old detector': "#ff8fc7", 'New detector': "#3d6bff"},
 }
 label_mapping = {'is_ripe': {True: 'Ripe', False: 'Unripe'}}
 
