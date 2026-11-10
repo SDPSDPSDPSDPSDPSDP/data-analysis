@@ -1,10 +1,10 @@
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import pandas as pd
 
 from ..config import TitleInput
-from ..core import HistogramOptions, ScatterPlotOptions
-from ..plots import Histogram, ScatterPlot
+from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
+from ..plots import Histogram, LinePlot, ScatterPlot
 
 
 class NumericPlotsMixin:
@@ -100,3 +100,64 @@ class NumericPlotsMixin:
             legend=legend,
         )
         self._render(ScatterPlot(options))
+
+    def line(
+        self,
+        df: pd.DataFrame,
+        x: str,
+        y: str,
+        hue: Optional[str] = None,
+        labels: Optional[str] = None,
+        title: Optional[TitleInput] = None,
+        x_axis_label: Optional[str] = None,
+        y_axis_label: Optional[str] = None,
+        legend: bool = False,
+        percentage_x: bool = False,
+        percentage_y: bool = False,
+        x_limits: Optional[Tuple[float, float]] = None,
+        y_limits: Optional[Tuple[float, float]] = None,
+    ) -> None:
+        """Create a **line plot** of two numeric columns, one line per `hue` group.
+
+        Input:
+            df: DataFrame containing the data to plot.
+            x: Numeric column for the x-axis. Duplicate x values (per hue) are averaged.
+            y: Numeric column for the y-axis.
+            hue: Column name for grouping data by color. *Optional*.
+            labels: Column with a label per point. Rows with a label get a dot and the label
+                next to it; missing or empty labels get nothing. Numbers are Dutch formatted. *Optional*.
+
+        Text:
+            title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
+                subtitle line. *Optional*.
+            x_axis_label: Label for the x-axis. *Optional*.
+            y_axis_label: Label for the y-axis. *Optional*.
+            legend: Whether to show the legend. *Default: `False`*.
+            percentage_x: Show x ticks as percentages of fractions (`0.25` -> `'25%'`). *Default: `False`*.
+            percentage_y: Same for the y ticks. *Default: `False`*.
+
+        Layout:
+            x_limits: `(low, high)` range of the x-axis; `high < low` flips the axis. *Optional*.
+            y_limits: Same for the y-axis. *Optional*.
+
+        Example:
+            >>> plot = PlotGraphs()
+            >>> plot.line(df, x='coverage', y='accuracy', labels='threshold', x_limits=(1, 0))
+        """
+        options = LinePlotOptions(
+            df=df,
+            x=x,
+            y=y,
+            hue=hue,
+            labels=labels,
+            **self._column_config(hue),
+            title=title,
+            x_axis_label=x_axis_label,
+            y_axis_label=y_axis_label,
+            legend=legend,
+            percentage_x=percentage_x,
+            percentage_y=percentage_y,
+            x_limits=x_limits,
+            y_limits=y_limits,
+        )
+        self._render(LinePlot(options))

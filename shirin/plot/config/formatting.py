@@ -56,6 +56,7 @@ class Layout:
     MONTH_TICK_STEPS = (1, 2, 3, 6)  # divide a year evenly so the labelled months repeat each year
     MONTH_TICK_ROTATION = 90
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
+    POINT_LABEL_GAP = 4  # right of and below a labelled line point
 
 
 class Marks:
@@ -72,4 +73,5 @@ class Marks:
     DOT_AREA = 36.0  # square points
     DOT_AREA_RANGE = (8, 200)  # square points, when sized by a column
     DOT_ALPHA = 0.8
+    POINT_LABEL_DOT_RADIUS = 2.5  # marks a labelled point on a line
     INNER_LABEL_ALPHA = 0.7  # black/white labels on a bar segment, pure black/white reads too harsh

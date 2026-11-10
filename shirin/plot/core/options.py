@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional, Union
+from typing import ClassVar, Optional, Tuple, Union
+
+import pandas as pd
 
 from ..config import FillMissingValues, FillMissingValuesInput, TimeGroupBy, TimeGroupByInput
 from .base_options import (
@@ -42,6 +44,37 @@ class ScatterPlotOptions(BasePlotOptions):
             raise ValueError("x column must be specified")
         if not self.y:
             raise ValueError("y column must be specified")
+
+
+def _validate_limits(name: str, limits: Optional[Tuple[float, float]]) -> None:
+    if limits is None:
+        return
+    if len(limits) != 2 or limits[0] == limits[1]:
+        raise ValueError(f"{name} must be two different numbers (low, high), got {limits!r}")
+
+
+@dataclass
+class LinePlotOptions(BasePlotOptions):
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y', 'labels')
+
+    x: str = ''
+    y: str = ''
+    labels: Optional[str] = None
+    percentage_x: bool = False
+    percentage_y: bool = False
+    x_limits: Optional[Tuple[float, float]] = None
+    y_limits: Optional[Tuple[float, float]] = None
+
+    def validate(self) -> None:
+        super().validate()
+        for name in ('x', 'y'):
+            column = getattr(self, name)
+            if not column:
+                raise ValueError(f"{name} column must be specified")
+            if not pd.api.types.is_numeric_dtype(self.df[column]):
+                raise ValueError(f"{name}={column!r} must be numeric, got dtype {self.df[column].dtype}; use time() for dates")
+        _validate_limits('x_limits', self.x_limits)
+        _validate_limits('y_limits', self.y_limits)
 
 
 @dataclass

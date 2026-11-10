@@ -4,8 +4,9 @@ from typing import Any, Dict, Optional
 import numpy as np
 import pandas as pd
 
-from ...config import Marks
-from ...svg import Chart, Dots, Line
+from ....number_format import format_thousands
+from ...config import FontSizes, Layout, Marks
+from ...svg import Chart, Dots, Line, Text
 from ...svg.ticks import to_days
 from .hue import hue_groups
 
@@ -31,14 +32,35 @@ def render_lineplot(
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
     fill: bool = False,
+    labels: Optional[str] = None,
 ) -> Chart:
-    """One line per hue value; duplicate x values are averaged."""
+    """One line per hue value; duplicate x values are averaged. labels: column with point labels, see _add_point_labels."""
     df = df.assign(**{x: _numeric_x(chart, df[x])})
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
+        if labels is not None:
+            _add_point_labels(chart, group, x, y, labels, group_color)
     return chart
+
+
+def _label_text(value: Any) -> str:
+    if pd.api.types.is_number(value) and not isinstance(value, bool):
+        return format_thousands(value)
+    return str(value)
+
+
+def _add_point_labels(chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str) -> None:
+    """Dot plus text below right of every row whose label is not missing or empty."""
+    texts = df[labels].map(_label_text, na_action='ignore')
+    rows = df[texts.notna() & (texts != '')]
+    if rows.empty:
+        return
+    chart.dots.append(Dots(list(rows[x]), list(rows[y]), [Marks.POINT_LABEL_DOT_RADIUS] * len(rows), color))
+    gap = Layout.POINT_LABEL_GAP
+    for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
+        chart.texts.append(Text(px, py, text, color, FontSizes.DATALABELS, 'left', 'top', dx=gap, dy=-gap))
 
 
 def render_scatterplot(
