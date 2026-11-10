@@ -51,7 +51,7 @@ def _create_harvest_by_year_dataframe(rng: np.random.Generator) -> DataFrame:
 def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int = 5000) -> DataFrame:
     """Ripeness detector: per probability threshold, the share of fruits it is that sure about and its accuracy on them.
 
-    marked holds the threshold on a few highlighted rows and is missing elsewhere.
+    marked is True on a few highlighted thresholds.
     """
     probability = rng.beta(5, 1.5, num_fruits)
     # Expected correctness instead of a random draw keeps the curve smooth where few fruits remain
@@ -64,7 +64,7 @@ def _create_threshold_curve_dataframe(rng: np.random.Generator, num_fruits: int 
         'coverage': above.mean(axis=1),
         'accuracy': (above * chance_correct).sum(axis=1) / above.sum(axis=1),
     })
-    df['marked'] = df['threshold'].where(df['threshold'].isin([0.5, 0.8, 0.9, 0.95]))
+    df['marked'] = df['threshold'].isin([0.5, 0.8, 0.9, 0.95])
     return df
 
 

@@ -1,21 +1,21 @@
 # %% [hidden]
 from shirin.assets.data import df_threshold_curve as df
 
-# %% Marks from a column: rows with a value in marked get a dot and that value
+# %% Marks: rows where marked is True get a dot with their y value
 plot.line(
     df,
     x='coverage',
     y='accuracy',
-    labels='marked',
+    marks='marked',
 )
 
-# %% Marks from a list, percentages, reversed x axis, axis labels
+# %% Both values per mark, percentages, reversed x axis, axis labels
 plot.line(
     df,
     x='coverage',
     y='accuracy',
-    labels='threshold',
-    label_values=[0.5, 0.9, 0.95, 0.98],
+    marks='marked',
+    mark_labels='both',
     percentage_x=True,
     percentage_y=True,
     x_limits=(1, 0),

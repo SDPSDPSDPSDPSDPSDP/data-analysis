@@ -86,12 +86,12 @@ plot.scatter(df, x='height', y='weight', hue='species', size='age')
 ### line
 
 ```python
-plot.line(df, x='coverage', y='accuracy', hue='model', labels='threshold', label_values=[0.5, 0.9, 0.95],
+plot.line(df, x='coverage', y='accuracy', hue='model', marks='marked', mark_labels='both',
           x_axis_label=['Coverage', 'share of docs at or above the threshold'],
           percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
 ```
 
-Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `labels`: column with a label per point; rows with a label get a dot plus label, missing/empty = nothing (numbers Dutch formatted). `label_values`: only label rows whose `labels` value is in this list; each value must occur, else `ValueError`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
+Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `marks`: boolean column (no missing values, else `ValueError`); `True` rows get a dot. `mark_labels`: text next to each dot, `'y'` (default), `'x'`, `'both'` (`(x; y)`) or `None` (dot only); formatted like the axis, so `%` with `percentage_x`/`percentage_y`. To mark specific values: `df.assign(marked=df['threshold'].isin([0.5, 0.9]))`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
 
 ### pie
 

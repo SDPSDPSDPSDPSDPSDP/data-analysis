@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 
-from ....number_format import format_compact, format_percentage, format_thousands
+from ....number_format import format_compact, format_fraction_percentage, format_thousands
 from ...config import Layout
 from ...svg import Axis, Chart
 
@@ -13,7 +13,7 @@ def _set_axis_formatter(axis: Axis, numeric: bool, percentage: bool) -> None:
     if numeric:
         axis.formatter, axis.short_formatter = format_thousands, format_compact
     elif percentage:
-        axis.formatter = lambda val: format_percentage(val * 100)
+        axis.formatter = format_fraction_percentage
 
 
 def format_categorical_tick_labels(

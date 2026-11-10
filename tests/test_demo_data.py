@@ -6,9 +6,7 @@ from shirin.assets import data
 def test_threshold_curve_marks_are_thresholds() -> None:
     df = data.df_threshold_curve
 
-    marked = df.dropna(subset=['marked'])
-    assert list(marked['marked']) == [0.5, 0.8, 0.9, 0.95]
-    assert (marked['marked'] == marked['threshold']).all()
+    assert list(df.loc[df['marked'], 'threshold']) == [0.5, 0.8, 0.9, 0.95]
     assert df['coverage'].is_monotonic_decreasing
 
 

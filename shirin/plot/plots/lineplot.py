@@ -22,7 +22,8 @@ class LinePlot(AbstractPlot[pd.DataFrame]):
         options = self.options
         return renderer.render_lineplot(
             self._standard_chart(), df=data, x=options.x, y=options.y, hue=options.hue,
-            color=self._color, palette=self._palette, labels=options.labels, label_values=options.label_values,
+            color=self._color, palette=self._palette, marks=options.marks, mark_labels=options.mark_labels,
+            percentage_x=options.percentage_x, percentage_y=options.percentage_y,
         )
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:

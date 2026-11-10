@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import pandas as pd
 
@@ -107,8 +107,8 @@ class NumericPlotsMixin:
         x: str,
         y: str,
         hue: Optional[str] = None,
-        labels: Optional[str] = None,
-        label_values: Optional[List[Any]] = None,
+        marks: Optional[str] = None,
+        mark_labels: Optional[str] = 'y',
         title: Optional[TitleInput] = None,
         x_axis_label: Optional[TitleInput] = None,
         y_axis_label: Optional[TitleInput] = None,
@@ -125,10 +125,9 @@ class NumericPlotsMixin:
             x: Numeric column for the x-axis. Duplicate x values (per hue) are averaged.
             y: Numeric column for the y-axis.
             hue: Column name for grouping data by color. *Optional*.
-            labels: Column with a label per point. Rows with a label get a dot and the label
-                next to it; missing or empty labels get nothing. Numbers are Dutch formatted. *Optional*.
-            label_values: Only label the points whose `labels` value is in this list (e.g. a few
-                thresholds out of many). Each value must occur in `labels`. Needs `labels`. *Optional*.
+            marks: Boolean column; rows with `True` get a dot on the line. *Optional*.
+            mark_labels: Text next to each mark: `'y'`, `'x'`, `'both'` (as `(x; y)`) or `None` for
+                dots only. Formatted like the axis, so `%` when `percentage_x`/`percentage_y`. *Default: `'y'`*.
 
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey
@@ -145,7 +144,7 @@ class NumericPlotsMixin:
 
         Example:
             >>> plot = PlotGraphs()
-            >>> plot.line(df, x='coverage', y='accuracy', labels='threshold', label_values=[0.5, 0.9],
+            >>> plot.line(df, x='coverage', y='accuracy', marks='marked', mark_labels='both', percentage_x=True,
             ...           x_axis_label=['Coverage', 'share of docs at or above the threshold'], x_limits=(1, 0))
         """
         options = LinePlotOptions(
@@ -153,8 +152,8 @@ class NumericPlotsMixin:
             x=x,
             y=y,
             hue=hue,
-            labels=labels,
-            label_values=label_values,
+            marks=marks,
+            mark_labels=mark_labels,
             **self._column_config(hue),
             title=title,
             x_axis_label=x_axis_label,

@@ -101,18 +101,17 @@ export function getCategories(): Category[] {
       ],
     }),
     section("Line plots", "line.py", {
-      description: "One row per point with two numeric values. The plot draws a line through them; labels marks single points.",
+      description: "One row per point with two numeric values. The plot draws a line through them; marks puts a dot on rows where it is True.",
       columns: [
-        { name: "threshold", role: "labels" },
         { name: "coverage", role: "x" },
         { name: "accuracy", role: "y" },
-        { name: "marked", role: "labels" },
+        { name: "marked", role: "marks" },
       ],
       rows: [
-        ["0.5", "0.932", "0.548", "0.5"],
-        ["0.51", "0.927", "0.548", ""],
-        ["0.52", "0.920", "0.549", ""],
-        ["0.8", "0.490", "0.590", "0.8"],
+        ["0.932", "0.548", "True"],
+        ["0.927", "0.548", "False"],
+        ["0.920", "0.549", "False"],
+        ["0.490", "0.590", "True"],
       ],
     }),
   ];

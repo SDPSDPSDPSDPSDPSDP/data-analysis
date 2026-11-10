@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, ClassVar, List, Optional, Tuple, Union
+from typing import ClassVar, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -10,6 +10,8 @@ from .base_options import (
     BasePlotOptions,
     validate_str_or_enum_option,
 )
+
+MARK_LABELS = ('x', 'y', 'both', None)
 
 
 @dataclass
@@ -55,12 +57,12 @@ def _validate_limits(name: str, limits: Optional[Tuple[float, float]]) -> None:
 
 @dataclass
 class LinePlotOptions(BasePlotOptions):
-    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y', 'labels')
+    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'x', 'y', 'marks')
 
     x: str = ''
     y: str = ''
-    labels: Optional[str] = None
-    label_values: Optional[List[Any]] = None
+    marks: Optional[str] = None
+    mark_labels: Optional[str] = 'y'
     percentage_x: bool = False
     percentage_y: bool = False
     x_limits: Optional[Tuple[float, float]] = None
@@ -76,12 +78,12 @@ class LinePlotOptions(BasePlotOptions):
                 raise ValueError(f"{name}={column!r} must be numeric, got dtype {self.df[column].dtype}; use time() for dates")
         _validate_limits('x_limits', self.x_limits)
         _validate_limits('y_limits', self.y_limits)
-        if self.label_values is not None:
-            if self.labels is None:
-                raise ValueError("label_values needs labels: the column the values are looked up in")
-            missing = [v for v in self.label_values if not self.df[self.labels].isin([v]).any()]
-            if missing:
-                raise ValueError(f"label_values {missing} not found in labels={self.labels!r}")
+        if self.marks is not None:
+            marks = self.df[self.marks]
+            if not pd.api.types.is_bool_dtype(marks) or marks.isna().any():
+                raise ValueError(f"marks={self.marks!r} must be a boolean column without missing values, got dtype {marks.dtype}")
+        if self.mark_labels not in MARK_LABELS:
+            raise ValueError(f"mark_labels must be one of {MARK_LABELS}, got {self.mark_labels!r}")
 
 
 @dataclass

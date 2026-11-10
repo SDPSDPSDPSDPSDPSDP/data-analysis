@@ -1,10 +1,10 @@
 """Point marks: lines and dots on a numeric, date or categorical x axis."""
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 import pandas as pd
 
-from ....number_format import format_thousands
+from ....number_format import format_fraction_percentage, format_thousands
 from ...config import FontSizes, Layout, Marks
 from ...svg import Chart, Dots, Line, Text
 from ...svg.ticks import to_days
@@ -32,20 +32,24 @@ def render_lineplot(
     color: Optional[str] = None,
     palette: Optional[Dict[Any, str]] = None,
     fill: bool = False,
-    labels: Optional[str] = None,
-    label_values: Optional[List[Any]] = None,
+    marks: Optional[str] = None,
+    mark_labels: Optional[str] = 'y',
+    percentage_x: bool = False,
+    percentage_y: bool = False,
 ) -> Chart:
-    """One line per hue value; duplicate x values are averaged. labels: column with point labels, see _add_point_labels.
+    """One line per hue value; duplicate x values are averaged.
 
-    label_values: only label the points whose labels value is in this list.
+    marks: boolean column, True rows get a dot. mark_labels: 'x', 'y', 'both' or None, the value(s) written
+    next to each dot, formatted like their axis (percentage_x/percentage_y).
     """
     df = df.assign(**{x: _numeric_x(chart, df[x])})
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
-        if labels is not None:
-            _add_point_labels(chart, group, x, y, labels, group_color, _slopes(line), label_values)
+        if marks is not None:
+            texts = _mark_texts(group[x], group[y], mark_labels, percentage_x, percentage_y)
+            _add_marks(chart, group[group[marks]], x, y, texts, group_color, _slopes(line))
     return chart
 
 
@@ -55,23 +59,21 @@ def _slopes(line: pd.Series) -> pd.Series:
     return pd.Series(np.gradient(line.values.astype(float), line.index.values.astype(float)), index=line.index)
 
 
-def _label_text(value: Any) -> str:
-    if pd.api.types.is_number(value) and not isinstance(value, bool):
-        return format_thousands(value)
-    return str(value)
+def _mark_texts(xs: pd.Series, ys: pd.Series, mark_labels: Optional[str], percentage_x: bool, percentage_y: bool) -> pd.Series:
+    x_text = xs.map(format_fraction_percentage if percentage_x else format_thousands)
+    y_text = ys.map(format_fraction_percentage if percentage_y else format_thousands)
+    if mark_labels == 'x':
+        return x_text
+    if mark_labels == 'y':
+        return y_text
+    if mark_labels == 'both':
+        # Dutch coordinate notation: the decimal comma rules out a comma between x and y.
+        return '(' + x_text + '; ' + y_text + ')'
+    return pd.Series('', index=xs.index)
 
 
-def _add_point_labels(
-    chart: Chart, df: pd.DataFrame, x: str, y: str, labels: str, color: str, slopes: pd.Series,
-    label_values: Optional[List[Any]] = None,
-) -> None:
-    """Dot plus text right of every row whose label is not missing or empty (and in label_values, if given).
-
-    The text sits below the line, or above it where the line falls to the right (see place_point_labels).
-    """
-    values = df[labels] if label_values is None else df[labels].where(df[labels].isin(label_values))
-    texts = values.map(_label_text, na_action='ignore')
-    rows = df[texts.notna() & (texts != '')]
+def _add_marks(chart: Chart, rows: pd.DataFrame, x: str, y: str, texts: pd.Series, color: str, slopes: pd.Series) -> None:
+    """Dot plus text right of every row; the text sits below the line, or above where it falls (see place_point_labels)."""
     if rows.empty:
         return
     chart.dots.append(Dots(list(rows[x]), list(rows[y]), [Marks.POINT_LABEL_DOT_RADIUS] * len(rows), color))

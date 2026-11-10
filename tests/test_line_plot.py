@@ -16,7 +16,7 @@ def _curve() -> pd.DataFrame:
     return pd.DataFrame({
         'coverage': [1.0, 0.8, 0.6, 0.4],
         'accuracy': [0.86, 0.93, 0.98, 0.99],
-        'threshold': [0.0, np.nan, 0.9, np.nan],
+        'marked': [True, False, True, False],
     })
 
 
@@ -32,17 +32,17 @@ def test_line_sorted_by_x() -> None:
     assert chart.x.grid and chart.y.grid
 
 
-def test_labels_mark_only_labelled_points() -> None:
-    chart = _render(_curve(), labels='threshold')
+def test_marks_dot_only_true_rows_labelled_with_y() -> None:
+    chart = _render(_curve(), marks='marked')
 
-    assert [(t.x, t.y, t.text) for t in chart.texts] == [(1.0, 0.86, '0'), (0.6, 0.98, '0,9')]
+    assert [(t.x, t.y, t.text) for t in chart.texts] == [(1.0, 0.86, '0,86'), (0.6, 0.98, '0,98')]
     assert chart.dots[0].xs == [1.0, 0.6]
     assert chart.dots[0].color == chart.lines[0].color
 
 
-def test_labels_keep_hue_colors() -> None:
+def test_marks_keep_hue_colors() -> None:
     df = pd.concat([_curve().assign(model='a'), _curve().assign(model='b')])
-    chart = _render(df, hue='model', labels='threshold', legend=True)
+    chart = _render(df, hue='model', marks='marked', legend=True)
 
     assert [dots.color for dots in chart.dots] == [line.color for line in chart.lines]
     assert [label for _, label, _ in chart.legend] == ['a', 'b']
@@ -70,10 +70,10 @@ def test_equal_limits_raise() -> None:
 
 
 def test_plotgraphs_line_renders_svg(plot, shown) -> None:
-    plot.line(_curve(), x='coverage', y='accuracy', labels='threshold', x_limits=(1, 0), title='Curve')
+    plot.line(_curve(), x='coverage', y='accuracy', marks='marked', x_limits=(1, 0), title='Curve')
 
     assert len(shown) == 1
-    assert '0,9' in shown[0]
+    assert '0,98' in shown[0]
 
 
 def test_flipped_x_axis_keeps_tick_labels() -> None:
@@ -84,27 +84,33 @@ def test_flipped_x_axis_keeps_tick_labels() -> None:
     assert labels == ['0%', '20%', '40%', '60%', '80%', '100%']
 
 
-def test_label_values_keep_only_listed_labels() -> None:
-    df = pd.DataFrame({
-        'coverage': [1.0, 0.8, 0.6, 0.4],
-        'accuracy': [0.86, 0.93, 0.98, 0.99],
-        'threshold': [0.5, 0.8, 0.9, 0.95],
-    })
+@pytest.mark.parametrize('mark_labels, expected', [
+    ('x', ['100%', '60%']),
+    ('y', ['86%', '98%']),
+    ('both', ['(100%; 86%)', '(60%; 98%)']),
+    (None, ['', '']),
+])
+def test_mark_labels_follow_axis_format(mark_labels, expected) -> None:
+    chart = _render(_curve(), marks='marked', mark_labels=mark_labels, percentage_x=True, percentage_y=True)
 
-    chart = _render(df, labels='threshold', label_values=[0.5, 0.9])
-
-    assert [t.text for t in chart.texts] == ['0,5', '0,9']
-    assert chart.dots[0].xs == [1.0, 0.6]
-
-
-def test_label_values_not_in_labels_raise() -> None:
-    with pytest.raises(ValueError, match=r'label_values \[0.42\] not found'):
-        _render(_curve(), labels='threshold', label_values=[0.9, 0.42])
+    assert [t.text for t in chart.texts] == expected
 
 
-def test_label_values_without_labels_raise() -> None:
-    with pytest.raises(ValueError, match='label_values needs labels'):
-        _render(_curve(), label_values=[0.9])
+def test_mark_labels_plain_numbers_without_percentage() -> None:
+    chart = _render(_curve(), marks='marked', mark_labels='both')
+
+    assert [t.text for t in chart.texts] == ['(1; 0,86)', '(0,6; 0,98)']
+
+
+@pytest.mark.parametrize('marked', [[1.0, np.nan, 1.0, np.nan], ['yes', '', 'yes', ''], [True, None, True, False]])
+def test_non_boolean_marks_raise(marked) -> None:
+    with pytest.raises(ValueError, match="marks='marked' must be a boolean column"):
+        _render(_curve().assign(marked=marked), marks='marked')
+
+
+def test_unknown_mark_labels_raise() -> None:
+    with pytest.raises(ValueError, match='mark_labels must be one of'):
+        _render(_curve(), marks='marked', mark_labels='xy')
 
 
 def test_axis_label_list_adds_sublabel(plot, shown) -> None:
@@ -124,13 +130,13 @@ def test_axis_label_list_of_three_raises() -> None:
 
 
 def test_point_labels_larger_than_bar_data_labels() -> None:
-    chart = _render(_curve(), labels='threshold')
+    chart = _render(_curve(), marks='marked')
 
     assert all(t.size == FontSizes.POINT_LABELS > FontSizes.DATALABELS for t in chart.texts)
 
 
 def _placed_label_va(**options) -> str:
-    chart = _render(_curve(), labels='threshold', label_values=[0.9], **options)
+    chart = _render(_curve().assign(marked=[False, False, True, False]), marks='marked', **options)
     return layout(chart, Theme(False).color).texts[0].va
 
 
@@ -143,6 +149,6 @@ def test_point_label_below_line_rising_on_flipped_axis() -> None:
 
 
 def test_point_labels_keep_line_color_in_dark_mode() -> None:
-    chart = _render(_curve(), labels='threshold', palette='#ffffff')
+    chart = _render(_curve(), marks='marked', palette='#ffffff')
 
-    assert re.search(r'fill="#ffffff"[^>]*>0,9</text>', to_svg(chart, dark_mode=True))
+    assert re.search(r'fill="#ffffff"[^>]*>0,98</text>', to_svg(chart, dark_mode=True))
