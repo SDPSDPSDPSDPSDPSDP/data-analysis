@@ -4,6 +4,15 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
+FRUIT_DESCRIPTIONS = {
+    'Apple': 'Crisp, keeps for months',
+    'Banana': 'Ripens fast after picking',
+    'Cherry': 'Short summer season',
+    'Date': 'Dried, very sweet',
+    'Orange': 'Winter citrus',
+    'Fig': 'Soft, bruises easily',
+}
+
 
 def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> DataFrame:
     fruit_share = {'Apple': .15, 'Banana': .08, 'Cherry': .3, 'Date': .05, 'Orange': .25, 'Fig': .17}
@@ -14,14 +23,16 @@ def _create_fruit_dataframe(rng: np.random.Generator, num_rows: int = 60000) -> 
         'fruit': fruit,
         'is_ripe': is_ripe,
         'sweetness': np.round(rng.normal(np.where(is_ripe, 14, 11), 2.5), 2),
+        'description': pd.Series(fruit).map(FRUIT_DESCRIPTIONS).to_numpy(),
     })
 
 
 def _count_fruit(df: DataFrame) -> DataFrame:
-    """Pre-aggregated fruit data: one row per fruit and ripeness, with count and the fruit's share sold."""
+    """Pre-aggregated fruit data: one row per fruit and ripeness, with count, the fruit's share sold and description."""
     sold_share = {'Apple': .92, 'Banana': .7, 'Cherry': .85, 'Date': .55, 'Orange': .97, 'Fig': .6}
     counts = df.groupby(['fruit', 'is_ripe']).size().reset_index(name='count')
     counts['sold_share'] = counts['fruit'].map(sold_share)
+    counts['description'] = counts['fruit'].map(FRUIT_DESCRIPTIONS)
     return counts
 
 

@@ -4,7 +4,7 @@ plot.bar(
     x='fruit',
 )
 
-# %% Title, axis label, top n, suffix [no-home]
+# %% Title, axis label, top n, suffix, description [no-home]
 plot.bar(
     df,
     y='fruit',
@@ -12,6 +12,7 @@ plot.bar(
     y_axis_label='Fruit',
     top_n=4,
     suffix='pcs',
+    description='description',
 )
 
 # %% [hidden]
