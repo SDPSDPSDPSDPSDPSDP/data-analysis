@@ -65,7 +65,8 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
         df = self._resolve_hue_palette(df)
         stacked = None
         if self.options.stacked:
-            pivot = largest_hue_first(aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0))
+            totals = aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0)
+            pivot = largest_hue_first(totals)
             stacked = sort_stacked_pivot(pivot, self.options.sort, self.options.orientation)
         return CategoricalData(df, order, stacked)
 

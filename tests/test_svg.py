@@ -74,4 +74,3 @@ def test_dark_mode_keeps_user_data_colors() -> None:
     svg = to_svg(c, dark_mode=True)
     assert 'fill="#ffffff"' in svg and 'fill="#000000"' in svg and 'stroke="#ffffff"' in svg
     assert svg.count('fill="#1e1e1e"') == 2  # background and donut hole
-

@@ -89,9 +89,10 @@ def _stacked_bars(
     for column in range(n_columns):
         for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
             row_colors = colors[row]
-            fade_to = next((row_colors[later] for later in range(column + 1, n_columns) if values[row, later]), None)
+            next_color = next((row_colors[later] for later in range(column + 1, n_columns) if values[row, later]), None)
             chart.rects.append(_bar_rect(
-                center, width, start, value, row_colors[column], horizontal, clip=outlines[row], fade_to=fade_to if fade else None,
+                center, width, start, value, row_colors[column], horizontal,
+                clip=outlines[row], fade_to=next_color if fade else None,
             ))
         base += values[:, column]
 
