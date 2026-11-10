@@ -6,7 +6,7 @@ import pandas as pd
 from ..common.colors import palette_colors
 from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
 from ..common.formatting import format_datalabels_stacked_normalized, format_tick_descriptions, format_ticks
-from ..common.stacked_plots import sort_stacked_pivot
+from ..common.stacked_plots import largest_hue_first, sort_stacked_pivot
 from ..config import Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
@@ -36,10 +36,11 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
 
     def _shares(self, df: pd.DataFrame) -> pd.DataFrame:
         values = df[self.options.value] if self.options.value else None
-        return pd.crosstab(
+        totals = pd.crosstab(
             df[self.options.axis_column], df[self.options.hue],
-            values=values, aggfunc='sum' if values is not None else None, normalize='index',
-        )
+            values=values, aggfunc='sum' if values is not None else None,
+        ).fillna(0)
+        return largest_hue_first(totals).div(totals.sum(axis=1), axis=0)
 
     def transform(self, df: pd.DataFrame) -> NormalizedData:
         shares = self._shares(df)

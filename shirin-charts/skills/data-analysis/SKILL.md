@@ -30,7 +30,7 @@ plot = PlotGraphs(
 )
 ```
 
-Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey.
+Palette and label mapping resolve automatically by the `hue` column name (or `col` for pie). Built-in: `is_correct` (green/red, Correct/Incorrect). `font='satoshi'` (default, embedded) or `None`. `dark_mode=True`: dark grey background, white text, charts without hue and palette entries set to `Colors.GREY` (`#d6dde6`) drawn white instead of grey. `gradient=False`: hard edges between stacked bar segments instead of a blend. Stacked and normalized bars put the largest hue level first (first segment, first legend entry).
 
 Every method draws immediately and returns `None`. `title` accepts a string or `['title', 'subtitle']`.
 
