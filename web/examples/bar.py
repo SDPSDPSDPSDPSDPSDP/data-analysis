@@ -59,30 +59,6 @@ plot.bar(
     title='Fruit stock by ripeness',
 )
 
-# %% Stacked by hue, segments blend into each other
-plot.bar(
-    df,
-    y='fruit',
-    value='count',
-    hue='is_ripe',
-    legend=True,
-    stacked=True,
-    split='gradient',
-    title='Fruit stock by ripeness',
-)
-
-# %% Stacked by hue, hard edges between segments
-plot.bar(
-    df,
-    y='fruit',
-    value='count',
-    hue='is_ripe',
-    legend=True,
-    stacked=True,
-    split='flat',
-    title='Fruit stock by ripeness',
-)
-
 # %% Share: fill each bar up to 100% with the remainder
 plot.bar(
     df,
