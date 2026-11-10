@@ -25,7 +25,7 @@ plot.line(
     y_axis_label='Accuracy',
 )
 
-# %% One line per hue, legend
+# %% One line per hue, legend [no-home]
 plot.line(
     df_threshold_curves,
     x='coverage',
