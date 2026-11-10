@@ -5,7 +5,7 @@ import pandas as pd
 from ..common.formatting import format_ticks
 from ..config import Colors
 from ..core import renderer
-from ..core.base_plot import AbstractPlot
+from ..core.base_plot import AbstractPlot, split_title
 from ..core.options import LinePlotOptions
 
 
@@ -20,10 +20,13 @@ class LinePlot(AbstractPlot[pd.DataFrame]):
 
     def draw(self, data: pd.DataFrame) -> Any:
         options = self.options
+        # An unlabelled axis still needs a name in front of its value, so the column name stands in.
+        x_title = split_title(options.x_axis_label, 'x_axis_label')[0] or options.x
+        y_title = split_title(options.y_axis_label, 'y_axis_label')[0] or options.y
         return renderer.render_lineplot(
             self._standard_chart(), df=data, x=options.x, y=options.y, hue=options.hue,
             color=self._color, palette=self._palette, marks=options.marks, mark_labels=options.mark_labels,
-            percentage_x=options.percentage_x, percentage_y=options.percentage_y,
+            percentage_x=options.percentage_x, percentage_y=options.percentage_y, axis_titles=(x_title, y_title),
         )
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:

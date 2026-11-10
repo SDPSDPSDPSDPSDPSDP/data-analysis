@@ -1,5 +1,5 @@
 """Point marks: lines and dots on a numeric, date or categorical x axis."""
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -36,11 +36,13 @@ def render_lineplot(
     mark_labels: Optional[str] = 'y',
     percentage_x: bool = False,
     percentage_y: bool = False,
+    axis_titles: Tuple[str, str] = ('', ''),
 ) -> Chart:
     """One line per hue value; duplicate x values are averaged.
 
     marks: boolean column, True rows get a dot. mark_labels: 'x', 'y', 'both' or None, the value(s) written
-    next to each dot, formatted like their axis (percentage_x/percentage_y).
+    next to each dot, formatted like their axis (percentage_x/percentage_y). 'both' writes x above y, each
+    after its axis title from axis_titles.
     """
     df = df.assign(**{x: _numeric_x(chart, df[x])})
     masks, colors = hue_groups(chart, df, hue, color, palette)
@@ -49,7 +51,8 @@ def render_lineplot(
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
         if marks is not None:
             texts = _mark_texts(group[x], group[y], mark_labels, percentage_x, percentage_y)
-            _add_marks(chart, group[group[marks]], x, y, texts, group_color, _slopes(line))
+            titles = axis_titles if mark_labels == 'both' else ()
+            _add_marks(chart, group[group[marks]], x, y, texts, titles, group_color, _slopes(line))
     return chart
 
 
@@ -67,12 +70,14 @@ def _mark_texts(xs: pd.Series, ys: pd.Series, mark_labels: Optional[str], percen
     if mark_labels == 'y':
         return y_text
     if mark_labels == 'both':
-        # Dutch coordinate notation: the decimal comma rules out a comma between x and y.
-        return '(' + x_text + '; ' + y_text + ')'
+        return x_text + '\n' + y_text
     return pd.Series('', index=xs.index)
 
 
-def _add_marks(chart: Chart, rows: pd.DataFrame, x: str, y: str, texts: pd.Series, color: str, slopes: pd.Series) -> None:
+def _add_marks(
+    chart: Chart, rows: pd.DataFrame, x: str, y: str, texts: pd.Series, titles: Tuple[str, ...], color: str,
+    slopes: pd.Series,
+) -> None:
     """Dot plus text right of every row; the text sits below the line, or above where it falls (see place_point_labels)."""
     if rows.empty:
         return
@@ -81,7 +86,7 @@ def _add_marks(chart: Chart, rows: pd.DataFrame, x: str, y: str, texts: pd.Serie
     for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
         chart.texts.append(Text(
             px, py, text, color, FontSizes.POINT_LABELS, 'left', 'top', dx=gap, dy=-gap, slope=float(slopes[px]),
-            keep_color=True,
+            keep_color=True, line_titles=titles,
         ))
 
 

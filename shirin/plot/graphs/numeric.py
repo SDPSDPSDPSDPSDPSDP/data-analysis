@@ -126,8 +126,9 @@ class NumericPlotsMixin:
             y: Numeric column for the y-axis.
             hue: Column name for grouping data by color. *Optional*.
             marks: Boolean column; rows with `True` get a dot on the line. *Optional*.
-            mark_labels: Text next to each mark: `'y'`, `'x'`, `'both'` (as `(x; y)`) or `None` for
-                dots only. Formatted like the axis, so `%` when `percentage_x`/`percentage_y`. *Default: `'y'`*.
+            mark_labels: Text next to each mark: `'y'`, `'x'`, `'both'` or `None` for dots only. `'both'`
+                writes x above y, each after its axis title in smaller, faded text; a title is the axis label,
+                else the column name. Formatted like the axis, so `%` when `percentage_x`/`percentage_y`. *Default: `'y'`*.
 
         Text:
             title: Chart title above the plot. Pass `['title', 'subtitle']` to add a grey

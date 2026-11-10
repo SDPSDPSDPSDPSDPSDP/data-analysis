@@ -91,7 +91,7 @@ plot.line(df, x='coverage', y='accuracy', hue='model', marks='marked', mark_labe
           percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
 ```
 
-Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `marks`: boolean column (no missing values, else `ValueError`); `True` rows get a dot. `mark_labels`: text next to each dot, `'y'` (default), `'x'`, `'both'` (`(x; y)`) or `None` (dot only); formatted like the axis, so `%` with `percentage_x`/`percentage_y`. To mark specific values: `df.assign(marked=df['threshold'].isin([0.5, 0.9]))`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
+Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `marks`: boolean column (no missing values, else `ValueError`); `True` rows get a dot. `mark_labels`: text next to each dot, `'y'` (default), `'x'`, `'both'` (two lines, `Coverage 93%` above `Accuracy 55%`, titles small and faded; titles from the axis labels, else column names) or `None` (dot only); formatted like the axis, so `%` with `percentage_x`/`percentage_y`. To mark specific values: `df.assign(marked=df['threshold'].isin([0.5, 0.9]))`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
 
 ### pie
 

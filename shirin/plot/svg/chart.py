@@ -47,6 +47,8 @@ class Text:
     # Dark theme leaves the color alone: text on a bar or wedge already contrasts with that fill, and a point
     # label shares its line's data color, which theming would turn into the background.
     keep_color: bool = False
+    # Smaller, faded text before each line of text (one per line), e.g. the axis name before a mark's value.
+    line_titles: Tuple[str, ...] = ()
 
 
 @dataclass

@@ -10,6 +10,8 @@ from .chart import Chart
 from .fonts import cap_height, text_width
 from .frame import Color, Frame
 
+SUBLABEL_CLASS = 's'  # tighter letter spacing, see font_css
+
 
 def _description_height(lines: List[str]) -> float:
     n = len(lines)
@@ -24,10 +26,11 @@ def _description(x: float, top: float, lines: List[str], anchor: str, color: str
             for i, line in enumerate(lines)]
 
 
-def _rotated_label(x: float, y: float, text: str, size: float, fill: str) -> str:
+def _rotated_label(x: float, y: float, text: str, size: float, fill: str, css_class: str = '') -> str:
     """Rotated a quarter turn counterclockwise, so the baseline x is the right edge of the text."""
+    class_attr = f' class="{css_class}"' if css_class else ''
     return (
-        f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}" '
+        f'<text x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{fill}"{class_attr} '
         f'text-anchor="middle" transform="rotate(-90 {x:.2f} {y:.2f})">{escape(text)}</text>'
     )
 
@@ -40,7 +43,7 @@ def y_axis(chart: Chart, frame: Frame, color: Color) -> List[str]:
         items.append(_rotated_label(x, y, chart.y.label, FontSizes.XYLABEL, color(TextColors.BLACK)))
     if chart.y.sublabel:
         x += (Layout.SUBLABEL_GAP if chart.y.label else 0) + cap_height(FontSizes.XYSUBLABEL)
-        items.append(_rotated_label(x, y, chart.y.sublabel, FontSizes.XYSUBLABEL, color(TextColors.LIGHT_GREY)))
+        items.append(_rotated_label(x, y, chart.y.sublabel, FontSizes.XYSUBLABEL, color(TextColors.LIGHT_GREY), SUBLABEL_CLASS))
     cap = cap_height(FontSizes.TICKS)
     x = frame.left - Layout.TICK_GAP
     y_tick_color = color(tick_color(chart.y, chart.x))
@@ -105,6 +108,9 @@ def x_axis(chart: Chart, frame: Frame, color: Color) -> Tuple[List[str], float]:
         bottom += Layout.SUBLABEL_GAP if chart.x.label else Layout.LABEL_GAP
         sublabel_baseline = bottom + cap_height(FontSizes.XYSUBLABEL)
         sublabel_color = color(TextColors.LIGHT_GREY)
-        items.append(marks.text(center, sublabel_baseline, chart.x.sublabel, FontSizes.XYSUBLABEL, sublabel_color, 'middle'))
+        items.append(marks.text(
+            center, sublabel_baseline, chart.x.sublabel, FontSizes.XYSUBLABEL, sublabel_color, 'middle',
+            css_class=SUBLABEL_CLASS,
+        ))
         bottom += FontSizes.XYSUBLABEL
     return items, bottom

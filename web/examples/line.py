@@ -19,8 +19,8 @@ plot.line(
     percentage_x=True,
     percentage_y=True,
     x_limits=(1, 0),
-    y_limits=(0.5, 1),
+    y_limits=(0.4, 1),
     title=['Ripeness detector', 'Pick a threshold: higher means fewer fruits, but more of them right'],
-    x_axis_label=['Coverage', 'share of fruits at or above the threshold'],
-    y_axis_label='Accuracy above the threshold',
+    x_axis_label=['Coverage', 'Share of fruits at or above the threshold'],
+    y_axis_label='Accuracy',
 )

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from shirin.plot.config import FontSizes
+from shirin.plot.config import FontSizes, Marks
 from shirin.plot.config.theme import Theme
 from shirin.plot.core import LinePlotOptions
 from shirin.plot.plots import LinePlot
@@ -87,7 +87,7 @@ def test_flipped_x_axis_keeps_tick_labels() -> None:
 @pytest.mark.parametrize('mark_labels, expected', [
     ('x', ['100%', '60%']),
     ('y', ['86%', '98%']),
-    ('both', ['(100%; 86%)', '(60%; 98%)']),
+    ('both', ['100%\n86%', '60%\n98%']),
     (None, ['', '']),
 ])
 def test_mark_labels_follow_axis_format(mark_labels, expected) -> None:
@@ -96,10 +96,33 @@ def test_mark_labels_follow_axis_format(mark_labels, expected) -> None:
     assert [t.text for t in chart.texts] == expected
 
 
-def test_mark_labels_plain_numbers_without_percentage() -> None:
-    chart = _render(_curve(), marks='marked', mark_labels='both')
+def test_both_mark_labels_use_axis_label_titles_and_plain_numbers() -> None:
+    chart = _render(
+        _curve(), marks='marked', mark_labels='both', x_axis_label=['Coverage', 'share'], y_axis_label='Accuracy',
+    )
 
-    assert [t.text for t in chart.texts] == ['(1; 0,86)', '(0,6; 0,98)']
+    assert [(t.line_titles, t.text) for t in chart.texts] == [
+        (('Coverage', 'Accuracy'), '1\n0,86'), (('Coverage', 'Accuracy'), '0,6\n0,98'),
+    ]
+
+
+def test_single_mark_labels_have_no_titles() -> None:
+    chart = _render(_curve(), marks='marked', mark_labels='y')
+
+    assert all(t.line_titles == () for t in chart.texts)
+
+
+def test_both_mark_labels_draw_faded_smaller_title_and_x_line_above_y_line() -> None:
+    chart = _render(_curve().assign(marked=[False, False, True, False]), marks='marked', mark_labels='both')
+
+    svg = to_svg(chart)
+    title = f'<tspan font-size="{FontSizes.POINT_LABEL_TITLES}" fill-opacity="{Marks.POINT_LABEL_TITLE_ALPHA}">'
+    x_line = re.search(r'y="([\d.]+)"[^>]*>' + re.escape(title) + r'coverage </tspan>0,6</text>', svg)
+    y_line = re.search(r'y="([\d.]+)"[^>]*>' + re.escape(title) + r'accuracy </tspan>0,98</text>', svg)
+
+    assert x_line and y_line
+    assert float(x_line.group(1)) < float(y_line.group(1))
+    assert FontSizes.POINT_LABEL_TITLES < FontSizes.POINT_LABELS
 
 
 @pytest.mark.parametrize('marked', [[1.0, np.nan, 1.0, np.nan], ['yes', '', 'yes', ''], [True, None, True, False]])
@@ -152,3 +175,11 @@ def test_point_labels_keep_line_color_in_dark_mode() -> None:
     chart = _render(_curve(), marks='marked', palette='#ffffff')
 
     assert re.search(r'fill="#ffffff"[^>]*>0,98</text>', to_svg(chart, dark_mode=True))
+
+
+def test_axis_sublabels_use_tighter_letter_spacing(plot, shown) -> None:
+    plot.line(_curve(), x='coverage', y='accuracy', x_axis_label=['Coverage', 'x share'], y_axis_label=['Accuracy', 'y share'])
+
+    assert re.search(r'class="s"[^>]*>x share</text>', shown[0])
+    assert re.search(r'class="s"[^>]*>y share</text>', shown[0])
+    assert f'.s{{letter-spacing:{FontSizes.SUBLABEL_LETTER_SPACING}em}}' in shown[0]
