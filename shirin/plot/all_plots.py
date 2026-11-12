@@ -1,6 +1,8 @@
+import struct
 from typing import Any, Dict, Optional
 
 from .common.colors import to_rgb
+from .config import FigureSize
 from .config.palettes import (
     DEFAULT_LABEL_MAPPING,
     DEFAULT_PALETTE,
@@ -19,11 +21,14 @@ from .svg import to_png, to_svg
 def show(svg: str) -> None:
     """Display one chart in the notebook; the web playground replaces this to collect the SVG.
 
-    Sends SVG and PNG in one bundle: notebooks render the SVG, VS Code's copy button needs the PNG.
+    Sends PNG only: VS Code renders SVG over PNG when both are present, and its copy button exists for PNG alone.
     """
     from IPython.display import display
 
-    display({'image/svg+xml': svg, 'image/png': to_png(svg)}, raw=True)
+    png = to_png(svg)
+    width, height = struct.unpack('>II', png[16:24])
+    size = {'width': width // FigureSize.PNG_SCALE, 'height': height // FigureSize.PNG_SCALE}
+    display({'image/png': png}, metadata={'image/png': size}, raw=True)
 
 
 class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
@@ -31,7 +36,7 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
 
     This class provides methods for creating various types of plots including
     **bar plots**, **histograms**, **line plots**, and **pie charts**. Each plot is shown
-    inline as an SVG.
+    inline as a PNG.
 
     Args:
         font: Font to use for all text. **Options:** `'satoshi'` (embedded in the SVG),
