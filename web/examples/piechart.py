@@ -31,3 +31,14 @@ plot.pie(
     legend_percentages=True,
     title='Ripe vs unripe fruit',
 )
+
+# %% Slice labels
+from shirin.number_format import format_thousands
+
+sweetness = df.loc[df['is_ripe'], 'sweetness'].mean()
+plot.pie(
+    df,
+    col='is_ripe',
+    slice_labels={True: f'Sweetness: {format_thousands(sweetness, decimals=1)}'},
+    title=['Ripe vs unripe fruit', 'Average sweetness of the ripe fruit'],
+)
