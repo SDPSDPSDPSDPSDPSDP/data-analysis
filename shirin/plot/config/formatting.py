@@ -5,7 +5,7 @@ class FontSizes:
     DATALABELS = 8
     POINT_LABEL_TITLES = 8.5  # axis title before a mark's value
     POINT_LABELS = 11  # labelled line points; stand alone on the plot, so larger than bar data labels
-    SLICE_LABEL = 12  # headline on a pie slice; the slice percentages drop to DATALABELS so it still stands out
+    SLICE_LABEL = 11  # headline on a pie slice; the slice percentages drop to DATALABELS so it still stands out
     XYLABEL = 10
     XYSUBLABEL = 8  # grey second line of an axis label
     LEGEND = 8
@@ -85,3 +85,4 @@ class Marks:
     POINT_LABEL_DOT_RADIUS = 2.5  # marks a labelled point on a line
     POINT_LABEL_TITLE_ALPHA = 0.6  # axis title before a mark's value, faded so the value stands out
     INNER_LABEL_ALPHA = 0.7  # black/white labels on a bar segment, pure black/white reads too harsh
+    SLICE_PERCENTAGE_ALPHA = 0.55  # pie percentages next to a slice headline, faded so the headline leads

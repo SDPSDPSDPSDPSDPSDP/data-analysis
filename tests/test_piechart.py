@@ -91,8 +91,9 @@ class TestPieSliceLabels:
         assert headline.dy > percentage.dy + cap_height(percentage.size) / 2
         assert headline.size > percentage.size
         assert headline.color == percentage.color
-        # Every percentage shrinks, not only the labelled slice's.
+        # Every percentage shrinks and fades, not only the labelled slice's.
         assert percentage.size == plot._autotexts[1].size == FontSizes.DATALABELS
+        assert percentage.alpha == plot._autotexts[1].alpha < headline.alpha
 
     def test_long_headline_wraps_and_keeps_explicit_newlines(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
