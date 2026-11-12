@@ -31,3 +31,14 @@ plot.pie(
     legend_percentages=True,
     title='Ripe vs unripe fruit',
 )
+
+# %% Slice labels
+from shirin.number_format import format_percentage
+
+sweet_share = (df.loc[df['is_ripe'], 'sweetness'] >= 12).mean() * 100
+plot.pie(
+    df,
+    col='is_ripe',
+    slice_labels={True: f'Sweetness: {format_percentage(sweet_share)}'},
+    title=['Ripe vs unripe fruit', 'Share of ripe fruit with sweetness 12 or more'],
+)

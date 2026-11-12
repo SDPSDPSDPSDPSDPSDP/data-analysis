@@ -1,7 +1,12 @@
-import pandas as pd
+import math
 
+import pandas as pd
+import pytest
+
+from shirin.plot.config import FontSizes, Marks
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
+from shirin.plot.svg.fonts import cap_height
 
 
 class TestPieChartRender:
@@ -64,3 +69,87 @@ class TestPieChartRender:
         plot.render()
 
         assert len(plot._autotexts) == 3
+
+
+class TestPieSliceLabels:
+    def test_headline_sits_above_percentage_on_its_slice(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=[True, False])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={True: "#e0fff0", False: "#a62a5a"},
+            slice_labels={True: "Accuracy: 96,4%"},
+        )
+
+        plot = PieChart(options)
+        chart = plot.render()
+
+        headline, percentage = plot._headline_texts[0], plot._autotexts[0]
+        assert headline in chart.texts
+        assert (headline.x, headline.y) == (percentage.x, percentage.y)
+        assert headline.va == "bottom"
+        # Pair centered on the label point: percentage pushed down, headline bottom above its top.
+        assert percentage.dy < 0
+        assert headline.dy > percentage.dy + cap_height(percentage.size) / 2
+        assert headline.size > percentage.size
+        assert headline.color == percentage.color
+        # Every percentage shrinks and fades, not only the labelled slice's.
+        assert percentage.size == plot._autotexts[1].size == FontSizes.DATALABELS
+        assert percentage.alpha == plot._autotexts[1].alpha < headline.alpha
+
+    def test_labelled_large_slice_centers_label_in_its_inscribed_circle(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"A": "Accuracy: 96%"},
+        )
+
+        plot = PieChart(options)
+        plot.render()
+
+        labelled, unlabelled = plot._autotexts
+        assert math.hypot(unlabelled.x, unlabelled.y) == pytest.approx(Marks.PIE_LABEL_RADIUS)
+        # Largest circle inside a slice over half the pie has radius 0.5, centered halfway out.
+        assert math.hypot(labelled.x, labelled.y) == pytest.approx(0.5)
+
+    def test_long_headline_wraps_and_keeps_explicit_newlines(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"A": "Accuracy: 96,38%", "B": "Rest\n24"},
+        )
+
+        plot = PieChart(options)
+        plot.render()
+
+        assert [t.text for t in plot._headline_texts] == ["Accuracy:\n96,38%", "Rest\n24"]
+
+    def test_headline_centered_when_slice_has_no_percentage(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            legend_percentages=True,
+            slice_labels={"A": "Accuracy: 96%"},
+        )
+
+        chart = PieChart(options).render()
+
+        assert [(t.text, t.va, t.dy) for t in chart.texts] == [("Accuracy:\n96%", "center", 0)]
+
+    def test_unknown_slice_label_key_raises(self) -> None:
+        df = pd.DataFrame({"count": [1, 1]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"C": "Missing"},
+        )
+
+        with pytest.raises(ValueError, match="slice_labels keys \\['C'\\]"):
+            PieChart(options).render()

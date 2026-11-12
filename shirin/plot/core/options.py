@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional, Tuple, Union
+from typing import Any, ClassVar, Dict, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -97,6 +97,7 @@ class PiePlotOptions(BasePlotOptions):
     value_datalabel: int = 5
     donut: bool = False
     legend_percentages: bool = False
+    slice_labels: Optional[Dict[Any, str]] = None  # {slice value: headline drawn above its percentage}
 
     def validate(self) -> None:
         super().validate()
