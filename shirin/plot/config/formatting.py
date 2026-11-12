@@ -65,6 +65,7 @@ class Layout:
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
     POINT_LABEL_GAP = 4  # right of and below (above, where the line falls) a labelled line point
     SLICE_LABEL_GAP = 4  # between a pie slice headline and the percentage below it
+    SLICE_LABEL_MAX_WIDTH = 75  # pie radius is ~92 points at FigureSize.PIE; wider headline lines run past the slice
 
 
 class Marks:

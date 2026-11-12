@@ -100,7 +100,7 @@ plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
 plot.pie(df, col='over_threshold', slice_labels={True: 'Accuracy: 96,4%'})   # large headline on that slice
 ```
 
-Slices are value counts of `col`. Slices below `value_datalabel` percent get no label. `legend_percentages=True` drops slice labels and shows percentages in the legend instead of counts. `slice_labels`: `{value: text}`, large text on that value's slice, above its percentage (centered when the slice has no percentage label); keys must be values of `col`, else `ValueError`.
+Slices are value counts of `col`. Slices below `value_datalabel` percent get no label. `legend_percentages=True` drops slice labels and shows percentages in the legend instead of counts. `slice_labels`: `{value: text}`, large text on that value's slice, above its percentage (centered when the slice has no percentage label); wraps on spaces to fit the slice, `\n` forces a break; keys must be values of `col`, else `ValueError`.
 
 ### Colors
 

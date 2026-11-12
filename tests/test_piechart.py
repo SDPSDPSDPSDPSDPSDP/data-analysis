@@ -3,6 +3,7 @@ import pytest
 
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
+from shirin.plot.svg.fonts import cap_height
 
 
 class TestPieChartRender:
@@ -80,14 +81,29 @@ class TestPieSliceLabels:
         plot = PieChart(options)
         chart = plot.render()
 
-        headlines = [t for t in chart.texts if t.text == "Accuracy: 96,4%"]
-        assert len(headlines) == 1
-        headline, percentage = headlines[0], plot._autotexts[0]
+        headline, percentage = plot._headline_texts[0], plot._autotexts[0]
+        assert headline in chart.texts
         assert (headline.x, headline.y) == (percentage.x, percentage.y)
         assert headline.va == "bottom"
-        assert headline.dy > 0
+        # Pair centered on the label point: percentage pushed down, headline bottom above its top.
+        assert percentage.dy < 0
+        assert headline.dy > percentage.dy + cap_height(percentage.size) / 2
         assert headline.size > percentage.size
         assert headline.color == percentage.color
+
+    def test_long_headline_wraps_and_keeps_explicit_newlines(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"A": "Accuracy: 96,38%", "B": "Rest\n24"},
+        )
+
+        plot = PieChart(options)
+        plot.render()
+
+        assert [t.text for t in plot._headline_texts] == ["Accuracy:\n96,38%", "Rest\n24"]
 
     def test_headline_centered_when_slice_has_no_percentage(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
@@ -101,7 +117,7 @@ class TestPieSliceLabels:
 
         chart = PieChart(options).render()
 
-        assert [(t.text, t.va, t.dy) for t in chart.texts] == [("Accuracy: 96%", "center", 0)]
+        assert [(t.text, t.va, t.dy) for t in chart.texts] == [("Accuracy:\n96%", "center", 0)]
 
     def test_unknown_slice_label_key_raises(self) -> None:
         df = pd.DataFrame({"count": [1, 1]}, index=["A", "B"])

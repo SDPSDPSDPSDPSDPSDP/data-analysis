@@ -37,7 +37,8 @@ class SpecializedPlotsMixin:
                 labels on the slices. *Default: `False`*.
             slice_labels: `{value: text}` headlines drawn large on the slice of that value in
                 `col`, above its percentage (centered when the slice has no percentage label).
-                Unknown values raise `ValueError`. *Optional*.
+                Long text wraps on spaces; `\\n` forces a break. Unknown values raise
+                `ValueError`. *Optional*.
 
         Layout:
             donut: Whether to draw a donut instead of a full pie. *Default: `False`*.
