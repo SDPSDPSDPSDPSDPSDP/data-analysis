@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import pandas as pd
 
@@ -20,6 +20,7 @@ class SpecializedPlotsMixin:
         value_datalabel: int = 5,
         donut: bool = False,
         legend_percentages: bool = False,
+        slice_labels: Optional[Dict[Any, str]] = None,
     ) -> None:
         """Create a **pie chart** of the value counts in a column.
 
@@ -34,9 +35,16 @@ class SpecializedPlotsMixin:
             value_datalabel: Slices below this percentage get no label. *Default: `5`*.
             legend_percentages: Show percentages in the legend instead of counts, and no
                 labels on the slices. *Default: `False`*.
+            slice_labels: `{value: text}` headlines drawn large on the slice of that value in
+                `col`, above its percentage (centered when the slice has no percentage label).
+                Unknown values raise `ValueError`. *Optional*.
 
         Layout:
             donut: Whether to draw a donut instead of a full pie. *Default: `False`*.
+
+        Example:
+            >>> plot = PlotGraphs()
+            >>> plot.pie(df, col='over_threshold', slice_labels={True: 'Accuracy: 96,4%'})
         """
         if col not in df.columns:
             raise ValueError(f"col={col!r} is not a column. Available columns: {list(df.columns)}")
@@ -52,6 +60,7 @@ class SpecializedPlotsMixin:
             value_datalabel=value_datalabel,
             donut=donut,
             legend_percentages=legend_percentages,
+            slice_labels=slice_labels,
         )
         self._render(PieChart(options))
 

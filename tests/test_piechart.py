@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
@@ -64,3 +65,52 @@ class TestPieChartRender:
         plot.render()
 
         assert len(plot._autotexts) == 3
+
+
+class TestPieSliceLabels:
+    def test_headline_sits_above_percentage_on_its_slice(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=[True, False])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={True: "#e0fff0", False: "#a62a5a"},
+            slice_labels={True: "Accuracy: 96,4%"},
+        )
+
+        plot = PieChart(options)
+        chart = plot.render()
+
+        headlines = [t for t in chart.texts if t.text == "Accuracy: 96,4%"]
+        assert len(headlines) == 1
+        headline, percentage = headlines[0], plot._autotexts[0]
+        assert (headline.x, headline.y) == (percentage.x, percentage.y)
+        assert headline.va == "bottom"
+        assert headline.dy > 0
+        assert headline.size > percentage.size
+        assert headline.color == percentage.color
+
+    def test_headline_centered_when_slice_has_no_percentage(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            legend_percentages=True,
+            slice_labels={"A": "Accuracy: 96%"},
+        )
+
+        chart = PieChart(options).render()
+
+        assert [(t.text, t.va, t.dy) for t in chart.texts] == [("Accuracy: 96%", "center", 0)]
+
+    def test_unknown_slice_label_key_raises(self) -> None:
+        df = pd.DataFrame({"count": [1, 1]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"C": "Missing"},
+        )
+
+        with pytest.raises(ValueError, match="slice_labels keys \\['C'\\]"):
+            PieChart(options).render()
