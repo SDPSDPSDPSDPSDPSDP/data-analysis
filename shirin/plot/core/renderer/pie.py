@@ -37,9 +37,9 @@ def _headline_text(x: float, y: float, headline: str, percentage: Optional[Text]
         return Text(x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, keep_color=True)
     headline_height = cap_height(FontSizes.SLICE_LABEL) + headline.count('\n') * line_step(FontSizes.SLICE_LABEL)
     percentage.dy = -(headline_height + Layout.SLICE_LABEL_GAP) / 2
+    headline_bottom = percentage.dy + cap_height(percentage.size) / 2 + Layout.SLICE_LABEL_GAP
     return Text(
-        x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, va='bottom',
-        dy=percentage.dy + cap_height(percentage.size) / 2 + Layout.SLICE_LABEL_GAP, keep_color=True,
+        x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, va='bottom', dy=headline_bottom, keep_color=True,
     )
 
 
