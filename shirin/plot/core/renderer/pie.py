@@ -16,6 +16,17 @@ def _wrap_headline(headline: str) -> str:
     )
 
 
+def _label_radius(share: float, default: float) -> float:
+    """Distance from the pie center to a headlined slice's label, as a share of the pie radius.
+
+    Uses the center of the slice's largest inscribed circle: the area centroid sits near the apex of a large
+    slice, where the wedge is too narrow for a wide headline. Capped at default so small slices keep their spot.
+    """
+    if share >= 0.5:
+        return min(0.5, default)
+    return min(1 / (1 + math.sin(math.pi * share)), default)
+
+
 def _headline_text(x: float, y: float, headline: str, percentage: Optional[Text]) -> Text:
     """Headline above the drawn percentage, the pair centered on the slice's label point (shifts percentage down).
 
@@ -63,7 +74,9 @@ def render_piechart(
         chart.wedges.append(Wedge(start, end, color))
         percentage = value / total * 100
         angle = math.pi * (start + end)
-        x, y = pctdistance * math.sin(angle), pctdistance * math.cos(angle)
+        # A donut's middle is the hole, so its labels stay on the ring.
+        radius = _label_radius(end - start, pctdistance) if headline and not donut else pctdistance
+        x, y = radius * math.sin(angle), radius * math.cos(angle)
         label = format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else ''
         percentage_text = Text(x, y, label, TextColors.BLACK, percentage_size, alpha=percentage_alpha, keep_color=True)
         texts.append(percentage_text)

@@ -1,7 +1,9 @@
+import math
+
 import pandas as pd
 import pytest
 
-from shirin.plot.config import FontSizes
+from shirin.plot.config import FontSizes, Marks
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
 from shirin.plot.svg.fonts import cap_height
@@ -94,6 +96,23 @@ class TestPieSliceLabels:
         # Every percentage shrinks and fades, not only the labelled slice's.
         assert percentage.size == plot._autotexts[1].size == FontSizes.DATALABELS
         assert percentage.alpha == plot._autotexts[1].alpha < headline.alpha
+
+    def test_labelled_large_slice_centers_label_in_its_inscribed_circle(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"A": "Accuracy: 96%"},
+        )
+
+        plot = PieChart(options)
+        plot.render()
+
+        labelled, unlabelled = plot._autotexts
+        assert math.hypot(unlabelled.x, unlabelled.y) == pytest.approx(Marks.PIE_LABEL_RADIUS)
+        # Largest circle inside a slice over half the pie has radius 0.5, centered halfway out.
+        assert math.hypot(labelled.x, labelled.y) == pytest.approx(0.5)
 
     def test_long_headline_wraps_and_keeps_explicit_newlines(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
