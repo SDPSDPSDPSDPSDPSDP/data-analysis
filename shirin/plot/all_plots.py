@@ -26,7 +26,7 @@ def show(svg: str) -> None:
     from IPython.display import display
 
     png = to_png(svg)
-    width, height = struct.unpack('>II', png[16:24])
+    width, height = struct.unpack('>II', png[16:24])  # IHDR chunk: big-endian width, height
     size = {'width': width // FigureSize.PNG_SCALE, 'height': height // FigureSize.PNG_SCALE}
     display({'image/png': png}, metadata={'image/png': size}, raw=True)
 
