@@ -5,7 +5,7 @@ class FontSizes:
     DATALABELS = 8
     POINT_LABEL_TITLES = 8.5  # axis title before a mark's value
     POINT_LABELS = 11  # labelled line points; stand alone on the plot, so larger than bar data labels
-    SLICE_LABEL = 14  # headline on a pie slice, e.g. a metric about that slice; must outweigh the percentage
+    SLICE_LABEL = 12  # headline on a pie slice; the slice percentages drop to DATALABELS so it still stands out
     XYLABEL = 10
     XYSUBLABEL = 8  # grey second line of an axis label
     LEGEND = 8
@@ -64,7 +64,7 @@ class Layout:
     MONTH_TICK_ROTATION = 90
     MAX_DAY_TICKS = 12  # daily bar axes label every nth day so the dates do not overlap
     POINT_LABEL_GAP = 4  # right of and below (above, where the line falls) a labelled line point
-    SLICE_LABEL_GAP = 4  # between a pie slice headline and the percentage below it
+    SLICE_LABEL_GAP = 8  # between a pie slice headline and the percentage below it
     SLICE_LABEL_MAX_WIDTH = 75  # pie radius is ~92 points at FigureSize.PIE; wider headline lines run past the slice
 
 

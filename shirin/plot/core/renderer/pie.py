@@ -46,6 +46,7 @@ def render_piechart(
     """Draw the pie clockwise from 12 o'clock.
 
     headlines: one per slice ('' = none), drawn large above the slice's percentage (centered when it has none).
+        Any headline shrinks every slice's percentage, so the headline stays the largest text on the pie.
     Returns one percentage text per slice ('' below value_datalabel) and the drawn headline texts.
     """
     chart.x.lim = chart.y.lim = (-1 / Marks.PIE_RADIUS, 1 / Marks.PIE_RADIUS)
@@ -53,6 +54,7 @@ def render_piechart(
     total = sum(values)
     texts: List[Text] = []
     headline_texts: List[Text] = []
+    percentage_size = FontSizes.DATALABELS if any(headlines) else FontSizes.TEXT
     start = 0.0
     for value, color, headline in zip(values, colors, headlines):
         end = start + value / total
@@ -61,7 +63,7 @@ def render_piechart(
         angle = math.pi * (start + end)
         x, y = pctdistance * math.sin(angle), pctdistance * math.cos(angle)
         label = format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else ''
-        percentage_text = Text(x, y, label, TextColors.BLACK, FontSizes.TEXT, keep_color=True)
+        percentage_text = Text(x, y, label, TextColors.BLACK, percentage_size, keep_color=True)
         texts.append(percentage_text)
         if headline:
             headline_texts.append(_headline_text(x, y, headline, percentage_text if datalabels and label else None))
