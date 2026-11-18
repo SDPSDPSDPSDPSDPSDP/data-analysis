@@ -47,6 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // The inline script sets data-theme before hydration, React would otherwise flag the mismatch.
     <html lang="en" className={`${futura.variable} ${satoshi.variable}`} suppressHydrationWarning>
       <head>
+        {/* Pyodide and its packages load from jsdelivr once a chart runs; module fetches use CORS. */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         {/* Blocked storage (Safari private mode, sandboxed iframes) throws; dark stays the default then. */}
         <Script id="theme-init" strategy="beforeInteractive">
           {`let saved = null; try { saved = localStorage.getItem("${STORAGE_KEY}"); } catch {} if (saved !== "0") document.documentElement.dataset.theme = "dark"; document.documentElement.dataset.js = "";`}
