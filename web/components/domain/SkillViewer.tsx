@@ -6,6 +6,7 @@ import { EditorView } from "@uiw/react-codemirror";
 import remarkGfm from "remark-gfm";
 import { FileText, ScrollText } from "lucide-react";
 import CodeBlock from "@/components/ui/CodeBlock";
+import LinkButton from "@/components/ui/LinkButton";
 import TerminalWindow from "@/components/ui/TerminalWindow";
 import type { Skill } from "@/lib/sections";
 
@@ -40,9 +41,7 @@ export default function SkillViewer({ skill, dark }: Props) {
     // Links to another file of the skill switch tabs, like Claude following them.
     a: ({ href, children }) =>
       skill.files.some((f) => f.name === href) ? (
-        <button type="button" className="skill-link" onClick={() => open(href!)}>
-          {children}
-        </button>
+        <LinkButton onClick={() => open(href!)}>{children}</LinkButton>
       ) : (
         <a href={href} target="_blank" rel="noopener noreferrer">
           {children}

@@ -42,6 +42,20 @@ export function sectionId(title: string): string {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
+// cardPreview is the gallery image without title, preview the full chart for the modal. dark* are the dark_mode=True versions.
+export type HomeChart = {
+  setup: string;
+  code: string;
+  title: string;
+  subtitle: string | null;
+  preview: string;
+  darkPreview: string;
+  cardPreview: string;
+  darkCardPreview: string;
+  section: string;
+  category: string;
+};
+
 export type Category = {
   title: string;
   sections: PlotSectionData[];

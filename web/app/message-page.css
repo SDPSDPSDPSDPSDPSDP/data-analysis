@@ -17,12 +17,10 @@
 }
 
 .message-page a,
-.message-page-button {
-  padding: 0;
-  border: none;
-  background: none;
-  font: inherit;
+.message-page .link-button {
   color: var(--text-primary);
+}
+
+.message-page a {
   text-decoration: underline;
-  cursor: pointer;
 }

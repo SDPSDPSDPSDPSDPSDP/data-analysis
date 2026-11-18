@@ -155,3 +155,13 @@ pre {
     animation: none;
   }
 }
+
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

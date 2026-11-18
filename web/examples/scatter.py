@@ -4,7 +4,9 @@ import pandas as pd
 rng = np.random.default_rng(0)
 df = df.sample(300, random_state=0)
 df['weight'] = (100 + df['sweetness'] * 8 + rng.normal(0, 20, len(df))).round(1)
-trend = (df['weight'] - df['weight'].mean()) / df['weight'].std() + (df['sweetness'] - df['sweetness'].mean()) / df['sweetness'].std()
+def z_score(column):
+    return (column - column.mean()) / column.std()
+trend = z_score(df['weight']) + z_score(df['sweetness'])
 df['fruit'] = pd.qcut(trend, 6, labels=['Cherry', 'Fig', 'Date', 'Apple', 'Orange', 'Banana']).astype(str)
 # Within each fruit sweeter = longer on tree; shuffled starts per fruit hide that pattern when pooled.
 start = df['fruit'].map({'Cherry': 32, 'Fig': 12, 'Date': 40, 'Apple': 10, 'Orange': 34, 'Banana': 18})

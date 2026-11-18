@@ -1,3 +1,4 @@
+import type { HomeChart } from "@/lib/sections";
 // Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
 import { exampleSetup, withDarkMode } from "../lib/exampleSetup.ts";
 import { getCategories, getGlobalSetup } from "./categories.ts";
@@ -15,8 +16,7 @@ function splitTitle(code: string) {
 }
 
 // Home gallery charts. Sections without a data format are tools, not charts.
-// cardPreview is the gallery image without title, preview the full chart for the modal. dark* are the dark_mode=True versions.
-export function getHomeCharts() {
+export function getHomeCharts(): HomeChart[] {
   const globalSetup = getGlobalSetup();
   return getCategories().flatMap((category) =>
     category.sections

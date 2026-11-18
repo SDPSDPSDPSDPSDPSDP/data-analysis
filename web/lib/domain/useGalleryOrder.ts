@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import type { getHomeCharts } from "@/app/homeCharts";
-
-export type Chart = ReturnType<typeof getHomeCharts>[number];
+import type { HomeChart as Chart } from "@/lib/sections";
 
 // Pinned charts fill their slots, null slots and everything after get the shuffled rest, capped at `limit`.
 export function useGalleryOrder(charts: Chart[], pinned: (Chart | null)[], limit: number): Chart[] | null {

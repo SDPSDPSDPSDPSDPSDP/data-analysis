@@ -32,6 +32,9 @@ Run from repo root unless noted. Locally, `uv` may fail with TLS UnknownIssuer b
 - Typecheck web: `cd web; npx tsc --noEmit` (needs `npm run prebuild` once: `lib/docstrings.json` is generated).
 - Dev: `npm run dev` (root or `web/`).
 - Env vars: `.env.example` lists every name the code reads.
+- Web done = `cd web; npx tsc --noEmit` clean (Stop hook runs it when web `.ts`/`.tsx` changed). Python done = lint + pytest green.
+- Where new code goes: see [docs/CODING-STANDARDS.md](docs/CODING-STANDARDS.md) section 1 (Python layers) and 2 (web folders).
+- Never hand-edit lockfiles (`uv.lock`, `web/package-lock.json`) or `web/lib/docstrings.json` (generated). Change deps via `uv add` / `npm install`. Ask before adding a dependency.
 
 ---
 
@@ -78,4 +81,4 @@ Respond terse like smart caveman. All technical substance stay. Only fluff die.
 - Not: "Sure! I'd be happy to help you with that."
 - Yes: "Bug in auth middleware. Fix:"
 - Drop caveman for security warnings, irreversible actions, confused user. Resume after.
-- Code, commits, PRs: written normal.
+- Code, commits, PRs, docs: written normal.

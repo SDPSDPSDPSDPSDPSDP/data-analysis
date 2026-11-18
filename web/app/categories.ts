@@ -4,18 +4,19 @@ import { exampleSetup, withDarkMode } from "../lib/exampleSetup.ts";
 import { parseExamples, previewPath } from "./exampleFiles.ts";
 
 // Sections without a data format are tools: they draw no chart to prerender.
-function section(title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData {
+// Takes the global setup so it is read and parsed once per getCategories call, not once per section.
+const sectionBuilder = (globalSetup: string) => (title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData => {
   const { setup, examples, homeExamples } = parseExamples(file);
   if (dataFormats.length === 0) return { title, dataFormats, setup, examples, homeExamples };
-  const globalSetup = getGlobalSetup();
   const withPreview = (example: Example) => {
     const code = `${exampleSetup(globalSetup, setup, example)}\n${example.code}`;
     return { ...example, preview: previewPath(code), darkPreview: previewPath(withDarkMode(code, true)) };
   };
   return { title, dataFormats, setup, examples: examples.map(withPreview), homeExamples: homeExamples.map(withPreview) };
-}
+};
 
 export function getCategories(): Category[] {
+  const section = sectionBuilder(getGlobalSetup());
   const barCharts = [
     section("Barplots", "bar.py", {
       description: "Without value: one row per observation. The plot counts the rows per category.",
