@@ -22,6 +22,8 @@ def _add_db2_dll_directory() -> None:
     override = os.environ.get("DB2_DLL_DIR")
     if override is not None and not os.path.isdir(override):
         raise FileNotFoundError(f"DB2_DLL_DIR={override!r} is not a directory")
+    # Deliberate exception to the no-fallback rule: IBM's standard install path, not config; a set but
+    # missing DB2_DLL_DIR still fails hard above.
     dll_dir = override or r"C:\Program Files\IBM\SQLLIB\BIN"
     if os.path.isdir(dll_dir):
         os.add_dll_directory(dll_dir)

@@ -10,8 +10,11 @@ if (!file || !file.endsWith(".py")) process.exit(0);
 const result = spawnSync("uv", ["run", "--system-certs", "ruff", "check", file], {
   cwd: process.env.CLAUDE_PROJECT_DIR,
   encoding: "utf8",
-  shell: process.platform === "win32",
 });
+if (result.error) {
+  process.stderr.write(`could not run uv: ${result.error.message}`);
+  process.exit(2);
+}
 if (result.status !== 0) {
   process.stderr.write(`ruff check failed for ${file}:\n${result.stdout}${result.stderr}`);
   process.exit(2);
