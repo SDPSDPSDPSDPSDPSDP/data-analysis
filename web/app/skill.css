@@ -117,16 +117,6 @@
   font-size: var(--font-size-inline-code);
 }
 
-.skill-link {
-  padding: 0;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 @media (max-width: 640px) {
   .skill-body {
     grid-template-columns: 1fr;
