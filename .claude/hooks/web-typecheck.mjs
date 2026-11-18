@@ -8,7 +8,7 @@ const input = JSON.parse(readFileSync(0, "utf8"));
 if (input.stop_hook_active) process.exit(0);
 
 const root = process.env.CLAUDE_PROJECT_DIR;
-const status = spawnSync("git", ["status", "--porcelain", "--", "web"], { cwd: root, encoding: "utf8" });
+const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=all", "--", "web"], { cwd: root, encoding: "utf8" });
 if (status.status !== 0) {
   process.stderr.write(`git status failed: ${status.stderr}`);
   process.exit(1);

@@ -128,6 +128,19 @@ class TestPieSliceLabels:
 
         assert [t.text for t in stack_texts(chart.texts)[2:]] == ["Accuracy:\n96,38%", "Rest\n24"]
 
+    def test_slice_label_keeps_blank_line(self) -> None:
+        df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
+        options = PiePlotOptions(
+            df=df,
+            col="count",
+            palette={"A": "#111111", "B": "#222222"},
+            slice_labels={"B": "Rest\n\n24"},
+        )
+
+        chart = PieChart(options).render()
+
+        assert stack_texts(chart.texts)[-1].text == "Rest\n\n24"
+
     def test_headline_centered_when_slice_has_no_percentage(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
         options = PiePlotOptions(

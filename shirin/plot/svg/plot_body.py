@@ -13,27 +13,29 @@ from .marks import Scale
 _CLIP_IDS = itertools.count()
 
 
+def _wrapped(t: Text) -> Text:
+    if t.wrap_width is None:
+        return t
+    # An empty line wraps to no lines; keep it so blank lines in the text stay.
+    lines = [line for part in t.text.split('\n') for line in (wrap_text(part, t.size, t.wrap_width) or [''])]
+    return dataclasses.replace(t, text='\n'.join(lines), wrap_width=None)
+
+
 def stack_texts(texts: List[Text]) -> List[Text]:
     """Copies with wrap_width texts wrapped and each `above` pair centered on its point: the lower text moves down,
     the upper one sits Layout.SLICE_LABEL_GAP above it.
     """
-    replaced: Dict[int, Text] = {}
+    out: Dict[int, Text] = {id(t): _wrapped(t) for t in texts}
     for t in texts:
-        if t.wrap_width is None:
-            continue
-        wrapped = '\n'.join(
-            line for part in t.text.split('\n') for line in wrap_text(part, t.size, t.wrap_width)
-        )
         if t.above is None:
-            replaced[id(t)] = dataclasses.replace(t, text=wrapped, wrap_width=None)
             continue
-        lower = t.above
-        height = cap_height(t.size) + wrapped.count('\n') * marks.line_step(t.size)
+        upper, lower = out[id(t)], out[id(t.above)]
+        height = cap_height(upper.size) + upper.text.count('\n') * marks.line_step(upper.size)
         lower_dy = -(height + Layout.SLICE_LABEL_GAP) / 2
-        replaced[id(lower)] = dataclasses.replace(lower, dy=lower_dy)
+        out[id(t.above)] = dataclasses.replace(lower, dy=lower_dy)
         upper_dy = lower_dy + cap_height(lower.size) / 2 + Layout.SLICE_LABEL_GAP
-        replaced[id(t)] = dataclasses.replace(t, text=wrapped, va='bottom', dy=upper_dy, wrap_width=None, above=None)
-    return [replaced.get(id(t), t) for t in texts]
+        out[id(t)] = dataclasses.replace(upper, va='bottom', dy=upper_dy, above=None)
+    return [out[id(t)] for t in texts]
 
 
 def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
