@@ -3,10 +3,12 @@ import math
 import pandas as pd
 import pytest
 
-from shirin.plot.config import FontSizes, Marks
+from shirin.plot.config import FontSizes, Layout, Marks
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
+from shirin.plot.svg.chart import Text
 from shirin.plot.svg.fonts import cap_height
+from shirin.plot.svg.marks import block_height, place
 from shirin.plot.svg.plot_body import stack_texts
 
 
@@ -114,6 +116,19 @@ class TestPieSliceLabels:
         assert math.hypot(unlabelled.x, unlabelled.y) == pytest.approx(Marks.PIE_LABEL_RADIUS)
         # Largest circle inside a slice over half the pie has radius 0.5, centered halfway out.
         assert math.hypot(labelled.x, labelled.y) == pytest.approx(0.5)
+
+    def test_stacked_text_clears_multi_line_text_below(self) -> None:
+        lower = Text(0, 0, "96%\n(24)\nof\nall", "#000000", FontSizes.DATALABELS)
+        upper = Text(0, 0, "Accuracy", "#000000", FontSizes.DATALABELS, above=lower)
+
+        stacked_lower, stacked_upper = stack_texts([lower, upper])
+
+        def same(v: float) -> float:
+            return v
+
+        lower_top = place(stacked_lower, same, same)[4]
+        upper_top = place(stacked_upper, same, same)[4]
+        assert upper_top + block_height(stacked_upper) + Layout.SLICE_LABEL_GAP == pytest.approx(lower_top)
 
     def test_long_headline_wraps_and_keeps_explicit_newlines(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])

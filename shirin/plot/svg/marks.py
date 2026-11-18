@@ -55,6 +55,11 @@ def line_step(size: float) -> float:
     return cap_height(size) + Layout.DATA_TEXT_LINE_GAP
 
 
+def block_height(t: Text) -> float:
+    """Top of the first line to the baseline of the last line of a data text, in points."""
+    return cap_height(t.size) + t.text.count('\n') * line_step(t.size)
+
+
 def place(t: Text, sx: Scale, sy: Scale) -> Tuple[float, float, float, float, float]:
     """Anchor x, first line's baseline y and bounding box (x0, x1, top) of a data text, in points.
 
@@ -64,7 +69,7 @@ def place(t: Text, sx: Scale, sy: Scale) -> Tuple[float, float, float, float, fl
     titles = line_titles(t)
     width = max(_title_width(title) + text_width(line, t.size) for title, line in zip(titles, lines))
     first_line = cap_height(t.size)
-    height = first_line + (len(lines) - 1) * line_step(t.size)
+    height = block_height(t)
     x, y = sx(t.x) + t.dx, sy(t.y) - t.dy
     top = {'bottom': y - height, 'center': y - height / 2, 'top': y}[t.va]
     x0 = {'left': x, 'center': x - width / 2, 'right': x - width}[t.ha]

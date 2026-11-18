@@ -7,7 +7,7 @@ from ..config import Layout
 from ..config.colors import BACKGROUND_COLOR
 from . import marks
 from .chart import Chart, Text, Wedge
-from .fonts import cap_height, wrap_text
+from .fonts import wrap_text
 from .marks import Scale
 
 _CLIP_IDS = itertools.count()
@@ -30,10 +30,9 @@ def stack_texts(texts: List[Text]) -> List[Text]:
         if t.above is None:
             continue
         upper, lower = out[id(t)], out[id(t.above)]
-        height = cap_height(upper.size) + upper.text.count('\n') * marks.line_step(upper.size)
-        lower_dy = -(height + Layout.SLICE_LABEL_GAP) / 2
+        lower_dy = -(marks.block_height(upper) + Layout.SLICE_LABEL_GAP) / 2
         out[id(t.above)] = dataclasses.replace(lower, dy=lower_dy)
-        upper_dy = lower_dy + cap_height(lower.size) / 2 + Layout.SLICE_LABEL_GAP
+        upper_dy = lower_dy + marks.block_height(lower) / 2 + Layout.SLICE_LABEL_GAP
         out[id(t)] = dataclasses.replace(upper, va='bottom', dy=upper_dy, above=None)
     return [out[id(t)] for t in texts]
 
