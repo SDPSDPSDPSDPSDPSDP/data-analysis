@@ -32,15 +32,25 @@ async def _run(code):
 
 let stdout = [];
 
-async function init() {
-  const py = await loadPyodide();
-  // Loading messages are not run output.
-  await py.loadPackage(["micropip", "numpy", "pandas"], { messageCallback: () => {} });
-  // micropip reads name and version from the filename, so give it a valid wheel name.
+async function fetchWheel() {
   // Revalidate so a rebuilt wheel is picked up without a hard reload.
   const response = await fetch("/shirin.whl", { cache: "no-cache" });
   if (!response.ok) throw new Error(`Fetching /shirin.whl failed: ${response.status} ${response.statusText}`);
-  const wheel = await response.arrayBuffer();
+  return response.arrayBuffer();
+}
+
+async function init() {
+  // Wheel download overlaps the runtime and package loads instead of waiting behind them.
+  const wheelPromise = fetchWheel();
+  const [py, wheel] = await Promise.all([
+    loadPyodide().then(async (loaded) => {
+      // Loading messages are not run output.
+      await loaded.loadPackage(["micropip", "numpy", "pandas"], { messageCallback: () => {} });
+      return loaded;
+    }),
+    wheelPromise,
+  ]);
+  // micropip reads name and version from the filename, so give it a valid wheel name.
   py.FS.writeFile("/tmp/shirin-0-py3-none-any.whl", new Uint8Array(wheel));
   await py.runPythonAsync(`import micropip; await micropip.install("emfs:/tmp/shirin-0-py3-none-any.whl")`);
   await py.runPythonAsync(SETUP);
