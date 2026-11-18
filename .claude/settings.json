@@ -1,4 +1,5 @@
 {
+  "enabledPlugins": {},
   "extraKnownMarketplaces": {
     "shirin-vibe": {
       "source": {
@@ -7,7 +8,51 @@
       }
     }
   },
-  "enabledPlugins": {
-    "shirin-vibe@shirin-vibe": true
+  "permissions": {
+    "allow": [
+      "Bash(uv run ruff check *)",
+      "Bash(uv run --system-certs ruff check *)",
+      "Bash(uv run python -m pytest *)",
+      "Bash(uv run --system-certs python -m pytest *)",
+      "Bash(npx tsc --noEmit)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.*.local)",
+      "Read(**/.env.production)",
+      "Edit(shirin/assets/fonts/**)",
+      "Edit(web/public/shirin.whl)",
+      "Edit(web/public/previews/**)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/ruff-check.mjs\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/web-typecheck.mjs\"",
+            "timeout": 180,
+            "statusMessage": "Typechecking web"
+          }
+        ]
+      }
+    ]
   }
 }

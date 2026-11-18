@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+# Jobs only read the repo; keeps the token read-only whatever the repo default is.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test Python ${{ matrix.python-version }}

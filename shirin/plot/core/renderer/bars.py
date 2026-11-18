@@ -11,17 +11,13 @@ from ...svg import Chart, Rect
 from .hue import hue_groups, hue_levels, set_legend
 
 
-def _bar_rect(center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any) -> Rect:
+def _bar_rect(
+    center: float, width: float, base: float, value: float, color: str, horizontal: bool, **kwargs: Any
+) -> Rect:
     lo, hi = center - width / 2, center + width / 2
     if horizontal:
         return Rect(base, base + value, lo, hi, color, horizontal=True, **kwargs)
     return Rect(lo, hi, base, base + value, color, **kwargs)
-
-
-def _bar(
-    chart: Chart, center: float, width: float, base: float, value: float, color: str, horizontal: bool, rounded: bool = False
-) -> None:
-    chart.rects.append(_bar_rect(center, width, base, value, color, horizontal, rounded=rounded))
 
 
 def _category_axis(chart: Chart, labels: List[str], horizontal: bool, top_down: bool) -> None:
@@ -45,7 +41,8 @@ def _draw_categorical_bars(
         offset = (i - (n_slots - 1) / 2) * width if n_slots > 1 else 0
         for position, value in enumerate(table[level]):
             if pd.notna(value):
-                _bar(chart, position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)
+                bar = _bar_rect(position + offset, bar_width, 0, float(value), color, horizontal, rounded=True)
+                chart.rects.append(bar)
     _category_axis(chart, [str(category) for category in table.index], horizontal, top_down=True)
     if hue is not None:
         set_legend(chart, colors, list(table.columns))

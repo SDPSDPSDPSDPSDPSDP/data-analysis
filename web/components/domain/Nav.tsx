@@ -7,6 +7,7 @@ import { Moon, Sun } from "lucide-react";
 import { sectionId } from "@/lib/sections";
 import SectionIcon from "@/components/domain/SectionIcon";
 import { setDarkMode, useDarkMode } from "@/lib/darkMode";
+import { isModifiedClick } from "@/lib/isModifiedClick";
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -23,7 +24,6 @@ type Props = {
 export default function Nav({ categories, filter }: Props) {
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
-  // Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter.
   const pathname = usePathname();
   const dark = useDarkMode();
   // Tab flips the theme only while nothing has focus, so focus navigation and code editor indent keep working.
@@ -39,12 +39,13 @@ export default function Nav({ categories, filter }: Props) {
   }, []);
   // Modified clicks open a new tab, home stays as is.
   function leave(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (!filter || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    if (!filter || isModifiedClick(e)) return;
     e.preventDefault();
     filter.onLeave(e.currentTarget.getAttribute("href")!);
   }
   return (
     <nav className="nav">
+      {/* Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter. */}
       <Link
         href={pathname === "/" && !filter?.active ? "/all" : "/"}
         className="nav-brand"

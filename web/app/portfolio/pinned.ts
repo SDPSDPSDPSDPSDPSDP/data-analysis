@@ -1,4 +1,4 @@
-import type { Chart } from "@/components/domain/useGalleryOrder";
+import type { Chart } from "@/lib/domain/useGalleryOrder";
 
 // Fixed chart per slot, row by row, as [category, title]: titles repeat across categories.
 // null slots and the rest are shuffled.
@@ -22,7 +22,13 @@ export const STILL_PINNED: Slots = [
 ];
 
 // Live gallery leads its last row with the pie and scatter; the still keeps them at the end.
-export const HOME_PINNED: Slots = [...STILL_PINNED.slice(0, 10), ...STILL_PINNED.slice(12), ...STILL_PINNED.slice(10, 12)];
+const LAST_ROW_START = 10;
+const PIE_AND_SCATTER_START = 12;
+export const HOME_PINNED: Slots = [
+  ...STILL_PINNED.slice(0, LAST_ROW_START),
+  ...STILL_PINNED.slice(PIE_AND_SCATTER_START),
+  ...STILL_PINNED.slice(LAST_ROW_START, PIE_AND_SCATTER_START),
+];
 
 export function getPinnedCharts(charts: Chart[], slots: Slots): (Chart | null)[] {
   return slots.map((slot) => {

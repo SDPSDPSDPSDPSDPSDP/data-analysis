@@ -22,6 +22,19 @@ Read docs before code, evaluate if needed to open depending on the user's reques
 
 ---
 
+## Commands
+
+Run from repo root unless noted. Locally, `uv` may fail with TLS UnknownIssuer behind a TLS-intercepting antivirus: use `uv run --system-certs` or set `UV_NATIVE_TLS=1`.
+
+- Install: `uv sync` (Python), `cd web; npm ci` (web).
+- Lint: `uv run ruff check .`
+- Test: `uv run python -m pytest`. One file or test: `uv run python -m pytest tests/test_colors.py -k name`.
+- Typecheck web: `cd web; npx tsc --noEmit` (needs `npm run prebuild` once: `lib/docstrings.json` is generated).
+- Dev: `npm run dev` (root or `web/`).
+- Env vars: `.env.example` lists every name the code reads.
+
+---
+
 ## Hard Rules
 
 - **Reuse first:** Before writing new function, class, component, type or util: grep codebase for existing one. Extend it over writing parallel copy. Same 5+ lines of logic in 2+ places = extract. Applies to app code, not tests (explicit test setup beats shared helpers).

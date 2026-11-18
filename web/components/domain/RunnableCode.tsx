@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { load, run, type RunResult } from "@/lib/pyodide";
 import { DOC_TOOLTIP } from "@/lib/docTooltip";
 import CodeBlock from "@/components/ui/CodeBlock";
+import ErrorText from "@/components/ui/ErrorText";
 import CopyableImage from "@/components/ui/CopyableImage";
 import { useVisible } from "@/lib/useVisible";
 import { useDarkMode } from "@/lib/darkMode";
@@ -66,7 +67,7 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
           <CopyableImage key={i} {...image} alt={`${title} chart`} />
         ))}
         {result?.stdout && <pre>{result.stdout}</pre>}
-        {result?.error && <pre className="error">{result.error}</pre>}
+        {result?.error && <ErrorText>{result.error}</ErrorText>}
         {!result && !preview && <div className="skeleton" role="status" aria-label="Rendering chart" />}
       </section>
     </div>

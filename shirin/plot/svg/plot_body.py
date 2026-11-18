@@ -7,9 +7,34 @@ from ..config import Layout
 from ..config.colors import BACKGROUND_COLOR
 from . import marks
 from .chart import Chart, Text, Wedge
+from .fonts import wrap_text
 from .marks import Scale
 
 _CLIP_IDS = itertools.count()
+
+
+def _wrapped(t: Text) -> Text:
+    if t.wrap_width is None:
+        return t
+    # An empty line wraps to no lines; keep it so blank lines in the text stay.
+    lines = [line for part in t.text.split('\n') for line in (wrap_text(part, t.size, t.wrap_width) or [''])]
+    return dataclasses.replace(t, text='\n'.join(lines), wrap_width=None)
+
+
+def stack_texts(texts: List[Text]) -> List[Text]:
+    """Copies with wrap_width texts wrapped and each `above` pair centered on its point: the lower text moves down,
+    the upper one sits Layout.SLICE_LABEL_GAP above it.
+    """
+    out: Dict[int, Text] = {id(t): _wrapped(t) for t in texts}
+    for t in texts:
+        if t.above is None:
+            continue
+        upper, lower = out[id(t)], out[id(t.above)]
+        lower_dy = -(marks.block_height(upper) + Layout.SLICE_LABEL_GAP) / 2
+        out[id(t.above)] = dataclasses.replace(lower, dy=lower_dy)
+        upper_dy = lower_dy + marks.block_height(lower) / 2 + Layout.SLICE_LABEL_GAP
+        out[id(t)] = dataclasses.replace(upper, va='bottom', dy=upper_dy, above=None)
+    return [out[id(t)] for t in texts]
 
 
 def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
@@ -34,7 +59,9 @@ def place_point_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
     return placed
 
 
-def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]) -> List[str]:
+def draw_marks(
+    chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]
+) -> List[str]:
     body: List[str] = []
     # Data colors are never themed: a user's white slice must stay white, not turn into the background.
     body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]

@@ -1,4 +1,19 @@
-import { ChartArea, ChartBarBig, ChartColumn, ChartLine, ChartPie, ChartScatter, ChartSpline, Bot, Database, Hash, LayoutGrid, Sigma, Wrench, type LucideIcon } from "lucide-react";
+import {
+  Bot,
+  ChartArea,
+  ChartBarBig,
+  ChartColumn,
+  ChartLine,
+  ChartPie,
+  ChartScatter,
+  ChartSpline,
+  Database,
+  Hash,
+  LayoutGrid,
+  Sigma,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
 // Keyed by category or section title: icon components can't be passed from the server page.
 const SECTION_ICONS: Record<string, LucideIcon> = {

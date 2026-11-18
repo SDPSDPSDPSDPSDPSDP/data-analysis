@@ -15,7 +15,10 @@ def _add_text(chart: Chart, rect: Rect, text: str, orientation: str, short_text:
     gap = Layout.DATALABEL_GAP * sign
     if orientation == 'vertical':
         va = 'bottom' if sign > 0 else 'top'
-        label = Text((rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'center', va, dy=gap, short_text=short_text)
+        label = Text(
+            (rect.x0 + rect.x1) / 2, rect.y1, text, TextColors.FAINT_GREY, FontSizes.DATALABELS, 'center', va,
+            dy=gap, short_text=short_text,
+        )
     else:
         # No short_text: crowding is only checked between side-by-side (vertical) labels.
         ha = 'left' if sign > 0 else 'right'

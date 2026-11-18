@@ -56,7 +56,6 @@ def y_axis(chart: Chart, frame: Frame, color: Color) -> List[str]:
         if not lines:
             items.append(marks.text(x, frame.sy(t) + cap / 2, label, FontSizes.TICKS, y_tick_color, 'end'))
             continue
-        # Label and description together are centered on the tick.
         top = frame.sy(t) - (cap + Layout.DESCRIPTION_GAP + _description_height(lines)) / 2
         items.append(marks.text(x, top + cap, label, FontSizes.TICKS, y_tick_color, 'end'))
         items += _description(x, top + cap + Layout.DESCRIPTION_GAP, lines, 'end', description_color)
