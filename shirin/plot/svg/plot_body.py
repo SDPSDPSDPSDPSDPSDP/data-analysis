@@ -7,9 +7,33 @@ from ..config import Layout
 from ..config.colors import BACKGROUND_COLOR
 from . import marks
 from .chart import Chart, Text, Wedge
+from .fonts import cap_height, wrap_text
 from .marks import Scale
 
 _CLIP_IDS = itertools.count()
+
+
+def stack_texts(texts: List[Text]) -> List[Text]:
+    """Copies with wrap_width texts wrapped and each `above` pair centered on its point: the lower text moves down,
+    the upper one sits Layout.SLICE_LABEL_GAP above it.
+    """
+    replaced: Dict[int, Text] = {}
+    for t in texts:
+        if t.wrap_width is None:
+            continue
+        wrapped = '\n'.join(
+            line for part in t.text.split('\n') for line in wrap_text(part, t.size, t.wrap_width)
+        )
+        if t.above is None:
+            replaced[id(t)] = dataclasses.replace(t, text=wrapped, wrap_width=None)
+            continue
+        lower = t.above
+        height = cap_height(t.size) + wrapped.count('\n') * marks.line_step(t.size)
+        lower_dy = -(height + Layout.SLICE_LABEL_GAP) / 2
+        replaced[id(lower)] = dataclasses.replace(lower, dy=lower_dy)
+        upper_dy = lower_dy + cap_height(lower.size) / 2 + Layout.SLICE_LABEL_GAP
+        replaced[id(t)] = dataclasses.replace(t, text=wrapped, va='bottom', dy=upper_dy, wrap_width=None, above=None)
+    return [replaced.get(id(t), t) for t in texts]
 
 
 def shorten_crowded_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:

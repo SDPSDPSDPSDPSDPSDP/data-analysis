@@ -7,6 +7,7 @@ from shirin.plot.config import FontSizes, Marks
 from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
 from shirin.plot.svg.fonts import cap_height
+from shirin.plot.svg.plot_body import stack_texts
 
 
 class TestPieChartRender:
@@ -84,8 +85,8 @@ class TestPieSliceLabels:
         plot = PieChart(options)
         chart = plot.render()
 
-        headline, percentage = plot._headline_texts[0], plot._autotexts[0]
-        assert headline in chart.texts
+        assert plot._headline_texts[0].above is plot._autotexts[0]
+        percentage, _, headline = stack_texts(chart.texts)
         assert (headline.x, headline.y) == (percentage.x, percentage.y)
         assert headline.va == "bottom"
         # Pair centered on the label point: percentage pushed down, headline bottom above its top.
@@ -123,10 +124,9 @@ class TestPieSliceLabels:
             slice_labels={"A": "Accuracy: 96,38%", "B": "Rest\n24"},
         )
 
-        plot = PieChart(options)
-        plot.render()
+        chart = PieChart(options).render()
 
-        assert [t.text for t in plot._headline_texts] == ["Accuracy:\n96,38%", "Rest\n24"]
+        assert [t.text for t in stack_texts(chart.texts)[2:]] == ["Accuracy:\n96,38%", "Rest\n24"]
 
     def test_headline_centered_when_slice_has_no_percentage(self) -> None:
         df = pd.DataFrame({"count": [76, 24]}, index=["A", "B"])
@@ -140,7 +140,7 @@ class TestPieSliceLabels:
 
         chart = PieChart(options).render()
 
-        assert [(t.text, t.va, t.dy) for t in chart.texts] == [("Accuracy:\n96%", "center", 0)]
+        assert [(t.text, t.va, t.dy) for t in stack_texts(chart.texts)] == [("Accuracy:\n96%", "center", 0)]
 
     def test_unknown_slice_label_key_raises(self) -> None:
         df = pd.DataFrame({"count": [1, 1]}, index=["A", "B"])

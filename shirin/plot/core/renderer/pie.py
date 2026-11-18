@@ -1,19 +1,9 @@
 import math
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from ....number_format import format_percentage
 from ...config import FontSizes, Layout, Marks, TextColors
 from ...svg import Chart, Text, Wedge
-from ...svg.fonts import cap_height, wrap_text
-from ...svg.marks import line_step
-
-
-def _wrap_headline(headline: str) -> str:
-    """Wrap each line of headline to Layout.SLICE_LABEL_MAX_WIDTH; newlines the caller put in stay."""
-    return '\n'.join(
-        line for part in headline.split('\n')
-        for line in wrap_text(part, FontSizes.SLICE_LABEL, Layout.SLICE_LABEL_MAX_WIDTH)
-    )
 
 
 def _label_radius(share: float, default: float) -> float:
@@ -25,22 +15,6 @@ def _label_radius(share: float, default: float) -> float:
     if share >= 0.5:
         return min(0.5, default)
     return min(1 / (1 + math.sin(math.pi * share)), default)
-
-
-def _headline_text(x: float, y: float, headline: str, percentage: Optional[Text]) -> Text:
-    """Headline above the drawn percentage, the pair centered on the slice's label point (shifts percentage down).
-
-    percentage: None when the slice shows none; the headline then centers on the label point alone.
-    """
-    headline = _wrap_headline(headline)
-    if percentage is None:
-        return Text(x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, keep_color=True)
-    headline_height = cap_height(FontSizes.SLICE_LABEL) + headline.count('\n') * line_step(FontSizes.SLICE_LABEL)
-    percentage.dy = -(headline_height + Layout.SLICE_LABEL_GAP) / 2
-    headline_bottom = percentage.dy + cap_height(percentage.size) / 2 + Layout.SLICE_LABEL_GAP
-    return Text(
-        x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, va='bottom', dy=headline_bottom, keep_color=True,
-    )
 
 
 def render_piechart(
@@ -81,7 +55,10 @@ def render_piechart(
         percentage_text = Text(x, y, label, TextColors.BLACK, percentage_size, alpha=percentage_alpha, keep_color=True)
         texts.append(percentage_text)
         if headline:
-            headline_texts.append(_headline_text(x, y, headline, percentage_text if datalabels and label else None))
+            headline_texts.append(Text(
+                x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, keep_color=True,
+                wrap_width=Layout.SLICE_LABEL_MAX_WIDTH, above=percentage_text if datalabels and label else None,
+            ))
         start = end
     if donut:
         chart.donut_hole = Marks.DONUT_HOLE_RADIUS

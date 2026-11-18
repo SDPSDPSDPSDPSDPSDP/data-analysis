@@ -51,6 +51,11 @@ class Text:
     keep_color: bool = False
     # Smaller, faded text before each line of text (one per line), e.g. the axis name before a mark's value.
     line_titles: Tuple[str, ...] = ()
+    # Layout wraps each line to this width in points; newlines already in text stay.
+    wrap_width: Optional[float] = None
+    # Text this one stacks on top of: layout centers the pair on their shared point, e.g. a pie headline over
+    # its percentage. Must also be in the chart's texts.
+    above: Optional['Text'] = None
 
 
 @dataclass
