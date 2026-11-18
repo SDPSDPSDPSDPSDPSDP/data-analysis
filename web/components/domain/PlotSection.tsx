@@ -9,7 +9,7 @@ import { useDarkMode } from "@/lib/darkMode";
 import { sectionId, type Example, type PlotSectionData, type SetupCell } from "@/lib/sections";
 
 // Only the Tools page shows a skill; keeps react-markdown out of every other page bundle.
-const SkillViewer = dynamic(() => import("@/components/ui/SkillViewer"));
+const SkillViewer = dynamic(() => import("@/components/domain/SkillViewer"));
 
 function SetupCellBody({ cell, dark }: { cell: SetupCell; dark: boolean }) {
   if (cell.kind === "skill") return <SkillViewer skill={cell.skill} dark={dark} />;

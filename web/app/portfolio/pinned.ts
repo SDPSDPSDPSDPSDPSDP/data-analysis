@@ -1,4 +1,4 @@
-import type { Chart } from "@/components/domain/useGalleryOrder";
+import type { Chart } from "@/lib/domain/useGalleryOrder";
 
 // Fixed chart per slot, row by row, as [category, title]: titles repeat across categories.
 // null slots and the rest are shuffled.

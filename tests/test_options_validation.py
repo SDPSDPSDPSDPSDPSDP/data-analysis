@@ -7,7 +7,7 @@ from shirin.plot.core import BarPlotOptions, InvalidOptionError, TimePlotOptions
 @pytest.mark.parametrize(
     "sort, match",
     [
-        ("alpabetical", "Invalid sort"),  # typo
+        ("alpabetical", "Invalid sort"),
         ("random", "Valid options"),
         ("Alphabetical", "Valid options"),  # uppercase is not normalized
     ],

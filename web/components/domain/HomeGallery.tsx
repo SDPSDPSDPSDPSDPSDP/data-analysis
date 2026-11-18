@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
-import { useGalleryOrder, type Chart } from "@/components/domain/useGalleryOrder";
+import { useGalleryOrder, type Chart } from "@/lib/domain/useGalleryOrder";
 import { sectionId } from "@/lib/sections";
 import { SITE_NAME } from "@/lib/site";
 import { useDarkMode } from "@/lib/darkMode";

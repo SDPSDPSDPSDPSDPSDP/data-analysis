@@ -19,6 +19,8 @@ wheels/
 # Virtual environments
 .venv
 .env
+.env.*
+!.env.example
 .vscode
 .claude/*
 !.claude/settings.json

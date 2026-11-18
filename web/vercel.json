@@ -4,6 +4,10 @@
   "cleanUrls": true,
   "headers": [
     {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }]
+    },
+    {
       "source": "/(opengraph-image|apple-icon)",
       "headers": [{ "key": "Content-Type", "value": "image/png" }]
     }

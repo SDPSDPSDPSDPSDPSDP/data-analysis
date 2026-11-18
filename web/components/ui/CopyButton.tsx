@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy, X } from "lucide-react";
+import IconButton from "@/components/ui/IconButton";
 
 type State = "idle" | "copied" | "failed";
 
@@ -26,8 +27,8 @@ export default function CopyButton({ copy }: { copy: () => Promise<void> }) {
 
   const Icon = ICONS[state];
   return (
-    <button type="button" className="icon-button copy-button" onClick={onClick} aria-label={LABELS[state]} title={LABELS[state]}>
+    <IconButton className="copy-button" onClick={onClick} aria-label={LABELS[state]} title={LABELS[state]}>
       <Icon size="1em" />
-    </button>
+    </IconButton>
   );
 }

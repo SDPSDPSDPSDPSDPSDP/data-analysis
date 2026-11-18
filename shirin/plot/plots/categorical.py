@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -42,7 +43,7 @@ def format_period_axis(chart: Chart, options: CategoricalPlotOptions) -> None:
         periods = pd.Series(pd.to_datetime(chart.x.tick_labels))
         format_period_ticks(chart, periods, pd.Series(chart.x.ticks), months=True)
     elif options.group_by == 'day':
-        step = -(-len(chart.x.ticks) // Layout.MAX_DAY_TICKS)
+        step = math.ceil(len(chart.x.ticks) / Layout.MAX_DAY_TICKS)
         chart.x.ticks, chart.x.tick_labels = chart.x.ticks[::step], chart.x.tick_labels[::step]  # type: ignore[index]
 
 

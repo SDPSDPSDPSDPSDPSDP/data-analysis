@@ -13,8 +13,8 @@ Scale = Callable[[float], float]
 
 
 def text(
-    x: float, y: float, s: str, size: float, color: str, anchor: str = 'start', bold: bool = False, rotate: float = 0, alpha: float = 1,
-    title: str = '', css_class: str = '',
+    x: float, y: float, s: str, size: float, color: str, anchor: str = 'start', bold: bool = False,
+    rotate: float = 0, alpha: float = 1, title: str = '', css_class: str = '',
 ) -> str:
     """title: smaller, faded text drawn right before s on the same baseline. css_class: style class from font_css."""
     attrs = f'x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{color}"'

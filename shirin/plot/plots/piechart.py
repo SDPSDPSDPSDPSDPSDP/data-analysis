@@ -66,11 +66,11 @@ class PieChart(AbstractPlot[pd.DataFrame]):
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         total = sum(self._values)
-        plot.legend = [
-            (color, label, format_percentage(val / total * 100, self.options.n_after_comma)
-             if self.options.legend_percentages else format_thousands(val))
-            for color, label, val in zip(self._colors, self._labels, self._values)
-        ]
+        if self.options.legend_percentages:
+            shown = [format_percentage(val / total * 100, self.options.n_after_comma) for val in self._values]
+        else:
+            shown = [format_thousands(val) for val in self._values]
+        plot.legend = list(zip(self._colors, self._labels, shown))
         for bg_color, autotext in zip(self._colors, self._autotexts):
             autotext.color = get_text_color_for_background(bg_color)
         headline_colors = [color for color, headline in zip(self._colors, self._headlines) if headline]

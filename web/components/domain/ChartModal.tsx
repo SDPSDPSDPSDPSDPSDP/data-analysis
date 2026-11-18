@@ -4,8 +4,10 @@ import { useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import IconButton from "@/components/ui/IconButton";
 import RunnableCode from "@/components/domain/RunnableCode";
 import SectionIcon from "@/components/domain/SectionIcon";
+import { isModifiedClick } from "@/lib/isModifiedClick";
 
 type Props = {
   title: string;
@@ -89,9 +91,9 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
       }}
     >
       <div className="chart-modal-actions">
-        <button type="button" className="icon-button chart-modal-button" onClick={close} aria-label="Close">
+        <IconButton className="chart-modal-button" onClick={close} aria-label="Close">
           <X size="1em" />
-        </button>
+        </IconButton>
       </div>
       <RunnableCode title={title} initialCode={code} setup={setup} preview={preview} />
       <Link
@@ -99,8 +101,7 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
         className="chart-modal-docs"
         onClick={(event) => {
           // Modified clicks open a new tab, the modal stays.
-          const isModifiedClick = event.ctrlKey || event.metaKey || event.shiftKey || event.button !== 0;
-          if (isModifiedClick) return;
+          if (isModifiedClick(event)) return;
           event.preventDefault();
           leave("to-docs", () => router.push(href));
         }}

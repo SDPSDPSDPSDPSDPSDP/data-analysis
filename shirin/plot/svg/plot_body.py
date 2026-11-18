@@ -34,7 +34,9 @@ def place_point_labels(texts: List[Text], sx: Scale, sy: Scale) -> List[Text]:
     return placed
 
 
-def draw_marks(chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]) -> List[str]:
+def draw_marks(
+    chart: Chart, texts: List[Text], sx: Scale, sy: Scale, plot_bottom: float, color: Callable[[str], str]
+) -> List[str]:
     body: List[str] = []
     # Data colors are never themed: a user's white slice must stay white, not turn into the background.
     body += [marks.wedge(w, sx, sy) for w in chart.wedges if w.end > w.start]
