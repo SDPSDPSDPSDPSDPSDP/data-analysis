@@ -8,9 +8,9 @@
     "prebuild": "node scripts/build-wheel.mjs && uv run python scripts/docstrings.py lib/docstrings.json && node scripts/build-previews.mjs",
     "build": "next build",
     "og": "node scripts/build-og.mjs",
-    "portfolio:stills": "node scripts/portfolio/stills.mjs",
-    "portfolio:upload": "node scripts/portfolio/upload.mjs",
-    "portfolio:compare": "node scripts/portfolio/upload.mjs --compare"
+    "portfolio:stills": "cd .. && portfolio-media stills",
+    "portfolio:upload": "cd .. && portfolio-media upload",
+    "portfolio:compare": "cd .. && portfolio-media compare"
   },
   "dependencies": {
     "@codemirror/lang-python": "6.2.1",
@@ -29,7 +29,8 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "playwright": "1.61.1",
+    "playwright": "1.65.1",
+    "portfolio-media": "0.1.0",
     "typescript": "5.9.3"
   }
 }
