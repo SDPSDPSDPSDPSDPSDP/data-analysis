@@ -30,3 +30,5 @@ portfolio-stills/
 
 # Wrangler local cache (account info)
 .wrangler/
+# Output of npm run portfolio:compare
+portfolio-compare.html
