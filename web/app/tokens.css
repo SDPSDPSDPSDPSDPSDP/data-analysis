@@ -1,0 +1,108 @@
+/* Sizes, type, spacing, motion and layers. Colors live in globals.css. */
+:root {
+  --glass-blur: 16px;
+  --glass-saturate: 180%;
+  /* Above CodeMirror gutters (z-index 200), which otherwise paint over the nav. */
+  --z-nav: 1000;
+  --z-tooltip: 1100;
+  --z-modal-editor: 1;
+  /* Claude Code window (transcript, skill viewer). */
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --terminal-marker-width: 2ch;
+  --terminal-chart-max-width: 520px;
+  --terminal-cursor-width: 1ch;
+  --terminal-cursor-blink: 1s;
+  --skill-files-width: 180px;
+  --skill-content-max-height: 520px;
+  --skill-icon-size: 40px;
+  --font-size-inline-code: 0.9em;
+  --font-body: var(--font-satoshi), sans-serif;
+  --font-heading: var(--font-futura), "Futura", sans-serif;
+  --font-size-brand: 28px;
+  --font-size-h2: clamp(32px, 8vw, 48px);
+  --font-size-h3: clamp(24px, 6vw, 32px);
+  --font-size-small: 13px;
+  --font-size-tiny: 10px;
+  --font-size-micro: 7px;
+  --font-size-eyebrow: 10px;
+  --docs-icon-size: 1.75em;
+  --docs-icon-stroke: 1.6;
+  --font-size-code: 14px;
+  --font-size-doc: 15px;
+  --font-size-doc-heading: 19px;
+  --font-weight-heading: 500;
+  --font-weight-nav: 500;
+  --font-weight-brand: 700;
+  --font-weight-doc-heading: 700;
+  --font-weight-card-title: 600;
+  --line-height-tight: 1.2;
+  --line-height-tooltip: 1.5;
+  --letter-spacing-heading: 0.015em;
+  --letter-spacing-eyebrow: 0.08em;
+  --letter-spacing-brand: 0.04em;
+  --space-0-25: 2px;
+  --space-0-5: 4px;
+  --space-1: 8px;
+  --space-1-5: 12px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-6: 48px;
+  --nav-height: 56px;
+  --nav-dim-opacity: 0.4;
+  --nav-dim-blur: 1.5px;
+  --nav-dim-transition: 350ms ease;
+  --nav-brand-hover-scale: 1.08;
+  --home-chart-min-width: 260px;
+  --portfolio-home-columns: 4;
+  --portfolio-still-columns: 5;
+  --portfolio-still-chart-scale: 100%;
+  --portfolio-still-chart-max-height: 170px;
+  --portfolio-still-gap: var(--space-6);
+  --z-demo-cursor: 1300;
+  --demo-cursor-size: 22px;
+  --demo-cursor-stroke-width: 1.5px;
+  --demo-cursor-fade: 200ms ease;
+  /* Tip of the arrow inside its 24px box, so the tip, not the corner, lands on the target. */
+  --demo-cursor-tip-x: 4px;
+  --demo-cursor-tip-y: 2px;
+  --home-chart-scale: 70%;
+  --home-chart-max-height: 150px;
+  --home-chart-hover-scale: 1.5;
+  --home-chart-enter-stagger: 180ms;
+  --home-chart-enter-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  --home-chart-grow-duration: 400ms;
+  --home-chart-fly-duration: 750ms;
+  --home-chart-fade-duration: 1000ms;
+  --docs-enter-stagger: 250ms;
+  --docs-enter-duration: 600ms;
+  /* Blocks past this one share its delay, so long pages don't keep the bottom waiting. */
+  --docs-enter-max-index: 8;
+  --modal-enter-content-delay: 300ms;
+  --modal-enter-content-duration: 900ms;
+  --modal-exit-duration: 180ms;
+  /* Same as the other cards growing back, so the chart lands as they settle. */
+  --modal-exit-fly-duration: var(--home-chart-grow-duration);
+  --radius: 6px;
+  --radius-home-chart: 10px;
+  /* Screen-reader-only box: 1px, not 0, so VoiceOver still announces it. */
+  --size-visually-hidden: 1px;
+  --radius-pill: 999px;
+  --radius-swatch: 2px;
+  --button-height: 28px;
+  --button-height-touch: 44px;
+  --transition: 120ms ease;
+  --theme-fade-duration: 400ms;
+  /* svh: stays put while the mobile address bar slides in and out. */
+  --runnable-height: 75svh;
+  --data-format-chart-height: 50svh;
+  --modal-chart-height: 55svh;
+  --chart-aspect-ratio: 4 / 3;
+  --shimmer-duration: 1.4s;
+  --tooltip-max-width: 560px;
+  --page-max-width: 960px;
+  --modal-width: min(90vw, 960px);
+  --tooltip-max-height: 400px;
+  --scrollbar-width: 6px;
+  --scrollbar-inset: 2px;
+  --z-scrollbar: 1200;
+}

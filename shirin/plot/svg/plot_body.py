@@ -6,7 +6,7 @@ from typing import Callable
 
 from ..config import Layout
 from ..config.colors import BACKGROUND_COLOR
-from . import marks
+from . import marks, text_marks
 from .chart import Chart, Text, Wedge
 from .fonts import wrap_text
 from .marks import Scale
@@ -31,16 +31,16 @@ def stack_texts(texts: list[Text]) -> list[Text]:
         if t.above is None:
             continue
         upper, lower = out[id(t)], out[id(t.above)]
-        lower_dy = -(marks.block_height(upper) + Layout.SLICE_LABEL_GAP) / 2
+        lower_dy = -(text_marks.block_height(upper) + Layout.SLICE_LABEL_GAP) / 2
         out[id(t.above)] = dataclasses.replace(lower, dy=lower_dy)
-        upper_dy = lower_dy + marks.block_height(lower) / 2 + Layout.SLICE_LABEL_GAP
+        upper_dy = lower_dy + text_marks.block_height(lower) / 2 + Layout.SLICE_LABEL_GAP
         out[id(t)] = dataclasses.replace(upper, va="bottom", dy=upper_dy, above=None)
     return [out[id(t)] for t in texts]
 
 
 def shorten_crowded_labels(texts: list[Text], sx: Scale, sy: Scale) -> list[Text]:
     """Copies with short_text swapped in when side-by-side labels overlap; the chart stays untouched."""
-    spans = sorted(marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
+    spans = sorted(text_marks.place(t, sx, sy)[2:4] for t in texts if t.short_text)
     gaps = (right[0] - left[1] for left, right in zip(spans, spans[1:]))
     if not any(gap < Layout.DATALABEL_MIN_SPACE for gap in gaps):
         return texts
@@ -69,39 +69,35 @@ def draw_marks(
     if chart.donut_hole:
         body.append(marks.wedge(Wedge(0, 1, color(BACKGROUND_COLOR), radius=chart.donut_hole), sx, sy))
     clip_ids: dict[int, str] = {}
-    fades: list[str] = []  # drawn after every segment, else the next segment covers them
     for r in chart.rects:
         if not (r.width and r.height):
             continue
         rect = marks.rect(r, sx, sy)
-        # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
-        fade = marks.fade(r, sx, sy, f"fade{next(_CLIP_IDS)}") if r.fade_to is not None else ""
         if r.clip is not None:
             if id(r.clip) not in clip_ids:
+                # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
                 clip_ids[id(r.clip)] = f"clip{next(_CLIP_IDS)}"
                 body.append(f'<clipPath id="{clip_ids[id(r.clip)]}">{marks.rect(r.clip, sx, sy)}</clipPath>')
             clip = f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" '
-            rect, fade = rect.replace("<rect ", clip, 1), fade.replace("<rect ", clip, 1)
+            rect = rect.replace("<rect ", clip, 1)
         body.append(rect)
-        fades.append(fade)
-    body += fades
     body += [marks.area(line, sx, sy, plot_bottom, f"area{next(_CLIP_IDS)}") for line in chart.lines if line.fill]
     body += [marks.line(line, sx, sy) for line in chart.lines]
     body += [marks.dots(dots, sx, sy) for dots in chart.dots]
     for t in texts:
         if t.text:
-            x, baseline = marks.place(t, sx, sy)[:2]
+            x, baseline = text_marks.place(t, sx, sy)[:2]
             text_color = t.color if t.keep_color else color(t.color)
-            for i, (title, line) in enumerate(zip(marks.line_titles(t), t.text.split("\n"))):
-                line_baseline = baseline + i * marks.line_step(t.size)
+            for i, (title, line) in enumerate(zip(text_marks.line_titles(t), t.text.split("\n"))):
+                line_baseline = baseline + i * text_marks.line_step(t.size)
                 body.append(
-                    marks.text(
+                    text_marks.text(
                         x,
                         line_baseline,
                         line,
                         t.size,
                         text_color,
-                        marks.ANCHOR[t.ha],
+                        text_marks.ANCHOR[t.ha],
                         alpha=t.alpha,
                         title=title,
                     )

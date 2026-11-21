@@ -53,6 +53,25 @@ def test_bar_group_by_rejects_incompatible_options(df: pd.DataFrame) -> None:
         PlotGraphs().bar(df, x="date", group_by="month", sort="frequency")
     with pytest.raises(ValueError, match="Valid options"):
         PlotGraphs().bar(df, x="date", group_by="week")
+    with pytest.raises(ValueError, match="does not work with sort, top_n"):
+        PlotGraphs().bar(df, x="date", group_by="month", top_n=2)
+    with pytest.raises(ValueError, match="does not work with sort, top_n"):
+        PlotGraphs().bar(df, x="date", value="value", group_by="month", normalized=True, remainder=True)
+
+
+def test_bar_group_by_works_for_counted_summed_and_normalized_bars(shown: list[str]) -> None:
+    df = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-05", "2024-03-02", "2024-03-09"]),
+            "shop": ["a", "b", "a"],
+            "sales": [1, 2, 3],
+        }
+    )
+    PlotGraphs().bar(df, x="date", hue="shop", stacked=True, group_by="month")
+    PlotGraphs().bar(df, x="date", value="sales", group_by="month")
+    PlotGraphs().bar(df, x="date", hue="shop", normalized=True, group_by="month")
+    for svg in shown:
+        assert svg.index(">Jan</text>") < svg.index(">Feb</text>") < svg.index(">Mar</text>")
 
 
 def test_bar_compact_labels(shown: list[str]) -> None:
@@ -91,6 +110,8 @@ def test_bar_description_line_under_each_category_label(shown: list[str]) -> Non
 def test_bar_description_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="description='notes' is not a column"):
         PlotGraphs().bar(DESCRIBED, y="name", description="notes")
+    with pytest.raises(ValueError, match="description='' is not a column"):
+        PlotGraphs().bar(DESCRIBED, y="name", description="")
     conflicting = pd.DataFrame({"name": ["a", "a"], "description": ["one", "two"]})
     with pytest.raises(ValueError, match=r"differs for \['a'\]"):
         PlotGraphs().bar(conflicting, y="name", description="description")
@@ -124,14 +145,13 @@ def test_stacked_bar_puts_largest_hue_first(shown: list[str]) -> None:
 
 def test_bar_split_option(df: pd.DataFrame, shown: list[str]) -> None:
     plot = PlotGraphs()
-    for split in ("rounded", "gradient", "flat"):
+    for split in ("rounded", "flat"):
         plot.bar(df, y="category", hue="group", stacked=True, split=split)
-    rounded, gradient, flat = shown
+    rounded, flat = shown
     assert "<linearGradient" not in rounded and "<clipPath" not in rounded
-    assert "<linearGradient" in gradient and "<clipPath" in gradient
     assert "<linearGradient" not in flat and "<clipPath" in flat
 
 
 def test_bar_rejects_unknown_split(df: pd.DataFrame) -> None:
     with pytest.raises(ValueError, match="split"):
-        PlotGraphs().bar(df, y="category", hue="group", stacked=True, split="wavy")
+        PlotGraphs().bar(df, y="category", hue="group", stacked=True, split="gradient")

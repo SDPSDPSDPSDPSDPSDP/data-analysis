@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 from ..config import FontSizes, Layout
-from . import marks
+from . import text_marks
 from .axis import Ticks, fit_x_ticks, limits, scale, tick_label_width, ticks
 from .chart import Chart, Text
 from .fonts import cap_height
@@ -66,7 +66,7 @@ def layout(chart: Chart, color: Color) -> Frame:
     # First pass at this size: measure what sticks out of the plot area, then shrink or grow to fit it.
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
     texts = shorten_crowded_labels(place_point_labels(stack_texts(chart.texts), sx, sy), sx, sy)
-    boxes = [marks.place(t, sx, sy)[2:] for t in texts if t.text]
+    boxes = [text_marks.place(t, sx, sy)[2:] for t in texts if t.text]
     shown_x_ticks = fit_x_ticks(chart.x, x_ticks, sx)
     if shown_x_ticks and not chart.x.rotation:
         position, label = max(shown_x_ticks, key=lambda tick: sx(tick[0]))

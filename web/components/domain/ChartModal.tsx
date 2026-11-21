@@ -25,24 +25,45 @@ type Props = {
   onClose: () => void;
 };
 
+// FLIP: figure laid out in place, CSS animates it between the card's rect and its own.
+// Measuring while already flying would read the card's spot, not the target, so the flight is dropped first.
+// Card measured each time: its hover growth from the click is gone by the time the chart flies back.
+function aim(chart: HTMLElement, card: HTMLElement) {
+  chart.classList.remove("flying");
+  const origin = card.getBoundingClientRect();
+  const target = chart.getBoundingClientRect();
+  chart.style.setProperty("--fly-x", `${origin.left - target.left}px`);
+  chart.style.setProperty("--fly-y", `${origin.top - target.top}px`);
+  chart.style.setProperty("--fly-scale", `${origin.width / target.width}`);
+  chart.classList.add("flying");
+}
+
+// Plain clicks animate the modal out first; modified clicks open a new tab and the modal stays.
+function DocsLink({ href, section, onNavigate }: { href: string; section: string; onNavigate: () => void }) {
+  return (
+    <Link
+      href={href}
+      className="chart-modal-docs"
+      onClick={(event) => {
+        if (isModifiedClick(event)) return;
+        event.preventDefault();
+        onNavigate();
+      }}
+    >
+      <SectionIcon title={section} />
+      <span className="chart-modal-docs-text">
+        <span className="chart-modal-docs-eyebrow">Documentation</span>
+        {section}
+      </span>
+    </Link>
+  );
+}
+
 export default function ChartModal({ title, setup, code, preview, card, href, section, onReturn, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const router = useRouter();
 
   const figure = () => dialog.current!.querySelector<HTMLElement>(".output .chart")!;
-
-  // FLIP: figure laid out in place, CSS animates it between the card's rect and its own.
-  // Measuring while already flying would read the card's spot, not the target, so the flight is dropped first.
-  // Card measured each time: its hover growth from the click is gone by the time the chart flies back.
-  function aim(chart: HTMLElement) {
-    chart.classList.remove("flying");
-    const origin = card.getBoundingClientRect();
-    const target = chart.getBoundingClientRect();
-    chart.style.setProperty("--fly-x", `${origin.left - target.left}px`);
-    chart.style.setProperty("--fly-y", `${origin.top - target.top}px`);
-    chart.style.setProperty("--fly-scale", `${origin.width / target.width}`);
-    chart.classList.add("flying");
-  }
 
   // Runs the closing animation (CSS picks it by `kind`), then `then` once the slowest part, the chart, is done.
   // Computed times are always in seconds; reduced motion drops the animation, so they read 0.
@@ -50,7 +71,7 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
     const modal = dialog.current!;
     if (modal.classList.contains("closing")) return;
     if (kind === "to-card") {
-      aim(figure());
+      aim(figure(), card);
       onReturn();
     }
     modal.classList.add("closing", kind);
@@ -67,13 +88,13 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
     if (!modal.open) modal.showModal();
     const chart = figure();
     // StrictMode runs this twice in dev, aim drops the first flight.
-    aim(chart);
+    aim(chart, card);
     // A close mid-flight reuses the class for the way back, it must stay on.
     const land = () => {
       if (!modal.classList.contains("closing")) chart.classList.remove("flying");
     };
     chart.addEventListener("animationend", land, { once: true });
-  }, []);
+  }, [card]);
 
   return (
     <dialog
@@ -96,22 +117,7 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
         </IconButton>
       </div>
       <RunnableCode title={title} initialCode={code} setup={setup} preview={preview} />
-      <Link
-        href={href}
-        className="chart-modal-docs"
-        onClick={(event) => {
-          // Modified clicks open a new tab, the modal stays.
-          if (isModifiedClick(event)) return;
-          event.preventDefault();
-          leave("to-docs", () => router.push(href));
-        }}
-      >
-        <SectionIcon title={section} />
-        <span className="chart-modal-docs-text">
-          <span className="chart-modal-docs-eyebrow">Documentation</span>
-          {section}
-        </span>
-      </Link>
+      <DocsLink href={href} section={section} onNavigate={() => leave("to-docs", () => router.push(href))} />
     </dialog>
   );
 }

@@ -57,44 +57,9 @@
     filter var(--nav-dim-transition);
 }
 
-.nav-menus:has(.nav-menu:hover, .nav-menu[data-demo-hover]) .nav-menu:not(:hover, [data-demo-hover]) {
+.nav-menus:has(.nav-menu:hover) .nav-menu:not(:hover) {
   opacity: var(--nav-dim-opacity);
   filter: blur(var(--nav-dim-blur));
-}
-
-.nav-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  flex-direction: column;
-  padding: var(--space-0-5);
-  white-space: nowrap;
-  border-radius: var(--radius);
-  background: var(--color-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow: var(--shadow-tooltip);
-}
-
-.nav-menu:hover .nav-dropdown,
-.nav-menu:focus-within .nav-dropdown {
-  display: flex;
-}
-
-.nav-menu.nav-menu-closed .nav-dropdown {
-  display: none;
-}
-
-.nav-dropdown a {
-  font-weight: var(--font-weight-nav);
-  padding: var(--space-1) var(--space-1-5);
-  border-radius: var(--radius);
-  transition: background var(--transition);
-}
-
-.nav-dropdown a:hover {
-  background: var(--color-surface);
 }
 
 .nav .nav-link {
@@ -106,10 +71,8 @@
   white-space: nowrap;
 }
 
-/* Negative margin keeps the padded button in line with the plain links. */
 .nav button.nav-link {
   padding: var(--space-1) var(--space-1-5);
-  margin: 0 calc(-1 * var(--space-1-5));
   border: none;
   outline: none;
   border-radius: var(--radius-pill);
@@ -127,17 +90,9 @@
   background: var(--color-surface);
 }
 
-.nav button.nav-link:not(.nav-theme)[aria-pressed="true"] {
-  background: var(--color-bg);
-}
-
 /* Right edge of the nav: the menus are centered absolutely, so auto margin pushes past them. */
 .nav button.nav-theme {
   margin: 0 0 0 auto;
-}
-
-.nav .nav-link-inactive {
-  color: var(--text-secondary);
 }
 
 /* Custom properties are not allowed in media queries. Centered menus would overlap the brand,

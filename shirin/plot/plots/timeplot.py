@@ -8,7 +8,7 @@ from ..common.formatting import format_period_ticks, format_ticks
 from ..config.colors import Colors
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
-from ..core.options import TimePlotOptions
+from ..core.time_options import TimePlotOptions
 from ..svg import Chart
 from ..svg.ticks import to_days
 

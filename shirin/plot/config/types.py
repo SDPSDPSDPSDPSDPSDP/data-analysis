@@ -20,7 +20,6 @@ class TimeGroupBy(str, Enum):
 
 class StackSplit(str, Enum):
     ROUNDED = "rounded"
-    GRADIENT = "gradient"
     FLAT = "flat"
 
 

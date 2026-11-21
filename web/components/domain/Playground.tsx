@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 import PlotSection from "@/components/domain/PlotSection";
 import { sectionId, type Category, type SetupCell } from "@/lib/sections";
 import { useDarkMode } from "@/lib/darkMode";
+import { useRevealOnScroll } from "@/lib/useRevealOnScroll";
 import { withDarkMode } from "@/lib/exampleSetup";
 
 type Props = {
@@ -32,21 +33,7 @@ export default function Playground({ title, setup, categories, showSetup, expand
     setSetupCode(toggle(setupCode));
   }
   const main = useRef<HTMLElement>(null);
-  // Blocks fade in the first time they scroll into view; ones arriving together stagger.
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries
-        .filter((entry) => entry.isIntersecting)
-        .forEach((entry, i) => {
-          const block = entry.target as HTMLElement;
-          block.style.setProperty("--i", `${i}`);
-          block.classList.add("seen");
-          observer.unobserve(block);
-        });
-    });
-    main.current!.querySelectorAll(":scope > :not(div), :scope > div > *").forEach((block) => observer.observe(block));
-    return () => observer.disconnect();
-  }, []);
+  useRevealOnScroll(main);
   return (
     <main className="page" ref={main}>
       <h1 className="visually-hidden">{title}</h1>

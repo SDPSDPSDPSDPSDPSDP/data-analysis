@@ -3,12 +3,11 @@
   overflow-x: auto;
 }
 
-/* separate, not collapse: border-radius is ignored on collapsed tables. */
+/* separate, not collapse: border-radius is ignored on collapsed tables. Rows separate by zebra background. */
 .data-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: var(--border-width) solid var(--color-shimmer);
   border-radius: var(--radius);
   overflow: hidden;
   font-size: var(--font-size-code);
@@ -20,12 +19,12 @@
   text-align: left;
 }
 
-.data-table td {
-  border-top: var(--border-width) solid var(--color-shimmer);
+.data-table tbody tr:nth-child(even) td {
+  background: var(--color-surface);
 }
 
 .data-table th {
-  background: var(--color-surface);
+  background: var(--color-shimmer);
   font-weight: var(--font-weight-doc-heading);
 }
 

@@ -3,7 +3,7 @@
 from typing import Callable
 
 from ..config import FontSizes, Layout, TextColors
-from . import marks
+from . import text_marks
 from .chart import Chart
 from .fonts import cap_height, text_width
 
@@ -46,7 +46,7 @@ def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> 
     ):
         if text:
             row_top = header_row(size)
-            title = marks.text(0, row_top + cap_height(size), text, size, text_color, bold=bold)
+            title = text_marks.text(0, row_top + cap_height(size), text, size, text_color, bold=bold)
             rows.append((text_width(text, size, bold), [title]))
     legend_rows = _legend_rows(chart.legend, max_width)
     if legend_rows and rows:
@@ -61,10 +61,10 @@ def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> 
             items.append(f'<circle cx="{x + radius:.2f}" cy="{center_y:.2f}" r="{radius}" fill="{swatch}"/>')
             baseline = center_y + cap_height(FontSizes.LEGEND) / 2
             label_x = x + Layout.SWATCH + Layout.SWATCH_GAP
-            items.append(marks.text(label_x, baseline, label, FontSizes.LEGEND, color(TextColors.DARK_GREY)))
+            items.append(text_marks.text(label_x, baseline, label, FontSizes.LEGEND, color(TextColors.DARK_GREY)))
             if value:
                 value_x = label_x + text_width(f"{label} ", FontSizes.LEGEND)
-                items.append(marks.text(value_x, baseline, value, FontSizes.LEGEND, color(TextColors.FAINT_GREY)))
+                items.append(text_marks.text(value_x, baseline, value, FontSizes.LEGEND, color(TextColors.FAINT_GREY)))
             x += item_width + Layout.LEGEND_ITEM_GAP
         rows.append((x - Layout.LEGEND_ITEM_GAP, items))
     plot_top = top - Layout.ROW_GAP + Layout.PLOT_GAP if rows else top

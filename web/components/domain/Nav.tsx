@@ -2,129 +2,62 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
 import { sectionId } from "@/lib/sections";
 import SectionIcon from "@/components/domain/SectionIcon";
-import { setDarkMode, useDarkMode } from "@/lib/darkMode";
-import { isModifiedClick } from "@/lib/isModifiedClick";
+import ThemeToggle from "@/components/domain/ThemeToggle";
+
+export type NavCategory = { title: string; sections: { title: string }[] };
 
 type Props = {
-  categories: { title: string; sections: { title: string }[] }[];
-  // Home only: these categories filter the page instead of linking to their own page.
-  filter?: {
-    categories: string[];
-    active: string | null;
-    onSelect: (title: string) => void;
-    // Cards shrink away before leaving home.
-    onLeave: (href: string) => void;
-  };
+  categories: NavCategory[];
 };
 
-export default function Nav({ categories, filter }: Props) {
+export default function Nav({ categories }: Props) {
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
   const pathname = usePathname();
-  const dark = useDarkMode();
-  // Tab flips the theme only while nothing has focus, so focus navigation and code editor indent keep working.
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Tab" || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-      if (document.activeElement !== document.body) return;
-      e.preventDefault();
-      setDarkMode(document.documentElement.dataset.theme !== "dark");
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-  // Modified clicks open a new tab, home stays as is.
-  function leave(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (!filter || isModifiedClick(e)) return;
-    e.preventDefault();
-    filter.onLeave(e.currentTarget.getAttribute("href")!);
-  }
   return (
     <nav className="nav">
-      {/* Home has no link to every example, so the brand leads there, unless a filter is on: then it clears the filter. */}
-      <Link
-        href={pathname === "/" && !filter?.active ? "/all" : "/"}
-        className="nav-brand"
-        onClick={(e) => {
-          if (!filter?.active) return leave(e);
-          e.preventDefault();
-          // Selecting the active category again clears the filter.
-          filter.onSelect(filter.active);
-        }}
-      >
+      {/* Home has no link to every example, so the brand leads there. */}
+      <Link href={pathname === "/" ? "/all" : "/"} className="nav-brand">
         data ink
       </Link>
       <div className="nav-menus">
-        {categories.map((category) =>
-          filter?.categories.includes(category.title) ? (
-            <div key={category.title} className="nav-menu">
-              <button
-                type="button"
-                className={
-                  filter.active && filter.active !== category.title ? "nav-link nav-link-inactive" : "nav-link"
-                }
-                aria-pressed={filter.active === category.title}
-                onClick={() => filter.onSelect(category.title)}
-              >
-                <SectionIcon title={category.title} />
-                {category.title}
-              </button>
-            </div>
-          ) : (
-            <div
-              key={category.title}
-              className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
-              // Layout wrapper; mouse-leave only resets the hover dropdown, keyboard users get it via :focus-within.
-              role="presentation"
-              onMouseLeave={() => setDropdownClosed(false)}
-            >
-              <Link
-                href={`/${sectionId(category.title)}`}
-                className={filter?.active ? "nav-link nav-link-inactive" : "nav-link"}
-                onClick={leave}
-              >
-                <SectionIcon title={category.title} />
-                {category.title}
-              </Link>
-              {category.sections.length > 1 && (
-                <div className="nav-dropdown">
-                  {category.sections.map((section) => (
-                    <Link
-                      key={section.title}
-                      href={`/${sectionId(category.title)}#${sectionId(section.title)}`}
-                      className="nav-link"
-                      onClick={(e) => {
-                        e.currentTarget.blur();
-                        setDropdownClosed(true);
-                        leave(e);
-                      }}
-                    >
-                      <SectionIcon title={section.title} />
-                      {section.title}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ),
-        )}
+        {categories.map((category) => (
+          <div
+            key={category.title}
+            className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
+            // Layout wrapper; mouse-leave only resets the hover dropdown, keyboard users get it via :focus-within.
+            role="presentation"
+            onMouseLeave={() => setDropdownClosed(false)}
+          >
+            <Link href={`/${sectionId(category.title)}`} className="nav-link">
+              <SectionIcon title={category.title} />
+              {category.title}
+            </Link>
+            {category.sections.length > 1 && (
+              <div className="nav-dropdown">
+                {category.sections.map((section) => (
+                  <Link
+                    key={section.title}
+                    href={`/${sectionId(category.title)}#${sectionId(section.title)}`}
+                    className="nav-link"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      setDropdownClosed(true);
+                    }}
+                  >
+                    <SectionIcon title={section.title} />
+                    {section.title}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-      <button
-        type="button"
-        className="nav-link nav-theme"
-        aria-pressed={dark}
-        aria-label="Dark mode"
-        title="Dark mode"
-        onClick={() => setDarkMode(!dark)}
-      >
-        {/* CSS picks the icon from data-theme, so the prerendered button already matches before hydration. */}
-        <Moon size="1em" className="dark-only" aria-hidden />
-        <Sun size="1em" className="light-only" aria-hidden />
-      </button>
+      <ThemeToggle />
     </nav>
   );
 }

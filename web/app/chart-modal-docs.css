@@ -1,0 +1,43 @@
+.chart-modal-docs {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1-5) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-overlay-button-light);
+  backdrop-filter: blur(var(--glass-blur));
+  color: var(--text-on-dark);
+  font-weight: var(--font-weight-nav);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+  transition: background var(--transition);
+}
+
+.chart-modal-docs > svg {
+  width: var(--docs-icon-size);
+  height: var(--docs-icon-size);
+  stroke-width: var(--docs-icon-stroke);
+}
+
+.chart-modal-docs-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-modal-docs-eyebrow {
+  color: var(--text-on-dark-secondary);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.chart-modal-docs:hover,
+.chart-modal-docs:focus-visible {
+  background: var(--color-overlay-button);
+}

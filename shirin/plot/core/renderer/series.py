@@ -5,11 +5,11 @@ from typing import Any, Optional
 import numpy as np
 import pandas as pd
 
-from ....number_format import format_fraction_percentage, format_thousands
-from ...config import FontSizes, Layout, Marks
-from ...svg import Chart, Dots, Line, Text
+from ...config import Marks
+from ...svg import Chart, Dots, Line
 from ...svg.ticks import to_days
 from .hue import hue_groups
+from .line_marks import add_marks, mark_texts, slopes
 
 
 def _numeric_x(chart: Chart, values: pd.Series) -> pd.Series:
@@ -51,69 +51,10 @@ def render_lineplot(
         line = group.groupby(x)[y].mean()
         chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))
         if marks is not None:
-            texts = _mark_texts(group[x], group[y], mark_labels, percentage_x, percentage_y)
+            texts = mark_texts(group[x], group[y], mark_labels, percentage_x, percentage_y)
             titles = axis_titles if mark_labels == "both" else ()
-            _add_marks(chart, group[group[marks]], x, y, texts, titles, group_color, _slopes(line))
+            add_marks(chart, group[group[marks]], x, y, texts, titles, group_color, slopes(line))
     return chart
-
-
-def _slopes(line: pd.Series) -> pd.Series:
-    if len(line) < 2:
-        return pd.Series(0.0, index=line.index)
-    xs, ys = line.index.values.astype(float), line.values.astype(float)
-    return pd.Series(np.gradient(ys, xs), index=line.index)
-
-
-def _mark_texts(
-    xs: pd.Series,
-    ys: pd.Series,
-    mark_labels: Optional[str],
-    percentage_x: bool,
-    percentage_y: bool,
-) -> pd.Series:
-    x_text = xs.map(format_fraction_percentage if percentage_x else format_thousands)
-    y_text = ys.map(format_fraction_percentage if percentage_y else format_thousands)
-    if mark_labels == "x":
-        return x_text
-    if mark_labels == "y":
-        return y_text
-    if mark_labels == "both":
-        return x_text + "\n" + y_text
-    return pd.Series("", index=xs.index)
-
-
-def _add_marks(
-    chart: Chart,
-    rows: pd.DataFrame,
-    x: str,
-    y: str,
-    texts: pd.Series,
-    titles: tuple[str, ...],
-    color: str,
-    slopes: pd.Series,
-) -> None:
-    """Dot plus text right of every row; the text sits below the line, or above where it falls (see place_point_labels)."""
-    if rows.empty:
-        return
-    chart.dots.append(Dots(list(rows[x]), list(rows[y]), [Marks.POINT_LABEL_DOT_RADIUS] * len(rows), color))
-    gap = Layout.POINT_LABEL_GAP
-    for px, py, text in zip(rows[x], rows[y], texts[rows.index]):
-        chart.texts.append(
-            Text(
-                px,
-                py,
-                text,
-                color,
-                FontSizes.POINT_LABELS,
-                "left",
-                "top",
-                dx=gap,
-                dy=-gap,
-                slope=float(slopes[px]),
-                keep_color=True,
-                line_titles=titles,
-            )
-        )
 
 
 def render_scatterplot(

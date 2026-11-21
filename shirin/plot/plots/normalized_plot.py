@@ -1,17 +1,18 @@
+import dataclasses
 from dataclasses import dataclass
 from typing import Any, Optional
 
 import pandas as pd
 
 from ..common.colors import palette_colors
-from ..common.data_conversion import ensure_column_is_string, filter_top_n_categories
+from ..common.data_conversion import COUNT_COL, ensure_column_is_string, filter_top_n_categories
 from ..common.formatting import format_datalabels_stacked_normalized, format_tick_descriptions, format_ticks
 from ..common.stacked_plots import largest_hue_first, sort_stacked_pivot
 from ..config import Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.categorical_options import NormalizedPlotOptions
-from .categorical import create_sized_figure, format_period_axis
+from .categorical_layout import create_sized_figure, format_period_axis, period_rows
 
 
 @dataclass
@@ -27,6 +28,11 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
     options: NormalizedPlotOptions
 
     def preprocess(self) -> pd.DataFrame:
+        if self.options.group_by is not None:
+            value = self.options.value
+            self.options = dataclasses.replace(
+                self.options, df=period_rows(self.options, value), value=value or COUNT_COL
+            )
         # crosstab aligns columns on the index, which fails on duplicate labels (e.g. after pd.concat).
         df = ensure_column_is_string(self.options.df, self.options.axis_column).reset_index(drop=True)
         df = self._resolve_hue_palette(df)
@@ -46,11 +52,11 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
 
     def transform(self, df: pd.DataFrame) -> NormalizedData:
         shares = self._shares(df)
-        if self.options.sort == "frequency":
+        if self.options.resolved_sort() == "frequency":
             # Every row sums to 1, so rank by the first segment's share instead.
             shares = shares.sort_values(shares.columns[0], ascending=self.options.orientation == "horizontal")
         else:
-            shares = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
+            shares = sort_stacked_pivot(shares, self.options.resolved_sort(), self.options.orientation)
         return NormalizedData(df, shares)
 
     def draw(self, data: NormalizedData) -> Any:

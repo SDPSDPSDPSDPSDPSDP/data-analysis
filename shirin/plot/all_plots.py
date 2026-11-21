@@ -13,8 +13,10 @@ from .config.palettes import (
 from .config.theme import Theme
 from .core import AbstractPlot
 from .graphs.bar import BarPlotsMixin
+from .graphs.line import LinePlotsMixin
 from .graphs.numeric import NumericPlotsMixin
 from .graphs.specialized import SpecializedPlotsMixin
+from .graphs.time import TimePlotsMixin
 from .svg import to_png, to_svg
 
 
@@ -31,7 +33,7 @@ def show(svg: str) -> None:
     display({"image/png": png}, metadata={"image/png": size}, raw=True)
 
 
-class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
+class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, LinePlotsMixin, SpecializedPlotsMixin, TimePlotsMixin):
     """A comprehensive plotting interface for creating data visualizations in a notebook.
 
     This class provides methods for creating various types of plots including

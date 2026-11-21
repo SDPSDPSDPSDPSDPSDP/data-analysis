@@ -1,0 +1,54 @@
+.page {
+  min-height: calc(100dvh - var(--nav-height));
+  background: var(--color-bg-home);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) max(var(--space-2), (100% - var(--page-max-width)) / 2);
+  gap: var(--space-2);
+}
+
+.page h2,
+.page h3 {
+  text-align: center;
+  scroll-margin-top: var(--nav-height);
+}
+
+.page h2 {
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-h2);
+}
+
+.page h3 {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+
+/* Sections sit in a category div, outside .page's flex gap. */
+.page > div > :is(h2, h3) + .setup-cell {
+  margin-top: var(--space-2);
+}
+
+.page h3 ~ h3 {
+  margin-top: var(--space-6);
+}
+
+/* Docs blocks wait hidden until Playground sees them scroll into view, then fade in fully.
+   Blocks seen together (the first screen on load) stagger by the --i it sets.
+   Hidden only when JS runs (data-js from layout.tsx), so pages stay readable without it. */
+:root[data-js] .page:not(.home) > :not(div):not(.seen),
+:root[data-js] .page:not(.home) > div > :not(.seen) {
+  opacity: 0;
+}
+
+.page:not(.home) > .seen,
+.page:not(.home) > div > .seen {
+  animation: chart-preview-in var(--docs-enter-duration) ease both;
+  animation-delay: calc(min(var(--i), var(--docs-enter-max-index)) * var(--docs-enter-stagger));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page:not(.home) > .seen,
+  .page:not(.home) > div > .seen {
+    animation: none;
+  }
+}

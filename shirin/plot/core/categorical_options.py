@@ -1,15 +1,18 @@
 from dataclasses import dataclass
 from typing import Any, ClassVar, Optional, Union
 
-from ..config import Sort, SortInput, StackSplit, StackSplitInput
+from ..config import Sort, SortInput, StackSplit, StackSplitInput, TimeGroupBy, TimeGroupByInput
 from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
     VALID_ORIENTATIONS,
     VALID_SORTS,
     VALID_STACK_SPLITS,
+    VALID_TIME_GROUP_BY,
     BasePlotOptions,
     validate_str_or_enum_option,
 )
+
+GROUP_BY_CONFLICT = "group_by does not work with sort, top_n or remainder."
 
 
 @dataclass
@@ -20,11 +23,12 @@ class CategoricalPlotOptions(BasePlotOptions):
     orientation: str = "vertical"
     stacked: bool = False
     split: StackSplitInput = "rounded"  # how stacked segments meet
-    sort: SortInput = "frequency"
+    sort: Optional[SortInput] = None  # None: 'frequency', or time order with group_by
     data_labels: bool = True
     compact_labels: bool = True
     suffix: Optional[str] = None
-    group_by: Optional[str] = None  # categories are date periods; 'month' gets month ticks with a year row
+    # axis_column holds dates, drawn as one bar per period; 'month' gets month ticks with a year row.
+    group_by: Optional[TimeGroupByInput] = None
     descriptions: Optional[dict[str, str]] = None  # {category: grey line under its tick label}
 
     def validate(self) -> None:
@@ -43,6 +47,7 @@ class CategoricalPlotOptions(BasePlotOptions):
             value=self.sort,
             valid_options=VALID_SORTS,
             enum_type=Sort,
+            allow_none=True,
         )
 
         validate_str_or_enum_option(
@@ -52,6 +57,9 @@ class CategoricalPlotOptions(BasePlotOptions):
             enum_type=StackSplit,
         )
 
+        if self.group_by is not None:
+            self._validate_group_by()
+
         if self.descriptions and self.group_by is not None:
             raise ValueError("descriptions do not work with group_by")
         if self.stacked and self.hue is None:
@@ -59,11 +67,35 @@ class CategoricalPlotOptions(BasePlotOptions):
         if self.stacked and self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) when stacked=True")
 
+    def resolved_sort(self) -> SortInput:
+        if self.sort is not None:
+            return self.sort
+        # ISO period labels sort alphabetically in time order.
+        return "alphabetical" if self.group_by is not None else "frequency"
+
+    def _validate_group_by(self) -> None:
+        validate_str_or_enum_option(
+            option_name="group_by",
+            value=self.group_by,
+            valid_options=VALID_TIME_GROUP_BY,
+            enum_type=TimeGroupBy,
+        )
+        self.group_by = TimeGroupBy(self.group_by).value
+        if self.orientation != "vertical":
+            raise ValueError("group_by needs x: periods run along the x-axis.")
+        if self.sort is not None:
+            raise ValueError(GROUP_BY_CONFLICT)
+
 
 @dataclass
 class CountPlotOptions(CategoricalPlotOptions):
     top_n: Optional[int] = None
     normalized: bool = False
+
+    def validate(self) -> None:
+        super().validate()
+        if self.group_by is not None and self.top_n is not None:
+            raise ValueError(GROUP_BY_CONFLICT)
 
 
 @dataclass
@@ -97,6 +129,8 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
             raise ValueError("hue must be specified for normalized plots")
         if self.palette is not None and not isinstance(self.palette, dict):
             raise ValueError("palette must be a dictionary (or None) for normalized plots")
+        if self.group_by is not None and self.top_n is not None:
+            raise ValueError(GROUP_BY_CONFLICT)
 
 
 @dataclass
@@ -115,6 +149,8 @@ class RemainderPlotOptions(NormalizedPlotOptions):
         # Skips NormalizedPlotOptions.validate: hue and palette describe the user's columns here,
         # RemainderPlot turns them into the normalized hue split.
         CategoricalPlotOptions.validate(self)
+        if self.group_by is not None:
+            raise ValueError(GROUP_BY_CONFLICT)
         if not self.value:
             raise ValueError("value column must be specified")
         if self.hue is not None and self.hue != self.axis_column:

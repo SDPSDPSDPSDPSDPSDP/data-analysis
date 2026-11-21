@@ -18,6 +18,22 @@ type Props = {
   dark: boolean;
 };
 
+function SkillHeader({ skill }: { skill: Skill }) {
+  return (
+    <div className="skill-header">
+      <span className="skill-icon">
+        <ScrollText size="1em" aria-hidden />
+      </span>
+      <div>
+        <div className="skill-name">{skill.name}</div>
+        <div className="skill-meta">
+          from {skill.plugin} plugin · v{skill.version}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SkillViewer({ skill, dark }: Props) {
   const [active, setActive] = useState(skill.files[0].name);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -50,17 +66,7 @@ export default function SkillViewer({ skill, dark }: Props) {
   };
   return (
     <TerminalWindow className="skill">
-      <div className="skill-header">
-        <span className="skill-icon">
-          <ScrollText size="1em" aria-hidden />
-        </span>
-        <div>
-          <div className="skill-name">{skill.name}</div>
-          <div className="skill-meta">
-            from {skill.plugin} plugin · v{skill.version}
-          </div>
-        </div>
-      </div>
+      <SkillHeader skill={skill} />
       <div className="skill-description">
         <p>{skill.description}</p>
       </div>

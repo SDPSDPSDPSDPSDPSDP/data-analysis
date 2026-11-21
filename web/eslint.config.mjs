@@ -1,5 +1,6 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
+import { builtinRules } from "eslint/use-at-your-own-risk";
 
 // Enforces the AGENTS.md hard rules that a linter can check.
 
@@ -9,12 +10,21 @@ const PX_ONLY_APIS = [
   ":not(AssignmentPattern[left.name=/^(rootMargin|sizes)$/] > *)",
   ":not(Property[key.name=/^(rootMargin|sizes)$/] *)",
 ].join("");
+
+// A rule takes one severity, so the 100 LOC warning runs as a second copy of max-lines.
+const size = { rules: { "max-lines-warn": builtinRules.get("max-lines") } };
+
 export default defineConfig([
   ...nextVitals,
   globalIgnores([".next/**", "node_modules/**", "out/**", "public/**", "next-env.d.ts"]),
   {
+    plugins: { size },
     rules: {
-      "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines": ["error", { max: 150, skipBlankLines: true, skipComments: true }],
+      "size/max-lines-warn": ["warn", { max: 100, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": ["error", { max: 60, skipBlankLines: true, skipComments: true }],
+      "max-nested-callbacks": ["error", 3],
+      "max-params": ["error", 4],
       "max-depth": ["error", 3],
       complexity: ["error", 15],
       "no-nested-ternary": "error",
@@ -27,6 +37,9 @@ export default defineConfig([
       "jsx-a11y/anchor-is-valid": "error",
       "jsx-a11y/html-has-lang": "error",
       "jsx-a11y/heading-has-content": "error",
+      // Static export has no image optimizer, and every <img> here shows an SVG or data URL or renders
+      // inside ImageResponse (apple-icon), where next/image does not work.
+      "@next/next/no-img-element": "off",
       "no-restricted-syntax": [
         "error",
         {
@@ -70,6 +83,11 @@ export default defineConfig([
         },
       ],
     },
+  },
+  {
+    // describe() wraps a whole suite; keep the per-function limit for app code.
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: { "max-lines-per-function": "off" },
   },
   {
     // Node CLI scripts (npm run <task>): stdout is their interface.

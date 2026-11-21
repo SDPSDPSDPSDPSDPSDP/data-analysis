@@ -5,20 +5,26 @@ import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
+import "./tokens.css";
 import "./base.css";
+import "./page.css";
+import "./buttons.css";
 import "./message-page.css";
 import "./nav.css";
+import "./nav-dropdown.css";
 import "./code.css";
 import "./copy-button.css";
 import "./doc-tooltip.css";
 import "./terminal.css";
 import "./skill.css";
+import "./skill-markdown.css";
 import "./examples.css";
 import "./data-table.css";
 import "./more-examples.css";
 import "./home.css";
 import "./chart-modal-motion.css";
 import "./chart-modal.css";
+import "./chart-modal-docs.css";
 
 const futura = localFont({
   src: "../public/fonts/FuturaND-Medium.woff2",

@@ -2,30 +2,12 @@ from typing import Optional
 
 import pandas as pd
 
-from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
-from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, TitleInput
-from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
-from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
-from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
-from .host import PlotHost
+from ..common.data_conversion import category_descriptions
+from ..config import SortInput, StackSplitInput, TimeGroupByInput, TitleInput
+from .bar_dispatch import BarDispatchMixin, BarModes, count_axis_labels
 
 
-def _check_group_by(
-    group_by: TimeGroupByInput, vertical: bool, sort: Optional[SortInput], top_n: Optional[int], remainder: bool
-) -> None:
-    validate_str_or_enum_option(
-        option_name="group_by",
-        value=group_by,
-        valid_options=VALID_TIME_GROUP_BY,
-        enum_type=TimeGroupBy,
-    )
-    if not vertical:
-        raise ValueError("group_by needs x: periods run along the x-axis.")
-    if sort is not None or top_n is not None or remainder:
-        raise ValueError("group_by does not work with sort, top_n or remainder.")
-
-
-class BarPlotsMixin(PlotHost):
+class BarPlotsMixin(BarDispatchMixin):
     def bar(
         self,
         df: pd.DataFrame,
@@ -83,8 +65,7 @@ class BarPlotsMixin(PlotHost):
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
             split: How segments of stacked and normalized bars meet. **Options:** `'rounded'` (each
-                segment ends in a rounded cap over the next), `'gradient'` (segments blend into each other),
-                `'flat'` (hard straight edge). *Default: `'rounded'`*.
+                segment ends in a rounded cap over the next), `'flat'` (hard straight edge). *Default: `'rounded'`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.
@@ -99,24 +80,9 @@ class BarPlotsMixin(PlotHost):
         if (x is None) == (y is None):
             raise ValueError("bar needs exactly one of x or y.")
         vertical = x is not None
-        if value is None:
-            # Without value bars count rows, so the count axis gets a label unless the user passed one ('' hides it).
-            if vertical and y_axis_label is None:
-                y_axis_label = "Count"
-            if not vertical and x_axis_label is None:
-                x_axis_label = "Count"
+        x_axis_label, y_axis_label = count_axis_labels(value, vertical, x_axis_label, y_axis_label)
         axis_column = x if vertical else y
-        # Read before group_by or remainder reshape df, which drop the description column.
-        descriptions = None
-        if description is not None:
-            descriptions = category_descriptions(df, axis_column, description)  # type: ignore[arg-type]
-        if group_by is not None:
-            _check_group_by(group_by, vertical, sort, top_n, remainder)
-            group_by = TimeGroupBy(group_by).value
-            df = period_totals(df, x, value, hue, group_by)  # type: ignore[arg-type]
-            # Counted per period up front, so the bars below sum COUNT_COL like any value column.
-            value = value or COUNT_COL
-            sort = "alphabetical"
+        descriptions = category_descriptions(df, axis_column, description) if description is not None else None  # type: ignore[arg-type]
         common = dict(
             df=df,
             axis_column=axis_column,
@@ -130,36 +96,13 @@ class BarPlotsMixin(PlotHost):
             legend=legend,
             data_labels=data_labels,
             compact_labels=compact_labels,
-            sort="frequency" if sort is None else sort,
+            sort=sort,
             split=split,
             group_by=group_by,
             descriptions=descriptions,
         )
+        modes = BarModes(top_n=top_n, remainder=remainder, normalized=normalized, stacked=stacked)
         if value is None:
-            if remainder:
-                raise ValueError("remainder needs value.")
-            common["top_n"] = top_n
-            if normalized and hue is not None:
-                self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
-            else:
-                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
-            return
-        if top_n is not None:
-            raise ValueError("top_n only works without value.")
-        common["value"] = value
-        if remainder:
-            if not normalized:
-                raise ValueError("remainder needs normalized=True.")
-            category_palette = self._column_config(hue)["palette"] if hue is not None else None
-            options = RemainderPlotOptions(
-                **{**common, **self._column_config(value)},
-                category_palette=category_palette,
-                background=self._theme.background,
-            )
-            self._render(RemainderPlot(options))
-            return
-        hue_splits_bars = hue is not None and hue != axis_column
-        if normalized and hue_splits_bars:
-            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
+            self._render_counted_bar(common, modes)
         else:
-            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))
+            self._render_summed_bar(common, value, modes)
