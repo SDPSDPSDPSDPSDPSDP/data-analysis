@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ class NormalizedData:
     # Share per hue level (columns) for each category (rows); every row sums to 1.
     shares: pd.DataFrame
     # (front, back) fill per bar when bars are colored by category, else None.
-    row_colors: Optional[List[Tuple[str, str]]] = None
+    row_colors: Optional[list[tuple[str, str]]] = None
 
 
 class NormalizedPlot(AbstractPlot[NormalizedData]):
@@ -37,22 +37,24 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
     def _shares(self, df: pd.DataFrame) -> pd.DataFrame:
         values = df[self.options.value] if self.options.value else None
         totals = pd.crosstab(
-            df[self.options.axis_column], df[self.options.hue],
-            values=values, aggfunc='sum' if values is not None else None,
+            df[self.options.axis_column],
+            df[self.options.hue],
+            values=values,
+            aggfunc="sum" if values is not None else None,
         ).fillna(0)
         return largest_hue_first(totals).div(totals.sum(axis=1), axis=0)
 
     def transform(self, df: pd.DataFrame) -> NormalizedData:
         shares = self._shares(df)
-        if self.options.sort == 'frequency':
+        if self.options.sort == "frequency":
             # Every row sums to 1, so rank by the first segment's share instead.
-            shares = shares.sort_values(shares.columns[0], ascending=self.options.orientation == 'horizontal')
+            shares = shares.sort_values(shares.columns[0], ascending=self.options.orientation == "horizontal")
         else:
             shares = sort_stacked_pivot(shares, self.options.sort, self.options.orientation)
         return NormalizedData(df, shares)
 
     def draw(self, data: NormalizedData) -> Any:
-        vertical = self.options.orientation == 'vertical'
+        vertical = self.options.orientation == "vertical"
         return renderer.render_stacked_barplot(
             create_sized_figure(self, data.df),
             df=data.shares,
@@ -65,8 +67,8 @@ class NormalizedPlot(AbstractPlot[NormalizedData]):
 
     def format_plot(self, plot: Any, data: NormalizedData) -> None:
         self._format_labels_and_legend(plot)
-        vertical = self.options.orientation == 'vertical'
-        format_tick_descriptions(plot, self.options.descriptions, 'x' if vertical else 'y')
+        vertical = self.options.orientation == "vertical"
+        format_tick_descriptions(plot, self.options.descriptions, "x" if vertical else "y")
 
         if vertical:
             format_ticks(plot, percentage_y=True)

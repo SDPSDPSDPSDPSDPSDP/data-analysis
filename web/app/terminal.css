@@ -56,7 +56,7 @@
 }
 
 .terminal-tool > .terminal-marker {
-  color: var(--color-terminal-tool);
+  color: var(--text-terminal-tool);
 }
 
 .terminal-pending,

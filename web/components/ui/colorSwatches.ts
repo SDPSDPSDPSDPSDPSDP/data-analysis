@@ -43,7 +43,8 @@ class ColorWidget extends WidgetType {
 const matcher = new MatchDecorator({
   regexp: /#[0-9a-fA-F]{6}\b/g,
   // Zero-length range: a widget spanning the match would replace the hex text.
-  decorate: (add, from, _to, match) => add(from, from, Decoration.widget({ widget: new ColorWidget(match[0]), side: -1 })),
+  decorate: (add, from, _to, match) =>
+    add(from, from, Decoration.widget({ widget: new ColorWidget(match[0]), side: -1 })),
 });
 
 export const colorSwatches = ViewPlugin.fromClass(

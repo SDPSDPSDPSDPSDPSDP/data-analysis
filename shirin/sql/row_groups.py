@@ -1,7 +1,6 @@
 """Parquet writer that buffers small fetch chunks into large row groups."""
 
 from pathlib import Path
-from typing import List
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -16,7 +15,7 @@ class RowGroupWriter:
 
     def __init__(self, path: Path, schema: pa.Schema) -> None:
         self._writer = pq.ParquetWriter(path, schema)
-        self._pending: List[pa.Table] = []
+        self._pending: list[pa.Table] = []
         self._rows = 0
 
     @property
@@ -38,7 +37,7 @@ class RowGroupWriter:
         self._writer.close()
 
 
-def drain(writer: RowGroupWriter, spilled: List[Path]) -> None:
+def drain(writer: RowGroupWriter, spilled: list[Path]) -> None:
     """Copy spilled chunks into writer one at a time, deleting each once read."""
     for path in spilled:
         writer.write(pq.read_table(path))

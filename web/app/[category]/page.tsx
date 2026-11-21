@@ -29,7 +29,13 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <>
       <Nav categories={categories} />
-      <Playground title={category.title} setup={getSetup()} categories={[category]} showSetup={slug !== "tools"} expanded />
+      <Playground
+        title={category.title}
+        setup={getSetup()}
+        categories={[category]}
+        showSetup={slug !== "tools"}
+        expanded
+      />
     </>
   );
 }

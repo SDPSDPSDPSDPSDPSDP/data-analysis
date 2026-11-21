@@ -4,6 +4,7 @@ Integration tests for palette key handling in categorical plots.
 These tests verify that boolean/integer (non-string) palette and label_map keys
 are applied correctly to bar colors and axis tick labels.
 """
+
 import pandas as pd
 
 from shirin.plot.config.colors import Colors
@@ -17,58 +18,50 @@ from shirin.plot.plots import BarPlot, CountPlot, NormalizedPlot
 
 class TestStackedCountPlotTextColors:
     """Integration tests for stacked count plot text color contrast."""
-    
+
     def test_stacked_countplot_boolean_palette_colors_applied(self):
         """Test that stacked countplot correctly uses boolean palette for bar colors."""
-        df = pd.DataFrame({
-            'category': ['A', 'A', 'A', 'B', 'B', 'B'],
-            'status': [True, True, False, True, False, False]
-        })
-        
-        palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
-        
-        options = CountPlotOptions(
-            df=df,
-            axis_column='category',
-            orientation='horizontal',
-            hue='status',
-            palette=palette,
-            stacked=True
+        df = pd.DataFrame(
+            {"category": ["A", "A", "A", "B", "B", "B"], "status": [True, True, False, True, False, False]}
         )
-        
+
+        palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
+
+        options = CountPlotOptions(
+            df=df, axis_column="category", orientation="horizontal", hue="status", palette=palette, stacked=True
+        )
+
         plot = CountPlot(options)
         plot.render()
-        
+
         assert plot._palette is not None
-        assert True in plot._palette or 'True' in plot._palette
+        assert True in plot._palette or "True" in plot._palette
 
 
 class TestStackedBarPlotTextColors:
     """Integration tests for stacked bar plot text color contrast."""
-    
+
     def test_stacked_barplot_boolean_palette_colors_applied(self):
         """Test that stacked barplot correctly uses boolean palette."""
-        df = pd.DataFrame({
-            'category': ['A', 'A', 'B', 'B'],
-            'status': [True, False, True, False],
-            'value': [10, 20, 15, 25]
-        })
-        
+        df = pd.DataFrame(
+            {"category": ["A", "A", "B", "B"], "status": [True, False, True, False], "value": [10, 20, 15, 25]}
+        )
+
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
-        
+
         options = BarPlotOptions(
             df=df,
-            axis_column='category',
-            value='value',
-            orientation='horizontal',
-            hue='status',
+            axis_column="category",
+            value="value",
+            orientation="horizontal",
+            hue="status",
             palette=palette,
-            stacked=True
+            stacked=True,
         )
-        
+
         plot = BarPlot(options)
         plot.render()
-        
+
         assert plot._palette is not None
 
 
@@ -77,18 +70,15 @@ class TestNormalizedPlotPaletteKeys:
 
     def test_normalized_countplot_boolean_palette_keys_do_not_raise(self):
         """Test that normalized count plot accepts boolean hue values with boolean-keyed palette."""
-        df = pd.DataFrame({
-            'category': ['A', 'A', 'B', 'B'],
-            'status': [True, False, True, False]
-        })
+        df = pd.DataFrame({"category": ["A", "A", "B", "B"], "status": [True, False, True, False]})
 
         palette = {True: Colors.BAD_RED, False: Colors.GOOD_GREEN}
 
         options = NormalizedPlotOptions(
             df=df,
-            axis_column='category',
-            orientation='vertical',
-            hue='status',
+            axis_column="category",
+            orientation="vertical",
+            hue="status",
             palette=palette,
             data_labels=False,
         )
@@ -97,7 +87,7 @@ class TestNormalizedPlotPaletteKeys:
         plot.render()
         plot.options.validate()
 
-        assert list(plot.transform(plot.preprocess()).shares.columns) == ['False', 'True']
+        assert list(plot.transform(plot.preprocess()).shares.columns) == ["False", "True"]
 
 
 class TestAxisLabelMapping:
@@ -105,15 +95,17 @@ class TestAxisLabelMapping:
 
     def test_countplot_applies_label_map_to_axis_ticks_without_legend(self):
         """CountPlot should map categorical axis ticks using label_map even when legend is hidden."""
-        df = pd.DataFrame({
-            'is_contentious': [0, 0, 1, 1, 1],
-        })
+        df = pd.DataFrame(
+            {
+                "is_contentious": [0, 0, 1, 1, 1],
+            }
+        )
 
         options = CountPlotOptions(
             df=df,
-            axis_column='is_contentious',
-            orientation='vertical',
-            label_map={0: 'Non-Contentious', 1: 'Contentious'},
+            axis_column="is_contentious",
+            orientation="vertical",
+            label_map={0: "Non-Contentious", 1: "Contentious"},
             legend=False,
             data_labels=False,
         )
@@ -122,24 +114,26 @@ class TestAxisLabelMapping:
         chart = plot.render()
 
         xtick_labels = chart.x.tick_labels
-        assert 'Non-Contentious' in xtick_labels
-        assert 'Contentious' in xtick_labels
-        assert '0' not in xtick_labels
-        assert '1' not in xtick_labels
+        assert "Non-Contentious" in xtick_labels
+        assert "Contentious" in xtick_labels
+        assert "0" not in xtick_labels
+        assert "1" not in xtick_labels
 
     def test_barplot_applies_label_map_to_horizontal_axis_ticks(self):
         """BarPlot should map horizontal categorical axis ticks using label_map."""
-        df = pd.DataFrame({
-            'is_contentious': [0, 1],
-            'count': [12, 7],
-        })
+        df = pd.DataFrame(
+            {
+                "is_contentious": [0, 1],
+                "count": [12, 7],
+            }
+        )
 
         options = BarPlotOptions(
             df=df,
-            axis_column='is_contentious',
-            value='count',
-            orientation='horizontal',
-            label_map={0: 'Non-Contentious', 1: 'Contentious'},
+            axis_column="is_contentious",
+            value="count",
+            orientation="horizontal",
+            label_map={0: "Non-Contentious", 1: "Contentious"},
             legend=False,
             normalized=False,
         )
@@ -148,7 +142,7 @@ class TestAxisLabelMapping:
         chart = plot.render()
 
         ytick_labels = chart.y.tick_labels
-        assert 'Non-Contentious' in ytick_labels
-        assert 'Contentious' in ytick_labels
-        assert '0' not in ytick_labels
-        assert '1' not in ytick_labels
+        assert "Non-Contentious" in ytick_labels
+        assert "Contentious" in ytick_labels
+        assert "0" not in ytick_labels
+        assert "1" not in ytick_labels

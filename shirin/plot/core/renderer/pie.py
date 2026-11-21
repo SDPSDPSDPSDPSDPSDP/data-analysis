@@ -1,5 +1,4 @@
 import math
-from typing import List, Tuple
 
 from ....number_format import format_percentage
 from ...config import FontSizes, Layout, Marks, TextColors
@@ -19,15 +18,15 @@ def _label_radius(share: float, default: float) -> float:
 
 def render_piechart(
     chart: Chart,
-    values: List[float],
-    colors: List[str],
+    values: list[float],
+    colors: list[str],
     donut: bool,
     n_after_comma: int,
     value_datalabel: int,
     pctdistance: float,
-    headlines: List[str],
+    headlines: list[str],
     datalabels: bool = True,
-) -> Tuple[List[Text], List[Text]]:
+) -> tuple[list[Text], list[Text]]:
     """Draw the pie clockwise from 12 o'clock.
 
     headlines: one per slice ('' = none), drawn large above the slice's percentage (centered when it has none).
@@ -37,8 +36,8 @@ def render_piechart(
     chart.x.lim = chart.y.lim = (-1 / Marks.PIE_RADIUS, 1 / Marks.PIE_RADIUS)
     chart.x.visible = chart.y.visible = False
     total = sum(values)
-    texts: List[Text] = []
-    headline_texts: List[Text] = []
+    texts: list[Text] = []
+    headline_texts: list[Text] = []
     has_headline = any(headlines)
     percentage_size = FontSizes.DATALABELS if has_headline else FontSizes.TEXT
     percentage_alpha = Marks.SLICE_PERCENTAGE_ALPHA if has_headline else 1
@@ -51,14 +50,22 @@ def render_piechart(
         # A donut's middle is the hole, so its labels stay on the ring.
         radius = _label_radius(end - start, pctdistance) if headline and not donut else pctdistance
         x, y = radius * math.sin(angle), radius * math.cos(angle)
-        label = format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else ''
+        label = format_percentage(percentage, n_after_comma) if percentage >= value_datalabel else ""
         percentage_text = Text(x, y, label, TextColors.BLACK, percentage_size, alpha=percentage_alpha, keep_color=True)
         texts.append(percentage_text)
         if headline:
-            headline_texts.append(Text(
-                x, y, headline, TextColors.BLACK, FontSizes.SLICE_LABEL, keep_color=True,
-                wrap_width=Layout.SLICE_LABEL_MAX_WIDTH, above=percentage_text if datalabels and label else None,
-            ))
+            headline_texts.append(
+                Text(
+                    x,
+                    y,
+                    headline,
+                    TextColors.BLACK,
+                    FontSizes.SLICE_LABEL,
+                    keep_color=True,
+                    wrap_width=Layout.SLICE_LABEL_MAX_WIDTH,
+                    above=percentage_text if datalabels and label else None,
+                )
+            )
         start = end
     if donut:
         chart.donut_hole = Marks.DONUT_HOLE_RADIUS

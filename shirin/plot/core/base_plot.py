@@ -1,6 +1,5 @@
 import dataclasses
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar, Union
 
 import pandas as pd
 
@@ -11,23 +10,23 @@ from ..config import Colors, FigureSize, TitleInput
 from ..svg import Chart
 from .base_options import BasePlotOptions
 
-PlotPalette = Optional[Union[Dict[Any, str], str]]
+PlotPalette = Optional[Union[dict[Any, str], str]]
 # What transform() hands to draw() and format_plot(): a DataFrame, or a plot's own dataclass.
-DataT = TypeVar('DataT')
+DataT = TypeVar("DataT")
 
 
-def split_title(title: Optional[TitleInput], name: str = 'title') -> Tuple[str, str]:
+def split_title(title: Optional[TitleInput], name: str = "title") -> tuple[str, str]:
     """A str is the text alone; a [text, subtext] list adds a grey second line. name is the argument, for errors."""
     if title is None:
-        return '', ''
+        return "", ""
     if isinstance(title, str):
-        return title, ''
+        return title, ""
     if isinstance(title, (list, tuple)) and len(title) == 2 and all(isinstance(t, str) for t in title):
         return title[0], title[1]
     raise ValueError(f"{name} must be a str or a [text, subtext] list of two str, got {title!r}")
 
 
-def split_palette(palette: PlotPalette) -> Tuple[Optional[str], Optional[Dict[Any, str]]]:
+def split_palette(palette: PlotPalette) -> tuple[Optional[str], Optional[dict[Any, str]]]:
     """Return (single color, per-hue palette): a dict maps hue values, a str is one color."""
     if isinstance(palette, dict):
         return None, palette
@@ -36,12 +35,12 @@ def split_palette(palette: PlotPalette) -> Tuple[Optional[str], Optional[Dict[An
     return Colors.GREY, None
 
 
-class AbstractPlot(ABC, Generic[DataT]):
+class AbstractPlot(Generic[DataT]):
     def __init__(self, options: BasePlotOptions):
         self.options = options
         self.chart: Optional[Chart] = None
         self._color: Optional[str] = None
-        self._palette: Optional[Dict[Any, str]] = None
+        self._palette: Optional[dict[Any, str]] = None
 
     def render(self) -> Chart:
         # Work on a copy: validate() normalizes fields, the caller's options stay untouched.
@@ -53,21 +52,17 @@ class AbstractPlot(ABC, Generic[DataT]):
         self.format_plot(chart, data)
         return chart
 
-    @abstractmethod
     def preprocess(self) -> pd.DataFrame:
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def transform(self, df: pd.DataFrame) -> DataT:
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def draw(self, data: DataT) -> Chart:
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def format_plot(self, plot: Chart, data: DataT) -> None:
-        pass
+        raise NotImplementedError
 
     def _new_chart(self, width: Optional[float], plot_height: float) -> Chart:
         """width None makes the plot area square (pie)."""
@@ -80,8 +75,8 @@ class AbstractPlot(ABC, Generic[DataT]):
 
     def _format_labels_and_legend(self, plot: Any) -> None:
         options = self.options
-        plot.x.label, plot.x.sublabel = split_title(options.x_axis_label, 'x_axis_label')
-        plot.y.label, plot.y.sublabel = split_title(options.y_axis_label, 'y_axis_label')
+        plot.x.label, plot.x.sublabel = split_title(options.x_axis_label, "x_axis_label")
+        plot.y.label, plot.y.sublabel = split_title(options.y_axis_label, "y_axis_label")
         format_optional_legend(plot, options.hue, options.legend, options.label_map)
 
     def _resolve_hue_palette(self, df: pd.DataFrame, no_hue_color: Optional[str] = None) -> pd.DataFrame:

@@ -8,7 +8,14 @@ const STREAM: Partial<Record<Line["kind"], { chars: number; delay: number }>> = 
   prompt: { chars: 1, delay: 35 },
   reply: { chars: 6, delay: 16 },
 };
-const LINE_DELAY: Record<Line["kind"], number> = { prompt: 400, tool: 350, reply: 250, result: 150, chart: 400, gap: 0 };
+const LINE_DELAY: Record<Line["kind"], number> = {
+  prompt: 400,
+  tool: 350,
+  reply: 250,
+  result: 150,
+  chart: 400,
+  gap: 0,
+};
 const CODE_LINE_DELAY = 40;
 
 // Transcript syntax: "> " user prompt, "* " Claude step (tool call when it reads Name(...)), indented lines its output,

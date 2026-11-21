@@ -1,20 +1,21 @@
 """Title, subtitle and legend rows above the plot area."""
-from typing import Callable, List, Tuple
+
+from typing import Callable
 
 from ..config import FontSizes, Layout, TextColors
 from . import marks
 from .chart import Chart
 from .fonts import cap_height, text_width
 
-HeaderRow = Tuple[float, List[str]]
+HeaderRow = tuple[float, list[str]]
 
 
-def _legend_rows(items: List[Tuple[str, str, str]], max_width: float) -> List[List[Tuple[str, str, str, float]]]:
+def _legend_rows(items: list[tuple[str, str, str]], max_width: float) -> list[list[tuple[str, str, str, float]]]:
     """One row of swatch + label items, wrapped when wider than the plot area."""
-    rows: List[List[Tuple[str, str, str, float]]] = [[]]
+    rows: list[list[tuple[str, str, str, float]]] = [[]]
     used = 0.0
     for color, label, value in items:
-        width = Layout.SWATCH + Layout.SWATCH_GAP + text_width(f'{label} {value}'.strip(), FontSizes.LEGEND)
+        width = Layout.SWATCH + Layout.SWATCH_GAP + text_width(f"{label} {value}".strip(), FontSizes.LEGEND)
         if rows[-1] and used + Layout.LEGEND_ITEM_GAP + width > max_width:
             rows.append([])
             used = 0.0
@@ -23,12 +24,12 @@ def _legend_rows(items: List[Tuple[str, str, str]], max_width: float) -> List[Li
     return [row for row in rows if row]
 
 
-def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> Tuple[List[HeaderRow], float]:
+def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> tuple[list[HeaderRow], float]:
     """(width, svg items) per row and the plot top below them.
 
     Rows are drawn from x=0 and shifted to center on the image once its final width is known.
     """
-    rows: List[HeaderRow] = []
+    rows: list[HeaderRow] = []
     top = float(Layout.PAD)
 
     def header_row(height: float) -> float:
@@ -55,14 +56,14 @@ def header_rows(chart: Chart, max_width: float, color: Callable[[str], str]) -> 
         row_top = header_row(Layout.SWATCH)
         center_y = row_top + radius
         x = 0.0
-        items: List[str] = []
+        items: list[str] = []
         for swatch, label, value, item_width in row:
             items.append(f'<circle cx="{x + radius:.2f}" cy="{center_y:.2f}" r="{radius}" fill="{swatch}"/>')
             baseline = center_y + cap_height(FontSizes.LEGEND) / 2
             label_x = x + Layout.SWATCH + Layout.SWATCH_GAP
             items.append(marks.text(label_x, baseline, label, FontSizes.LEGEND, color(TextColors.DARK_GREY)))
             if value:
-                value_x = label_x + text_width(f'{label} ', FontSizes.LEGEND)
+                value_x = label_x + text_width(f"{label} ", FontSizes.LEGEND)
                 items.append(marks.text(value_x, baseline, value, FontSizes.LEGEND, color(TextColors.FAINT_GREY)))
             x += item_width + Layout.LEGEND_ITEM_GAP
         rows.append((x - Layout.LEGEND_ITEM_GAP, items))

@@ -24,7 +24,9 @@
   font: inherit;
   background: none;
   color: var(--text-on-dark-secondary);
-  transition: background var(--transition), color var(--transition);
+  transition:
+    background var(--transition),
+    color var(--transition);
 }
 
 .chart-modal-button:hover,
@@ -115,5 +117,10 @@ html:has(.chart-modal[open]) {
 
 /* Default shimmer is black on light, invisible on the dark backdrop. */
 .chart-modal .skeleton {
-  background-image: linear-gradient(90deg, var(--color-button) 25%, var(--color-button-hover) 50%, var(--color-button) 75%);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-button) 25%,
+    var(--color-button-hover) 50%,
+    var(--color-button) 75%
+  );
 }

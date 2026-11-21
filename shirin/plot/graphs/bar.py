@@ -9,6 +9,21 @@ from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
 
 
+def _check_group_by(
+    group_by: TimeGroupByInput, vertical: bool, sort: Optional[SortInput], top_n: Optional[int], remainder: bool
+) -> None:
+    validate_str_or_enum_option(
+        option_name="group_by",
+        value=group_by,
+        valid_options=VALID_TIME_GROUP_BY,
+        enum_type=TimeGroupBy,
+    )
+    if not vertical:
+        raise ValueError("group_by needs x: periods run along the x-axis.")
+    if sort is not None or top_n is not None or remainder:
+        raise ValueError("group_by does not work with sort, top_n or remainder.")
+
+
 class BarPlotsMixin:
     def bar(
         self,
@@ -27,7 +42,7 @@ class BarPlotsMixin:
         compact_labels: bool = True,
         stacked: bool = False,
         normalized: bool = False,
-        split: StackSplitInput = 'rounded',
+        split: StackSplitInput = "rounded",
         sort: Optional[SortInput] = None,
         top_n: Optional[int] = None,
         remainder: bool = False,
@@ -81,36 +96,30 @@ class BarPlotsMixin:
                 `sort`, `top_n` or `remainder`. **Options:** `'year'`, `'month'`, `'day'`. *Optional*.
         """
         if (x is None) == (y is None):
-            raise ValueError('bar needs exactly one of x or y.')
+            raise ValueError("bar needs exactly one of x or y.")
         vertical = x is not None
         if value is None:
             # Without value bars count rows, so the count axis gets a label unless the user passed one ('' hides it).
             if vertical and y_axis_label is None:
-                y_axis_label = 'Count'
+                y_axis_label = "Count"
             if not vertical and x_axis_label is None:
-                x_axis_label = 'Count'
+                x_axis_label = "Count"
         axis_column = x if vertical else y
         # Read before group_by or remainder reshape df, which drop the description column.
         descriptions = None
         if description is not None:
             descriptions = category_descriptions(df, axis_column, description)  # type: ignore[arg-type]
         if group_by is not None:
-            validate_str_or_enum_option(
-                option_name='group_by', value=group_by, valid_options=VALID_TIME_GROUP_BY, enum_type=TimeGroupBy,
-            )
-            if not vertical:
-                raise ValueError('group_by needs x: periods run along the x-axis.')
-            if sort is not None or top_n is not None or remainder:
-                raise ValueError('group_by does not work with sort, top_n or remainder.')
+            _check_group_by(group_by, vertical, sort, top_n, remainder)
             group_by = TimeGroupBy(group_by).value
             df = period_totals(df, x, value, hue, group_by)  # type: ignore[arg-type]
             # Counted per period up front, so the bars below sum COUNT_COL like any value column.
             value = value or COUNT_COL
-            sort = 'alphabetical'
+            sort = "alphabetical"
         common = dict(
             df=df,
             axis_column=axis_column,
-            orientation='vertical' if vertical else 'horizontal',
+            orientation="vertical" if vertical else "horizontal",
             hue=hue,
             **self._column_config(hue),
             title=title,
@@ -120,31 +129,35 @@ class BarPlotsMixin:
             legend=legend,
             data_labels=data_labels,
             compact_labels=compact_labels,
-            sort='frequency' if sort is None else sort,
+            sort="frequency" if sort is None else sort,
             split=split,
             group_by=group_by,
             descriptions=descriptions,
         )
         if value is None:
             if remainder:
-                raise ValueError('remainder needs value.')
-            common['top_n'] = top_n
+                raise ValueError("remainder needs value.")
+            common["top_n"] = top_n
             if normalized and hue is not None:
                 self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
             else:
                 self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
             return
         if top_n is not None:
-            raise ValueError('top_n only works without value.')
-        common['value'] = value
+            raise ValueError("top_n only works without value.")
+        common["value"] = value
         if remainder:
             if not normalized:
-                raise ValueError('remainder needs normalized=True.')
-            self._render(RemainderPlot(RemainderPlotOptions(
-                **{**common, **self._column_config(value)},
-                category_palette=self._column_config(hue)['palette'] if hue is not None else None,
-                background=self._theme.background,
-            )))
+                raise ValueError("remainder needs normalized=True.")
+            self._render(
+                RemainderPlot(
+                    RemainderPlotOptions(
+                        **{**common, **self._column_config(value)},
+                        category_palette=self._column_config(hue)["palette"] if hue is not None else None,
+                        background=self._theme.background,
+                    )
+                )
+            )
             return
         hue_splits_bars = hue is not None and hue != axis_column
         if normalized and hue_splits_bars:

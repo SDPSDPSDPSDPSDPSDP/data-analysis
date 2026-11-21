@@ -48,8 +48,14 @@ class TimePlot(AbstractPlot[TimeData]):
     def draw(self, data: TimeData) -> Any:
         options = self.options
         return renderer.render_lineplot(
-            self._standard_chart(), df=data.df, x=options.x, y=data.y, hue=options.hue,
-            color=self._color, palette=self._palette, fill=options.fill,
+            self._standard_chart(),
+            df=data.df,
+            x=options.x,
+            y=data.y,
+            hue=options.hue,
+            color=self._color,
+            palette=self._palette,
+            fill=options.fill,
         )
 
     def format_plot(self, plot: Any, data: TimeData) -> None:
@@ -60,8 +66,8 @@ class TimePlot(AbstractPlot[TimeData]):
 
     def _format_date_axis(self, chart: Chart, periods: pd.Series) -> None:
         """Year ticks, month ticks with a year row below, or automatic day ticks."""
-        if self.options.group_by == 'day':
-            chart.x.date_format = '%Y-%m-%d'
+        if self.options.group_by == "day":
+            chart.x.date_format = "%Y-%m-%d"
             return
-        months = self.options.group_by == 'month' and self.options.display_month
+        months = self.options.group_by == "month" and self.options.display_month
         format_period_ticks(chart, periods, to_days(periods), months)

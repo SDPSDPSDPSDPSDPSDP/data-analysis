@@ -9,6 +9,13 @@ from .scatterplot import ScatterPlot
 from .timeplot import TimePlot
 
 __all__ = [
-    'CountPlot', 'BarPlot', 'Histogram', 'PieChart', 'NormalizedPlot', 'RemainderPlot', 'TimePlot',
-    'ScatterPlot', 'LinePlot',
+    "BarPlot",
+    "CountPlot",
+    "Histogram",
+    "LinePlot",
+    "NormalizedPlot",
+    "PieChart",
+    "RemainderPlot",
+    "ScatterPlot",
+    "TimePlot",
 ]

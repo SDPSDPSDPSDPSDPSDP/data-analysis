@@ -2,7 +2,7 @@ import pandas as pd
 
 from ..number_format import format_thousands
 
-_PRINTED = (('Mean', 'mean'), ('Median', 'median'), ('Minimum', 'min'), ('Maximum', 'max'))
+_PRINTED = (("Mean", "mean"), ("Median", "median"), ("Minimum", "min"), ("Maximum", "max"))
 
 
 @pd.api.extensions.register_series_accessor("stats")
@@ -13,11 +13,11 @@ class StatsAccessor:
     def __call__(self, printing: bool = True):
         missing_values = int(self._obj.isna().sum())
         stats = {
-            'mean': self._obj.mean(),
-            'median': self._obj.median(),
-            'min': self._obj.min(),
-            'max': self._obj.max(),
-            'missing_values': missing_values,
+            "mean": self._obj.mean(),
+            "median": self._obj.median(),
+            "min": self._obj.min(),
+            "max": self._obj.max(),
+            "missing_values": missing_values,
         }
         if not printing:
             return stats

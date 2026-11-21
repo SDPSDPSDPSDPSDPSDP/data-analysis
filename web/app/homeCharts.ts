@@ -26,7 +26,8 @@ export function getHomeCharts(): HomeChart[] {
           const setup = exampleSetup(globalSetup, section.setup, example);
           const { title, subtitle, previewCode } = splitTitle(example.code);
           const cardCode = `${setup}\n${previewCode}`;
-          if (!example.preview || !example.darkPreview) throw new Error(`Home gallery example has no preview:\n${example.code}`);
+          if (!example.preview || !example.darkPreview)
+            throw new Error(`Home gallery example has no preview:\n${example.code}`);
           return {
             setup,
             code: example.code,

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Optional
 
 from ..config import PaletteInput, Sort, SortInput, StackSplit, StackSplitInput
 from ..config.colors import BACKGROUND_COLOR
@@ -14,18 +14,18 @@ from .base_options import (
 
 @dataclass
 class CategoricalPlotOptions(BasePlotOptions):
-    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column')
+    column_fields: ClassVar[tuple[str, ...]] = ("hue", "axis_column")
 
-    axis_column: str = ''
-    orientation: str = 'vertical'
+    axis_column: str = ""
+    orientation: str = "vertical"
     stacked: bool = False
-    split: StackSplitInput = 'rounded'  # how stacked segments meet
-    sort: SortInput = 'frequency'
+    split: StackSplitInput = "rounded"  # how stacked segments meet
+    sort: SortInput = "frequency"
     data_labels: bool = True
     compact_labels: bool = True
     suffix: Optional[str] = None
     group_by: Optional[str] = None  # categories are date periods; 'month' gets month ticks with a year row
-    descriptions: Optional[Dict[str, str]] = None  # {category: grey line under its tick label}
+    descriptions: Optional[dict[str, str]] = None  # {category: grey line under its tick label}
 
     def validate(self) -> None:
         super().validate()
@@ -33,20 +33,20 @@ class CategoricalPlotOptions(BasePlotOptions):
             raise ValueError("axis_column must be specified")
 
         validate_str_or_enum_option(
-            option_name='orientation',
+            option_name="orientation",
             value=self.orientation,
             valid_options=VALID_ORIENTATIONS,
         )
 
         validate_str_or_enum_option(
-            option_name='sort',
+            option_name="sort",
             value=self.sort,
             valid_options=VALID_SORTS,
             enum_type=Sort,
         )
 
         validate_str_or_enum_option(
-            option_name='split',
+            option_name="split",
             value=self.split,
             valid_options=VALID_STACK_SPLITS,
             enum_type=StackSplit,
@@ -68,9 +68,9 @@ class CountPlotOptions(CategoricalPlotOptions):
 
 @dataclass
 class BarPlotOptions(CategoricalPlotOptions):
-    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column', 'value')
+    column_fields: ClassVar[tuple[str, ...]] = ("hue", "axis_column", "value")
 
-    value: str = ''
+    value: str = ""
     normalized: bool = False
 
     def validate(self) -> None:
@@ -86,7 +86,7 @@ class NormalizedPlotOptions(CategoricalPlotOptions):
     Shares are of row counts, or of the summed `value` column when set.
     """
 
-    column_fields: ClassVar[tuple[str, ...]] = ('hue', 'axis_column', 'value')
+    column_fields: ClassVar[tuple[str, ...]] = ("hue", "axis_column", "value")
 
     top_n: Optional[int] = None
     value: Optional[str] = None
@@ -107,7 +107,7 @@ class RemainderPlotOptions(NormalizedPlotOptions):
     With `hue` equal to `axis_column`, each bar gets its own color from `category_palette` instead.
     """
 
-    value: str = ''  # type: ignore[assignment]
+    value: str = ""  # type: ignore[assignment]
     category_palette: Optional[PaletteInput] = None
     background: str = BACKGROUND_COLOR  # remainder tint blends toward this, so it matches the dark mode background
 

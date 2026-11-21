@@ -1,0 +1,13 @@
+# Editors (VS Code) show only the first line of a failed hook's output, so each step leads with what failed.
+run() {
+  name=$1
+  shift
+  out=$("$@" 2>&1) || {
+    printf '%s failed. Full output below (VS Code: Show Command Output).\n%s\n' "$name" "$out" >&2
+    exit 1
+  }
+}
+# husky runs hooks from the repo root; lint-staged only sees web/ files from inside web/.
+run "Web lint (ESLint/stylelint/Prettier)" sh -c "cd web && npx lint-staged"
+# husky owns core.hooksPath, so `pre-commit install` refuses; run its hooks from here.
+run "Python checks (pre-commit)" uv run pre-commit run

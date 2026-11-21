@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -13,11 +13,11 @@ def _add_stacked_labels(
     chart: Chart,
     pivot_data: pd.DataFrame,
     percentages,
-    palette: Dict,
+    palette: dict,
     orientation: str,
     suffix: Optional[str],
     threshold: float,
-    row_colors: Optional[List[str]] = None,
+    row_colors: Optional[list[str]] = None,
 ) -> None:
     """row_colors: background per row, overriding the palette color of each column."""
     for index, (row_values, row_percentages) in enumerate(zip(pivot_data.values, percentages)):
@@ -27,24 +27,26 @@ def _add_stacked_labels(
             if value < threshold:
                 continue
             center = cumulative_sum - value / 2
-            x, y = (center, index) if orientation == 'horizontal' else (index, center)
+            x, y = (center, index) if orientation == "horizontal" else (index, center)
             background = row_colors[index] if row_colors is not None else palette[str(category)]
-            chart.texts.append(Text(
-                x,
-                y,
-                percentage_label(value_percentage, 0, suffix),
-                get_text_color_for_background(background),
-                FontSizes.DATALABELS,
-                alpha=Marks.INNER_LABEL_ALPHA,
-                keep_color=True,
-            ))
+            chart.texts.append(
+                Text(
+                    x,
+                    y,
+                    percentage_label(value_percentage, 0, suffix),
+                    get_text_color_for_background(background),
+                    FontSizes.DATALABELS,
+                    alpha=Marks.INNER_LABEL_ALPHA,
+                    keep_color=True,
+                )
+            )
 
 
 def format_datalabels_stacked(
     chart: Chart,
     pivot_data: pd.DataFrame,
-    palette: Dict,
-    orientation: str = 'horizontal',
+    palette: dict,
+    orientation: str = "horizontal",
     suffix: Optional[str] = None,
 ) -> None:
     values = pivot_data.values
@@ -57,12 +59,18 @@ def format_datalabels_stacked(
 def format_datalabels_stacked_normalized(
     chart: Chart,
     pivot_data: pd.DataFrame,
-    palette: Dict,
-    orientation: str = 'horizontal',
+    palette: dict,
+    orientation: str = "horizontal",
     suffix: Optional[str] = None,
-    row_colors: Optional[List[str]] = None,
+    row_colors: Optional[list[str]] = None,
 ) -> None:
     _add_stacked_labels(
-        chart, pivot_data, pivot_data.values * 100, palette, orientation, suffix,
-        threshold=Layout.STACKED_LABEL_MIN_SHARE, row_colors=row_colors,
+        chart,
+        pivot_data,
+        pivot_data.values * 100,
+        palette,
+        orientation,
+        suffix,
+        threshold=Layout.STACKED_LABEL_MIN_SHARE,
+        row_colors=row_colors,
     )

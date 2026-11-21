@@ -1,7 +1,7 @@
 """Helper functions for SQL query execution."""
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 import pandas as pd
 from sqlalchemy import text
@@ -23,7 +23,7 @@ def load_sql_query(sql_query: Union[str, Path]) -> str:
     if isinstance(sql_query, Path):
         if not sql_query.exists():
             raise ValueError(f"SQL file not found: {sql_query}")
-        return sql_query.read_text(encoding='utf-8')
+        return sql_query.read_text(encoding="utf-8")
     if isinstance(sql_query, str):
         return sql_query
     raise ValueError("sql_query must be a string or Path object.")
@@ -32,7 +32,7 @@ def load_sql_query(sql_query: Union[str, Path]) -> str:
 def execute_query(
     sql_query: str,
     engine: Engine,
-    params: Optional[Dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
 ) -> pd.DataFrame:
     """Execute SQL query and load the whole result into memory.
 

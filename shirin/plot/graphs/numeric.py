@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import pandas as pd
 
@@ -108,15 +108,15 @@ class NumericPlotsMixin:
         y: str,
         hue: Optional[str] = None,
         marks: Optional[str] = None,
-        mark_labels: Optional[str] = 'y',
+        mark_labels: Optional[str] = "y",
         title: Optional[TitleInput] = None,
         x_axis_label: Optional[TitleInput] = None,
         y_axis_label: Optional[TitleInput] = None,
         legend: bool = False,
         percentage_x: bool = False,
         percentage_y: bool = False,
-        x_limits: Optional[Tuple[float, float]] = None,
-        y_limits: Optional[Tuple[float, float]] = None,
+        x_limits: Optional[tuple[float, float]] = None,
+        y_limits: Optional[tuple[float, float]] = None,
     ) -> None:
         """Create a **line plot** of two numeric columns, one line per `hue` group.
 

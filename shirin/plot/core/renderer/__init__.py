@@ -1,13 +1,14 @@
 """Fills a Chart with marks in data coordinates."""
+
 from .bars import render_barplot, render_histogram, render_stacked_barplot
 from .pie import render_piechart
 from .series import render_lineplot, render_scatterplot
 
 __all__ = [
-    'render_barplot',
-    'render_histogram',
-    'render_lineplot',
-    'render_piechart',
-    'render_scatterplot',
-    'render_stacked_barplot',
+    "render_barplot",
+    "render_histogram",
+    "render_lineplot",
+    "render_piechart",
+    "render_scatterplot",
+    "render_stacked_barplot",
 ]

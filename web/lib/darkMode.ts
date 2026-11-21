@@ -28,5 +28,9 @@ export function setDarkMode(dark: boolean) {
 
 // Off during prerender, data-theme applies after hydration. Read from data-theme, not storage, so /portfolio can force dark.
 export function useDarkMode(): boolean {
-  return useSyncExternalStore(subscribe, () => document.documentElement.dataset.theme === "dark", () => false);
+  return useSyncExternalStore(
+    subscribe,
+    () => document.documentElement.dataset.theme === "dark",
+    () => false,
+  );
 }

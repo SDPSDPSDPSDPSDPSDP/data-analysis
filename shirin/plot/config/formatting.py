@@ -19,6 +19,7 @@ class FontSizes:
 
 class FigureSize:
     """Inches. Figure height is the plot area plus whatever rows (title, legend, labels) are present."""
+
     WIDTH = 8.4
     PLOT_HEIGHT = 3.2
     CATEGORY_SLOT = 0.75  # plot width per category for vertical bars; sets the figure width
@@ -33,6 +34,7 @@ class FigureSize:
 
 class Layout:
     """Points, measured from the figure edges."""
+
     PAD = 12
     TITLE_TOP_GAP = 6  # extra whitespace above the title, on top of PAD
     CORNER_RADIUS = 6
@@ -54,7 +56,9 @@ class Layout:
     LEGEND_GAP = 2  # extra space between title/subtitle and legend
     STACK_BLEND = 20  # gradient length across the boundary between stack segments
     WEDGE_SEAM = 1  # stroke in the slice's own color: anti-aliased edges of touching slices leave a white seam
-    STACKED_LABEL_MIN_SHARE = 0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
+    STACKED_LABEL_MIN_SHARE = (
+        0.15  # smaller stack segments (share of tallest stack) get no label; rounded ends leave no room
+    )
     HAIRLINE = 0.5  # stroke width of grid lines
     AXIS_MARGIN = 0.05  # share of the data range padded on each side of an auto-scaled axis
     NUMERIC_TICKS = 5  # target count; nice_ticks rounds the step so the actual count varies
@@ -70,6 +74,7 @@ class Layout:
 
 class Marks:
     """Data-mark sizes. Bar widths are shares of a category slot, pie radii shares of the pie radius."""
+
     BAR_WIDTH = 0.6
     HORIZONTAL_BAR_WIDTH = 0.8
     HISTOGRAM_GAP = 0.15  # share of a bin left empty between neighbouring histogram bars

@@ -10,7 +10,13 @@
     "og": "node scripts/build-og.mjs",
     "portfolio:stills": "cd .. && portfolio-media stills",
     "portfolio:upload": "cd .. && portfolio-media upload",
-    "portfolio:compare": "cd .. && portfolio-media compare"
+    "portfolio:compare": "cd .. && portfolio-media compare",
+    "lint": "eslint . && stylelint \"{app,components}/**/*.css\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "prepare": "cd .. && husky web/.husky",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@codemirror/lang-python": "6.2.1",
@@ -29,8 +35,29 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.5",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.1",
     "playwright": "1.65.1",
     "portfolio-media": "0.1.0",
-    "typescript": "5.9.3"
+    "prettier": "3.10.1",
+    "stylelint": "18.1.0",
+    "typescript": "5.9.3",
+    "vitest": "5.1.1"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.json": "prettier --write"
+  },
+  "prettier": {
+    "printWidth": 120
   }
 }

@@ -28,7 +28,8 @@ Saving to a file was the point of `export=True`. 4.x has no API for it; tell the
 
 ```python
 import shirin.plot.all_plots as ap
-ap.show = lambda svg: open('chart.svg', 'w', encoding='utf-8').write(svg)
+
+ap.show = lambda svg: open("chart.svg", "w", encoding="utf-8").write(svg)
 ```
 
 ## PlotGraphs constructor
@@ -43,13 +44,15 @@ ap.show = lambda svg: open('chart.svg', 'w', encoding='utf-8').write(svg)
 ```python
 # 3.x
 class MyPalettes(Palette):
-    fruit = {'Apple': Colors.RED, 'Pear': Colors.GREEN}
+    fruit = {"Apple": Colors.RED, "Pear": Colors.GREEN}
     is_correct = Palette.is_correct
+
+
 plot = PlotGraphs(palette=MyPalettes, label_mapping=MyLabels, export=True)
 
 # 4.x
 plot = PlotGraphs(
-    palette={'fruit': {'Apple': Colors.RED, 'Pear': Colors.GREEN}},
+    palette={"fruit": {"Apple": Colors.RED, "Pear": Colors.GREEN}},
     label_mapping={...},
 )
 ```
@@ -58,10 +61,10 @@ plot = PlotGraphs(
 
 ```python
 # 2.x
-plot.countplot_x(df, x='fruit', hue='ripe', palette={True: Colors.GREEN, False: Colors.RED})
+plot.countplot_x(df, x="fruit", hue="ripe", palette={True: Colors.GREEN, False: Colors.RED})
 # 4.x
-plot = PlotGraphs(palette={'ripe': {True: Colors.GREEN, False: Colors.RED}})
-plot.bar(df, x='fruit', hue='ripe')
+plot = PlotGraphs(palette={"ripe": {True: Colors.GREEN, False: Colors.RED}})
+plot.bar(df, x="fruit", hue="ripe")
 ```
 
 If the same hue column needs different colors in different charts, make a second `PlotGraphs` instance.

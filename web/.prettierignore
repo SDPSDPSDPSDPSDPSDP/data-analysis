@@ -1,0 +1,11 @@
+# Web code only. YAML/Markdown/generated files stay hand-formatted.
+.next
+node_modules
+package-lock.json
+next-env.d.ts
+out
+public
+lib/docstrings.json
+*.md
+*.yml
+*.yaml

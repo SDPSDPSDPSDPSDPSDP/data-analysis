@@ -11,7 +11,9 @@ export default function MoreExamples({ title, count, expanded, children }: Props
       <summary>
         <span className="more-examples-button">
           <SectionIcon title={title} />
-          <span className="more-examples-closed">{count} more {count === 1 ? "example" : "examples"}</span>
+          <span className="more-examples-closed">
+            {count} more {count === 1 ? "example" : "examples"}
+          </span>
           <span className="more-examples-open">Hide examples</span>
           <ChevronDown size="1em" className="more-examples-chevron" aria-hidden />
         </span>

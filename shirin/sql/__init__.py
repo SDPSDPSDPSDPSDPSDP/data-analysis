@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
@@ -45,10 +45,11 @@ class Database:
         schema: Optional[str] = None,
     ) -> None:
         load_dotenv(find_dotenv(usecwd=True))
-        given = {'user': user, 'password': password, 'host': host, 'port': port, 'db_name': db_name, 'schema': schema}
-        credentials = {name: value if value is not None else os.environ.get(f'DB2_{name.upper()}')
-                       for name, value in given.items()}
-        missing = [f'DB2_{name.upper()}' for name, value in credentials.items() if value is None]
+        given = {"user": user, "password": password, "host": host, "port": port, "db_name": db_name, "schema": schema}
+        credentials = {
+            name: value if value is not None else os.environ.get(f"DB2_{name.upper()}") for name, value in given.items()
+        }
+        missing = [f"DB2_{name.upper()}" for name, value in credentials.items() if value is None]
         if missing:
             raise ValueError(f"Missing database credentials: pass them to Database() or set {missing} in .env")
         self._engine = engine.get_engine(**credentials)
@@ -56,7 +57,7 @@ class Database:
     def sql(
         self,
         query: Union[str, Path],
-        params: Optional[Dict[str, Any]] = None,
+        params: Optional[dict[str, Any]] = None,
         output_path: Optional[Path] = None,
     ) -> Optional[pd.DataFrame]:
         """Run a read query (SELECT). Nothing is committed, so INSERT/UPDATE/DELETE are rolled back.

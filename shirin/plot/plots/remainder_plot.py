@@ -46,7 +46,7 @@ class RemainderPlot(NormalizedPlot):
     def _shares(self, df: pd.DataFrame) -> pd.DataFrame:
         shares = super()._shares(df)
         filled_levels = [level for level in shares.columns if level != REMAINDER_LABEL]
-        return shares[filled_levels + [REMAINDER_LABEL]]
+        return shares[[*filled_levels, REMAINDER_LABEL]]
 
     def transform(self, df: pd.DataFrame) -> NormalizedData:
         data = super().transform(df)

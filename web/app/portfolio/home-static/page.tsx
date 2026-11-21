@@ -17,7 +17,13 @@ export default function PortfolioHomeStatic() {
   const charts = getHomeCharts();
   return (
     <div className="portfolio-still">
-      <HomeGallery categories={getCategories()} charts={charts} showNav={false} pinned={getPinnedCharts(charts, STILL_PINNED)} limit={LIMIT} />
+      <HomeGallery
+        categories={getCategories()}
+        charts={charts}
+        showNav={false}
+        pinned={getPinnedCharts(charts, STILL_PINNED)}
+        limit={LIMIT}
+      />
     </div>
   );
 }

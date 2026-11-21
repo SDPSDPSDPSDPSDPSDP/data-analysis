@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 import pandas as pd
 
@@ -17,12 +17,12 @@ class PieChart(AbstractPlot[pd.DataFrame]):
 
     def __init__(self, options: PiePlotOptions):
         super().__init__(options)
-        self._labels: List[str] = []
-        self._colors: List[str] = []
-        self._values: List[float] = []
-        self._autotexts: List[Text] = []
-        self._headlines: List[str] = []
-        self._headline_texts: List[Text] = []
+        self._labels: list[str] = []
+        self._colors: list[str] = []
+        self._values: list[float] = []
+        self._autotexts: list[Text] = []
+        self._headlines: list[str] = []
+        self._headline_texts: list[Text] = []
 
     def preprocess(self) -> pd.DataFrame:
         return self.options.df.copy()
@@ -39,7 +39,7 @@ class PieChart(AbstractPlot[pd.DataFrame]):
         unknown = sorted(set(slice_labels) - set(keys))
         if unknown:
             raise ValueError(f"slice_labels keys {unknown} are not values of the column. Available values: {keys}")
-        self._headlines = [slice_labels.get(key, '') for key in keys]
+        self._headlines = [slice_labels.get(key, "") for key in keys]
 
         palette = self.options.palette
         if palette is None:

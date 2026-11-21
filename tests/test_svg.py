@@ -9,26 +9,26 @@ from .svg_helpers import svg_attr
 
 def test_rounded_rect_is_pill_shaped() -> None:
     c = Chart(width=6, plot_height=3)
-    c.rects.append(Rect(0, 1, 0, 5, '#123456', rounded=True))
-    rect = to_svg(c).split('<rect x=')[1]
-    assert svg_attr(rect, 'rx') == pytest.approx(min(svg_attr(rect, 'width'), svg_attr(rect, 'height')) / 2)
+    c.rects.append(Rect(0, 1, 0, 5, "#123456", rounded=True))
+    rect = to_svg(c).split("<rect x=")[1]
+    assert svg_attr(rect, "rx") == pytest.approx(min(svg_attr(rect, "width"), svg_attr(rect, "height")) / 2)
 
 
 def _path_xs(svg: str) -> list:
     d = svg.split('<path d="')[1].split('"')[0]
-    return [float(x) for x in re.findall(r'[ML]([\d.]+) ', d)]
+    return [float(x) for x in re.findall(r"[ML]([\d.]+) ", d)]
 
 
 def test_tucked_pill_starts_inside_front_pill_not_at_base() -> None:
     # A back pill sharing the front pill's edges bleeds through its anti-aliasing as a colored rim.
     c = Chart(width=6, plot_height=3)
-    front = Rect(0, 10, 0, 1, '#111111', rounded=True, horizontal=True)
-    c.rects += [Rect(0, 20, 0, 1, '#222222', rounded=True, horizontal=True, tuck=10), front]
+    front = Rect(0, 10, 0, 1, "#111111", rounded=True, horizontal=True)
+    c.rects += [Rect(0, 20, 0, 1, "#222222", rounded=True, horizontal=True, tuck=10), front]
     svg = to_svg(c)
-    front_rect = svg.split('<rect x=')[-1]
+    front_rect = svg.split("<rect x=")[-1]
     front_x0 = float(front_rect.split('"')[1])
-    front_x1 = front_x0 + svg_attr(front_rect, 'width')
-    radius = svg_attr(front_rect, 'rx')
+    front_x1 = front_x0 + svg_attr(front_rect, "width")
+    radius = svg_attr(front_rect, "rx")
     cut = min(_path_xs(svg))
     assert cut == pytest.approx(front_x1 - radius, abs=0.01)
     assert cut > front_x0
@@ -36,28 +36,30 @@ def test_tucked_pill_starts_inside_front_pill_not_at_base() -> None:
 
 def test_tucked_pill_behind_short_front_pill_still_starts_inside_it() -> None:
     c = Chart(width=6, plot_height=3)
-    c.rects += [Rect(0, 20, 0, 1, '#222222', rounded=True, horizontal=True, tuck=0.1),
-                Rect(0, 0.1, 0, 1, '#111111', rounded=True, horizontal=True)]
+    c.rects += [
+        Rect(0, 20, 0, 1, "#222222", rounded=True, horizontal=True, tuck=0.1),
+        Rect(0, 0.1, 0, 1, "#111111", rounded=True, horizontal=True),
+    ]
     svg = to_svg(c)
-    front_rect = svg.split('<rect x=')[-1]
+    front_rect = svg.split("<rect x=")[-1]
     front_x0 = float(front_rect.split('"')[1])
-    assert front_x0 < min(_path_xs(svg)) < front_x0 + svg_attr(front_rect, 'width')
+    assert front_x0 < min(_path_xs(svg)) < front_x0 + svg_attr(front_rect, "width")
 
 
 def test_stacked_segments_share_one_clip_path() -> None:
     c = Chart(width=6, plot_height=3)
-    outline = Rect(0, 1, 0, 5, '', rounded=True)
-    c.rects += [Rect(0, 1, 0, 2, '#111111', clip=outline), Rect(0, 1, 2, 5, '#222222', clip=outline)]
+    outline = Rect(0, 1, 0, 5, "", rounded=True)
+    c.rects += [Rect(0, 1, 0, 2, "#111111", clip=outline), Rect(0, 1, 2, 5, "#222222", clip=outline)]
     svg = to_svg(c)
-    assert svg.count('<clipPath') == 1 and svg.count('clip-path="url(#') == 2
+    assert svg.count("<clipPath") == 1 and svg.count('clip-path="url(#') == 2
 
 
 def test_stacked_segment_fades_into_next_inside_clip() -> None:
     c = Chart(width=6, plot_height=3)
-    outline = Rect(0, 1, 0, 5, '', rounded=True)
-    c.rects += [Rect(0, 1, 0, 2, '#111111', clip=outline, fade_to='#222222'), Rect(0, 1, 2, 5, '#222222', clip=outline)]
+    outline = Rect(0, 1, 0, 5, "", rounded=True)
+    c.rects += [Rect(0, 1, 0, 2, "#111111", clip=outline, fade_to="#222222"), Rect(0, 1, 2, 5, "#222222", clip=outline)]
     svg = to_svg(c)
-    assert svg.count('<linearGradient') == 1 and 'stop-color="#222222"' in svg
+    assert svg.count("<linearGradient") == 1 and 'stop-color="#222222"' in svg
     assert svg.count('clip-path="url(#') == 3
 
 
@@ -69,7 +71,7 @@ def test_axis_without_data_raises() -> None:
 def test_wedge_stroked_in_own_color_hides_seams() -> None:
     c = Chart(None, plot_height=2)
     c.x.lim = c.y.lim = (-1, 1)
-    c.wedges = [Wedge(0, 0.3, '#ff0000'), Wedge(0.3, 1, '#00ff00')]
+    c.wedges = [Wedge(0, 0.3, "#ff0000"), Wedge(0.3, 1, "#00ff00")]
     svg = to_svg(c)
     assert 'fill="#ff0000" stroke="#ff0000"' in svg
     assert 'fill="#00ff00" stroke="#00ff00"' in svg
@@ -77,18 +79,18 @@ def test_wedge_stroked_in_own_color_hides_seams() -> None:
 
 def test_filled_line_draws_fading_area_per_segment() -> None:
     c = Chart(width=6, plot_height=3)
-    c.lines += [Line([0, 1, 2, 3], [1, 2, float('nan'), 3], '#123456', fill=True), Line([0, 3], [0, 1], '#654321')]
+    c.lines += [Line([0, 1, 2, 3], [1, 2, float("nan"), 3], "#123456", fill=True), Line([0, 3], [0, 1], "#654321")]
     svg = to_svg(c)
-    assert svg.count('<linearGradient') == 1 and 'stop-opacity="0"' in svg
+    assert svg.count("<linearGradient") == 1 and 'stop-opacity="0"' in svg
     area = svg.split('" fill="url(#area')[0].rsplit('<path d="', 1)[1]
-    assert area.count('Z') == 2
+    assert area.count("Z") == 2
 
 
 def test_dark_mode_darkens_background_and_whitens_text_but_keeps_labels_on_bars() -> None:
-    c = Chart(width=6, plot_height=3, title='Title')
-    c.rects.append(Rect(0, 1, 0, 5, '#ffd5ff'))
-    c.texts.append(Text(0.5, 2, 'on bar', '#000000', 10, keep_color=True))
-    c.texts.append(Text(0.5, 4, 'beside', '#000000', 10))
+    c = Chart(width=6, plot_height=3, title="Title")
+    c.rects.append(Rect(0, 1, 0, 5, "#ffd5ff"))
+    c.texts.append(Text(0.5, 2, "on bar", "#000000", 10, keep_color=True))
+    c.texts.append(Text(0.5, 4, "beside", "#000000", 10))
     svg = to_svg(c, dark_mode=True)
     assert 'fill="#ffffff"' not in svg
     assert 'fill="#FFFFFF" class="b">Title<' in svg
@@ -100,8 +102,8 @@ def test_dark_mode_keeps_user_data_colors() -> None:
     c = Chart(width=None, plot_height=3)
     c.x.lim = c.y.lim = (-1.2, 1.2)
     c.x.visible = c.y.visible = False
-    c.wedges = [Wedge(0, 0.5, '#ffffff'), Wedge(0.5, 1, '#000000')]
-    c.lines.append(Line([0, 1], [0, 1], '#ffffff'))
+    c.wedges = [Wedge(0, 0.5, "#ffffff"), Wedge(0.5, 1, "#000000")]
+    c.lines.append(Line([0, 1], [0, 1], "#ffffff"))
     c.donut_hole = 0.6
     svg = to_svg(c, dark_mode=True)
     assert 'fill="#ffffff"' in svg and 'fill="#000000"' in svg and 'stroke="#ffffff"' in svg

@@ -1,5 +1,4 @@
 import math
-from typing import List, Tuple
 
 import pandas as pd
 
@@ -10,9 +9,21 @@ _DAY = pd.Timedelta(days=1)
 
 # (pandas frequency, label format), finest first; the first one that fits is used.
 _DATE_STEPS = (
-    ('D', '%Y-%m-%d'), ('2D', '%Y-%m-%d'), ('7D', '%Y-%m-%d'), ('14D', '%Y-%m-%d'),
-    ('MS', '%b %Y'), ('2MS', '%b %Y'), ('3MS', '%b %Y'), ('6MS', '%b %Y'),
-    ('YS', '%Y'), ('2YS', '%Y'), ('5YS', '%Y'), ('10YS', '%Y'), ('20YS', '%Y'), ('50YS', '%Y'), ('100YS', '%Y'),
+    ("D", "%Y-%m-%d"),
+    ("2D", "%Y-%m-%d"),
+    ("7D", "%Y-%m-%d"),
+    ("14D", "%Y-%m-%d"),
+    ("MS", "%b %Y"),
+    ("2MS", "%b %Y"),
+    ("3MS", "%b %Y"),
+    ("6MS", "%b %Y"),
+    ("YS", "%Y"),
+    ("2YS", "%Y"),
+    ("5YS", "%Y"),
+    ("10YS", "%Y"),
+    ("20YS", "%Y"),
+    ("50YS", "%Y"),
+    ("100YS", "%Y"),
 )
 
 
@@ -25,7 +36,7 @@ def from_days(days: float) -> pd.Timestamp:
     return _EPOCH + days * _DAY
 
 
-def nice_ticks(lo: float, hi: float, count: int = Layout.NUMERIC_TICKS) -> List[float]:
+def nice_ticks(lo: float, hi: float, count: int = Layout.NUMERIC_TICKS) -> list[float]:
     """Round tick values (steps of 1, 2, 2.5 or 5 times a power of ten) inside [lo, hi]."""
     lo, hi = min(lo, hi), max(lo, hi)
     if hi == lo:
@@ -37,13 +48,14 @@ def nice_ticks(lo: float, hi: float, count: int = Layout.NUMERIC_TICKS) -> List[
     return [round(i * step, 12) for i in range(first, last + 1)]
 
 
-def date_ticks(lo: float, hi: float, max_ticks: int = Layout.MAX_DATE_TICKS, fmt: str = '') -> Tuple[List[float], List[str]]:
+def date_ticks(
+    lo: float, hi: float, max_ticks: int = Layout.MAX_DATE_TICKS, fmt: str = ""
+) -> tuple[list[float], list[str]]:
     """Day/month/year ticks between two day numbers; fmt overrides the step's own format."""
     lo, hi = min(lo, hi), max(lo, hi)
-    start, end = from_days(lo).ceil('D'), from_days(hi)
+    start, end = from_days(lo).ceil("D"), from_days(hi)
     for freq, step_fmt in _DATE_STEPS:
         dates = pd.date_range(start, end, freq=freq)
         if len(dates) <= max_ticks:
             return list(to_days(pd.Series(dates))), [d.strftime(fmt or step_fmt) for d in dates]
     raise ValueError(f"Date range {start} - {end} is too long for date ticks")
-

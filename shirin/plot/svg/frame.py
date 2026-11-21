@@ -1,6 +1,7 @@
 """Sizes the plot area of a Chart: where it sits in the SVG and how data maps onto it."""
+
 from dataclasses import dataclass
-from typing import Callable, List
+from typing import Callable
 
 from ..config import FontSizes, Layout
 from . import marks
@@ -30,8 +31,8 @@ class Frame:
     sy: Scale
     x_ticks: Ticks
     y_ticks: Ticks
-    texts: List[Text]  # data labels, shortened where they would overlap
-    header_rows: List[HeaderRow]
+    texts: list[Text]  # data labels, shortened where they would overlap
+    header_rows: list[HeaderRow]
 
     @property
     def right(self) -> float:
@@ -44,7 +45,7 @@ class Frame:
 
 def layout(chart: Chart, color: Color) -> Frame:
     """Size the plot area so ticks, header and data labels sticking out of it all fit in the SVG."""
-    x_lim, y_lim = limits(chart.x, chart.data_values('x')), limits(chart.y, chart.data_values('y'))
+    x_lim, y_lim = limits(chart.x, chart.data_values("x")), limits(chart.y, chart.data_values("y"))
     x_ticks, y_ticks = ticks(chart.x, *x_lim), ticks(chart.y, *y_lim)
 
     y_tick_width = max((tick_label_width(chart.y, t, label) for t, label in y_ticks), default=0)
@@ -79,6 +80,15 @@ def layout(chart: Chart, color: Color) -> Frame:
 
     sx, sy = scale(*x_lim, plot_left, plot_left + plot_w), scale(*y_lim, plot_top + plot_h, plot_top)
     return Frame(
-        width=width, left=plot_left, top=plot_top, plot_w=plot_w, plot_h=plot_h, sx=sx, sy=sy,
-        x_ticks=fit_x_ticks(chart.x, x_ticks, sx), y_ticks=y_ticks, texts=texts, header_rows=header_rows,
+        width=width,
+        left=plot_left,
+        top=plot_top,
+        plot_w=plot_w,
+        plot_h=plot_h,
+        sx=sx,
+        sy=sy,
+        x_ticks=fit_x_ticks(chart.x, x_ticks, sx),
+        y_ticks=y_ticks,
+        texts=texts,
+        header_rows=header_rows,
     )

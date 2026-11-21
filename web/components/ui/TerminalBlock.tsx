@@ -6,7 +6,7 @@ import { charsPerStep, marker, parse, schedule, streamSteps } from "@/lib/termin
 import { useVisible } from "@/lib/useVisible";
 
 // Start only once the terminal is on screen, not ahead of it, so the stream is seen from its start.
-const ON_SCREEN_MARGIN = "0px";
+const ON_SCREEN_MARGIN = "0%";
 
 type Props = {
   transcript: string;
@@ -25,11 +25,8 @@ export default function TerminalBlock({ transcript, chart }: Props) {
 
   useEffect(() => {
     if (!visible || step >= delays.length) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setStep(delays.length);
-      return;
-    }
-    const timer = setTimeout(() => setStep(step + 1), delays[step]);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = setTimeout(() => setStep(reduced ? delays.length : step + 1), reduced ? 0 : delays[step]);
     return () => clearTimeout(timer);
   }, [visible, step, delays]);
 

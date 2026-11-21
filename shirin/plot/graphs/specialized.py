@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ class SpecializedPlotsMixin:
         value_datalabel: int = 5,
         donut: bool = False,
         legend_percentages: bool = False,
-        slice_labels: Optional[Dict[Any, str]] = None,
+        slice_labels: Optional[dict[Any, str]] = None,
     ) -> None:
         """Create a **pie chart** of the value counts in a column.
 

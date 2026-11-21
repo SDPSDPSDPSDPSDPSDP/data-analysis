@@ -9,47 +9,43 @@ from shirin.plot.common.sorting import (
 
 def test_sort_alphabetically_strings():
     """Test alphabetical sorting with strings."""
-    values = ['zebra', 'apple', 'banana']
+    values = ["zebra", "apple", "banana"]
     result = sort_alphabetically(values, ascending=True)
-    assert result == ['apple', 'banana', 'zebra']
+    assert result == ["apple", "banana", "zebra"]
 
 
 def test_sort_alphabetically_numeric_strings():
     """Test numeric-aware sorting."""
-    values = ['10', '2', '1', '20']
+    values = ["10", "2", "1", "20"]
     result = sort_alphabetically(values, ascending=True)
-    assert result == ['1', '2', '10', '20']
+    assert result == ["1", "2", "10", "20"]
 
 
 def test_sort_alphabetically_descending():
     """Test descending alphabetical sort."""
-    values = ['a', 'b', 'c']
+    values = ["a", "b", "c"]
     result = sort_alphabetically(values, ascending=False)
-    assert result == ['c', 'b', 'a']
+    assert result == ["c", "b", "a"]
 
 
 def test_sort_by_frequency():
     """Test frequency-based sorting."""
-    df = pd.DataFrame({
-        'A': [1, 2, 3],
-        'B': [10, 20, 30],
-        'C': [5, 5, 5]
-    })
-    
+    df = pd.DataFrame({"A": [1, 2, 3], "B": [10, 20, 30], "C": [5, 5, 5]})
+
     result = sort_by_frequency(df, ascending=False)
-    
+
     assert list(result.index) == [2, 1, 0]
-    assert 'A' in result.columns
-    assert '_order' not in result.columns
+    assert "A" in result.columns
+    assert "_order" not in result.columns
 
 
 def test_palette_colors():
     """Test creating color list from palette."""
-    palette = {'red': '#FF0000', 'blue': '#0000FF'}
+    palette = {"red": "#FF0000", "blue": "#0000FF"}
 
-    result = palette_colors(palette, ['red', 'blue'])
+    result = palette_colors(palette, ["red", "blue"])
 
-    assert result == ['#FF0000', '#0000FF']
+    assert result == ["#FF0000", "#0000FF"]
 
 
 def test_sort_alphabetically_integers():

@@ -4,7 +4,7 @@
   --color-bg-home: #f8fafc;
   --color-surface: rgba(0, 0, 0, 0.04);
   --color-shimmer: rgba(0, 0, 0, 0.08);
-  --color-error: #b00020;
+  --text-error: #b00020;
   --color-glass: rgba(241, 244, 248, 0.7);
   --glass-blur: 16px;
   --glass-saturate: 180%;
@@ -18,10 +18,10 @@
   --color-code-highlight: rgba(0, 0, 0, 0.04);
   --color-code-button: rgba(0, 0, 0, 0.06);
   --color-code-button-hover: rgba(0, 0, 0, 0.12);
-  --code-button-text: rgba(0, 0, 0, 0.6);
-  --code-button-text-hover: rgba(0, 0, 0, 0.87);
+  --text-code-button: rgba(0, 0, 0, 0.6);
+  --text-code-button-hover: rgba(0, 0, 0, 0.87);
   /* Syntax colors, applied by CodeBlock's highlight style. */
-  --code-text: rgba(0, 0, 0, 0.87);
+  --text-code: rgba(0, 0, 0, 0.87);
   --code-keyword: #0000ff;
   --code-name: #001080;
   --code-function: #795e26;
@@ -36,7 +36,7 @@
   --color-terminal-bar: rgba(0, 0, 0, 0.04);
   --color-terminal-prompt: rgba(0, 0, 0, 0.06);
   --color-terminal-dot: rgba(0, 0, 0, 0.2);
-  --color-terminal-tool: #2e9e4f;
+  --text-terminal-tool: #2e9e4f;
   --color-terminal-code: rgba(0, 0, 0, 0.05);
   --terminal-marker-width: 2ch;
   --terminal-chart-max-width: 520px;
@@ -135,6 +135,8 @@
   --radius: 6px;
   --radius-home-chart: 10px;
   --border-width: 1px;
+  /* Screen-reader-only box: 1px, not 0, so VoiceOver still announces it. */
+  --size-visually-hidden: 1px;
   --radius-pill: 999px;
   --radius-swatch: 2px;
   --button-height: 28px;
@@ -168,7 +170,7 @@
   --color-bg-home: #121212;
   --color-surface: rgba(255, 255, 255, 0.06);
   --color-shimmer: rgba(255, 255, 255, 0.12);
-  --color-error: #ff6b81;
+  --text-error: #ff6b81;
   --color-glass: rgba(30, 30, 30, 0.92);
   --text-primary: rgba(255, 255, 255, 0.93);
   --text-muted: rgba(255, 255, 255, 0.7);
@@ -180,11 +182,11 @@
   --color-code-highlight: rgba(255, 255, 255, 0.05);
   --color-code-button: var(--color-button);
   --color-code-button-hover: var(--color-button-hover);
-  --code-button-text: var(--text-on-dark-secondary);
-  --code-button-text-hover: var(--text-on-dark);
-  --code-text: rgba(255, 255, 255, 0.82);
+  --text-code-button: var(--text-on-dark-secondary);
+  --text-code-button-hover: var(--text-on-dark);
+  --text-code: rgba(255, 255, 255, 0.82);
   --code-keyword: #ff7b72;
-  --code-name: var(--code-text);
+  --code-name: var(--text-code);
   --code-function: #d2a8ff;
   --code-constant: #79c0ff;
   --code-class: #ffa657;
@@ -194,7 +196,6 @@
   --color-terminal-bar: rgba(255, 255, 255, 0.06);
   --color-terminal-prompt: rgba(255, 255, 255, 0.08);
   --color-terminal-dot: rgba(255, 255, 255, 0.2);
-  --color-terminal-tool: #4eba65;
+  --text-terminal-tool: #4eba65;
   --color-terminal-code: rgba(255, 255, 255, 0.06);
 }
-

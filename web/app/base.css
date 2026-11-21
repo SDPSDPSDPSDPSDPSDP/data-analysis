@@ -72,8 +72,8 @@ body {
 
 .visually-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: var(--size-visually-hidden);
+  height: var(--size-visually-hidden);
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
@@ -93,7 +93,7 @@ pre {
 }
 
 .error {
-  color: var(--color-error);
+  color: var(--text-error);
 }
 
 .skeleton {

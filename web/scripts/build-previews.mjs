@@ -9,5 +9,8 @@ import { getPreviews } from "../app/homeCharts.ts";
 mkdirSync("public/previews", { recursive: true });
 for (const file of readdirSync("public/previews")) rmSync(`public/previews/${file}`, { recursive: true, force: true });
 const charts = getPreviews().map((chart) => ({ path: `public${chart.path}`, code: chart.code }));
-execFileSync("uv", ["run", "python", "scripts/render_previews.py"], { input: JSON.stringify(charts), stdio: ["pipe", "inherit", "inherit"] });
+execFileSync("uv", ["run", "python", "scripts/render_previews.py"], {
+  input: JSON.stringify(charts),
+  stdio: ["pipe", "inherit", "inherit"],
+});
 console.log(`rendered ${charts.length} previews to public/previews`);

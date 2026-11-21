@@ -4,7 +4,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -18,7 +18,7 @@ PARQUET_CHUNK_ROWS = 20_000
 
 
 def _execute_streaming(
-    connection: Connection, sql_query: str, params: Optional[Dict[str, Any]], chunk_rows: int
+    connection: Connection, sql_query: str, params: Optional[dict[str, Any]], chunk_rows: int
 ) -> CursorResult:
     """Same parsing rules as helpers.execute_query, but rows are fetched chunk_rows at a time."""
     streaming = connection.execution_options(yield_per=chunk_rows)
@@ -27,11 +27,11 @@ def _execute_streaming(
     return streaming.exec_driver_sql(sql_query)
 
 
-def _rows_to_table(columns: List[str], rows: List[Any]) -> pa.Table:
+def _rows_to_table(columns: list[str], rows: list[Any]) -> pa.Table:
     return pa.Table.from_arrays([pa.array(values) for values in zip(*rows)], names=columns)
 
 
-def _rows_to_typed_table(schema: pa.Schema, rows: List[Any]) -> pa.Table:
+def _rows_to_typed_table(schema: pa.Schema, rows: list[Any]) -> pa.Table:
     """Build arrays with the fixed schema's types, skipping per-chunk type inference."""
     arrays = [pa.array(values, type=field.type) for field, values in zip(schema, zip(*rows))]
     return pa.Table.from_arrays(arrays, schema=schema)
@@ -39,14 +39,16 @@ def _rows_to_typed_table(schema: pa.Schema, rows: List[Any]) -> pa.Table:
 
 def _widen(schema: pa.Schema) -> pa.Schema:
     """Arrow infers decimal precision per chunk; widen to the max so later chunks still fit."""
-    return pa.schema([
-        field.with_type(pa.decimal128(38, field.type.scale)) if pa.types.is_decimal(field.type) else field
-        for field in schema
-    ])
+    return pa.schema(
+        [
+            field.with_type(pa.decimal128(38, field.type.scale)) if pa.types.is_decimal(field.type) else field
+            for field in schema
+        ]
+    )
 
 
 def _spill(table: pa.Table, spill_dir: Path, index: int) -> Path:
-    path = spill_dir / f'{index}.parquet'
+    path = spill_dir / f"{index}.parquet"
     pq.write_table(table, path)
     return path
 
@@ -55,7 +57,7 @@ def _stream_to_parquet(
     sql_query: str,
     engine: Engine,
     output_path: Path,
-    params: Optional[Dict[str, Any]],
+    params: Optional[dict[str, Any]],
     chunk_rows: int,
 ) -> None:
     """Stream the result into one parquet file, chunk_rows rows at a time, without pandas.
@@ -68,11 +70,11 @@ def _stream_to_parquet(
         result = _execute_streaming(connection, sql_query, params, chunk_rows)
         columns = list(result.keys())
         schema = pa.schema([(column, pa.null()) for column in columns])
-        spilled: List[Path] = []
+        spilled: list[Path] = []
         writer: Optional[RowGroupWriter] = None
         # Piped to a log file, every redraw becomes a line; update once a minute there instead.
         interactive = sys.stderr.isatty()
-        progress = tqdm(unit=' rows', desc='Fetching', mininterval=0.1 if interactive else 60, ascii=not interactive)
+        progress = tqdm(unit=" rows", desc="Fetching", mininterval=0.1 if interactive else 60, ascii=not interactive)
         try:
             for index, rows in enumerate(result.partitions()):
                 progress.update(len(rows))
@@ -81,7 +83,7 @@ def _stream_to_parquet(
                     continue
                 table = _rows_to_table(columns, rows)
                 spilled.append(_spill(table, Path(spill_dir), index))
-                schema = pa.unify_schemas([schema, table.schema], promote_options='permissive')
+                schema = pa.unify_schemas([schema, table.schema], promote_options="permissive")
                 if any(pa.types.is_null(field.type) for field in schema):
                     continue
                 writer = RowGroupWriter(output_path, _widen(schema))
@@ -101,12 +103,12 @@ def query_to_parquet(
     sql_query: str,
     engine: Engine,
     output_path: Path,
-    params: Optional[Dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
     chunk_rows: int = PARQUET_CHUNK_ROWS,
 ) -> None:
     """Write to a .part file first, so a failed query never leaves a truncated parquet at output_path."""
     output_path = Path(output_path)
-    part_path = output_path.with_name(output_path.name + '.part')
+    part_path = output_path.with_name(output_path.name + ".part")
     try:
         _stream_to_parquet(sql_query, engine, part_path, params, chunk_rows)
     except BaseException:
