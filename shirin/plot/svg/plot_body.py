@@ -69,22 +69,18 @@ def draw_marks(
     if chart.donut_hole:
         body.append(marks.wedge(Wedge(0, 1, color(BACKGROUND_COLOR), radius=chart.donut_hole), sx, sy))
     clip_ids: dict[int, str] = {}
-    fades: list[str] = []  # drawn after every segment, else the next segment covers them
     for r in chart.rects:
         if not (r.width and r.height):
             continue
         rect = marks.rect(r, sx, sy)
-        # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
-        fade = marks.fade(r, sx, sy, f"fade{next(_CLIP_IDS)}") if r.fade_to is not None else ""
         if r.clip is not None:
             if id(r.clip) not in clip_ids:
+                # Ids must be unique across every chart on the page, e.g. a notebook with many outputs.
                 clip_ids[id(r.clip)] = f"clip{next(_CLIP_IDS)}"
                 body.append(f'<clipPath id="{clip_ids[id(r.clip)]}">{marks.rect(r.clip, sx, sy)}</clipPath>')
             clip = f'<rect clip-path="url(#{clip_ids[id(r.clip)]})" '
-            rect, fade = rect.replace("<rect ", clip, 1), fade.replace("<rect ", clip, 1)
+            rect = rect.replace("<rect ", clip, 1)
         body.append(rect)
-        fades.append(fade)
-    body += fades
     body += [marks.area(line, sx, sy, plot_bottom, f"area{next(_CLIP_IDS)}") for line in chart.lines if line.fill]
     body += [marks.line(line, sx, sy) for line in chart.lines]
     body += [marks.dots(dots, sx, sy) for dots in chart.dots]

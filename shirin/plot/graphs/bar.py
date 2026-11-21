@@ -83,8 +83,7 @@ class BarPlotsMixin(PlotHost):
             normalized: Show percentages. With `hue`: 100% stacked bars of hue shares (overrides `stacked`).
                 Without `hue`: labels show each bar's share of the total. *Default: `False`*.
             split: How segments of stacked and normalized bars meet. **Options:** `'rounded'` (each
-                segment ends in a rounded cap over the next), `'gradient'` (segments blend into each other),
-                `'flat'` (hard straight edge). *Default: `'rounded'`*.
+                segment ends in a rounded cap over the next), `'flat'` (hard straight edge). *Default: `'rounded'`*.
             sort: How to sort categories. **Options:** `'frequency'`, `'alphabetical'`.
                 *Default: `'frequency'`*, or time order with `group_by`.
             top_n: Show only the top N most frequent categories. Only without `value`. *Optional*.

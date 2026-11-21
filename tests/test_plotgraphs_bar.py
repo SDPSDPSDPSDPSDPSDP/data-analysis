@@ -124,14 +124,13 @@ def test_stacked_bar_puts_largest_hue_first(shown: list[str]) -> None:
 
 def test_bar_split_option(df: pd.DataFrame, shown: list[str]) -> None:
     plot = PlotGraphs()
-    for split in ("rounded", "gradient", "flat"):
+    for split in ("rounded", "flat"):
         plot.bar(df, y="category", hue="group", stacked=True, split=split)
-    rounded, gradient, flat = shown
+    rounded, flat = shown
     assert "<linearGradient" not in rounded and "<clipPath" not in rounded
-    assert "<linearGradient" in gradient and "<clipPath" in gradient
     assert "<linearGradient" not in flat and "<clipPath" in flat
 
 
 def test_bar_rejects_unknown_split(df: pd.DataFrame) -> None:
     with pytest.raises(ValueError, match="split"):
-        PlotGraphs().bar(df, y="category", hue="group", stacked=True, split="wavy")
+        PlotGraphs().bar(df, y="category", hue="group", stacked=True, split="gradient")

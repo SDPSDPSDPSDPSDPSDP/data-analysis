@@ -80,11 +80,10 @@ def _stacked_bars(
     values: np.ndarray,
     colors: list[Sequence[str]],
     horizontal: bool,
-    fade: bool = True,
 ) -> None:
     """One bar per row of values, columns stacked in order as segments cut to one rounded outline.
 
-    colors: segment colors per row. fade: each segment blends into the next one instead of a hard edge.
+    colors: segment colors per row.
     """
     n_columns = values.shape[1]
     totals = values.sum(axis=1)
@@ -94,19 +93,8 @@ def _stacked_bars(
     base = np.zeros(len(values))
     for column in range(n_columns):
         for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
-            row_colors = colors[row]
-            next_color = next((row_colors[later] for later in range(column + 1, n_columns) if values[row, later]), None)
             chart.rects.append(
-                _bar_rect(
-                    center,
-                    width,
-                    start,
-                    value,
-                    row_colors[column],
-                    horizontal,
-                    clip=outlines[row],
-                    fade_to=next_color if fade else None,
-                )
+                _bar_rect(center, width, start, value, colors[row][column], horizontal, clip=outlines[row])
             )
         base += values[:, column]
 
@@ -148,7 +136,7 @@ def render_stacked_barplot(
 ) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
 
-    split: how segments meet, 'rounded' (rounded caps), 'gradient' (blend) or 'flat' (hard edge).
+    split: how segments meet, 'rounded' (rounded caps) or 'flat' (hard edge).
     row_colors: segment colors per row instead of colors.
     """
     values = df.to_numpy(dtype=float)
@@ -157,7 +145,7 @@ def render_stacked_barplot(
     if split == "rounded":
         _rounded_split_bars(chart, centers, width, values, segment_colors, horizontal)
     else:
-        _stacked_bars(chart, centers, width, values, segment_colors, horizontal, fade=split == "gradient")
+        _stacked_bars(chart, centers, width, values, segment_colors, horizontal)
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     set_legend(chart, colors, list(df.columns))
     return chart

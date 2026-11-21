@@ -124,22 +124,6 @@ def rect(r: Rect, sx: Scale, sy: Scale) -> str:
     return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{width:.2f}" height="{height:.2f}"{radius} fill="{r.color}"/>'
 
 
-def fade(r: Rect, sx: Scale, sy: Scale, gradient_id: str) -> str:
-    """Gradient band centered on the rect's end edge, so the next stack segment blends in."""
-    half = Layout.STACK_BLEND / 2
-    if r.horizontal:
-        ya, yb = sorted((sy(r.y0), sy(r.y1)))
-        x, y, w, h, direction = sx(r.x1) - half, ya, 2 * half, yb - ya, 'x2="1" y2="0"'
-    else:
-        xa, xb = sorted((sx(r.x0), sx(r.x1)))
-        x, y, w, h, direction = xa, sy(r.y1) - half, xb - xa, 2 * half, 'x1="0" y1="1" x2="0" y2="0"'
-    return (
-        f'<linearGradient id="{gradient_id}" {direction}><stop offset="0" stop-color="{r.color}"/>'
-        f'<stop offset="1" stop-color="{r.fade_to}"/></linearGradient>'
-        f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="url(#{gradient_id})"/>'
-    )
-
-
 def _segments(line: Line, sx: Scale, sy: Scale) -> list[list[tuple[float, float]]]:
     segments: list[list[tuple[float, float]]] = [[]]
     for x, y in zip(line.xs, line.ys):
