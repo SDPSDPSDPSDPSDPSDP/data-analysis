@@ -1,5 +1,6 @@
 """Axis limits, scales and tick selection for the SVG layout."""
-from typing import List, Optional, Tuple
+
+from typing import Optional
 
 from ..config import FontSizes, Layout, TextColors
 from .chart import Axis
@@ -7,10 +8,10 @@ from .fonts import text_width, wrap_text
 from .marks import Scale
 from .ticks import date_ticks, nice_ticks
 
-Ticks = List[Tuple[float, str]]
+Ticks = list[tuple[float, str]]
 
 
-def limits(axis: Axis, values: List[float]) -> Tuple[float, float]:
+def limits(axis: Axis, values: list[float]) -> tuple[float, float]:
     if axis.lim is not None:
         return axis.lim
     values = [v for v in values if v == v]
@@ -49,7 +50,7 @@ def tick_color(axis: Axis, other: Axis) -> str:
     return TextColors.LIGHT_GREY if is_value_axis else TextColors.DARK_GREY
 
 
-def description_lines(axis: Axis, position: float, sx: Optional[Scale] = None) -> List[str]:
+def description_lines(axis: Axis, position: float, sx: Optional[Scale] = None) -> list[str]:
     """The description under the tick at position, wrapped; empty when it has none.
 
     Pass the x scale for an x-axis: its descriptions also wrap to the space between ticks, so neighbours do not overlap.
@@ -58,7 +59,7 @@ def description_lines(axis: Axis, position: float, sx: Optional[Scale] = None) -
     if sx is not None and axis.ticks is not None and len(axis.ticks) > 1:
         tick_spacing = abs(sx(axis.ticks[1]) - sx(axis.ticks[0]))
         max_width = min(max_width, tick_spacing - Layout.TICK_LABEL_MIN_SPACE)
-    return wrap_text(dict(axis.descriptions).get(position, ''), FontSizes.DESCRIPTION, max_width)
+    return wrap_text(dict(axis.descriptions).get(position, ""), FontSizes.DESCRIPTION, max_width)
 
 
 def tick_label_width(axis: Axis, position: float, label: str, sx: Optional[Scale] = None) -> float:
@@ -90,5 +91,5 @@ def fit_x_ticks(axis: Axis, ticks: Ticks, sx: Scale) -> Ticks:
     thinned = ticks
     while _x_labels_overlap(axis, thinned, sx) and step < len(ticks):
         step += 1
-        thinned = [(t, label if i % step == 0 else '') for i, (t, label) in enumerate(ticks)]
+        thinned = [(t, label if i % step == 0 else "") for i, (t, label) in enumerate(ticks)]
     return thinned

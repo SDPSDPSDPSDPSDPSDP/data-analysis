@@ -65,9 +65,7 @@ export default function Nav({ categories, filter }: Props) {
               <button
                 type="button"
                 className={
-                  filter.active && filter.active !== category.title
-                    ? "nav-link nav-link-inactive"
-                    : "nav-link"
+                  filter.active && filter.active !== category.title ? "nav-link nav-link-inactive" : "nav-link"
                 }
                 aria-pressed={filter.active === category.title}
                 onClick={() => filter.onSelect(category.title)}
@@ -79,9 +77,9 @@ export default function Nav({ categories, filter }: Props) {
           ) : (
             <div
               key={category.title}
-              className={
-                dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"
-              }
+              className={dropdownClosed ? "nav-menu nav-menu-closed" : "nav-menu"}
+              // Layout wrapper; mouse-leave only resets the hover dropdown, keyboard users get it via :focus-within.
+              role="presentation"
               onMouseLeave={() => setDropdownClosed(false)}
             >
               <Link

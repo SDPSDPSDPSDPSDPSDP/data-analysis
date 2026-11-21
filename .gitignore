@@ -32,3 +32,9 @@ portfolio-stills/
 .wrangler/
 # Output of npm run portfolio:compare
 portfolio-compare.html
+
+# Test and type-check output
+.mypy_cache/
+.coverage
+coverage.xml
+junit.xml

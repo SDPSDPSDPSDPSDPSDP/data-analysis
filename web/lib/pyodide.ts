@@ -75,8 +75,11 @@ export function run(code: string): Promise<RunResult> {
     pending.set(id, resolve);
     worker!.postMessage({ id, code });
     // Loading is not timed (first Pyodide download is slow); a load failure is reported in the run result.
-    loaded.then(() => {
-      if (watchdog === undefined) armWatchdog();
-    }, () => {});
+    loaded.then(
+      () => {
+        if (watchdog === undefined) armWatchdog();
+      },
+      () => {},
+    );
   });
 }

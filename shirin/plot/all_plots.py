@@ -1,5 +1,5 @@
 import struct
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from .common.colors import to_rgb
 from .config import FigureSize
@@ -26,9 +26,9 @@ def show(svg: str) -> None:
     from IPython.display import display
 
     png = to_png(svg)
-    width, height = struct.unpack('>II', png[16:24])  # IHDR chunk: big-endian width, height
-    size = {'width': width // FigureSize.PNG_SCALE, 'height': height // FigureSize.PNG_SCALE}
-    display({'image/png': png}, metadata={'image/png': size}, raw=True)
+    width, height = struct.unpack(">II", png[16:24])  # IHDR chunk: big-endian width, height
+    size = {"width": width // FigureSize.PNG_SCALE, "height": height // FigureSize.PNG_SCALE}
+    display({"image/png": png}, metadata={"image/png": size}, raw=True)
 
 
 class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
@@ -58,16 +58,16 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
 
     def __init__(
         self,
-        font: Optional[str] = 'satoshi',
+        font: Optional[str] = "satoshi",
         palette: Optional[PaletteInput] = None,
         label_mapping: Optional[LabelMappingInput] = None,
         dark_mode: bool = False,
     ) -> None:
-        if font is not None and font.lower() != 'satoshi':
+        if font is not None and font.lower() != "satoshi":
             raise ValueError(f"Unknown font {font!r}. Supported values: 'satoshi', None.")
         self._font = font
         self._theme = Theme(dark_mode)
-        self._palette = merge_column_config('palette', DEFAULT_PALETTE, palette, (dict, str))
+        self._palette = merge_column_config("palette", DEFAULT_PALETTE, palette, (dict, str))
         # Hex only: contrast, blending and shades all need RGB, so a named color would fail on some charts only.
         for column, mapping in self._palette.items():
             for color in mapping.values() if isinstance(mapping, dict) else [mapping]:
@@ -75,13 +75,13 @@ class PlotGraphs(BarPlotsMixin, NumericPlotsMixin, SpecializedPlotsMixin):
                     to_rgb(color)
                 except (ValueError, AttributeError) as e:
                     raise ValueError(f"palette[{column!r}]: color {color!r} must be a hex string like '#1a2b3c'") from e
-        self._label_mapping = merge_column_config('label_mapping', DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
+        self._label_mapping = merge_column_config("label_mapping", DEFAULT_LABEL_MAPPING, label_mapping, (dict,))
 
-    def _column_config(self, column: Optional[str]) -> Dict[str, Any]:
+    def _column_config(self, column: Optional[str]) -> dict[str, Any]:
         """palette and label_map configured for a hue (or pie col) column."""
         if column is None:
-            return {'palette': self._theme.no_hue_palette, 'label_map': None}
-        return {'palette': self._theme.palette(self._palette.get(column)), 'label_map': self._label_mapping.get(column)}
+            return {"palette": self._theme.no_hue_palette, "label_map": None}
+        return {"palette": self._theme.palette(self._palette.get(column)), "label_map": self._label_mapping.get(column)}
 
     def _render(self, plot: AbstractPlot) -> None:
         show(to_svg(plot.render(), font=self._font, dark_mode=self._theme.dark))

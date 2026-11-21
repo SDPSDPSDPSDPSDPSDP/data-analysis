@@ -3,6 +3,7 @@
 import functools
 import os
 import re
+from typing import Any
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import URL, Engine
@@ -10,11 +11,11 @@ from sqlalchemy.engine import URL, Engine
 
 def _validate_schema(schema: str) -> None:
     # SET SCHEMA can't take a bind parameter, so only allow plain identifiers.
-    if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_$#@]*', schema):
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$#@]*", schema):
         raise ValueError(f"Invalid schema name: {schema!r}")
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _add_db2_dll_directory() -> None:
     """Windows needs the DB2 client DLLs on the search path; override with DB2_DLL_DIR."""
     if not hasattr(os, "add_dll_directory"):
@@ -31,14 +32,14 @@ def _add_db2_dll_directory() -> None:
 
 # ponytail: one pooled engine per (connection, schema) for the process lifetime; unbounded,
 # fine for a handful of configs. Add eviction/dispose if configs are generated dynamically.
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _get_engine(url: URL, schema: str) -> Engine:
     _add_db2_dll_directory()
     # pool_recycle (15 min, under typical DB2/firewall idle timeouts) replaces a pre-ping round trip per query.
     engine = create_engine(url, pool_recycle=900, pool_size=1, max_overflow=4)
 
     @event.listens_for(engine, "connect")
-    def _set_schema(dbapi_connection, _connection_record) -> None:
+    def _set_schema(dbapi_connection: Any, _connection_record: Any) -> None:
         # Once per physical connection instead of a round trip per query.
         cursor = dbapi_connection.cursor()
         cursor.execute(f"SET SCHEMA {schema}")

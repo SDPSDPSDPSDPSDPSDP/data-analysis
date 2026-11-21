@@ -6,7 +6,7 @@ def get_luminance(color: str) -> float:
     """WCAG relative luminance of a hex color (with or without '#')."""
     r, g, b = to_rgb(color)
 
-    def adjust(c):
+    def adjust(c: float) -> float:
         return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
 
     r, g, b = adjust(r), adjust(g), adjust(b)

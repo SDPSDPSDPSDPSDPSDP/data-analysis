@@ -22,10 +22,10 @@ def get_order(
     value_column: Optional[str] = None,
 ) -> Optional[list]:
     """Category order: by total (value sum or count), alphabetical, or None (data order)."""
-    if sort == 'frequency':
+    if sort == "frequency":
         totals = aggregate(df, column, value_column)
         return list(totals.sort_values(ascending=False).index)
-    if sort == 'alphabetical':
+    if sort == "alphabetical":
         return sort_alphabetically(df[column].unique())
     return None
 
@@ -35,8 +35,8 @@ def sort_by_frequency(df_pivot: pd.DataFrame, ascending: bool = False) -> pd.Dat
 
 
 def sort_pivot_table(df_pivot: pd.DataFrame, sort: Optional[SortInput], ascending: bool = False) -> pd.DataFrame:
-    if sort == 'frequency':
+    if sort == "frequency":
         return sort_by_frequency(df_pivot, ascending=ascending)
-    if sort == 'alphabetical':
+    if sort == "alphabetical":
         return df_pivot.loc[sort_alphabetically(df_pivot.index, ascending=ascending)]
     return df_pivot

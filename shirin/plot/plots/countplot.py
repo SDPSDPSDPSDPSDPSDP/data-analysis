@@ -15,4 +15,4 @@ class CountPlot(StackableCategoricalPlot):
         return df
 
     def _datalabel_formatting(self) -> str:
-        return 'percentage' if self.options.normalized and self.options.hue is None else 'totals'
+        return "percentage" if self.options.normalized and self.options.hue is None else "totals"

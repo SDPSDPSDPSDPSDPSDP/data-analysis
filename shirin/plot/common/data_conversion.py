@@ -1,15 +1,15 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import pandas as pd
 
-REMAINDER_SHARE_COL = '__share__'
-REMAINDER_LABEL = 'Remainder'
+REMAINDER_SHARE_COL = "__share__"
+REMAINDER_LABEL = "Remainder"
 # Reserved name: a user column called 'count' must not collide with the row counts.
-COUNT_COL = '__count__'
-_PERIODS = {'year': 'Y', 'month': 'M', 'day': 'D'}
-_PERIOD_STARTS = {'year': 'YS', 'month': 'MS', 'day': 'D'}
+COUNT_COL = "__count__"
+_PERIODS = {"year": "Y", "month": "M", "day": "D"}
+_PERIOD_STARTS = {"year": "YS", "month": "MS", "day": "D"}
 # ISO labels sort alphabetically in time order.
-_PERIOD_LABELS = {'year': '%Y', 'month': '%Y-%m', 'day': '%Y-%m-%d'}
+_PERIOD_LABELS = {"year": "%Y", "month": "%Y-%m", "day": "%Y-%m-%d"}
 
 
 def convert_dict_keys_to_string(d: Optional[dict]) -> Optional[dict]:
@@ -24,7 +24,7 @@ def ensure_column_is_string(df: pd.DataFrame, col: str) -> pd.DataFrame:
     return df
 
 
-def category_descriptions(df: pd.DataFrame, category_col: str, description_col: str) -> Dict[str, str]:
+def category_descriptions(df: pd.DataFrame, category_col: str, description_col: str) -> dict[str, str]:
     """{category: description}, keyed by str(category) like the tick labels. Categories without one are left out.
 
     Raises when a category has more than one distinct description.
@@ -91,16 +91,10 @@ def period_totals(df: pd.DataFrame, x: str, y: Optional[str], hue: Optional[str]
     return totals
 
 
-def fill_missing_values_in_data(
-    df: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: Optional[str],
-    fill_method: str
-) -> pd.DataFrame:
+def fill_missing_values_in_data(df: pd.DataFrame, x: str, y: str, hue: Optional[str], fill_method: str) -> pd.DataFrame:
     fills = {
-        'shift': lambda s: s.interpolate(method='linear', limit_direction='forward'),
-        'zero': lambda s: s.fillna(0),
+        "shift": lambda s: s.interpolate(method="linear", limit_direction="forward"),
+        "zero": lambda s: s.fillna(0),
     }
     # 'shift' interpolates between neighbours along x, so rows must be in x order.
     df = df.sort_values(x)
@@ -126,7 +120,10 @@ def fill_remainder(df: pd.DataFrame, category_col: str, value_col: str, remainde
     if not fractions.between(0, 1).all():
         raise ValueError(f"{value_col!r} must hold fractions in [0, 1] when remainder is set")
     shares = fractions.to_numpy()
-    return pd.concat([
-        pd.DataFrame({category_col: fractions.index, value_col: value_col, REMAINDER_SHARE_COL: shares}),
-        pd.DataFrame({category_col: fractions.index, value_col: remainder, REMAINDER_SHARE_COL: 1 - shares}),
-    ], ignore_index=True)
+    return pd.concat(
+        [
+            pd.DataFrame({category_col: fractions.index, value_col: value_col, REMAINDER_SHARE_COL: shares}),
+            pd.DataFrame({category_col: fractions.index, value_col: remainder, REMAINDER_SHARE_COL: 1 - shares}),
+        ],
+        ignore_index=True,
+    )

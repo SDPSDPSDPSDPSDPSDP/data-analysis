@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -18,22 +18,22 @@ def _set_axis_formatter(axis: Axis, numeric: bool, percentage: bool) -> None:
 
 def format_categorical_tick_labels(
     chart: Chart,
-    label_map: Optional[Dict[Any, str]],
+    label_map: Optional[dict[Any, str]],
     axis: str,
 ) -> None:
     if not label_map:
         return
-    target = chart.x if axis == 'x' else chart.y
+    target = chart.x if axis == "x" else chart.y
     if target.tick_labels is None:
         raise ValueError(f"Categorical {axis}-axis has no tick labels to map")
     target.tick_labels = [label_map.get(label, label) for label in target.tick_labels]
 
 
-def format_tick_descriptions(chart: Chart, descriptions: Optional[Dict[str, str]], axis: str) -> None:
+def format_tick_descriptions(chart: Chart, descriptions: Optional[dict[str, str]], axis: str) -> None:
     """Grey line under each category tick label; call before label_map renames the labels."""
     if not descriptions:
         return
-    target = chart.x if axis == 'x' else chart.y
+    target = chart.x if axis == "x" else chart.y
     if target.ticks is None or target.tick_labels is None:
         raise ValueError(f"Categorical {axis}-axis has no tick labels to describe")
     target.descriptions = [
@@ -64,11 +64,11 @@ def format_period_ticks(chart: Chart, periods: pd.Series, positions: pd.Series, 
     """
     step = next((s for s in Layout.MONTH_TICK_STEPS if len(periods) / s <= Layout.MAX_MONTH_TICKS), None)
     if months and step is not None:
-        shown, fmt = (periods.dt.month - 1) % step == 0, '%b'
+        shown, fmt = (periods.dt.month - 1) % step == 0, "%b"
         chart.x.rotation = Layout.MONTH_TICK_ROTATION
         first_of_year = periods.groupby(periods.dt.year).idxmin()
         chart.x.sub_labels = [(positions[i], str(periods[i].year)) for i in first_of_year]
     else:
-        shown, fmt = periods.dt.month == 1, '%Y'
+        shown, fmt = periods.dt.month == 1, "%Y"
     chart.x.ticks = list(positions[shown])
     chart.x.tick_labels = [d.strftime(fmt) for d in periods[shown]]

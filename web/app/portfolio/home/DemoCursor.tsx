@@ -34,8 +34,7 @@ export default function DemoCursor() {
 
     function moveTo(point: Point) {
       current = point;
-      cursorRef.current!.style.transform =
-        `translate(calc(${point.x}px - var(--demo-cursor-tip-x)), calc(${point.y}px - var(--demo-cursor-tip-y)))`;
+      cursorRef.current!.style.transform = `translate(calc(${point.x}px - var(--demo-cursor-tip-x)), calc(${point.y}px - var(--demo-cursor-tip-y)))`;
     }
 
     async function travel(el: Element) {

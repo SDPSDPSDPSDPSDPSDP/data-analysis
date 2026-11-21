@@ -27,15 +27,9 @@ class ScatterPlot(AbstractPlot[pd.DataFrame]):
             hue=self.options.hue,
             size=self.options.size,
             color=self._color,
-            palette=self._palette
+            palette=self._palette,
         )
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         self._format_labels_and_legend(plot)
-        format_ticks(
-            plot,
-            x_grid=True,
-            y_grid=True,
-            numeric_y=True,
-            numeric_x=True
-        )
+        format_ticks(plot, x_grid=True, y_grid=True, numeric_y=True, numeric_x=True)

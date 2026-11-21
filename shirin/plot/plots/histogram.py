@@ -53,17 +53,12 @@ class Histogram(AbstractPlot[pd.DataFrame]):
             hue=self.options.hue,
             color=self._color,
             palette=self._palette,
-            stacked=self.options.stacked
+            stacked=self.options.stacked,
         )
 
     def format_plot(self, plot: Any, data: pd.DataFrame) -> None:
         self._format_labels_and_legend(plot)
-        format_ticks(
-            plot,
-            y_grid=True,
-            numeric_x=not self._is_year,
-            numeric_y=True
-        )
+        format_ticks(plot, y_grid=True, numeric_x=not self._is_year, numeric_y=True)
         if self.options.suffix:
             plain, short = plot.x.formatter, plot.x.short_formatter
             plot.x.formatter = lambda val: with_suffix(plain(val), self.options.suffix)

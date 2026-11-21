@@ -17,4 +17,4 @@ class BarPlot(StackableCategoricalPlot):
         return ensure_column_is_string(self.options.df, self.options.axis_column)
 
     def _datalabel_formatting(self) -> str:
-        return 'percentage' if self.options.normalized else 'totals'
+        return "percentage" if self.options.normalized else "totals"

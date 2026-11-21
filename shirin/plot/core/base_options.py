@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, Optional, Union
+from typing import Any, ClassVar, Optional, Union
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ class InvalidOptionError(ValueError):
 
 VALID_SORTS = tuple(sort.value for sort in Sort)
 VALID_STACK_SPLITS = tuple(split.value for split in StackSplit)
-VALID_ORIENTATIONS = ('vertical', 'horizontal')
+VALID_ORIENTATIONS = ("vertical", "horizontal")
 VALID_TIME_GROUP_BY = tuple(time_group.value for time_group in TimeGroupBy)
 VALID_FILL_MISSING_VALUES = tuple(fill_option.value for fill_option in FillMissingValues)
 
@@ -37,7 +37,7 @@ def validate_str_or_enum_option(
             raise InvalidOptionError(f"Invalid {option_name} '{value}'. Valid options are: {valid_options}.")
         return
 
-    expected = 'strings' if enum_type is None else f'strings or {enum_type.__name__} enum values'
+    expected = "strings" if enum_type is None else f"strings or {enum_type.__name__} enum values"
     raise InvalidOptionError(
         f"Invalid {option_name} type '{type(value).__name__}'. Valid options are {expected}: {valid_options}."
     )
@@ -46,11 +46,11 @@ def validate_str_or_enum_option(
 @dataclass
 class BasePlotOptions:
     # Fields naming a df column; validate() checks each one that is set.
-    column_fields: ClassVar[tuple[str, ...]] = ('hue',)
+    column_fields: ClassVar[tuple[str, ...]] = ("hue",)
 
     df: pd.DataFrame
-    palette: Optional[Union[Dict[Any, str], str]] = None
-    label_map: Optional[Dict[Any, str]] = None
+    palette: Optional[Union[dict[Any, str], str]] = None
+    label_map: Optional[dict[Any, str]] = None
     x_axis_label: Optional[TitleInput] = None
     y_axis_label: Optional[TitleInput] = None
     legend: bool = False
@@ -65,5 +65,6 @@ class BasePlotOptions:
             if column and column not in self.df.columns:
                 raise ValueError(f"{field_name}={column!r} is not a column. Available columns: {list(self.df.columns)}")
 
-        self.palette = convert_dict_keys_to_string(self.palette)
+        if isinstance(self.palette, dict):
+            self.palette = convert_dict_keys_to_string(self.palette)
         self.label_map = convert_dict_keys_to_string(self.label_map)

@@ -1,135 +1,137 @@
 """Smoke tests: every public PlotGraphs method renders without raising, plus argument validation."""
+
 import re
-from typing import List
 
 import pandas as pd
 import pytest
 
 from shirin.plot import PlotGraphs
 
-GROUP_PALETTE = {'group': {'x': '#111111', 'y': '#eeeeee'}}
-GROUP_LABELS = {'group': {'x': 'Ex'}}
+GROUP_PALETTE = {"group": {"x": "#111111", "y": "#eeeeee"}}
+GROUP_LABELS = {"group": {"x": "Ex"}}
 
 
-def test_countplot_direction_from_x_or_y(df: pd.DataFrame, shown: List[str]) -> None:
-    PlotGraphs().bar(df, y='category')
-    PlotGraphs().bar(df, y='category', x_axis_label='')
-    assert '>Count</text>' in shown[0]
-    assert '>Count</text>' not in shown[1]
-    with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().bar(df, x='category', y='category')
-    with pytest.raises(ValueError, match='exactly one of x or y'):
+def test_countplot_direction_from_x_or_y(df: pd.DataFrame, shown: list[str]) -> None:
+    PlotGraphs().bar(df, y="category")
+    PlotGraphs().bar(df, y="category", x_axis_label="")
+    assert ">Count</text>" in shown[0]
+    assert ">Count</text>" not in shown[1]
+    with pytest.raises(ValueError, match="exactly one of x or y"):
+        PlotGraphs().bar(df, x="category", y="category")
+    with pytest.raises(ValueError, match="exactly one of x or y"):
         PlotGraphs().bar(df)
 
 
 def test_barplot_needs_exactly_one_of_x_or_y(df: pd.DataFrame) -> None:
-    with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().bar(df, x='category', y='category', value='value')
-    with pytest.raises(ValueError, match='exactly one of x or y'):
-        PlotGraphs().bar(df, value='value')
+    with pytest.raises(ValueError, match="exactly one of x or y"):
+        PlotGraphs().bar(df, x="category", y="category", value="value")
+    with pytest.raises(ValueError, match="exactly one of x or y"):
+        PlotGraphs().bar(df, value="value")
 
 
 def test_bar_rejects_options_of_the_other_mode(df: pd.DataFrame) -> None:
-    with pytest.raises(ValueError, match='remainder needs value'):
-        PlotGraphs().bar(df, x='category', normalized=True, remainder=True)
-    with pytest.raises(ValueError, match='top_n only works without value'):
-        PlotGraphs().bar(df, x='category', value='value', top_n=2)
+    with pytest.raises(ValueError, match="remainder needs value"):
+        PlotGraphs().bar(df, x="category", normalized=True, remainder=True)
+    with pytest.raises(ValueError, match="top_n only works without value"):
+        PlotGraphs().bar(df, x="category", value="value", top_n=2)
 
 
-def test_bar_group_by_fills_empty_periods_in_time_order(shown: List[str]) -> None:
-    df = pd.DataFrame({'date': pd.to_datetime(['2024-03-02', '2024-01-05', '2024-03-09'])})
-    PlotGraphs().bar(df, x='date', group_by='month')
-    PlotGraphs().bar(df, x='date', group_by='day')
+def test_bar_group_by_fills_empty_periods_in_time_order(shown: list[str]) -> None:
+    df = pd.DataFrame({"date": pd.to_datetime(["2024-03-02", "2024-01-05", "2024-03-09"])})
+    PlotGraphs().bar(df, x="date", group_by="month")
+    PlotGraphs().bar(df, x="date", group_by="day")
     month_svg, day_svg = shown
-    assert month_svg.index('>Jan</text>') < month_svg.index('>Feb</text>') < month_svg.index('>Mar</text>')
-    assert '>2024</text>' in month_svg
-    assert day_svg.count('>2024-') <= 12
+    assert month_svg.index(">Jan</text>") < month_svg.index(">Feb</text>") < month_svg.index(">Mar</text>")
+    assert ">2024</text>" in month_svg
+    assert day_svg.count(">2024-") <= 12
 
 
 def test_bar_group_by_rejects_incompatible_options(df: pd.DataFrame) -> None:
-    with pytest.raises(ValueError, match='group_by needs x'):
-        PlotGraphs().bar(df, y='date', group_by='month')
-    with pytest.raises(ValueError, match='does not work with sort'):
-        PlotGraphs().bar(df, x='date', group_by='month', sort='frequency')
-    with pytest.raises(ValueError, match='Valid options'):
-        PlotGraphs().bar(df, x='date', group_by='week')
+    with pytest.raises(ValueError, match="group_by needs x"):
+        PlotGraphs().bar(df, y="date", group_by="month")
+    with pytest.raises(ValueError, match="does not work with sort"):
+        PlotGraphs().bar(df, x="date", group_by="month", sort="frequency")
+    with pytest.raises(ValueError, match="Valid options"):
+        PlotGraphs().bar(df, x="date", group_by="week")
 
 
-def test_bar_compact_labels(shown: List[str]) -> None:
-    df = pd.DataFrame({'category': ['a', 'b'], 'value': [1_228_787, 457_435]})
-    PlotGraphs().bar(df, y='category', value='value')
-    PlotGraphs().bar(df, y='category', value='value', compact_labels=False)
-    assert '1,2M' in shown[0] and '457k' in shown[0]
-    assert '1.228.787' in shown[1] and '457.435' in shown[1]
+def test_bar_compact_labels(shown: list[str]) -> None:
+    df = pd.DataFrame({"category": ["a", "b"], "value": [1_228_787, 457_435]})
+    PlotGraphs().bar(df, y="category", value="value")
+    PlotGraphs().bar(df, y="category", value="value", compact_labels=False)
+    assert "1,2M" in shown[0] and "457k" in shown[0]
+    assert "1.228.787" in shown[1] and "457.435" in shown[1]
 
 
-DESCRIBED = pd.DataFrame({
-    'name': ['v1', 'v2', 'v3'],
-    'accuracy': [0.8, 0.86, 0.7],
-    'description': ['Baseline', 'Route features', None],
-})
+DESCRIBED = pd.DataFrame(
+    {
+        "name": ["v1", "v2", "v3"],
+        "accuracy": [0.8, 0.86, 0.7],
+        "description": ["Baseline", "Route features", None],
+    }
+)
 
 
 def _text_y(svg: str, text: str) -> float:
     match = re.search(rf'<text x="[\d.]+" y="([\d.]+)"[^>]*>{re.escape(text)}</text>', svg)
-    assert match, f'{text!r} not in SVG'
+    assert match, f"{text!r} not in SVG"
     return float(match.group(1))
 
 
-def test_bar_description_line_under_each_category_label(shown: List[str]) -> None:
-    PlotGraphs().bar(DESCRIBED, y='name', value='accuracy', description='description')
-    PlotGraphs().bar(DESCRIBED, x='name', value='accuracy', description='description')
-    PlotGraphs().bar(DESCRIBED, y='name', value='accuracy', normalized=True, remainder=True, description='description')
+def test_bar_description_line_under_each_category_label(shown: list[str]) -> None:
+    PlotGraphs().bar(DESCRIBED, y="name", value="accuracy", description="description")
+    PlotGraphs().bar(DESCRIBED, x="name", value="accuracy", description="description")
+    PlotGraphs().bar(DESCRIBED, y="name", value="accuracy", normalized=True, remainder=True, description="description")
     for svg in shown:
-        assert _text_y(svg, 'v1') < _text_y(svg, 'Baseline')
-        assert _text_y(svg, 'v2') < _text_y(svg, 'Route features')
-        assert '>None</text>' not in svg and '>nan</text>' not in svg
+        assert _text_y(svg, "v1") < _text_y(svg, "Baseline")
+        assert _text_y(svg, "v2") < _text_y(svg, "Route features")
+        assert ">None</text>" not in svg and ">nan</text>" not in svg
 
 
 def test_bar_description_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="description='notes' is not a column"):
-        PlotGraphs().bar(DESCRIBED, y='name', description='notes')
-    conflicting = pd.DataFrame({'name': ['a', 'a'], 'description': ['one', 'two']})
+        PlotGraphs().bar(DESCRIBED, y="name", description="notes")
+    conflicting = pd.DataFrame({"name": ["a", "a"], "description": ["one", "two"]})
     with pytest.raises(ValueError, match=r"differs for \['a'\]"):
-        PlotGraphs().bar(conflicting, y='name', description='description')
-    dates = pd.DataFrame({'date': pd.to_datetime(['2024-01-01']), 'description': ['x']})
-    with pytest.raises(ValueError, match='descriptions do not work with group_by'):
-        PlotGraphs().bar(dates, x='date', group_by='month', description='description')
+        PlotGraphs().bar(conflicting, y="name", description="description")
+    dates = pd.DataFrame({"date": pd.to_datetime(["2024-01-01"]), "description": ["x"]})
+    with pytest.raises(ValueError, match="descriptions do not work with group_by"):
+        PlotGraphs().bar(dates, x="date", group_by="month", description="description")
 
 
-def test_bar_long_description_wraps_onto_more_lines(shown: List[str]) -> None:
-    long = 'Baseline model trained on the original feature set'
-    df = pd.DataFrame({'name': ['v1', 'v2'], 'accuracy': [0.8, 0.9], 'description': [long, 'Short']})
-    PlotGraphs().bar(df, y='name', value='accuracy', description='description')
-    PlotGraphs().bar(df, x='name', value='accuracy', description='description')
+def test_bar_long_description_wraps_onto_more_lines(shown: list[str]) -> None:
+    long = "Baseline model trained on the original feature set"
+    df = pd.DataFrame({"name": ["v1", "v2"], "accuracy": [0.8, 0.9], "description": [long, "Short"]})
+    PlotGraphs().bar(df, y="name", value="accuracy", description="description")
+    PlotGraphs().bar(df, x="name", value="accuracy", description="description")
     for svg in shown:
         assert long not in svg
         lines = re.findall(r'<text x="[\d.]+" y="([\d.]+)"[^>]*>([^<]*)</text>', svg)
         long_lines = [(float(y), text) for y, text in lines if text and text in long]
         assert len(long_lines) > 1
-        assert ' '.join(text for _, text in sorted(long_lines)) == long
-        assert _text_y(svg, 'v1') < min(y for y, _ in long_lines)
+        assert " ".join(text for _, text in sorted(long_lines)) == long
+        assert _text_y(svg, "v1") < min(y for y, _ in long_lines)
 
 
-def test_stacked_bar_puts_largest_hue_first(shown: List[str]) -> None:
-    df = pd.DataFrame({'category': ['a'] * 4 + ['b'] * 3, 'ok': [False, True, True, True, True, True, True]})
-    palette = {'ok': {True: '#111111', False: '#eeeeee'}}
-    PlotGraphs(palette=palette).bar(df, y='category', hue='ok', stacked=True, legend=True)
-    PlotGraphs(palette=palette).bar(df, y='category', hue='ok', normalized=True, legend=True)
+def test_stacked_bar_puts_largest_hue_first(shown: list[str]) -> None:
+    df = pd.DataFrame({"category": ["a"] * 4 + ["b"] * 3, "ok": [False, True, True, True, True, True, True]})
+    palette = {"ok": {True: "#111111", False: "#eeeeee"}}
+    PlotGraphs(palette=palette).bar(df, y="category", hue="ok", stacked=True, legend=True)
+    PlotGraphs(palette=palette).bar(df, y="category", hue="ok", normalized=True, legend=True)
     for svg in shown:
-        assert svg.index('>True<') < svg.index('>False<')
+        assert svg.index(">True<") < svg.index(">False<")
 
 
-def test_bar_split_option(df: pd.DataFrame, shown: List[str]) -> None:
+def test_bar_split_option(df: pd.DataFrame, shown: list[str]) -> None:
     plot = PlotGraphs()
-    for split in ('rounded', 'gradient', 'flat'):
-        plot.bar(df, y='category', hue='group', stacked=True, split=split)
+    for split in ("rounded", "gradient", "flat"):
+        plot.bar(df, y="category", hue="group", stacked=True, split=split)
     rounded, gradient, flat = shown
-    assert '<linearGradient' not in rounded and '<clipPath' not in rounded
-    assert '<linearGradient' in gradient and '<clipPath' in gradient
-    assert '<linearGradient' not in flat and '<clipPath' in flat
+    assert "<linearGradient" not in rounded and "<clipPath" not in rounded
+    assert "<linearGradient" in gradient and "<clipPath" in gradient
+    assert "<linearGradient" not in flat and "<clipPath" in flat
 
 
 def test_bar_rejects_unknown_split(df: pd.DataFrame) -> None:
-    with pytest.raises(ValueError, match='split'):
-        PlotGraphs().bar(df, y='category', hue='group', stacked=True, split='wavy')
+    with pytest.raises(ValueError, match="split"):
+        PlotGraphs().bar(df, y="category", hue="group", stacked=True, split="wavy")

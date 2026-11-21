@@ -2,7 +2,7 @@ import base64
 import functools
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from ..config import FontSizes
 
@@ -11,12 +11,12 @@ FONT_FILES = {500: "Satoshi-Medium.woff2", 700: "Satoshi-Bold.woff2"}
 TTF_FILES = [str(FONTS_DIR / name.replace(".woff2", ".ttf")) for name in FONT_FILES.values()]
 
 
-@functools.lru_cache(maxsize=None)
-def _metrics() -> Dict[str, Any]:
+@functools.cache
+def _metrics() -> dict[str, Any]:
     path = FONTS_DIR / "satoshi_metrics.json"
     if not path.exists():
         raise FileNotFoundError(f"Font metrics not found at {path}; reinstall the package.")
-    return json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def is_large(size: float) -> bool:
@@ -31,16 +31,16 @@ def letter_spacing(size: float, bold: bool) -> float:
 
 def text_width(text: str, size: float, bold: bool = False) -> float:
     """Width in points. Always measured with Satoshi, so with font=None it is an estimate."""
-    metrics = _metrics()['bold' if bold else 'regular']
-    widths, default = metrics['widths'], metrics['default']
+    metrics = _metrics()["bold" if bold else "regular"]
+    widths, default = metrics["widths"], metrics["default"]
     return size * (sum(widths.get(str(ord(char)), default) for char in text) + letter_spacing(size, bold) * len(text))
 
 
-def wrap_text(text: str, size: float, max_width: float) -> List[str]:
+def wrap_text(text: str, size: float, max_width: float) -> list[str]:
     """Split text on spaces into lines no wider than max_width; a single longer word gets its own line."""
-    lines: List[str] = []
+    lines: list[str] = []
     for word in text.split():
-        candidate = f'{lines[-1]} {word}' if lines else word
+        candidate = f"{lines[-1]} {word}" if lines else word
         if lines and text_width(candidate, size) <= max_width:
             lines[-1] = candidate
         else:
@@ -49,15 +49,14 @@ def wrap_text(text: str, size: float, max_width: float) -> List[str]:
 
 
 def cap_height(size: float) -> float:
-    return size * _metrics()['regular']['cap_height']
+    return size * _metrics()["regular"]["cap_height"]
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _font_face(weight: int) -> str:
     data = base64.b64encode((FONTS_DIR / FONT_FILES[weight]).read_bytes()).decode()
     return (
-        f"@font-face{{font-family:Satoshi;font-weight:{weight};"
-        f"src:url(data:font/woff2;base64,{data}) format('woff2')}}"
+        f"@font-face{{font-family:Satoshi;font-weight:{weight};src:url(data:font/woff2;base64,{data}) format('woff2')}}"
     )
 
 
@@ -65,11 +64,13 @@ def font_css(font: Optional[str], bold_used: bool) -> str:
     """Style block for the SVG; Satoshi is embedded so the chart renders the same everywhere."""
     if font is None:
         return "text{font-family:Helvetica,Arial,sans-serif;font-feature-settings:'tnum'}.b{font-weight:700}"
-    faces = _font_face(500) + (_font_face(700) if bold_used else '')
-    return ''.join([
-        faces,
-        f"text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{FontSizes.LETTER_SPACING}em}}",
-        f".l{{letter-spacing:{FontSizes.LARGE_LETTER_SPACING}em}}",
-        f".b{{font-weight:700;letter-spacing:{FontSizes.BOLD_LETTER_SPACING}em}}",
-        f".s{{letter-spacing:{FontSizes.SUBLABEL_LETTER_SPACING}em}}",
-    ])
+    faces = _font_face(500) + (_font_face(700) if bold_used else "")
+    return "".join(
+        [
+            faces,
+            f"text{{font-family:Satoshi;font-weight:500;font-feature-settings:'tnum';letter-spacing:{FontSizes.LETTER_SPACING}em}}",
+            f".l{{letter-spacing:{FontSizes.LARGE_LETTER_SPACING}em}}",
+            f".b{{font-weight:700;letter-spacing:{FontSizes.BOLD_LETTER_SPACING}em}}",
+            f".s{{letter-spacing:{FontSizes.SUBLABEL_LETTER_SPACING}em}}",
+        ]
+    )

@@ -11,8 +11,7 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
       <h1>Something went wrong</h1>
       <ErrorText>{error.message}</ErrorText>
       <p>
-        <LinkButton onClick={reset}>Try again</LinkButton>{" "}
-        or <Link href="/">go back to all charts</Link>.
+        <LinkButton onClick={reset}>Try again</LinkButton> or <Link href="/">go back to all charts</Link>.
       </p>
     </main>
   );

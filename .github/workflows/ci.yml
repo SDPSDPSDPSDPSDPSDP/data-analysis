@@ -36,13 +36,26 @@ jobs:
         run: uv run python -c "import sys; assert sys.version.startswith('${{ matrix.python-version }}.'), sys.version"
 
       - name: Lint
-        run: uv run ruff check
+        run: uv run ruff check .
+
+      - name: Format
+        run: uv run ruff format --check .
+
+      - name: Typecheck
+        run: uv run mypy
 
       - name: Run tests
-        run: uv run python -m pytest tests/ -v
+        run: uv run python -m pytest -v
+
+      # Repo hooks (dashes, secrets, large files) as a gate --no-verify can't skip.
+      # no-commit-to-branch skipped: CI also runs on the push to master after a merge.
+      - name: Pre-commit hooks
+        run: uv run pre-commit run --all-files --show-diff-on-failure
+        env:
+          SKIP: no-commit-to-branch
 
   web:
-    name: Web build
+    name: Web - build, lint, types, format, tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,5 +82,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Typecheck
-        run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm test

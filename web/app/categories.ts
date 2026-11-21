@@ -5,45 +5,59 @@ import { parseExamples, previewPath } from "./exampleFiles.ts";
 
 // Sections without a data format are tools: they draw no chart to prerender.
 // Takes the global setup so it is read and parsed once per getCategories call, not once per section.
-const sectionBuilder = (globalSetup: string) => (title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData => {
-  const { setup, examples, homeExamples } = parseExamples(file);
-  if (dataFormats.length === 0) return { title, dataFormats, setup, examples, homeExamples };
-  const withPreview = (example: Example) => {
-    const code = `${exampleSetup(globalSetup, setup, example)}\n${example.code}`;
-    return { ...example, preview: previewPath(code), darkPreview: previewPath(withDarkMode(code, true)) };
+const sectionBuilder =
+  (globalSetup: string) =>
+  (title: string, file: string, ...dataFormats: DataFormat[]): PlotSectionData => {
+    const { setup, examples, homeExamples } = parseExamples(file);
+    if (dataFormats.length === 0) return { title, dataFormats, setup, examples, homeExamples };
+    const withPreview = (example: Example) => {
+      const code = `${exampleSetup(globalSetup, setup, example)}\n${example.code}`;
+      return { ...example, preview: previewPath(code), darkPreview: previewPath(withDarkMode(code, true)) };
+    };
+    return {
+      title,
+      dataFormats,
+      setup,
+      examples: examples.map(withPreview),
+      homeExamples: homeExamples.map(withPreview),
+    };
   };
-  return { title, dataFormats, setup, examples: examples.map(withPreview), homeExamples: homeExamples.map(withPreview) };
-};
 
 export function getCategories(): Category[] {
   const section = sectionBuilder(getGlobalSetup());
   const barCharts = [
-    section("Barplots", "bar.py", {
-      description: "Without value: one row per observation. The plot counts the rows per category.",
-      columns: [
-        { name: "fruit", role: "x or y" },
-        { name: "is_ripe", role: "hue" },
-      ],
-      rows: [
-        ["Apple", "True"],
-        ["Apple", "False"],
-        ["Apple", "False"],
-        ["Orange", "True"],
-      ],
-    }, {
-      description: "With value: one row per category and hue, with the value already calculated. The plot sums the values per category.",
-      columns: [
-        { name: "fruit", role: "x or y" },
-        { name: "is_ripe", role: "hue" },
-        { name: "count", role: "value" },
-      ],
-      rows: [
-        ["Apple", "False", "5"],
-        ["Apple", "True", "40"],
-        ["Banana", "False", "12"],
-        ["Banana", "True", "4"],
-      ],
-    }),
+    section(
+      "Barplots",
+      "bar.py",
+      {
+        description: "Without value: one row per observation. The plot counts the rows per category.",
+        columns: [
+          { name: "fruit", role: "x or y" },
+          { name: "is_ripe", role: "hue" },
+        ],
+        rows: [
+          ["Apple", "True"],
+          ["Apple", "False"],
+          ["Apple", "False"],
+          ["Orange", "True"],
+        ],
+      },
+      {
+        description:
+          "With value: one row per category and hue, with the value already calculated. The plot sums the values per category.",
+        columns: [
+          { name: "fruit", role: "x or y" },
+          { name: "is_ripe", role: "hue" },
+          { name: "count", role: "value" },
+        ],
+        rows: [
+          ["Apple", "False", "5"],
+          ["Apple", "True", "40"],
+          ["Banana", "False", "12"],
+          ["Banana", "True", "4"],
+        ],
+      },
+    ),
     section("Histograms", "histogram.py", {
       description: "One row per observation with a numeric value. The plot counts the rows per bin.",
       columns: [
@@ -75,34 +89,41 @@ export function getCategories(): Category[] {
     }),
   ];
   const lineCharts = [
-    section("Time plots", "time.py", {
-      description: "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
-      columns: [
-        { name: "year", role: "x" },
-        { name: "n_harvested", role: "y" },
-        { name: "is_ripe", role: "hue" },
-      ],
-      rows: [
-        ["2000", "83", "True"],
-        ["2000", "44", "False"],
-        ["2001", "199", "True"],
-        ["2001", "68", "False"],
-      ],
-    }, {
-      description: "Without y: one row per observation with a date. group_by counts the rows per year, month or day.",
-      columns: [
-        { name: "date", role: "x" },
-        { name: "is_ripe", role: "hue" },
-      ],
-      rows: [
-        ["2018-01-01", "True"],
-        ["2018-01-01", "False"],
-        ["2018-01-02", "True"],
-        ["2018-01-04", "False"],
-      ],
-    }),
+    section(
+      "Time plots",
+      "time.py",
+      {
+        description:
+          "With y: one row per x value and hue, with the y value already calculated. The plot draws one line per hue.",
+        columns: [
+          { name: "year", role: "x" },
+          { name: "n_harvested", role: "y" },
+          { name: "is_ripe", role: "hue" },
+        ],
+        rows: [
+          ["2000", "83", "True"],
+          ["2000", "44", "False"],
+          ["2001", "199", "True"],
+          ["2001", "68", "False"],
+        ],
+      },
+      {
+        description: "Without y: one row per observation with a date. group_by counts the rows per year, month or day.",
+        columns: [
+          { name: "date", role: "x" },
+          { name: "is_ripe", role: "hue" },
+        ],
+        rows: [
+          ["2018-01-01", "True"],
+          ["2018-01-01", "False"],
+          ["2018-01-02", "True"],
+          ["2018-01-04", "False"],
+        ],
+      },
+    ),
     section("Line plots", "line.py", {
-      description: "One row per point with two numeric values. The plot draws a line through them, one per hue; marks puts a dot on rows where it is True.",
+      description:
+        "One row per point with two numeric values. The plot draws a line through them, one per hue; marks puts a dot on rows where it is True.",
       columns: [
         { name: "detector", role: "hue" },
         { name: "coverage", role: "x" },

@@ -1,5 +1,7 @@
 """Bar marks: categorical, stacked and histogram."""
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+from collections.abc import Sequence
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -20,7 +22,7 @@ def _bar_rect(
     return Rect(lo, hi, base, base + value, color, **kwargs)
 
 
-def _category_axis(chart: Chart, labels: List[str], horizontal: bool, top_down: bool) -> None:
+def _category_axis(chart: Chart, labels: list[str], horizontal: bool, top_down: bool) -> None:
     """Categories at 0..n-1; horizontal bars put the first category on top when top_down."""
     n = len(labels)
     axis, value_axis = (chart.y, chart.x) if horizontal else (chart.x, chart.y)
@@ -30,7 +32,7 @@ def _category_axis(chart: Chart, labels: List[str], horizontal: bool, top_down: 
 
 
 def _draw_categorical_bars(
-    chart: Chart, table: pd.DataFrame, colors: List[str], horizontal: bool, hue: Optional[str]
+    chart: Chart, table: pd.DataFrame, colors: list[str], horizontal: bool, hue: Optional[str]
 ) -> Chart:
     """One bar group per row of table, one dodged bar per column; NaN cells are not drawn."""
     # hue equal to the category column fills one cell per row: draw full-width bars, no dodge.
@@ -56,9 +58,9 @@ def render_barplot(
     value: Optional[str],
     horizontal: bool,
     hue: Optional[str] = None,
-    order: Optional[List[Any]] = None,
+    order: Optional[list[Any]] = None,
     color: Optional[str] = None,
-    palette: Optional[Dict[Any, str]] = None,
+    palette: Optional[dict[Any, str]] = None,
 ) -> Chart:
     """Bar length is the sum of value per category (and hue), or the row count when value is None."""
     order = order if order is not None else list(df[column].dropna().unique())
@@ -72,7 +74,12 @@ def render_barplot(
 
 
 def _stacked_bars(
-    chart: Chart, centers: List[float], width: float, values: np.ndarray, colors: List[Sequence[str]], horizontal: bool,
+    chart: Chart,
+    centers: list[float],
+    width: float,
+    values: np.ndarray,
+    colors: list[Sequence[str]],
+    horizontal: bool,
     fade: bool = True,
 ) -> None:
     """One bar per row of values, columns stacked in order as segments cut to one rounded outline.
@@ -81,21 +88,31 @@ def _stacked_bars(
     """
     n_columns = values.shape[1]
     totals = values.sum(axis=1)
-    outlines = [_bar_rect(center, width, 0, total, '', horizontal, rounded=True) for center, total in zip(centers, totals)]
+    outlines = [
+        _bar_rect(center, width, 0, total, "", horizontal, rounded=True) for center, total in zip(centers, totals)
+    ]
     base = np.zeros(len(values))
     for column in range(n_columns):
         for row, (center, start, value) in enumerate(zip(centers, base, values[:, column])):
             row_colors = colors[row]
             next_color = next((row_colors[later] for later in range(column + 1, n_columns) if values[row, later]), None)
-            chart.rects.append(_bar_rect(
-                center, width, start, value, row_colors[column], horizontal,
-                clip=outlines[row], fade_to=next_color if fade else None,
-            ))
+            chart.rects.append(
+                _bar_rect(
+                    center,
+                    width,
+                    start,
+                    value,
+                    row_colors[column],
+                    horizontal,
+                    clip=outlines[row],
+                    fade_to=next_color if fade else None,
+                )
+            )
         base += values[:, column]
 
 
 def _rounded_split_bars(
-    chart: Chart, centers: List[float], width: float, values: np.ndarray, colors: List[Sequence[str]], horizontal: bool
+    chart: Chart, centers: list[float], width: float, values: np.ndarray, colors: list[Sequence[str]], horizontal: bool
 ) -> None:
     """Each segment a pill to its stack end, drawn back to front: segments meet in rounded caps.
 
@@ -106,20 +123,28 @@ def _rounded_split_bars(
         for column in reversed(range(len(row_values))):
             if row_values[column]:
                 before = row_ends[column] - row_values[column]
-                chart.rects.append(_bar_rect(
-                    center, width, 0, row_ends[column], row_colors[column], horizontal,
-                    rounded=True, tuck=float(before) if before else None,
-                ))
+                chart.rects.append(
+                    _bar_rect(
+                        center,
+                        width,
+                        0,
+                        row_ends[column],
+                        row_colors[column],
+                        horizontal,
+                        rounded=True,
+                        tuck=float(before) if before else None,
+                    )
+                )
 
 
 def render_stacked_barplot(
     chart: Chart,
     df: pd.DataFrame,
     horizontal: bool,
-    colors: List[str],
+    colors: list[str],
     width: float = Marks.BAR_WIDTH,
-    split: str = 'rounded',
-    row_colors: Optional[List[Tuple[str, ...]]] = None,
+    split: str = "rounded",
+    row_colors: Optional[Sequence[Sequence[str]]] = None,
 ) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
 
@@ -127,12 +152,12 @@ def render_stacked_barplot(
     row_colors: segment colors per row instead of colors.
     """
     values = df.to_numpy(dtype=float)
-    centers = list(range(len(df)))
-    segment_colors: List[Sequence[str]] = list(row_colors) if row_colors is not None else [colors] * len(df)
-    if split == 'rounded':
+    centers: list[float] = list(range(len(df)))
+    segment_colors: list[Sequence[str]] = list(row_colors) if row_colors is not None else [colors] * len(df)
+    if split == "rounded":
         _rounded_split_bars(chart, centers, width, values, segment_colors, horizontal)
     else:
-        _stacked_bars(chart, centers, width, values, segment_colors, horizontal, fade=split == 'gradient')
+        _stacked_bars(chart, centers, width, values, segment_colors, horizontal, fade=split == "gradient")
     _category_axis(chart, [str(category) for category in df.index], horizontal, top_down=False)
     set_legend(chart, colors, list(df.columns))
     return chart
@@ -145,7 +170,7 @@ def render_histogram(
     bins: int,
     hue: Optional[str] = None,
     color: Optional[str] = None,
-    palette: Optional[Dict[Any, str]] = None,
+    palette: Optional[dict[Any, str]] = None,
     stacked: Optional[bool] = None,
 ) -> Chart:
     """With hue, groups stack unless stacked is False, then they are drawn side by side."""
@@ -160,12 +185,14 @@ def render_histogram(
     if hue is not None and stacked is not False:
         centers = list((edges[:-1] + edges[1:]) / 2)
         bar_width = bin_width - 2 * inset
-        _stacked_bars(chart, centers, bar_width, np.column_stack(group_counts), [colors] * len(centers), horizontal=False)
+        _stacked_bars(
+            chart, centers, bar_width, np.column_stack(group_counts), [colors] * len(centers), horizontal=False
+        )
         return chart
     for i, (counts, group_color) in enumerate(zip(group_counts, colors)):
         for left, right, count in zip(edges[:-1] + inset, edges[1:] - inset, counts):
             if hue is not None:
                 step = (right - left) / len(groups)
                 left, right = left + i * step, left + (i + 1) * step
-            chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
+            chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))
     return chart

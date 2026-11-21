@@ -18,16 +18,19 @@ type Props = {
 };
 
 export default function Playground({ title, setup, categories, showSetup, expanded }: Props) {
-  const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => cell.code));
-  // Edits apply to the examples only once a setup cell is run.
-  const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
   // Toggling dark mode edits the shown PlotGraphs(...) call and reruns the examples with it.
   const dark = useDarkMode();
-  useEffect(() => {
-    const toggle = (code: string) => (code.includes("PlotGraphs(") ? withDarkMode(code, dark) : code);
-    setSetupCodes((codes) => codes.map(toggle));
-    setSetupCode(toggle);
-  }, [dark]);
+  const toggle = (code: string) => (code.includes("PlotGraphs(") ? withDarkMode(code, dark) : code);
+  const [setupCodes, setSetupCodes] = useState(() => setup.map((cell) => toggle(cell.code)));
+  // Edits apply to the examples only once a setup cell is run.
+  const [setupCode, setSetupCode] = useState(() => setupCodes.join("\n\n"));
+  // Adjusted during render, not in an effect, so the examples never run once with the stale theme.
+  const [codesDark, setCodesDark] = useState(dark);
+  if (codesDark !== dark) {
+    setCodesDark(dark);
+    setSetupCodes(setupCodes.map(toggle));
+    setSetupCode(toggle(setupCode));
+  }
   const main = useRef<HTMLElement>(null);
   // Blocks fade in the first time they scroll into view; ones arriving together stagger.
   useEffect(() => {

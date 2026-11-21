@@ -1,31 +1,32 @@
 import re
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from collections.abc import Iterable
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
 
 from ..config.colors import DEFAULT_CYCLE, SHADE_BASE, SHADE_DARKEST_MIX
 
-RGB = Tuple[float, float, float]
+RGB = tuple[float, float, float]
 
 
 def to_rgb(color: str) -> RGB:
     """RGB in [0, 1] of a hex color ('#1a2b3c', '1a2b3c' or '#abc')."""
-    digits = color.lstrip('#')
+    digits = color.lstrip("#")
     if len(digits) == 3:
-        digits = ''.join(c * 2 for c in digits)
-    if not re.fullmatch(r'[0-9a-fA-F]{6}', digits):
+        digits = "".join(c * 2 for c in digits)
+    if not re.fullmatch(r"[0-9a-fA-F]{6}", digits):
         raise ValueError(f"Color {color!r} must be a hex string like '#1a2b3c'")
-    return tuple(int(digits[i:i + 2], 16) / 255 for i in (0, 2, 4))  # type: ignore[return-value]
+    return tuple(int(digits[i : i + 2], 16) / 255 for i in (0, 2, 4))  # type: ignore[return-value]
 
 
 def blend(start: str, end: str, t: float) -> str:
     """Hex color t of the way from start to end."""
     mixed = [a + (b - a) * t for a, b in zip(to_rgb(start), to_rgb(end))]
-    return '#' + ''.join(f'{round(c * 255):02x}' for c in mixed)
+    return "#" + "".join(f"{round(c * 255):02x}" for c in mixed)
 
 
-def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> List[str]:
+def palette_colors(palette: dict[Any, str], keys: Iterable[Any]) -> list[str]:
     """Color per key; every plot raises the same KeyError when the palette misses a key."""
     keys = [str(key) for key in keys]
     missing = [key for key in keys if key not in palette]
@@ -34,12 +35,12 @@ def palette_colors(palette: Dict[Any, str], keys: Iterable[Any]) -> List[str]:
     return [palette[key] for key in keys]
 
 
-def default_colors(n: int) -> List[str]:
+def default_colors(n: int) -> list[str]:
     """First n colors of the default color cycle, repeating when n is larger."""
     return [DEFAULT_CYCLE[i % len(DEFAULT_CYCLE)] for i in range(n)]
 
 
-def resolve_palette(palette: Optional[Union[Dict[Any, str], str]], values: pd.Series) -> Dict[Any, str]:
+def resolve_palette(palette: Optional[Union[dict[Any, str], str]], values: pd.Series) -> dict[Any, str]:
     """Color per hue value: a dict as given, else per sorted value shades of one color, or the default cycle for None."""
     if isinstance(palette, dict):
         return palette

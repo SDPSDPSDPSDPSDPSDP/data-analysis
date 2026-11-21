@@ -25,8 +25,8 @@ Python 3.9+. Deps: numpy, pandas>=2. Always use uv, never pip.
 from shirin.plot import PlotGraphs, Colors
 
 plot = PlotGraphs(
-    palette={'is_ripe': {True: Colors.GREEN, False: Colors.RED}},    # {column: {value: color}} or {column: color}
-    label_mapping={'is_ripe': {True: 'Ripe', False: 'Unripe'}},      # {column: {value: label}}
+    palette={"is_ripe": {True: Colors.GREEN, False: Colors.RED}},  # {column: {value: color}} or {column: color}
+    label_mapping={"is_ripe": {True: "Ripe", False: "Unripe"}},  # {column: {value: label}}
 )
 ```
 
@@ -37,17 +37,19 @@ Every method draws immediately and returns `None`. `title` accepts a string or `
 ### bar
 
 ```python
-plot.bar(df, x='fruit')                                   # count rows per category, vertical
-plot.bar(df, y='fruit')                                   # horizontal
-plot.bar(df, x='fruit', value='sales')                    # sum pre-aggregated column
-plot.bar(df, x='fruit', hue='is_ripe', stacked=True, legend=True)
-plot.bar(df, x='fruit', hue='is_ripe', normalized=True)   # 100% stacked hue shares
-plot.bar(df, y='fruit', hue='is_ripe', stacked=True, split='flat')   # how segments meet: 'rounded' (default), 'gradient', 'flat'
-plot.bar(df, x='fruit', normalized=True)                  # labels show share of total
-plot.bar(df, x='model', value='accuracy', normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
-plot.bar(df, y='model', value='accuracy', description='description')  # grey second line under each category label
-plot.bar(df, x='fruit', top_n=5, sort='alphabetical')
-plot.bar(df, x='created_at', group_by='month')           # one bar per period, time order, empty periods 0
+plot.bar(df, x="fruit")  # count rows per category, vertical
+plot.bar(df, y="fruit")  # horizontal
+plot.bar(df, x="fruit", value="sales")  # sum pre-aggregated column
+plot.bar(df, x="fruit", hue="is_ripe", stacked=True, legend=True)
+plot.bar(df, x="fruit", hue="is_ripe", normalized=True)  # 100% stacked hue shares
+plot.bar(
+    df, y="fruit", hue="is_ripe", stacked=True, split="flat"
+)  # how segments meet: 'rounded' (default), 'gradient', 'flat'
+plot.bar(df, x="fruit", normalized=True)  # labels show share of total
+plot.bar(df, x="model", value="accuracy", normalized=True, remainder=True)  # fractions in [0, 1] filled to 100%
+plot.bar(df, y="model", value="accuracy", description="description")  # grey second line under each category label
+plot.bar(df, x="fruit", top_n=5, sort="alphabetical")
+plot.bar(df, x="created_at", group_by="month")  # one bar per period, time order, empty periods 0
 ```
 
 Rules (raise `ValueError` otherwise):
@@ -63,7 +65,7 @@ Other args: `x_axis_label`, `y_axis_label` (count axis defaults to `'Count'`, `'
 ### histogram
 
 ```python
-plot.histogram(df, x='price', hue='shop', bins=50, xlimit=1000, stacked=False, suffix='%')
+plot.histogram(df, x="price", hue="shop", bins=50, xlimit=1000, stacked=False, suffix="%")
 ```
 
 `bins` is a maximum; whole-number data gets at most one bin per value. `xlimit` drops rows above it.
@@ -71,8 +73,8 @@ plot.histogram(df, x='price', hue='shop', bins=50, xlimit=1000, stacked=False, s
 ### time
 
 ```python
-plot.time(df, x='week', y='sales', hue='shop', fill_missing_values='shift', rotation=45)
-plot.time(df, x='created_at', group_by='month', cumulative=True)
+plot.time(df, x="week", y="sales", hue="shop", fill_missing_values="shift", rotation=45)
+plot.time(df, x="created_at", group_by="month", cumulative=True)
 ```
 
 Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`: `'year'|'month'|'day'` groups dates per period, sums `y` (or counts rows), empty periods become 0. `cumulative=True`: running total per hue. `display_month=False` shows only years. `fill_missing_values`: `'shift'` (interpolate), `'zero'`, or `None`; needs `y`. `fill=True`: gradient area under each line, fading out towards the bottom.
@@ -80,15 +82,25 @@ Line over `x`, one line per `hue`. Without `y`: counts rows per `x`. `group_by`:
 ### scatter
 
 ```python
-plot.scatter(df, x='height', y='weight', hue='species', size='age')
+plot.scatter(df, x="height", y="weight", hue="species", size="age")
 ```
 
 ### line
 
 ```python
-plot.line(df, x='coverage', y='accuracy', hue='model', marks='marked', mark_labels='both',
-          x_axis_label=['Coverage', 'share of docs at or above the threshold'],
-          percentage_x=True, percentage_y=True, x_limits=(1, 0), y_limits=(0.84, 1))
+plot.line(
+    df,
+    x="coverage",
+    y="accuracy",
+    hue="model",
+    marks="marked",
+    mark_labels="both",
+    x_axis_label=["Coverage", "share of docs at or above the threshold"],
+    percentage_x=True,
+    percentage_y=True,
+    x_limits=(1, 0),
+    y_limits=(0.84, 1),
+)
 ```
 
 Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate x values averaged. `marks`: boolean column (no missing values, else `ValueError`); `True` rows get a dot. `mark_labels`: text next to each dot, `'y'` (default), `'x'`, `'both'` (two lines, `Coverage 93%` above `Accuracy 55%`, titles small and faded; titles from the axis labels, else column names) or `None` (dot only); formatted like the axis, so `%` with `percentage_x`/`percentage_y`. To mark specific values: `df.assign(marked=df['threshold'].isin([0.5, 0.9]))`. `percentage_x`/`percentage_y`: fractions as `%` ticks. `x_limits`/`y_limits`: `(low, high)`, `high < low` flips the axis. Non-numeric `x`/`y` or equal limits raise `ValueError`.
@@ -96,8 +108,8 @@ Line over two numeric columns (dates: use `time`), one line per `hue`; duplicate
 ### pie
 
 ```python
-plot.pie(df, col='fruit', donut=True, n_after_comma=1, value_datalabel=5)
-plot.pie(df, col='over_threshold', slice_labels={True: 'Accuracy: 96,4%'})   # large headline on that slice
+plot.pie(df, col="fruit", donut=True, n_after_comma=1, value_datalabel=5)
+plot.pie(df, col="over_threshold", slice_labels={True: "Accuracy: 96,4%"})  # large headline on that slice
 ```
 
 Slices are value counts of `col`. Slices below `value_datalabel` percent get no label. `legend_percentages=True` drops slice labels and shows percentages in the legend instead of counts. `slice_labels`: `{value: text}`, large text on that value's slice, above its percentage (centered when the slice has no percentage label); wraps on spaces to fit the slice, `\n` forces a break; keys must be values of `col`, else `ValueError`.
@@ -112,17 +124,19 @@ Importing `shirin.stats` registers a pandas Series accessor.
 
 ```python
 import shirin.stats
-df['price'].stats()                 # prints mean, median, min, max, missing values
-d = df['price'].stats(printing=False)  # dict: mean, median, min, max, missing_values
+
+df["price"].stats()  # prints mean, median, min, max, missing values
+d = df["price"].stats(printing=False)  # dict: mean, median, min, max, missing_values
 ```
 
 ## Number formatting (Dutch)
 
 ```python
 from shirin.number_format import format_thousands, format_percentage, format_compact
-format_thousands(1234567.8, decimals=1)   # '1.234.567,8'
-format_percentage(12.5, decimals=1)        # '12,5%' (input is already a percentage, not a fraction)
-format_compact(1500000)                    # '1,5M' (also 'k')
+
+format_thousands(1234567.8, decimals=1)  # '1.234.567,8'
+format_percentage(12.5, decimals=1)  # '12,5%' (input is already a percentage, not a fraction)
+format_compact(1500000)  # '1,5M' (also 'k')
 ```
 
 ## SQL (IBM DB2, needs `shirin[sql]`)
@@ -132,9 +146,9 @@ from pathlib import Path
 from shirin.sql import Database
 
 db = Database()  # credentials from .env, create once, reuse
-db = Database(user='u', password='p', host='h', port=50000, db_name='d', schema='S1')  # or explicit
-df = db.sql("SELECT * FROM t WHERE year = :year", params={'year': 2024})
-db.sql(Path('query.sql'), output_path=Path('out.parquet'))  # streams to Parquet with tqdm row counter, returns None
+db = Database(user="u", password="p", host="h", port=50000, db_name="d", schema="S1")  # or explicit
+df = db.sql("SELECT * FROM t WHERE year = :year", params={"year": 2024})
+db.sql(Path("query.sql"), output_path=Path("out.parquet"))  # streams to Parquet with tqdm row counter, returns None
 ```
 
 `.env` (working dir or parent) keys: `DB2_USER`, `DB2_PASSWORD`, `DB2_HOST`, `DB2_PORT`, `DB2_DB_NAME`, `DB2_SCHEMA`. Explicit arguments override `.env`. Missing value raises `ValueError`. Use `params` with `:name` placeholders, never format values into SQL. With params, escape literal colons: `'12\:00'`.

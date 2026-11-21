@@ -71,7 +71,9 @@ function readSkill(folder: string): Skill {
     return value.trim();
   };
   const plugin = JSON.parse(readFileSync(join(dir, "..", "..", ".claude-plugin", "plugin.json"), "utf8"));
-  const others = readdirSync(dir).filter((name) => name.endsWith(".md") && name !== "SKILL.md").sort();
+  const others = readdirSync(dir)
+    .filter((name) => name.endsWith(".md") && name !== "SKILL.md")
+    .sort();
   return {
     name: field("name"),
     description: field("description"),
@@ -86,7 +88,10 @@ function readSkill(folder: string): Skill {
 
 // The file list already names each file, so its leading "# title" is not repeated.
 function withoutTitle(markdown: string) {
-  return markdown.trim().replace(/^# .*\r?\n/, "").trim();
+  return markdown
+    .trim()
+    .replace(/^# .*\r?\n/, "")
+    .trim();
 }
 
 // Code of every prerendered SVG by its path, filled as sections are built; read by scripts/build-previews.mjs.

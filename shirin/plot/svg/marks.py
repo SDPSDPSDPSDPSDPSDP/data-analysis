@@ -1,26 +1,36 @@
 """SVG markup for single marks, positioned through the chart's x/y scales (in points)."""
+
 import math
-from typing import Callable, List, Tuple
+from typing import Callable
 from xml.sax.saxutils import escape
 
 from ..config import FontSizes, Layout, Marks
 from .chart import Dots, Line, Rect, Text, Wedge
 from .fonts import cap_height, is_large, text_width
 
-ANCHOR = {'left': 'start', 'center': 'middle', 'right': 'end'}
+ANCHOR = {"left": "start", "center": "middle", "right": "end"}
 
 Scale = Callable[[float], float]
 
 
 def text(
-    x: float, y: float, s: str, size: float, color: str, anchor: str = 'start', bold: bool = False,
-    rotate: float = 0, alpha: float = 1, title: str = '', css_class: str = '',
+    x: float,
+    y: float,
+    s: str,
+    size: float,
+    color: str,
+    anchor: str = "start",
+    bold: bool = False,
+    rotate: float = 0,
+    alpha: float = 1,
+    title: str = "",
+    css_class: str = "",
 ) -> str:
     """title: smaller, faded text drawn right before s on the same baseline. css_class: style class from font_css."""
     attrs = f'x="{x:.2f}" y="{y:.2f}" font-size="{size}" fill="{color}"'
     if alpha != 1:
         attrs += f' fill-opacity="{alpha}"'
-    if anchor != 'start':
+    if anchor != "start":
         attrs += f' text-anchor="{anchor}"'
     if bold:
         attrs += ' class="b"'
@@ -30,24 +40,24 @@ def text(
         attrs += f' class="{css_class}"'
     if rotate:
         attrs += f' transform="rotate({-rotate} {x:.2f} {y - cap_height(size) / 2:.2f})"'
-    prefix = ''
+    prefix = ""
     if title:
         title_alpha = Marks.POINT_LABEL_TITLE_ALPHA * alpha
         title_attrs = f'font-size="{FontSizes.POINT_LABEL_TITLES}" fill-opacity="{title_alpha}"'
-        prefix = f'<tspan {title_attrs}>{escape(title)} </tspan>'
-    return f'<text {attrs}>{prefix}{escape(s)}</text>'
+        prefix = f"<tspan {title_attrs}>{escape(title)} </tspan>"
+    return f"<text {attrs}>{prefix}{escape(s)}</text>"
 
 
 def _title_width(title: str) -> float:
-    return text_width(f'{title} ', FontSizes.POINT_LABEL_TITLES) if title else 0
+    return text_width(f"{title} ", FontSizes.POINT_LABEL_TITLES) if title else 0
 
 
-def line_titles(t: Text) -> Tuple[str, ...]:
+def line_titles(t: Text) -> tuple[str, ...]:
     """One title per line of t, '' where a line has none."""
-    line_count = t.text.count('\n') + 1
+    line_count = t.text.count("\n") + 1
     if t.line_titles and len(t.line_titles) != line_count:
         raise ValueError(f"{len(t.line_titles)} line_titles for {line_count} lines in {t.text!r}")
-    return t.line_titles or ('',) * line_count
+    return t.line_titles or ("",) * line_count
 
 
 def line_step(size: float) -> float:
@@ -57,22 +67,22 @@ def line_step(size: float) -> float:
 
 def block_height(t: Text) -> float:
     """Top of the first line to the baseline of the last line of a data text, in points."""
-    return cap_height(t.size) + t.text.count('\n') * line_step(t.size)
+    return cap_height(t.size) + t.text.count("\n") * line_step(t.size)
 
 
-def place(t: Text, sx: Scale, sy: Scale) -> Tuple[float, float, float, float, float]:
+def place(t: Text, sx: Scale, sy: Scale) -> tuple[float, float, float, float, float]:
     """Anchor x, first line's baseline y and bounding box (x0, x1, top) of a data text, in points.
 
     A text with newlines is one block: va aligns the whole block, ha every line. Line titles widen their line.
     """
-    lines = t.text.split('\n')
+    lines = t.text.split("\n")
     titles = line_titles(t)
     width = max(_title_width(title) + text_width(line, t.size) for title, line in zip(titles, lines))
     first_line = cap_height(t.size)
     height = block_height(t)
     x, y = sx(t.x) + t.dx, sy(t.y) - t.dy
-    top = {'bottom': y - height, 'center': y - height / 2, 'top': y}[t.va]
-    x0 = {'left': x, 'center': x - width / 2, 'right': x - width}[t.ha]
+    top = {"bottom": y - height, "center": y - height / 2, "top": y}[t.va]
+    x0 = {"left": x, "center": x - width / 2, "right": x - width}[t.ha]
     return x, top + first_line, x0, x0 + width, top
 
 
@@ -93,12 +103,14 @@ def _tucked_pill(r: Rect, sx: Scale, sy: Scale) -> str:
 
     def point(a: float, c: float) -> str:
         x, y = (a, c) if r.horizontal else (c, a)
-        return f'{x:.2f} {y:.2f}'
+        return f"{x:.2f} {y:.2f}"
 
     sweep = int((direction > 0) == r.horizontal)
-    arc = f'A{radius:.2f} {radius:.2f} 0 0 {sweep} '
-    d = (f'M{point(cut, side0)} L{point(p1 - direction * radius, side0)} {arc}{point(p1, side0 + radius)} '
-         f'L{point(p1, side1 - radius)} {arc}{point(p1 - direction * radius, side1)} L{point(cut, side1)} Z')
+    arc = f"A{radius:.2f} {radius:.2f} 0 0 {sweep} "
+    d = (
+        f"M{point(cut, side0)} L{point(p1 - direction * radius, side0)} {arc}{point(p1, side0 + radius)} "
+        f"L{point(p1, side1 - radius)} {arc}{point(p1 - direction * radius, side1)} L{point(cut, side1)} Z"
+    )
     return f'<path d="{d}" fill="{r.color}"/>'
 
 
@@ -108,7 +120,7 @@ def rect(r: Rect, sx: Scale, sy: Scale) -> str:
     xa, xb = sorted((sx(r.x0), sx(r.x1)))
     ya, yb = sorted((sy(r.y0), sy(r.y1)))
     width, height = xb - xa, yb - ya
-    radius = f' rx="{min(width, height) / 2:.2f}"' if r.rounded else ''
+    radius = f' rx="{min(width, height) / 2:.2f}"' if r.rounded else ""
     return f'<rect x="{xa:.2f}" y="{ya:.2f}" width="{width:.2f}" height="{height:.2f}"{radius} fill="{r.color}"/>'
 
 
@@ -121,13 +133,15 @@ def fade(r: Rect, sx: Scale, sy: Scale, gradient_id: str) -> str:
     else:
         xa, xb = sorted((sx(r.x0), sx(r.x1)))
         x, y, w, h, direction = xa, sy(r.y1) - half, xb - xa, 2 * half, 'x1="0" y1="1" x2="0" y2="0"'
-    return (f'<linearGradient id="{gradient_id}" {direction}><stop offset="0" stop-color="{r.color}"/>'
-            f'<stop offset="1" stop-color="{r.fade_to}"/></linearGradient>'
-            f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="url(#{gradient_id})"/>')
+    return (
+        f'<linearGradient id="{gradient_id}" {direction}><stop offset="0" stop-color="{r.color}"/>'
+        f'<stop offset="1" stop-color="{r.fade_to}"/></linearGradient>'
+        f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="url(#{gradient_id})"/>'
+    )
 
 
-def _segments(line: Line, sx: Scale, sy: Scale) -> List[List[Tuple[float, float]]]:
-    segments: List[List[Tuple[float, float]]] = [[]]
+def _segments(line: Line, sx: Scale, sy: Scale) -> list[list[tuple[float, float]]]:
+    segments: list[list[tuple[float, float]]] = [[]]
     for x, y in zip(line.xs, line.ys):
         if y != y:  # NaN breaks the line
             segments.append([])
@@ -136,29 +150,34 @@ def _segments(line: Line, sx: Scale, sy: Scale) -> List[List[Tuple[float, float]
     return [seg for seg in segments if seg]
 
 
-def _path(points: List[Tuple[float, float]]) -> str:
-    return 'M' + ' L'.join(f'{x:.2f} {y:.2f}' for x, y in points)
+def _path(points: list[tuple[float, float]]) -> str:
+    return "M" + " L".join(f"{x:.2f} {y:.2f}" for x, y in points)
 
 
 def line(line: Line, sx: Scale, sy: Scale) -> str:
-    d = ' '.join(_path(seg) for seg in _segments(line, sx, sy))
-    return (f'<path d="{d}" fill="none" stroke="{line.color}" stroke-width="{Marks.LINE_WIDTH}" '
-            'stroke-linejoin="round" stroke-linecap="round"/>')
+    d = " ".join(_path(seg) for seg in _segments(line, sx, sy))
+    return (
+        f'<path d="{d}" fill="none" stroke="{line.color}" stroke-width="{Marks.LINE_WIDTH}" '
+        'stroke-linejoin="round" stroke-linecap="round"/>'
+    )
 
 
 def area(line: Line, sx: Scale, sy: Scale, bottom: float, gradient_id: str) -> str:
     """Area under the line down to `bottom`, fading out towards the bottom."""
-    d = ' '.join(_path(seg + [(seg[-1][0], bottom), (seg[0][0], bottom)]) + ' Z' for seg in _segments(line, sx, sy))
-    return (f'<linearGradient id="{gradient_id}" x1="0" y1="0" x2="0" y2="1">'
-            f'<stop offset="0" stop-color="{line.color}" stop-opacity="{Marks.LINE_FILL_ALPHA}"/>'
-            f'<stop offset="1" stop-color="{line.color}" stop-opacity="0"/></linearGradient>'
-            f'<path d="{d}" fill="url(#{gradient_id})"/>')
+    d = " ".join(_path([*seg, (seg[-1][0], bottom), (seg[0][0], bottom)]) + " Z" for seg in _segments(line, sx, sy))
+    return (
+        f'<linearGradient id="{gradient_id}" x1="0" y1="0" x2="0" y2="1">'
+        f'<stop offset="0" stop-color="{line.color}" stop-opacity="{Marks.LINE_FILL_ALPHA}"/>'
+        f'<stop offset="1" stop-color="{line.color}" stop-opacity="0"/></linearGradient>'
+        f'<path d="{d}" fill="url(#{gradient_id})"/>'
+    )
 
 
 def dots(dots: Dots, sx: Scale, sy: Scale) -> str:
-    return ''.join(
+    return "".join(
         f'<circle cx="{sx(x):.2f}" cy="{sy(y):.2f}" r="{r:.2f}" fill="{dots.color}" fill-opacity="{dots.alpha}"/>'
-        for x, y, r in zip(dots.xs, dots.ys, dots.radii) if y == y
+        for x, y, r in zip(dots.xs, dots.ys, dots.radii)
+        if y == y
     )
 
 
@@ -169,7 +188,7 @@ def wedge(w: Wedge, sx: Scale, sy: Scale) -> str:
 
     def point(turn: float) -> str:
         angle = 2 * math.pi * turn
-        return f'{cx + r * math.sin(angle):.2f} {cy - r * math.cos(angle):.2f}'
+        return f"{cx + r * math.sin(angle):.2f} {cy - r * math.cos(angle):.2f}"
 
     large = 1 if w.end - w.start > 0.5 else 0
     return (

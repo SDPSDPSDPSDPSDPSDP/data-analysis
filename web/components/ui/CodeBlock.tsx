@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, type RefObject } from "react";
+import { useMemo, type KeyboardEvent } from "react";
 import CodeMirror, { EditorSelection, keymap, Prec, type EditorView, type Extension } from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
@@ -15,10 +15,17 @@ const highlightStyle = HighlightStyle.define([
   { tag: [tags.name, tags.propertyName], color: "var(--code-name)" },
   { tag: [tags.function(tags.variableName), tags.labelName], color: "var(--code-function)" },
   {
-    tag: [tags.constant(tags.name), tags.standard(tags.name), tags.atom, tags.bool, tags.number, tags.special(tags.variableName)],
+    tag: [
+      tags.constant(tags.name),
+      tags.standard(tags.name),
+      tags.atom,
+      tags.bool,
+      tags.number,
+      tags.special(tags.variableName),
+    ],
     color: "var(--code-constant)",
   },
-  { tag: [tags.definition(tags.name), tags.separator, tags.punctuation], color: "var(--code-text)" },
+  { tag: [tags.definition(tags.name), tags.separator, tags.punctuation], color: "var(--text-code)" },
   { tag: [tags.typeName, tags.className, tags.self, tags.namespace], color: "var(--code-class)" },
   { tag: [tags.operator, tags.operatorKeyword, tags.escape, tags.special(tags.string)], color: "var(--code-operator)" },
   { tag: tags.string, color: "var(--code-string)" },
@@ -50,14 +57,6 @@ const keepIndentOnEnter = Prec.high(
 
 const NO_EXTENSIONS: Extension[] = [];
 
-function runKey(onRun: RefObject<((value: string) => void) | undefined>) {
-  const run = (view: EditorView) => {
-    onRun.current!(view.state.doc.toString());
-    return true;
-  };
-  return Prec.highest(keymap.of([{ key: "Mod-Enter", run }]));
-}
-
 type Props = {
   value: string;
   onChange?: (value: string) => void;
@@ -69,22 +68,20 @@ type Props = {
 
 // Read-only unless onChange is given.
 export default function CodeBlock({ value, onChange, onRun, extensions = NO_EXTENSIONS, dark }: Props) {
-  // Callbacks change every render; a ref keeps the extension list stable so CodeMirror is not reconfigured per keystroke.
-  const onRunRef = useRef(onRun);
-  onRunRef.current = onRun;
   const editable = Boolean(onChange);
-  const runnable = Boolean(onRun);
   const allExtensions = useMemo(
-    () => [
-      python(),
-      ...(editable ? [colorSwatches, keepIndentOnEnter] : []),
-      ...(runnable ? [runKey(onRunRef)] : []),
-      ...extensions,
-    ],
-    [editable, runnable, extensions],
+    () => [python(), ...(editable ? [colorSwatches, keepIndentOnEnter] : []), ...extensions],
+    [editable, extensions],
   );
+  // Capture phase runs before CodeMirror's own Mod-Enter (insertBlankLine); value is controlled, so it is current.
+  const runOnModEnter = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!onRun || e.key !== "Enter" || !(e.metaKey || e.ctrlKey)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onRun(value);
+  };
   return (
-    <div className="code-block copyable">
+    <div className="code-block copyable" onKeyDownCapture={runOnModEnter}>
       <CodeMirror
         value={value}
         onChange={onChange}
