@@ -1,11 +1,22 @@
 """Picks the bar plot class for a PlotGraphs.bar call and renders it."""
 
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from ..config import TitleInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
 from .host import PlotHost
+
+
+@dataclass(frozen=True)
+class BarModes:
+    """The bar() flags that pick the plot class."""
+
+    top_n: Optional[int]
+    remainder: bool
+    normalized: bool
+    stacked: bool
 
 
 def count_axis_labels(
@@ -21,43 +32,41 @@ def count_axis_labels(
     return x_axis_label, y_axis_label
 
 
-def render_bar(
-    host: PlotHost,
-    common: dict[str, Any],
-    value: Optional[str],
-    hue: Optional[str],
-    axis_column: Optional[str],
-    top_n: Optional[int],
-    remainder: bool,
-    normalized: bool,
-    stacked: bool,
-) -> None:
-    """Raises ValueError for option combinations the chosen plot does not support."""
-    if value is None:
-        if remainder:
+class BarDispatchMixin(PlotHost):
+    """`common` holds the options every bar plot shares, including hue and axis_column."""
+
+    def _render_counted_bar(self, common: dict[str, Any], modes: BarModes) -> None:
+        """Raises ValueError for options that need a value column."""
+        if modes.remainder:
             raise ValueError("remainder needs value.")
-        common["top_n"] = top_n
-        if normalized and hue is not None:
-            host._render(NormalizedPlot(NormalizedPlotOptions(**common)))
-        else:
-            host._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
-        return
-    if top_n is not None:
-        raise ValueError("top_n only works without value.")
-    common["value"] = value
-    if remainder:
+        if modes.normalized and common["hue"] is not None:
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common, top_n=modes.top_n)))
+            return
+        options = CountPlotOptions(**common, top_n=modes.top_n, stacked=modes.stacked, normalized=modes.normalized)
+        self._render(CountPlot(options))
+
+    def _render_summed_bar(self, common: dict[str, Any], value: str, modes: BarModes) -> None:
+        """Raises ValueError for options that only work on counted bars."""
+        if modes.top_n is not None:
+            raise ValueError("top_n only works without value.")
+        if modes.remainder:
+            self._render_remainder_bar(common, value, modes.normalized)
+            return
+        hue = common["hue"]
+        if modes.normalized and hue is not None and hue != common["axis_column"]:
+            self._render(NormalizedPlot(NormalizedPlotOptions(**common, value=value)))
+            return
+        options = BarPlotOptions(**common, value=value, stacked=modes.stacked, normalized=modes.normalized)
+        self._render(BarPlot(options))
+
+    def _render_remainder_bar(self, common: dict[str, Any], value: str, normalized: bool) -> None:
         if not normalized:
             raise ValueError("remainder needs normalized=True.")
-        category_palette = host._column_config(hue)["palette"] if hue is not None else None
+        hue = common["hue"]
         options = RemainderPlotOptions(
-            **{**common, **host._column_config(value)},
-            category_palette=category_palette,
-            background=host._theme.background,
+            **{**common, **self._column_config(value)},
+            value=value,
+            category_palette=self._column_config(hue)["palette"] if hue is not None else None,
+            background=self._theme.background,
         )
-        host._render(RemainderPlot(options))
-        return
-    hue_splits_bars = hue is not None and hue != axis_column
-    if normalized and hue_splits_bars:
-        host._render(NormalizedPlot(NormalizedPlotOptions(**common)))
-    else:
-        host._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))
+        self._render(RemainderPlot(options))

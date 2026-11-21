@@ -1,9 +1,11 @@
-"""Figure size and period axis shared by the categorical bar plots."""
+"""Figure size and date periods shared by the categorical bar plots."""
 
 import math
+from typing import Optional, cast
 
 import pandas as pd
 
+from ..common.data_conversion import period_totals
 from ..common.formatting import format_period_ticks
 from ..config import FigureSize, Layout
 from ..core.base_plot import AbstractPlot
@@ -23,6 +25,14 @@ def calculate_figsize(options: CategoricalPlotOptions, data: pd.DataFrame) -> tu
 
 def create_sized_figure(plot: AbstractPlot, data: pd.DataFrame) -> Chart:
     return plot._new_chart(*calculate_figsize(plot.options, data))  # type: ignore[arg-type]
+
+
+def period_rows(options: CategoricalPlotOptions, value: Optional[str]) -> pd.DataFrame:
+    """One row per period (and hue) of the dates in axis_column, totals in value (COUNT_COL when None).
+
+    Empty periods count as zero. Call only with group_by set; validate() made it a plain str.
+    """
+    return period_totals(options.df, options.axis_column, value, options.hue, cast(str, options.group_by))
 
 
 def format_period_axis(chart: Chart, options: CategoricalPlotOptions) -> None:

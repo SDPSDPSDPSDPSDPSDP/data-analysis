@@ -37,13 +37,13 @@ class StackableCategoricalPlot(AbstractPlot[CategoricalData]):
     options: CategoricalPlotOptions
 
     def transform(self, df: pd.DataFrame) -> CategoricalData:
-        order = get_order(self.options.sort, df, self.options.axis_column, value_column=self._value_column())
+        order = get_order(self.options.resolved_sort(), df, self.options.axis_column, value_column=self._value_column())
         df = self._resolve_hue_palette(df)
         stacked = None
         if self.options.stacked:
             totals = aggregate(df, self.options.axis_column, self._value_column(), self.options.hue).fillna(0)
             pivot = largest_hue_first(totals)
-            stacked = sort_stacked_pivot(pivot, self.options.sort, self.options.orientation)
+            stacked = sort_stacked_pivot(pivot, self.options.resolved_sort(), self.options.orientation)
         return CategoricalData(df, order, stacked)
 
     def _draw_unstacked(self, chart: Chart, data: CategoricalData) -> Any:

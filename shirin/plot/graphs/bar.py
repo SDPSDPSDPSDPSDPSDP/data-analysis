@@ -4,12 +4,10 @@ import pandas as pd
 
 from ..common.data_conversion import category_descriptions
 from ..config import SortInput, StackSplitInput, TimeGroupByInput, TitleInput
-from .bar_dispatch import count_axis_labels, render_bar
-from .group_by import group_periods
-from .host import PlotHost
+from .bar_dispatch import BarDispatchMixin, BarModes, count_axis_labels
 
 
-class BarPlotsMixin(PlotHost):
+class BarPlotsMixin(BarDispatchMixin):
     def bar(
         self,
         df: pd.DataFrame,
@@ -84,10 +82,7 @@ class BarPlotsMixin(PlotHost):
         vertical = x is not None
         x_axis_label, y_axis_label = count_axis_labels(value, vertical, x_axis_label, y_axis_label)
         axis_column = x if vertical else y
-        # Read before group_by or remainder reshape df, which drop the description column.
         descriptions = category_descriptions(df, axis_column, description) if description is not None else None  # type: ignore[arg-type]
-        if group_by is not None:
-            df, value, group_by, sort = group_periods(df, x, value, hue, group_by, vertical, sort, top_n, remainder)  # type: ignore[arg-type]
         common = dict(
             df=df,
             axis_column=axis_column,
@@ -101,9 +96,13 @@ class BarPlotsMixin(PlotHost):
             legend=legend,
             data_labels=data_labels,
             compact_labels=compact_labels,
-            sort="frequency" if sort is None else sort,
+            sort=sort,
             split=split,
             group_by=group_by,
             descriptions=descriptions,
         )
-        render_bar(self, common, value, hue, axis_column, top_n, remainder, normalized, stacked)
+        modes = BarModes(top_n=top_n, remainder=remainder, normalized=normalized, stacked=stacked)
+        if value is None:
+            self._render_counted_bar(common, modes)
+        else:
+            self._render_summed_bar(common, value, modes)

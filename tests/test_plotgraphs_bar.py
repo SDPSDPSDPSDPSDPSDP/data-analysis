@@ -53,6 +53,25 @@ def test_bar_group_by_rejects_incompatible_options(df: pd.DataFrame) -> None:
         PlotGraphs().bar(df, x="date", group_by="month", sort="frequency")
     with pytest.raises(ValueError, match="Valid options"):
         PlotGraphs().bar(df, x="date", group_by="week")
+    with pytest.raises(ValueError, match="does not work with sort, top_n"):
+        PlotGraphs().bar(df, x="date", group_by="month", top_n=2)
+    with pytest.raises(ValueError, match="does not work with sort, top_n"):
+        PlotGraphs().bar(df, x="date", value="value", group_by="month", normalized=True, remainder=True)
+
+
+def test_bar_group_by_works_for_counted_summed_and_normalized_bars(shown: list[str]) -> None:
+    df = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-05", "2024-03-02", "2024-03-09"]),
+            "shop": ["a", "b", "a"],
+            "sales": [1, 2, 3],
+        }
+    )
+    PlotGraphs().bar(df, x="date", hue="shop", stacked=True, group_by="month")
+    PlotGraphs().bar(df, x="date", value="sales", group_by="month")
+    PlotGraphs().bar(df, x="date", hue="shop", normalized=True, group_by="month")
+    for svg in shown:
+        assert svg.index(">Jan</text>") < svg.index(">Feb</text>") < svg.index(">Mar</text>")
 
 
 def test_bar_compact_labels(shown: list[str]) -> None:
