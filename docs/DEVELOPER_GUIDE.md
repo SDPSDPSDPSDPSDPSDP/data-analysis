@@ -34,7 +34,7 @@ uv run ruff check .
 shirin/
   plot/
     all_plots.py   PlotGraphs: public entry point, composed of the graphs/ mixins
-    graphs/        public methods (bar, pie, ...): build an Options object, pick the plot class
+    graphs/        public methods (bar, pie, ...): build an Options object, pick the plot class; host.py `PlotHost` declares what the mixins use from PlotGraphs
     core/          Options dataclasses + validation, AbstractPlot, renderer/ (fills a Chart with marks)
     plots/         one class per chart: preprocess -> transform -> draw -> format_plot
     common/        shared helpers: data conversion, sorting, palettes, formatting (ticks, labels, legend)

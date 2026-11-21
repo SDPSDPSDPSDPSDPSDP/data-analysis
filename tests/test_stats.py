@@ -1,6 +1,11 @@
 import pandas as pd
 
-from shirin.stats.descriptive_statistics import StatsAccessor  # noqa: F401 - registers the accessor
+from shirin.stats.descriptive_statistics import StatsAccessor
+
+
+def test_stats_accessor_registered():
+    """Importing the module registers the accessor on pandas Series."""
+    assert isinstance(pd.Series([1]).stats, StatsAccessor)
 
 
 def test_stats_accessor_calculation():

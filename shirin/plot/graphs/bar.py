@@ -150,15 +150,13 @@ class BarPlotsMixin(PlotHost):
         if remainder:
             if not normalized:
                 raise ValueError("remainder needs normalized=True.")
-            self._render(
-                RemainderPlot(
-                    RemainderPlotOptions(
-                        **{**common, **self._column_config(value)},
-                        category_palette=self._column_config(hue)["palette"] if hue is not None else None,
-                        background=self._theme.background,
-                    )
-                )
+            category_palette = self._column_config(hue)["palette"] if hue is not None else None
+            options = RemainderPlotOptions(
+                **{**common, **self._column_config(value)},
+                category_palette=category_palette,
+                background=self._theme.background,
             )
+            self._render(RemainderPlot(options))
             return
         hue_splits_bars = hue is not None and hue != axis_column
         if normalized and hue_splits_bars:
