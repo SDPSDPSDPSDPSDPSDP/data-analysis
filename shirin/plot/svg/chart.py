@@ -1,7 +1,7 @@
 """What a chart contains, in data coordinates. render.py turns it into an SVG."""
 
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 
 def plain_number(value: float) -> str:
@@ -131,6 +131,7 @@ class Chart:
         values: list[float] = []
         for rect in self.rects:
             values += [rect.x0, rect.x1] if axis == "x" else [rect.y0, rect.y1]
-        for series in [*self.lines, *self.dots]:
+        all_series: list[Union[Line, Dots]] = [*self.lines, *self.dots]
+        for series in all_series:
             values += list(series.xs if axis == "x" else series.ys)
         return values

@@ -17,7 +17,7 @@ class RemainderPlot(NormalizedPlot):
     no legend entry or data label.
     """
 
-    options: RemainderPlotOptions  # type: ignore[assignment]
+    options: RemainderPlotOptions
 
     def preprocess(self) -> pd.DataFrame:
         options = self.options
@@ -36,8 +36,10 @@ class RemainderPlot(NormalizedPlot):
         )
         df = super().preprocess()
         if not (isinstance(palette, dict) and REMAINDER_LABEL in palette):
+            resolved = self._palette
+            assert resolved is not None, "hue is set, so preprocess resolved a palette"
             filled = next(level for level in df[self.options.hue].unique() if level != REMAINDER_LABEL)
-            self._palette = {**self._palette, REMAINDER_LABEL: self._tint(self._palette[filled])}  # type: ignore[index]
+            self._palette = {**resolved, REMAINDER_LABEL: self._tint(resolved[filled])}
         return df
 
     def _tint(self, color: str) -> str:

@@ -46,7 +46,7 @@ class Database:
     ) -> None:
         load_dotenv(find_dotenv(usecwd=True))
         given = {"user": user, "password": password, "host": host, "port": port, "db_name": db_name, "schema": schema}
-        credentials = {
+        credentials: dict[str, Any] = {
             name: value if value is not None else os.environ.get(f"DB2_{name.upper()}") for name, value in given.items()
         }
         missing = [f"DB2_{name.upper()}" for name, value in credentials.items() if value is None]

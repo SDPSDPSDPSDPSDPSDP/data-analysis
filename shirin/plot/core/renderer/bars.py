@@ -144,7 +144,7 @@ def render_stacked_barplot(
     colors: list[str],
     width: float = Marks.BAR_WIDTH,
     split: str = "rounded",
-    row_colors: Optional[list[tuple[str, ...]]] = None,
+    row_colors: Optional[Sequence[Sequence[str]]] = None,
 ) -> Chart:
     """One stacked bar per row of df, columns stacked in order; horizontal draws row 0 at the bottom.
 
@@ -152,7 +152,7 @@ def render_stacked_barplot(
     row_colors: segment colors per row instead of colors.
     """
     values = df.to_numpy(dtype=float)
-    centers = list(range(len(df)))
+    centers: list[float] = list(range(len(df)))
     segment_colors: list[Sequence[str]] = list(row_colors) if row_colors is not None else [colors] * len(df)
     if split == "rounded":
         _rounded_split_bars(chart, centers, width, values, segment_colors, horizontal)
@@ -194,5 +194,5 @@ def render_histogram(
             if hue is not None:
                 step = (right - left) / len(groups)
                 left, right = left + i * step, left + (i + 1) * step
-            chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))  # type: ignore[arg-type]
+            chart.rects.append(Rect(left, right, 0, count, group_color, rounded=True))
     return chart

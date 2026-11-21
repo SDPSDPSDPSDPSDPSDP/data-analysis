@@ -5,9 +5,10 @@ import pandas as pd
 from ..config import TitleInput
 from ..core import HistogramOptions, LinePlotOptions, ScatterPlotOptions
 from ..plots import Histogram, LinePlot, ScatterPlot
+from .host import PlotHost
 
 
-class NumericPlotsMixin:
+class NumericPlotsMixin(PlotHost):
     def histogram(
         self,
         df: pd.DataFrame,

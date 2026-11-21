@@ -49,7 +49,7 @@ def render_lineplot(
     masks, colors = hue_groups(chart, df, hue, color, palette)
     for group, group_color in zip((df[mask] for mask in masks), colors):
         line = group.groupby(x)[y].mean()
-        chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))  # type: ignore[arg-type]
+        chart.lines.append(Line(list(line.index), list(line.values), group_color, fill))
         if marks is not None:
             texts = _mark_texts(group[x], group[y], mark_labels, percentage_x, percentage_y)
             titles = axis_titles if mark_labels == "both" else ()

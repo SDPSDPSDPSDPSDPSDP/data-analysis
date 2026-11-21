@@ -6,9 +6,10 @@ from ..common.data_conversion import COUNT_COL
 from ..config import FillMissingValuesInput, TimeGroupByInput, TitleInput
 from ..core import PiePlotOptions, TimePlotOptions
 from ..plots import PieChart, TimePlot
+from .host import PlotHost
 
 
-class SpecializedPlotsMixin:
+class SpecializedPlotsMixin(PlotHost):
     """Plots with chart-specific layouts: pie, time series."""
 
     def pie(

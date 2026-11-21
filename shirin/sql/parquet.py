@@ -3,6 +3,7 @@
 import os
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Optional
 
@@ -27,11 +28,11 @@ def _execute_streaming(
     return streaming.exec_driver_sql(sql_query)
 
 
-def _rows_to_table(columns: list[str], rows: list[Any]) -> pa.Table:
+def _rows_to_table(columns: list[str], rows: Sequence[Any]) -> pa.Table:
     return pa.Table.from_arrays([pa.array(values) for values in zip(*rows)], names=columns)
 
 
-def _rows_to_typed_table(schema: pa.Schema, rows: list[Any]) -> pa.Table:
+def _rows_to_typed_table(schema: pa.Schema, rows: Sequence[Any]) -> pa.Table:
     """Build arrays with the fixed schema's types, skipping per-chunk type inference."""
     arrays = [pa.array(values, type=field.type) for field, values in zip(schema, zip(*rows))]
     return pa.Table.from_arrays(arrays, schema=schema)

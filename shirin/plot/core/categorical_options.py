@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import ClassVar, Optional
+from typing import Any, ClassVar, Optional, Union
 
-from ..config import PaletteInput, Sort, SortInput, StackSplit, StackSplitInput
+from ..config import Sort, SortInput, StackSplit, StackSplitInput
 from ..config.colors import BACKGROUND_COLOR
 from .base_options import (
     VALID_ORIENTATIONS,
@@ -107,8 +107,8 @@ class RemainderPlotOptions(NormalizedPlotOptions):
     With `hue` equal to `axis_column`, each bar gets its own color from `category_palette` instead.
     """
 
-    value: str = ""  # type: ignore[assignment]
-    category_palette: Optional[PaletteInput] = None
+    value: str = ""
+    category_palette: Optional[Union[dict[Any, str], str]] = None
     background: str = BACKGROUND_COLOR  # remainder tint blends toward this, so it matches the dark mode background
 
     def validate(self) -> None:

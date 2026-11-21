@@ -65,5 +65,6 @@ class BasePlotOptions:
             if column and column not in self.df.columns:
                 raise ValueError(f"{field_name}={column!r} is not a column. Available columns: {list(self.df.columns)}")
 
-        self.palette = convert_dict_keys_to_string(self.palette)
+        if isinstance(self.palette, dict):
+            self.palette = convert_dict_keys_to_string(self.palette)
         self.label_map = convert_dict_keys_to_string(self.label_map)

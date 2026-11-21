@@ -29,7 +29,7 @@ class TimePlot(AbstractPlot[TimeData]):
         options = self.options
         df = options.df.copy()
         if options.group_by is not None:
-            df[options.x] = to_period_start(df[options.x], options.group_by)  # type: ignore[arg-type]
+            df[options.x] = to_period_start(df[options.x], options.group_by)
         if options.fill_missing_values is not None:
             df = fill_missing_values_in_data(df, options.x, options.y, options.hue, options.fill_missing_values)  # type: ignore[arg-type]
         return df
@@ -39,7 +39,7 @@ class TimePlot(AbstractPlot[TimeData]):
         df = self._resolve_hue_palette(df, no_hue_color=Colors.BLACK)
         y = options.y or COUNT_COL
         if options.y is None or options.group_by is not None or options.cumulative:
-            values = totals_per_x(df, options.x, options.y, options.hue, options.group_by)  # type: ignore[arg-type]
+            values = totals_per_x(df, options.x, options.y, options.hue, options.group_by)
             if options.cumulative:
                 values = values.groupby(level=options.hue).cumsum() if options.hue else values.cumsum()
             df = values.rename(y).reset_index()

@@ -43,8 +43,10 @@ def format_period_axis(chart: Chart, options: CategoricalPlotOptions) -> None:
         periods = pd.Series(pd.to_datetime(chart.x.tick_labels))
         format_period_ticks(chart, periods, pd.Series(chart.x.ticks), months=True)
     elif options.group_by == "day":
-        step = math.ceil(len(chart.x.ticks) / Layout.MAX_DAY_TICKS)
-        chart.x.ticks, chart.x.tick_labels = chart.x.ticks[::step], chart.x.tick_labels[::step]  # type: ignore[index]
+        ticks, labels = chart.x.ticks, chart.x.tick_labels
+        assert ticks is not None and labels is not None, "category axis sets ticks before period formatting"
+        step = math.ceil(len(ticks) / Layout.MAX_DAY_TICKS)
+        chart.x.ticks, chart.x.tick_labels = ticks[::step], labels[::step]
 
 
 @dataclass

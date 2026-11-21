@@ -7,6 +7,7 @@ from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, 
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
 from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
+from .host import PlotHost
 
 
 def _check_group_by(
@@ -24,7 +25,7 @@ def _check_group_by(
         raise ValueError("group_by does not work with sort, top_n or remainder.")
 
 
-class BarPlotsMixin:
+class BarPlotsMixin(PlotHost):
     def bar(
         self,
         df: pd.DataFrame,

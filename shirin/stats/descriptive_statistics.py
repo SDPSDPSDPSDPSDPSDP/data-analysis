@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 import pandas as pd
 
 from ..number_format import format_thousands
@@ -7,10 +9,10 @@ _PRINTED = (("Mean", "mean"), ("Median", "median"), ("Minimum", "min"), ("Maximu
 
 @pd.api.extensions.register_series_accessor("stats")
 class StatsAccessor:
-    def __init__(self, pandas_obj):
+    def __init__(self, pandas_obj: pd.Series) -> None:
         self._obj = pandas_obj
 
-    def __call__(self, printing: bool = True):
+    def __call__(self, printing: bool = True) -> Optional[dict[str, Any]]:
         missing_values = int(self._obj.isna().sum())
         stats = {
             "mean": self._obj.mean(),

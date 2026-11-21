@@ -12,7 +12,7 @@ from .text_contrast import get_text_color_for_background
 def _add_stacked_labels(
     chart: Chart,
     pivot_data: pd.DataFrame,
-    percentages,
+    percentages: np.ndarray,
     palette: dict,
     orientation: str,
     suffix: Optional[str],

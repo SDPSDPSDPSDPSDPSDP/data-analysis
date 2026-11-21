@@ -3,6 +3,7 @@
 import functools
 import os
 import re
+from typing import Any
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import URL, Engine
@@ -38,7 +39,7 @@ def _get_engine(url: URL, schema: str) -> Engine:
     engine = create_engine(url, pool_recycle=900, pool_size=1, max_overflow=4)
 
     @event.listens_for(engine, "connect")
-    def _set_schema(dbapi_connection, _connection_record) -> None:
+    def _set_schema(dbapi_connection: Any, _connection_record: Any) -> None:
         # Once per physical connection instead of a round trip per query.
         cursor = dbapi_connection.cursor()
         cursor.execute(f"SET SCHEMA {schema}")
