@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Nav from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
@@ -35,25 +34,13 @@ export default function HomeGallery({
   pinned = NO_PINS,
   limit = charts.length,
 }: Props) {
-  const router = useRouter();
   const dark = useDarkMode();
-  const [active, setActive] = useState<string | null>(null);
   // Clicked card; the others shrink first, the modal opens once they are done.
   const [selected, setSelected] = useState<Chart | null>(null);
   // Card is the clicked one, the modal chart flies out of it.
   // Returning: modal chart is flying back, its card shows again.
   const [open, setOpen] = useState<{ chart: Chart; card: HTMLElement; returning?: boolean } | null>(null);
   const order = useGalleryOrder(charts, pinned, limit);
-
-  // Set while switching filter: every card shrinks away before the new ones fade in.
-  const [leaving, setLeaving] = useState(false);
-
-  // Computed transitionDuration is always in seconds; the raw token may be minified to another unit.
-  function shrinkAll(then: () => void) {
-    setLeaving(true);
-    const card = document.querySelector(".chart-preview");
-    setTimeout(then, card ? parseFloat(getComputedStyle(card).transitionDuration) * 1000 : 0);
-  }
 
   // Chart flies out while the others shrink. Modal code loaded and image decoded first, so the modal
   // can measure its final size on open.
@@ -72,46 +59,25 @@ export default function HomeGallery({
     });
   }
 
-  function selectFilter(next: string | null) {
-    shrinkAll(() => {
-      setActive(next);
-      setLeaving(false);
-    });
-  }
-
   return (
     <>
-      {showNav && (
-        <Nav
-          categories={categories}
-          filter={{
-            categories: [...new Set(charts.map((chart) => chart.category))],
-            active,
-            // Clicking the active category again shows every chart.
-            onSelect: (title) => selectFilter(title === active ? null : title),
-            onLeave: (href) => shrinkAll(() => router.push(href)),
-          }}
-        />
-      )}
+      {showNav && <Nav categories={categories} />}
       <main className="page home">
         <h1 className="visually-hidden">{SITE_NAME}</h1>
-        {/* Keyed on filter so the entrance wave replays on every category switch. */}
-        <div className="home-charts" key={active ?? ""}>
-          {order
-            ?.filter((chart) => !active || chart.category === active)
-            .map((chart, index) => (
-              <ChartPreview
-                key={chart.code}
-                src={dark ? chart.darkCardPreview : chart.cardPreview}
-                title={chart.title}
-                subtitle={chart.subtitle}
-                index={index}
-                shrunk={leaving || (selected !== null && selected !== chart)}
-                hidden={open?.chart === chart && !open.returning}
-                returning={open?.chart === chart && !!open.returning}
-                onOpen={(card) => openChart(chart, card)}
-              />
-            ))}
+        <div className="home-charts">
+          {order?.map((chart, index) => (
+            <ChartPreview
+              key={chart.code}
+              src={dark ? chart.darkCardPreview : chart.cardPreview}
+              title={chart.title}
+              subtitle={chart.subtitle}
+              index={index}
+              shrunk={selected !== null && selected !== chart}
+              hidden={open?.chart === chart && !open.returning}
+              returning={open?.chart === chart && !!open.returning}
+              onOpen={(card) => openChart(chart, card)}
+            />
+          ))}
         </div>
       </main>
       {open && (
@@ -121,7 +87,7 @@ export default function HomeGallery({
           code={open.chart.code}
           preview={{ light: open.chart.preview, dark: open.chart.darkPreview }}
           card={open.card}
-          href={`${active ? `/${sectionId(active)}` : "/all"}#${sectionId(open.chart.section)}`}
+          href={`/all#${sectionId(open.chart.section)}`}
           section={open.chart.section}
           // Other cards grow back while the chart flies, not after it lands.
           onReturn={() => {

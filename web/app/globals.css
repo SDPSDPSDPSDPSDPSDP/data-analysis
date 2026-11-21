@@ -110,8 +110,6 @@
   --demo-cursor-stroke-width: 1.5px;
   --demo-cursor-shadow: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
   --demo-cursor-fade: 200ms ease;
-  --demo-cursor-press: 120ms ease-out;
-  --demo-cursor-pressed-scale: 0.82;
   /* Tip of the arrow inside its 24px box, so the tip, not the corner, lands on the target. */
   --demo-cursor-tip-x: 4px;
   --demo-cursor-tip-y: 2px;

@@ -106,10 +106,8 @@
   white-space: nowrap;
 }
 
-/* Negative margin keeps the padded button in line with the plain links. */
 .nav button.nav-link {
   padding: var(--space-1) var(--space-1-5);
-  margin: 0 calc(-1 * var(--space-1-5));
   border: none;
   outline: none;
   border-radius: var(--radius-pill);
@@ -127,17 +125,9 @@
   background: var(--color-surface);
 }
 
-.nav button.nav-link:not(.nav-theme)[aria-pressed="true"] {
-  background: var(--color-bg);
-}
-
 /* Right edge of the nav: the menus are centered absolutely, so auto margin pushes past them. */
 .nav button.nav-theme {
   margin: 0 0 0 auto;
-}
-
-.nav .nav-link-inactive {
-  color: var(--text-secondary);
 }
 
 /* Custom properties are not allowed in media queries. Centered menus would overlap the brand,

@@ -2,26 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createDemoClock } from "./demoClock";
-import { CARD_SELECTOR, card, filterButton, hover } from "./demoTargets";
+import { CARD_SELECTOR, card, hover } from "./demoTargets";
 
 type Point = { x: number; y: number };
 
-// Grid positions to hover, before and after filtering: spread out so the arrow crosses the page.
-const HOVERS_ALL = [0, 6, 9];
-const HOVERS_FILTERED = [1, 4, 2];
+// Grid positions to hover: spread out so the arrow crosses the page.
+const HOVERS = [0, 6, 9, 1, 4, 2];
 const TRAVEL_MS = 700;
 const DWELL_MS = 1100;
-const PRESS_MS = 150;
-// Filter switch: cards shrink away, then the new grid fades in with its stagger.
+// Grid fades in with its stagger before the arrow appears.
 const SETTLE_MS = 1800;
 // Reader's own pointer pauses the script until it rests this long.
 const IDLE_RESUME_MS = 3000;
 
-/** Scripted arrow for portfolio recordings: hovers charts, filters to bar charts, hovers, clears the filter, repeats. */
+/** Scripted arrow for portfolio recordings: hovers charts in a loop. */
 export default function DemoCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -55,30 +52,13 @@ export default function DemoCursor() {
       }
     }
 
-    async function clickFilter() {
-      const button = filterButton();
-      await travel(button.closest(".nav-menu")!);
-      await wait(DWELL_MS / 2);
-      setPressed(true);
-      await wait(PRESS_MS);
-      button.click();
-      setPressed(false);
-      hover(null);
-      await wait(SETTLE_MS);
-    }
-
     async function run() {
       // Grid shuffles after mount, cards appear once it has.
       while (!document.querySelector(CARD_SELECTOR)) await frame();
       await wait(SETTLE_MS);
       moveTo(current);
       setVisible(true);
-      while (true) {
-        await hoverCards(HOVERS_ALL);
-        await clickFilter();
-        await hoverCards(HOVERS_FILTERED);
-        await clickFilter();
-      }
+      while (true) await hoverCards(HOVERS);
     }
 
     function onRealPointer(event: PointerEvent) {
@@ -108,7 +88,7 @@ export default function DemoCursor() {
 
   return (
     <div ref={cursorRef} className="demo-cursor" data-visible={visible} aria-hidden="true">
-      <svg viewBox="0 0 24 24" data-pressed={pressed}>
+      <svg viewBox="0 0 24 24">
         <path d="M4 2L4 20L9.5 15.5L12.8 21.5L15.5 20L12.2 14L19 13.5L4 2Z" strokeLinejoin="round" />
       </svg>
     </div>

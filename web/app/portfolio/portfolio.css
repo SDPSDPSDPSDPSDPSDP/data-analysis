@@ -92,12 +92,6 @@
 
 .demo-cursor svg {
   display: block;
-  transform-origin: var(--demo-cursor-tip-x) var(--demo-cursor-tip-y);
-  transition: transform var(--demo-cursor-press);
-}
-
-.demo-cursor svg[data-pressed="true"] {
-  transform: scale(var(--demo-cursor-pressed-scale));
 }
 
 .demo-cursor path {
