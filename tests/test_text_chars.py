@@ -20,12 +20,11 @@ SKIP_DIRS = {
     ".ruff_cache",
     ".pytest_cache",
     "__pycache__",
-    "data",
-    "models",
-    "plots",
     "out",
     "build",
 }
+# Gitignored outputs at the repo root only: `web/lib/data/`-style dirs are source.
+ROOT_SKIP_DIRS = {"data", "models", "plots"}
 SKIP_FILES = {"uv.lock", "package-lock.json"}
 # Rewritten by `next dev` with its own em dashes.
 SKIP_PATHS = {"web/AGENTS.md"}
@@ -34,7 +33,8 @@ SKIP_PATHS = {"web/AGENTS.md"}
 def text_files() -> list[Path]:
     files = []
     for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        root_skip = ROOT_SKIP_DIRS if Path(dirpath) == ROOT else set()
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS | root_skip]
         files += [Path(dirpath) / f for f in filenames if f not in SKIP_FILES]
     return [f for f in files if f.relative_to(ROOT).as_posix() not in SKIP_PATHS]
 
