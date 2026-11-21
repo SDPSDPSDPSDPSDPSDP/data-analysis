@@ -5,6 +5,7 @@ import OverlayScrollbar from "@/components/ui/OverlayScrollbar";
 import { STORAGE_KEY } from "@/lib/darkModeKey";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
+import "./tokens.css";
 import "./base.css";
 import "./message-page.css";
 import "./nav.css";

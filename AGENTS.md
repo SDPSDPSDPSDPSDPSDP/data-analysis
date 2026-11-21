@@ -65,7 +65,7 @@ Run from repo root unless noted. Locally, `uv` may fail with TLS UnknownIssuer b
   - `web/components/domain/`: Smart feature components. Compose ui primitives.
   - `web/lib/pyodide.ts`: Only entry point to Python. Components never talk to worker directly.
 - **Tokens & CSS:**
-  - Never hardcode raw values (colors, pixels, padding). Use `var(--token)` defined in `web/app/globals.css` `:root`.
+  - Never hardcode raw values (colors, pixels, padding). Use `var(--token)` defined in `:root` of `web/app/globals.css` (colors) or `web/app/tokens.css` (sizes, type, spacing, motion).
   - Text color: alpha white/black only (`rgba(0,0,0,0.87)`). No solid hex greys. New shade = new token in `globals.css`. Stylelint allows `color:` only `var(--text-*)`, token-derived `oklch(from var(--x) ...)`, `inherit`, `currentColor`, `transparent`.
   - Borders: avoid. Separate with spacing or background contrast. Stylelint warns (non-blocking); keep a border only when nothing else works.
 - **Fail hard:** No silent fallbacks. No empty fallback arrays/objects/dicts. No env var fallbacks (`process.env.X || 'val'`, `os.getenv("X", "val")`). Raise/throw immediately with clear message.

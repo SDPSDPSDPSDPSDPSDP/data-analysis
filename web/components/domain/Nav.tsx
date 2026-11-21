@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useState } from "react";
 import { sectionId } from "@/lib/sections";
 import SectionIcon from "@/components/domain/SectionIcon";
-import { setDarkMode, useDarkMode } from "@/lib/darkMode";
+import ThemeToggle from "@/components/domain/ThemeToggle";
 
 type Props = {
   categories: { title: string; sections: { title: string }[] }[];
@@ -16,18 +15,6 @@ export default function Nav({ categories }: Props) {
   // Hover and focus keep the dropdown open after a click, so close it until the mouse leaves.
   const [dropdownClosed, setDropdownClosed] = useState(false);
   const pathname = usePathname();
-  const dark = useDarkMode();
-  // Tab flips the theme only while nothing has focus, so focus navigation and code editor indent keep working.
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "Tab" || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-      if (document.activeElement !== document.body) return;
-      e.preventDefault();
-      setDarkMode(document.documentElement.dataset.theme !== "dark");
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
   return (
     <nav className="nav">
       {/* Home has no link to every example, so the brand leads there. */}
@@ -68,18 +55,7 @@ export default function Nav({ categories }: Props) {
           </div>
         ))}
       </div>
-      <button
-        type="button"
-        className="nav-link nav-theme"
-        aria-pressed={dark}
-        aria-label="Dark mode"
-        title="Dark mode"
-        onClick={() => setDarkMode(!dark)}
-      >
-        {/* CSS picks the icon from data-theme, so the prerendered button already matches before hydration. */}
-        <Moon size="1em" className="dark-only" aria-hidden />
-        <Sun size="1em" className="light-only" aria-hidden />
-      </button>
+      <ThemeToggle />
     </nav>
   );
 }

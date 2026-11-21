@@ -27,6 +27,16 @@ type Props = {
 // Module-level so the default keeps one identity: a fresh `[]` per render retriggers the shuffle effect forever.
 const NO_PINS: (Chart | null)[] = [];
 
+// A failed decode still opens the modal (the img retries the load), so it resolves to the error for the caller to rethrow.
+function decodeImage(src: string): Promise<unknown> {
+  const image = new Image();
+  image.src = src;
+  return image.decode().then(
+    () => null,
+    (err: unknown) => err,
+  );
+}
+
 export default function HomeGallery({
   categories,
   charts,
@@ -46,13 +56,7 @@ export default function HomeGallery({
   // can measure its final size on open.
   function openChart(chart: Chart, card: HTMLElement) {
     setSelected(chart);
-    const image = new Image();
-    image.src = dark ? chart.darkPreview : chart.preview;
-    // A failed decode still opens the modal (the img retries the load) and is rethrown after so it is logged.
-    const decoded = image.decode().then(
-      () => null,
-      (err: unknown) => err,
-    );
+    const decoded = decodeImage(dark ? chart.darkPreview : chart.preview);
     Promise.all([loadChartModal(), decoded]).then(([, decodeError]) => {
       setOpen({ chart, card });
       if (decodeError) throw decodeError;

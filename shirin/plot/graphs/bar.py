@@ -5,24 +5,9 @@ import pandas as pd
 from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
 from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, TitleInput
 from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
-from ..core.base_options import VALID_TIME_GROUP_BY, validate_str_or_enum_option
 from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
+from .group_by import check_group_by
 from .host import PlotHost
-
-
-def _check_group_by(
-    group_by: TimeGroupByInput, vertical: bool, sort: Optional[SortInput], top_n: Optional[int], remainder: bool
-) -> None:
-    validate_str_or_enum_option(
-        option_name="group_by",
-        value=group_by,
-        valid_options=VALID_TIME_GROUP_BY,
-        enum_type=TimeGroupBy,
-    )
-    if not vertical:
-        raise ValueError("group_by needs x: periods run along the x-axis.")
-    if sort is not None or top_n is not None or remainder:
-        raise ValueError("group_by does not work with sort, top_n or remainder.")
 
 
 class BarPlotsMixin(PlotHost):
@@ -110,7 +95,7 @@ class BarPlotsMixin(PlotHost):
         if description is not None:
             descriptions = category_descriptions(df, axis_column, description)  # type: ignore[arg-type]
         if group_by is not None:
-            _check_group_by(group_by, vertical, sort, top_n, remainder)
+            check_group_by(group_by, vertical, sort, top_n, remainder)
             group_by = TimeGroupBy(group_by).value
             df = period_totals(df, x, value, hue, group_by)  # type: ignore[arg-type]
             # Counted per period up front, so the bars below sum COUNT_COL like any value column.

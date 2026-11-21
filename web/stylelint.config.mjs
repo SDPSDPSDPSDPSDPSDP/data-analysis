@@ -38,7 +38,7 @@ const config = {
   },
   overrides: [
     {
-      files: ["app/globals.css"],
+      files: ["app/globals.css", "app/tokens.css"],
       rules: {
         "color-no-hex": null,
         "unit-disallowed-list": null,

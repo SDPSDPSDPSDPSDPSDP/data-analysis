@@ -11,7 +11,7 @@ function scrollerOf(el: Element | null): Element {
   return root;
 }
 
-// Native scrollbars are hidden in globals.css; CSS alone cannot draw one over content.
+// Native scrollbars are hidden in base.css; CSS alone cannot draw one over content.
 export default function OverlayScrollbar() {
   const thumbRef = useRef<HTMLDivElement>(null);
 
