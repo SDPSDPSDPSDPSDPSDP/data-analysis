@@ -37,6 +37,9 @@ export default defineConfig([
       "jsx-a11y/anchor-is-valid": "error",
       "jsx-a11y/html-has-lang": "error",
       "jsx-a11y/heading-has-content": "error",
+      // Static export has no image optimizer, and every <img> here shows an SVG or data URL or renders
+      // inside ImageResponse (apple-icon), where next/image does not work.
+      "@next/next/no-img-element": "off",
       "no-restricted-syntax": [
         "error",
         {
