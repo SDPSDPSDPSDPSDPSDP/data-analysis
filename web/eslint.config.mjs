@@ -57,8 +57,9 @@ export default defineConfig([
     },
   },
   {
-    // Env only via typed getters in lib/env.ts.
-    ignores: ["lib/env.ts"],
+    // Env only via typed getters in lib/env.ts. middleware.js is bundled alone by Vercel Routing Middleware
+    // (not Next), so it reads its own env and checks it itself.
+    ignores: ["lib/env.ts", "middleware.js"],
     rules: {
       "no-restricted-properties": [
         "error",
