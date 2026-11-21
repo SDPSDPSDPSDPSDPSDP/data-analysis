@@ -3,7 +3,7 @@
 from typing import Optional
 
 from ..config import FontSizes, Layout, TextColors
-from .chart import Axis
+from .axis_model import Axis
 from .fonts import text_width, wrap_text
 from .marks import Scale
 from .ticks import date_ticks, nice_ticks

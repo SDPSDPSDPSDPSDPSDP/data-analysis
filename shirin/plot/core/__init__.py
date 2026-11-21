@@ -12,8 +12,8 @@ from .options import (
     LinePlotOptions,
     PiePlotOptions,
     ScatterPlotOptions,
-    TimePlotOptions,
 )
+from .time_options import TimePlotOptions
 
 __all__ = [
     "AbstractPlot",

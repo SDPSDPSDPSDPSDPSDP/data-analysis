@@ -5,7 +5,8 @@ import pandas as pd
 from ..config import Layout
 
 _EPOCH = pd.Timestamp(0)
-_DAY = pd.Timedelta(days=1)
+# unit=, not days=: days= goes through a generic NumPy timedelta, deprecated since NumPy 2.5.
+_DAY = pd.Timedelta(1, unit="D")
 
 # (pandas frequency, label format), finest first; the first one that fits is used.
 _DATE_STEPS = (

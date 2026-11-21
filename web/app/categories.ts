@@ -1,7 +1,8 @@
 import type { Category, DataFormat, Example, PlotSectionData } from "@/lib/sections";
 // Relative with extension: scripts/build-previews.mjs imports this file with plain Node, which knows no "@/" alias.
 import { exampleSetup, withDarkMode } from "../lib/exampleSetup.ts";
-import { BAR_COUNTED, BAR_VALUES, HISTOGRAM, LINE, PIE, SCATTER, TIME_DATES, TIME_VALUES } from "./dataFormats.ts";
+import { BAR_COUNTED, BAR_VALUES, HISTOGRAM, PIE } from "./dataFormats.ts";
+import { LINE, SCATTER, TIME_DATES, TIME_VALUES } from "./xyDataFormats.ts";
 import { parseExamples, previewPath } from "./exampleFiles.ts";
 
 // Sections without a data format are tools: they draw no chart to prerender.

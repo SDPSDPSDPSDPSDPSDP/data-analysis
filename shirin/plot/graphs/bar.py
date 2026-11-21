@@ -2,11 +2,10 @@ from typing import Optional
 
 import pandas as pd
 
-from ..common.data_conversion import COUNT_COL, category_descriptions, period_totals
-from ..config import SortInput, StackSplitInput, TimeGroupBy, TimeGroupByInput, TitleInput
-from ..core import BarPlotOptions, CountPlotOptions, NormalizedPlotOptions, RemainderPlotOptions
-from ..plots import BarPlot, CountPlot, NormalizedPlot, RemainderPlot
-from .group_by import check_group_by
+from ..common.data_conversion import category_descriptions
+from ..config import SortInput, StackSplitInput, TimeGroupByInput, TitleInput
+from .bar_dispatch import count_axis_labels, render_bar
+from .group_by import group_periods
 from .host import PlotHost
 
 
@@ -83,24 +82,12 @@ class BarPlotsMixin(PlotHost):
         if (x is None) == (y is None):
             raise ValueError("bar needs exactly one of x or y.")
         vertical = x is not None
-        if value is None:
-            # Without value bars count rows, so the count axis gets a label unless the user passed one ('' hides it).
-            if vertical and y_axis_label is None:
-                y_axis_label = "Count"
-            if not vertical and x_axis_label is None:
-                x_axis_label = "Count"
+        x_axis_label, y_axis_label = count_axis_labels(value, vertical, x_axis_label, y_axis_label)
         axis_column = x if vertical else y
         # Read before group_by or remainder reshape df, which drop the description column.
-        descriptions = None
-        if description is not None:
-            descriptions = category_descriptions(df, axis_column, description)  # type: ignore[arg-type]
+        descriptions = category_descriptions(df, axis_column, description) if description else None  # type: ignore[arg-type]
         if group_by is not None:
-            check_group_by(group_by, vertical, sort, top_n, remainder)
-            group_by = TimeGroupBy(group_by).value
-            df = period_totals(df, x, value, hue, group_by)  # type: ignore[arg-type]
-            # Counted per period up front, so the bars below sum COUNT_COL like any value column.
-            value = value or COUNT_COL
-            sort = "alphabetical"
+            df, value, group_by, sort = group_periods(df, x, value, hue, group_by, vertical, sort, top_n, remainder)  # type: ignore[arg-type]
         common = dict(
             df=df,
             axis_column=axis_column,
@@ -119,31 +106,4 @@ class BarPlotsMixin(PlotHost):
             group_by=group_by,
             descriptions=descriptions,
         )
-        if value is None:
-            if remainder:
-                raise ValueError("remainder needs value.")
-            common["top_n"] = top_n
-            if normalized and hue is not None:
-                self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
-            else:
-                self._render(CountPlot(CountPlotOptions(**common, stacked=stacked, normalized=normalized)))
-            return
-        if top_n is not None:
-            raise ValueError("top_n only works without value.")
-        common["value"] = value
-        if remainder:
-            if not normalized:
-                raise ValueError("remainder needs normalized=True.")
-            category_palette = self._column_config(hue)["palette"] if hue is not None else None
-            options = RemainderPlotOptions(
-                **{**common, **self._column_config(value)},
-                category_palette=category_palette,
-                background=self._theme.background,
-            )
-            self._render(RemainderPlot(options))
-            return
-        hue_splits_bars = hue is not None and hue != axis_column
-        if normalized and hue_splits_bars:
-            self._render(NormalizedPlot(NormalizedPlotOptions(**common)))
-        else:
-            self._render(BarPlot(BarPlotOptions(**common, stacked=stacked, normalized=normalized)))
+        render_bar(self, common, value, hue, axis_column, top_n, remainder, normalized, stacked)

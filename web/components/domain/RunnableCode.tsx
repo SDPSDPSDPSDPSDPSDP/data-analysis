@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { load, run, type RunResult } from "@/lib/pyodide";
 import { DOC_TOOLTIP } from "@/lib/docTooltip";
 import CodeBlock from "@/components/ui/CodeBlock";
@@ -45,8 +45,10 @@ export default function RunnableCode({ title, initialCode, setup, preview }: Pro
 
   // Running a setup cell (like after picking a palette color) re-renders the chart.
   // An example that has not run yet picks up the new setup when it becomes visible.
+  // Effect event: reads the latest code without rerunning on every edit.
+  const runCurrent = useEffectEvent(() => execute(code));
   useEffect(() => {
-    if (visible) execute(code);
+    if (visible) runCurrent();
   }, [visible, setup]);
 
   async function execute(source: string) {

@@ -8,8 +8,8 @@ from shirin.plot.core import PiePlotOptions
 from shirin.plot.plots import PieChart
 from shirin.plot.svg.chart import Text
 from shirin.plot.svg.fonts import cap_height
-from shirin.plot.svg.marks import block_height, place
 from shirin.plot.svg.plot_body import stack_texts
+from shirin.plot.svg.text_marks import block_height, place
 
 
 class TestPieChartRender:

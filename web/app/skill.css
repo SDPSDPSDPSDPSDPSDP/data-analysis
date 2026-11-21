@@ -89,34 +89,6 @@
   padding: var(--space-1-5) var(--space-2);
 }
 
-.skill-markdown h1 {
-  font-size: var(--font-size-doc-heading);
-}
-
-.skill-markdown h2,
-.skill-markdown h3 {
-  font-size: var(--font-size-doc);
-}
-
-.skill-markdown :is(h1, h2, h3) {
-  margin: var(--space-3) 0 var(--space-1);
-  text-align: left;
-  font-weight: var(--font-weight-doc-heading);
-}
-
-/* :is() outweighs ".setup-cell p { margin: 0 }", which loads later. */
-.skill-markdown :is(p, ul, .code-block, .data-table) {
-  margin: 0 0 var(--space-1-5);
-}
-
-.skill-markdown :not(pre) > code {
-  padding: 0 var(--space-0-5);
-  border-radius: var(--radius-swatch);
-  background: var(--color-surface);
-  font-family: var(--font-mono);
-  font-size: var(--font-size-inline-code);
-}
-
 @media (max-width: 640px) {
   .skill-body {
     grid-template-columns: 1fr;

@@ -62,41 +62,6 @@
   filter: blur(var(--nav-dim-blur));
 }
 
-.nav-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  flex-direction: column;
-  padding: var(--space-0-5);
-  white-space: nowrap;
-  border-radius: var(--radius);
-  background: var(--color-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow: var(--shadow-tooltip);
-}
-
-.nav-menu:hover .nav-dropdown,
-.nav-menu:focus-within .nav-dropdown {
-  display: flex;
-}
-
-.nav-menu.nav-menu-closed .nav-dropdown {
-  display: none;
-}
-
-.nav-dropdown a {
-  font-weight: var(--font-weight-nav);
-  padding: var(--space-1) var(--space-1-5);
-  border-radius: var(--radius);
-  transition: background var(--transition);
-}
-
-.nav-dropdown a:hover {
-  background: var(--color-surface);
-}
-
 .nav .nav-link {
   display: inline-flex;
   align-items: center;

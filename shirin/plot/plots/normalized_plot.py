@@ -11,7 +11,7 @@ from ..config import Marks
 from ..core import renderer
 from ..core.base_plot import AbstractPlot
 from ..core.categorical_options import NormalizedPlotOptions
-from .categorical import create_sized_figure, format_period_axis
+from .categorical_layout import create_sized_figure, format_period_axis
 
 
 @dataclass

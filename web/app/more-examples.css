@@ -1,7 +1,7 @@
 .more-examples > summary {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  justify-content: center;
   list-style: none;
   cursor: pointer;
 }
@@ -10,27 +10,20 @@
   display: none;
 }
 
-.more-examples > summary::before,
-.more-examples > summary::after {
-  content: "";
-  flex: 1;
-  border-top: var(--border-width) solid var(--color-shimmer);
-}
-
 .more-examples-button {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-shimmer);
   border-radius: var(--radius-pill);
+  background: var(--color-surface);
   color: var(--text-primary);
   font-weight: var(--font-weight-nav);
   transition: background var(--transition);
 }
 
 .more-examples > summary:hover .more-examples-button {
-  background: var(--color-surface);
+  background: var(--color-shimmer);
 }
 
 .more-examples-chevron {

@@ -94,7 +94,7 @@ export default function ChartModal({ title, setup, code, preview, card, href, se
       if (!modal.classList.contains("closing")) chart.classList.remove("flying");
     };
     chart.addEventListener("animationend", land, { once: true });
-  }, []);
+  }, [card]);
 
   return (
     <dialog

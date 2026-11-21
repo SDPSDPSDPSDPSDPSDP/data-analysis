@@ -84,7 +84,6 @@
   --modal-exit-fly-duration: var(--home-chart-grow-duration);
   --radius: 6px;
   --radius-home-chart: 10px;
-  --border-width: 1px;
   /* Screen-reader-only box: 1px, not 0, so VoiceOver still announces it. */
   --size-visually-hidden: 1px;
   --radius-pill: 999px;
