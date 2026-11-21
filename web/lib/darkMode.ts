@@ -21,6 +21,9 @@ export function setDarkMode(dark: boolean) {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     // Sync so the view transition snapshots the re-rendered charts, not the old ones.
     flushSync(() => listeners.forEach((listener) => listener()));
+    // First switch loads the other theme's chart images; wait so the fade ends on them, not on empty cards.
+    // allSettled: a broken image must not block the theme switch, the img itself shows the failure.
+    return Promise.allSettled(Array.from(document.images, (image) => image.decode()));
   };
   if (document.startViewTransition) document.startViewTransition(apply);
   else apply();
