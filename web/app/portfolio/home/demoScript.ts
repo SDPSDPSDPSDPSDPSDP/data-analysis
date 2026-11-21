@@ -23,7 +23,9 @@ export function runDemoCursor(cursor: HTMLDivElement, setVisible: (visible: bool
 
   function moveTo(point: Point) {
     current = point;
-    cursor.style.transform = `translate(calc(${point.x}px - var(--demo-cursor-tip-x)), calc(${point.y}px - var(--demo-cursor-tip-y)))`;
+    const tipX = `calc(${point.x}px - var(--demo-cursor-tip-x))`;
+    const tipY = `calc(${point.y}px - var(--demo-cursor-tip-y))`;
+    cursor.style.transform = `translate(${tipX}, ${tipY})`;
   }
 
   async function travel(el: Element) {

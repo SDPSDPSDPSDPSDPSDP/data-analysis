@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import Nav from "@/components/domain/Nav";
+import Nav, { type NavCategory } from "@/components/domain/Nav";
 import ChartPreview from "@/components/domain/ChartPreview";
 import { useGalleryOrder } from "@/lib/domain/useGalleryOrder";
 import { sectionId, type HomeChart as Chart } from "@/lib/sections";
@@ -15,7 +15,7 @@ const loadChartModal = () => import("@/components/domain/ChartModal");
 const ChartModal = dynamic(loadChartModal, { ssr: false });
 
 type Props = {
-  categories: { title: string; sections: { title: string }[] }[];
+  categories: NavCategory[];
   charts: Chart[];
   // Nav. Off on portfolio screens: the host page frames them with its own chrome.
   showNav?: boolean;

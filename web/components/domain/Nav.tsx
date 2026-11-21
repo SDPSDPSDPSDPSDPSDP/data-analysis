@@ -7,8 +7,10 @@ import { sectionId } from "@/lib/sections";
 import SectionIcon from "@/components/domain/SectionIcon";
 import ThemeToggle from "@/components/domain/ThemeToggle";
 
+export type NavCategory = { title: string; sections: { title: string }[] };
+
 type Props = {
-  categories: { title: string; sections: { title: string }[] }[];
+  categories: NavCategory[];
 };
 
 export default function Nav({ categories }: Props) {
