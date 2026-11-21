@@ -8,6 +8,9 @@ run() {
   }
 }
 # husky runs hooks from the repo root; lint-staged only sees web/ files from inside web/.
-run "Web lint (ESLint/stylelint/Prettier)" sh -c "cd web && npx lint-staged"
+# --no-revert: on lint errors, skip the `git reset --hard` + `git stash apply` rollback. When that apply fails
+# (file or index.lock held by an editor, dev server or antivirus), it leaves the index empty and files at HEAD.
+# The staged files stay staged either way; the backup is in `git stash list` (lint-staged automatic backup).
+run "Web lint (ESLint/stylelint/Prettier)" sh -c "cd web && npx lint-staged --no-revert"
 # husky owns core.hooksPath, so `pre-commit install` refuses; run its hooks from here.
 run "Python checks (pre-commit)" uv run pre-commit run
