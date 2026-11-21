@@ -85,7 +85,7 @@ class BarPlotsMixin(PlotHost):
         x_axis_label, y_axis_label = count_axis_labels(value, vertical, x_axis_label, y_axis_label)
         axis_column = x if vertical else y
         # Read before group_by or remainder reshape df, which drop the description column.
-        descriptions = category_descriptions(df, axis_column, description) if description else None  # type: ignore[arg-type]
+        descriptions = category_descriptions(df, axis_column, description) if description is not None else None  # type: ignore[arg-type]
         if group_by is not None:
             df, value, group_by, sort = group_periods(df, x, value, hue, group_by, vertical, sort, top_n, remainder)  # type: ignore[arg-type]
         common = dict(

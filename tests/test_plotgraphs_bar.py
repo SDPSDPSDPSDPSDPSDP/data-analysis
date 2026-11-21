@@ -91,6 +91,8 @@ def test_bar_description_line_under_each_category_label(shown: list[str]) -> Non
 def test_bar_description_rejects_bad_input() -> None:
     with pytest.raises(ValueError, match="description='notes' is not a column"):
         PlotGraphs().bar(DESCRIBED, y="name", description="notes")
+    with pytest.raises(ValueError, match="description='' is not a column"):
+        PlotGraphs().bar(DESCRIBED, y="name", description="")
     conflicting = pd.DataFrame({"name": ["a", "a"], "description": ["one", "two"]})
     with pytest.raises(ValueError, match=r"differs for \['a'\]"):
         PlotGraphs().bar(conflicting, y="name", description="description")

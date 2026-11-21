@@ -4,9 +4,7 @@ import math
 
 import pandas as pd
 
-from ..common.formatting import (
-    format_period_ticks,
-)
+from ..common.formatting import format_period_ticks
 from ..config import FigureSize, Layout
 from ..core.base_plot import AbstractPlot
 from ..core.categorical_options import CategoricalPlotOptions

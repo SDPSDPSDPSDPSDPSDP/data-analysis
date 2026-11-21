@@ -1,4 +1,4 @@
-﻿import { useEffect, type RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 
 // Blocks of ref (children, and children of its div wrappers) fade in (class `seen`) the first time they scroll into view; ones arriving together stagger.
 export function useRevealOnScroll(ref: RefObject<HTMLElement | null>): void {

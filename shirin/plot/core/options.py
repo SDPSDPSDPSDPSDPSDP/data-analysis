@@ -3,9 +3,7 @@ from typing import Any, ClassVar, Optional, Union
 
 import pandas as pd
 
-from .base_options import (
-    BasePlotOptions,
-)
+from .base_options import BasePlotOptions
 
 MARK_LABELS = ("x", "y", "both", None)
 

@@ -1,6 +1,6 @@
 export const CARD_SELECTOR = ".home-charts .chart-preview-card";
 
-// Synthetic events never trigger CSS :hover, so the hovered card and nav item get this attribute instead.
+// Synthetic events never trigger CSS :hover, so the hovered card gets this attribute instead.
 const HOVER_ATTR = "data-demo-hover";
 
 export function hover(el: Element | null) {
